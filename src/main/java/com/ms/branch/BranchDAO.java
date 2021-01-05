@@ -1,0 +1,283 @@
+package com.ms.branch;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.sql.DataSource;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.ms.User.UserController;
+import com.ms.common.Constant;
+import com.ms.common.Util;
+
+@Repository
+public class BranchDAO {
+	
+	private JdbcTemplate jdbc;
+
+	@Autowired
+	public void setDataSource(@Qualifier("dataSource") DataSource source) {
+		jdbc = new JdbcTemplate(source);
+	}
+	
+	public static Logger log = LogManager.getLogger(BranchDAO.class);
+	
+	public ResponseBranchInfo getBranchDetails(int statusCode) {
+		ResponseBranchInfo result = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+					   .append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid AND b.status = ?");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),statusCode);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					String id = Util.trimString((String)row.get("seqid"));
+					String branchName = Util.trimString((String)row.get("branchName"));
+					String address = Util.trimString((String)row.get("address"));
+					int postcode = (int)row.get("postcode");					
+					String district = Util.trimString((String)row.get("districtname"));
+					String state = Util.trimString((String)row.get("stateName"));
+					String status = Util.getBranchStatus((int)row.get("status"));
+					ResponseBranchInfo.Result branchDetails = new ResponseBranchInfo.Result(id, branchName, address, postcode, district, state,status);
+					result = new ResponseBranchInfo(branchDetails);
+				}
+			}
+			else {
+				result = new ResponseBranchInfo("No record Found.");
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			result = new ResponseBranchInfo("Unable to retrieve record.");
+		}
+		return result;
+	}
+	
+	public ResponseBranchInfo getBranchDetails(String seqid) {
+		ResponseBranchInfo result = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+					   .append("WHERE b.seqid = ? AND b.districtid = d.seqid AND d.stateid = s.seqid");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),seqid);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					String id = Util.trimString((String)row.get("seqid"));
+					String branchName = Util.trimString((String)row.get("branchName"));
+					String address = Util.trimString((String)row.get("address"));
+					int postcode = (int)row.get("postcode");		
+					String district = Util.trimString((String)row.get("districtname"));
+					String state = Util.trimString((String)row.get("stateName"));
+					String status = Util.getBranchStatus((int)row.get("status"));
+					ResponseBranchInfo.Result branchDetails = new ResponseBranchInfo.Result(id, branchName, address, postcode, district, state,status);
+					result = new ResponseBranchInfo(branchDetails);
+				}
+			}
+			else {
+				result = new ResponseBranchInfo("No record Found.");
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			result = new ResponseBranchInfo("Unable to retrieve record.");
+		}
+		return result;
+	}
+	
+	public ResponseBranchInfo getBranchDetails() {
+		ResponseBranchInfo result = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+												   .append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid");
+			
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString());
+			if(rows.size() > 0) {
+				List<ResponseBranchInfo.Result> resultList = new ArrayList<ResponseBranchInfo.Result>();
+				for(Map<String,Object> row:rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					String branchName = Util.trimString((String)row.get("branchName"));
+					String address = Util.trimString((String)row.get("address"));
+					int postcode = (int)row.get("postcode");		
+					String district = Util.trimString((String)row.get("districtname"));
+					String state = Util.trimString((String)row.get("stateName"));
+					String status = Util.getBranchStatus((int)row.get("status"));
+					resultList.add(new ResponseBranchInfo.Result(seqid, branchName, address, postcode, district, state,status));
+				}
+				
+				result = new ResponseBranchInfo(resultList);
+				return result;
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return new ResponseBranchInfo("Unable to retrieve records.");
+		}
+		return new ResponseBranchInfo("No records.");
+	}
+
+	public String getBranchId(String username) {
+		String id = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT b.seqid FROM Branch b, Staff s WHERE s.username = ? AND s.branchid = b.seqid");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),username);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					id = Util.trimString((String)row.get("seqid"));
+					return id;
+				}
+			}
+		}
+		catch(Exception ex){
+			log.error("Exception ex::" + ex.getMessage());
+			id = null;
+		}
+		return id;
+	}
+	
+	public String deleteBranch(String branchID) {
+		String message = null;
+		try {
+			StringBuffer query = new StringBuffer().append("UPDATE branch SET status = ? WHERE seqid = ?");
+			int result = jdbc.update(query.toString(),Constant.REMOVED_BRANCH_CODE,branchID);
+			if(result > 0) {
+				message = "Branch removed.";
+			}else {
+				message = "Unable to remove.";
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			message = "Error occured, unable to remove.";
+		}
+		return message;
+	}
+	
+	public String updateStatus(int statusCode, String branchId) {
+		String message = null;
+		try {
+			StringBuffer query = new StringBuffer().append("UPDATE branch SET status = ? WHERE seqid = ?");
+			int result = jdbc.update(query.toString(),statusCode,branchId);
+			if(result > 0) {
+				message = "Status updated";
+			}else {
+				message = "Unable to update the status";
+			}
+		}catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			message = "Error occured, unable to update the status.";
+		}
+		return message;
+	}
+	
+	public List<States.Result> retrieveAllState(){
+		List<States.Result> states = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT seqid, stateName FROM state");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString());
+			if(rows.size() > 0) {
+				states = new LinkedList<States.Result>();
+				for(Map<String,Object> row : rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					String name = Util.trimString((String)row.get("stateName"));
+					
+					States.Result state = new States.Result(seqid,name);
+					states.add(state);
+				}
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			states = null;
+		}
+		return states;
+	}
+
+	public List<Districts.Result> retrieveDistricts(String stateId){
+		List<Districts.Result> districts = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT seqid, districtname FROM district where stateid = ?");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),stateId);
+			if(rows.size() > 0) {
+				districts = new LinkedList<Districts.Result>();
+				for(Map<String,Object> row : rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					String name = Util.trimString((String)row.get("districtname"));
+					
+					Districts.Result state = new Districts.Result(seqid,name);
+					districts.add(state);
+				}
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			districts = null;
+		}
+		return districts;
+	}
+	
+	public Boolean findBranchByName(String branchName) {
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT seqid from branch where branchname = ?");
+			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),branchName);
+			if(records.size() > 0) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return false;
+		}
+	}
+	
+	public Map<String,String> addBranch(String seqid, NewBranchForm form) {
+		Map<String,String> response = new HashMap<String, String>();
+		try {
+			StringBuffer query = new StringBuffer().append("INSERT INTO branch (seqid,branchName,address,postcode,districtid) values(?,?,?,?,?)");
+			int result = jdbc.update(query.toString(),seqid,form.getBranchname(),form.getAddress(),form.getPostcode(),form.getDistrict());
+			if(result > 0) {
+				response.put("msg","Branch created.");
+				response.put("status","true");
+			}
+			else {
+				response.put("msg","Unable to create branch");
+				response.put("status","false");
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response = new HashMap<String,String>();
+			response.put("msg","Error occurect, unable to create branch");
+			response.put("status","false");
+		}
+		return response;
+	}
+	
+	public String updateBranch(String seqid, NewBranchForm form) {
+		try {
+			StringBuffer query = new StringBuffer().append("UPDATE branch SET branchName = ?, address = ?, postcode = ?, districtid = ? WHERE seqid = ?");
+			int result = jdbc.update(query.toString(),form.getBranchname(),form.getAddress(),form.getPostcode(),form.getDistrict(),seqid);
+			if(result > 0) {
+				return "Update successful.";
+			}
+			else {
+				return "Unable to update the details. Please try again later.";
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			return "Unexpected error occured, unable to update the information.";
+		}
+	}
+	
+}

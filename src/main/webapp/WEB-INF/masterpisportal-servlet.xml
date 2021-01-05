@@ -1,0 +1,84 @@
+	<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/data/jpa 
+    	http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+ 
+	<context:component-scan base-package="com.ms" />
+	
+	<mvc:annotation-driven />
+
+	<!-- static resources -->
+	<mvc:resources mapping="/static/**" location="/static/">
+		<mvc:cache-control max-age="86400" must-revalidate="true"/>
+	</mvc:resources>
+	
+	<!-- Auto create proxy for target class for any advisors found
+	     List of advisor we are using: 
+	     	- com.fl.starhub.flprs.log.RequestPerfLogger, used to log the time used to process each request
+	 -->
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+	 
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="jdbc/masp"/>
+		<property name="resourceRef" value="true"/>
+	</bean>
+
+	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+
+<!-- JPA Transaction Manager -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+	
+	<!-- JPA entity manager factory -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.ms"/>
+        <property name="jpaProperties">
+        	<props>
+        		<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
+        	</props>
+        </property>
+        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+    </bean>
+
+	<!-- Configure Spring Data JPA Support -->
+	<jpa:repositories base-package="com.ms"/>
+	
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="WEB-INF/messages" />
+    </bean>
+    
+     <import resource="security-config.xml"/>
+    <beans>
+		<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		 <!-- setting maximum upload size -->
+		<property name="maxUploadSize" value="1000000" />
+		</bean>
+	</beans>
+        
+</beans>

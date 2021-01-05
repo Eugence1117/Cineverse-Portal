@@ -1,0 +1,61 @@
+html, body {
+    height: 100%;
+}
+
+
+.container {
+    min-height: 85%;
+    padding-bottom: 25px;
+    position: relative;
+}
+
+footer {
+    bottom: 0;
+    height: 25px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.help-block,.redundant-block{
+  padding:2px 0px;
+  margin:0px 11px;
+  color: #F00;
+  background-color: #FFF;
+}
+
+@media only screen and (max-width: 640px) {
+	
+	.btn {
+	    width:100%;
+	  }
+	  
+	div .toggle-group{
+		width:160px;  
+	}
+	
+	div .toggle-group > label{
+		width:80px;
+	}
+	
+	.Tooltip{
+		display:none !important; 
+	}
+	
+	.navbar-brand{
+	 	display:block;
+	 	margin:0px !important;
+	 	text-align:center;
+	}
+	 
+ 	.colon{
+	 	display:none;
+	}
+	
+	.showPicture{
+		margin-top:3px;
+	}
+	
+	
+	
+}

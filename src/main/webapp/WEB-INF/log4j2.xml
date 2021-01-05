@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configuration> <!-- to remove the "No grammar constraints (DTD or XML Schema) referenced in the document" warning  -->
+<Configuration status="warn">
+
+<!-- Development .194 -->
+    <Appenders>
+        <RollingFile name="file-log" fileName="/MasterPis/Portal/MSPortal.log"
+                     filePattern="/MasterPis/Portal/MSPortal-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%-5p] (%c:%L) %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <Logger name="com.ms" level="all" additivity="false">
+        	<AppenderRef ref="file-log"/>
+        </Logger>
+        <Logger name="org.hibernate.SQL" level="all" additivity="false">
+        	<AppenderRef ref="file-log"/>
+        </Logger>
+        
+        <Root level="warn">
+        	<AppenderRef ref="file-log"/>
+        </Root>
+    </Loggers>
+</Configuration>
