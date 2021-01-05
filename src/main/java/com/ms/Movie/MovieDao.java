@@ -2,12 +2,10 @@ package com.ms.Movie;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 
-import antlr.Utils;
 
 @Repository
 public class MovieDao {
@@ -267,7 +264,7 @@ public class MovieDao {
 	public List<ResponseMovieResult.Result> getMovieByMovieName(String movieName) {
 		log.info("Retrieving Movies details...");
 		List<ResponseMovieResult.Result> result = null;
-		List<Map<String,Object>> rows = new ArrayList();
+		List<Map<String,Object>> rows = new ArrayList<Map<String,Object>>();
 		try {
 			if(!movieName.equals("*")){
 				StringBuffer query = new StringBuffer().append("SELECT seqid,moviename,picurl ")

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ms.common.Constant;
-import com.ms.common.Util;
 
 @Service
 public class BranchService {

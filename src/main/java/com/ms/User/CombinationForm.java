@@ -1,7 +1,5 @@
 package com.ms.User;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -3,14 +3,6 @@ package com.ms.login;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;

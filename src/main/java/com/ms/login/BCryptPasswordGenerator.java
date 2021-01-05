@@ -23,10 +23,5 @@ public class BCryptPasswordGenerator {
 		
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		System.out.println(encoder.encode(rawPassword));
-		
-		System.out.println("Enter encrpted password: ");
-		try(Scanner scanner = new Scanner(System.in)){
-			String encrptyPas = scanner.nextLine();
-		}
 	}
 }
