@@ -32,6 +32,8 @@ public class Constant {
 	public static final String EA_ENABLE = "Enable"; //Early Access
 	public static final String EA_DISABLED = "Disable";
 	
+	public static final int DEFAULT_TIME_RANGE = 14;
+	
 	public static final String FILE_PATTERN = ".[a-zA-Z0-9]+";
 
 	public static final String IMG_STORE_PATH = "B:" + File.separator + "Program Files (x86)" + File.separator + "Tomcat8.5" + File.separator+"webapps"+File.separator+"MovieImg"+File.separator;

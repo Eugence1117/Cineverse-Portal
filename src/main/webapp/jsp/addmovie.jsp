@@ -37,8 +37,8 @@
 	<%@ include file="include/navbar.jsp"%>
 	<%@ include file="include/js.jsp"%>
 	<div class="container mt-4">
-		<input type="hidden" id="movieList" value="${movieList}"> <input
-			type="hidden" id="usergroupid" value="${usergroup}">
+		<input type="hidden" id="movieList" value="${movieList}">
+		<input type="hidden" id="usergroupid" value="${usergroup}">
 		<div class="card border-0">
 			<div class="card-title">
 				<h2>Add New Movie</h2>
@@ -156,7 +156,7 @@
 										Date</label> <label class="col-form-label colon">:</label>
 									<div class="col-sm-8">
 										<div class="col-sm-10">
-											<input class="form-control data col-sm-10 ignore" type="date"
+											<input class="form-control data col-sm-10" type="date"
 												name="releaseDate" id="releaseDate" />
 										</div>
 									</div>
@@ -445,12 +445,12 @@
 											<div class="form-group row">
 												<label class="font-weight-bold col-form-label col-sm-5">Movie Start Date</label>
 												<label class="col-form-label colon col-sm-1">:</label>
-												<input type="date" name="startDate" class="form-control col-sm-5">
+												<input type="date" name="startDate" class="form-control col-sm-5" required>
 											</div>
 											<div class="form-group row">
 												<label class="font-weight-bold col-form-label col-sm-5">Movie End Date</label>
 												<label class="col-form-label colon col-sm-1">:</label>
-												<input type="date" name="endDate" class="form-control col-sm-5">
+												<input type="date" name="endDate" class="form-control col-sm-5" required>
 											</div>
 										</div>
 										<div class="modal-footer">
@@ -623,8 +623,14 @@
 				accepts : "application/json",
 				dataType : "json",
 				}).done(function(data) {
-					$("#details-collapse").toggle(true);
-					insertData(data);
+					if(data != null){
+						$("#details-collapse").toggle(true);
+						insertData(data);
+					}
+					else{
+						bootbox.alert("Unable to retrive the movie details. Please try again later.");
+					}
+
 			});
 		});
 
@@ -698,7 +704,7 @@
 			$("input[name=publishDate]").val($("#extreleaseDate").val());
 			
 			$("#ext-btn-addMovie").on("click",function(){
-					$.ajax("addMovie/AddExistMovie.json?" + $("#addMovieForm").serialize(),{
+			$.ajax("addMovie/AddExistMovie.json?" + $("#addMovieForm").serialize(),{
 						method : "GET",
 						accepts : "application/json",
 						dataType : "json",

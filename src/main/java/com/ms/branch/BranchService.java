@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class BranchService {
 	public static Logger log = LogManager.getLogger(BranchService.class);
 	
 	@Autowired
+	HttpSession session;
+	
+	@Autowired
 	BranchDAO dao;
 	
 	public ResponseBranchInfo getBranchDetails(int usergroup,String username) {
@@ -29,7 +34,7 @@ public class BranchService {
 		}
 		else if(usergroup == Constant.MANAGER_GROUP){
 			log.info("Retrieving owned branch information.");
-			String branchId = dao.getBranchId(username);
+			String branchId = (String)session.getAttribute("branchid");
 			if(branchId == null) {
 				return new ResponseBranchInfo("Unable to retrieve branch information.");
 			}else {

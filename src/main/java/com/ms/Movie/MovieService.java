@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ import com.ms.common.Util;
 public class MovieService {
 
 	public static Logger log = LogManager.getLogger(MovieService.class);
+	
+	@Autowired
+	HttpSession session;
 	
 	@Autowired
 	MovieDao dao;
@@ -255,7 +260,7 @@ public class MovieService {
 	
 	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {
 		
-		String branchId = dao.getBranchIdByUsername(username);
+		String branchId = (String)session.getAttribute("branchid");
 		if(Util.trimString(branchId) == "") {
 			return new ResponseResultJson("Cannot find relavant branch.");
 		}
@@ -374,6 +379,11 @@ public class MovieService {
 		
 		Map<Boolean,String> result = new HashMap<Boolean,String>();
 		try {
+			if(Util.trimString(startDate).equals("") || Util.trimString(endDate).equals("")) {
+				result.put(false,"Both date need to fill in with value.");
+				return result;
+			}
+			
 			SimpleDateFormat displayFormat = Constant.SQL_DATE_FORMAT;
 			displayFormat.setLenient(false);
 			

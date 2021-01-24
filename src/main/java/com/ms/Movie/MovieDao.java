@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.schedule.AvailableMovie;
 
 
 @Repository
@@ -112,8 +113,8 @@ public class MovieDao {
 		//TODO Need to select based on the branch manager id
 		try{
 			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.earlyaccess, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
-												   .append("m.releasedate, m.synopsis, m.movietype, c.description FROM movie m, censorship c ")
-												   .append("WHERE m.seqid = ? AND m.censorshipId = c.seqid");
+												   .append("m.releasedate, m.synopsis, m.movietype, m.censorshipId FROM movie m ")
+												   .append("WHERE m.seqid = ?");
 			
 			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),movieId);
 			
@@ -131,7 +132,7 @@ public class MovieDao {
 					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
 					String synopsis = Util.trimString((String)row.get("synopsis"));
 					String movieType = Util.trimString((String)row.get("movietype"));
-					String desc = Util.trimString((String)row.get("desc"));
+					String desc = Util.trimString((String)row.get("censorshipId"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
 					result = new MovieModel(id,name,earlyAccess,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc);
@@ -180,29 +181,6 @@ public class MovieDao {
 		}
 		
 		return result;
-	}
-	
-	public String getBranchIdByUsername(String username) {
-		
-		try {
-			StringBuffer query = new StringBuffer().append("SELECT branchid from STAFF WHERE USERNAME = ? AND STATUS = 1");
-			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),username);
-			if(rows.size() > 0) {
-				for(Map<String,Object> row : rows) {
-					String branchid = (String)row.get("branchid");
-					return branchid;
-				}
-			}else{
-				return null;
-			}
-			
-		}
-		catch(Exception ex) {
-			log.error("Exception ::" + ex.getMessage());
-			return null;
-		}
-		
-		return null;
 	}
 	
 	public List<Map<String,String>> getMovieNameList(String minDate, String maxDate){
@@ -295,6 +273,34 @@ public class MovieDao {
 		}
 		
 		return result;
+	}
+	
+	public AvailableMovie.resultList getAvailableMovieByBranch(String branchid, String date) {
+		List<AvailableMovie.Result> movieList = null;
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT m.movieName,m.seqid,m.picURL FROM movie m, movieavailable a")
+												.append(" WHERE a.branchid = ? AND a.movieid = m.seqid AND a.startDate <= ? AND a.endDate >= ?");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),branchid,date,date);
+			if(rows.size() > 0) {
+				movieList = new ArrayList<AvailableMovie.Result>();
+				for(Map<String,Object> row : rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					String moviename = Util.trimString((String)row.get("moviename"));
+					String picUrl = Util.trimString((String)row.get("picurl"));
+					
+					AvailableMovie.Result movie = new AvailableMovie.Result(seqid, moviename, picUrl);
+					movieList.add(movie);
+				}
+				return new AvailableMovie.resultList(movieList,Constant.SQL_DATE_WITHOUT_TIME.parse(date));
+			}
+			else {
+				return null;
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception :: " + ex.getMessage());
+			return new AvailableMovie.resultList("Unexpected error occured, please try again later.");
+		}
 	}
 	
 	public boolean insertMovieAvailable(ExistMovieForm form, String branchId) {

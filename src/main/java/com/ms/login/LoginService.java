@@ -42,6 +42,7 @@ public class LoginService implements UserDetailsService {
 			
 			httpSession.setAttribute("usergroupid", user.getUserGroup().getId());
 			httpSession.setAttribute("username", user.getUsername());
+			httpSession.setAttribute("branchid", user.getBranchid());
 			
 			logger.info("Usergroupid :: " + user.getUserGroup().getId());
 			
