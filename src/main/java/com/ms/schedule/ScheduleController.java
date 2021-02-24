@@ -100,4 +100,12 @@ public class ScheduleController {
 		Map<String,String> result = service.generateWeeklySchedule(req);
 		return result;
 	}
+	
+	@RequestMapping( value= {"/schedule/configureScheduleByDaily.json"})
+	@ResponseBody
+	public Map<String,String> getDailyConfiguration(Model model, HttpServletRequest req){
+		log.info("Entered /schedule/configureScheduleByWeekly.json");
+		Map<String,String> result = service.generateDailySchedule(req);
+		return result;
+	}
 }

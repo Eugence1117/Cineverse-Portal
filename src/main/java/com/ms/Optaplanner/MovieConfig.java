@@ -1,5 +1,7 @@
 package com.ms.Optaplanner;
 
+import com.ms.common.Constant;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,8 +25,9 @@ public class MovieConfig {
 	//private int defaultTime;
 	
 	//private String color;
+	private int originalTime;
 	
 	public int getDurationInGrain() {
-		return totalTime / 15;
+		return totalTime / Constant.DEFAULT_TIME_GRAIN;
 	}
 }

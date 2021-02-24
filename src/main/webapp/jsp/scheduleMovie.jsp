@@ -402,7 +402,140 @@
 						console.log(dataLocation);
 						 var calendar = new FullCalendar.Calendar(calendarEl, {
 							 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-						      now: '2021-02-14',
+						      now: new Date(form.data("startDate")),
+						      editable: true,
+						      slotDuration:'00:15:00',
+						      slotLabelInterval:'00:15:00',
+						      aspectRatio: 3,
+						      themeSystem: 'bootstrap',
+						      scrollTime: '09:00:00',
+						      contentHeight: 'auto',
+						      headerToolbar: {
+						        left: 'today prev,next',
+						        center: 'title',
+						        right: 'resourceTimelineDay'
+						      },
+						      initialView: 'resourceTimelineDay',
+						      resourceAreaWidth: '10%',
+						      resourceAreaColumns: [
+						        {
+						          headerContent: 'Theatre',
+						          field: 'name'
+						        },
+						      ],
+						      resources: dataLocation,
+						      events: dataResult,
+						      eventDataTransform: function( json ) {
+						          return json;
+						      },
+						    });
+
+						    calendar.render();
+					});
+				
+			});
+		}
+		
+		<!-- Retrieve Movie that grouped by Daily-->
+		function configureByDaily() {
+			var startDate = $("#startDate").val();
+			$.ajax("schedule/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
+					method : "GET",
+					accepts : "application/json",
+					dataType : "json",
+				}).done(function(data) {
+				if (data.error == null) {
+					hideAllSchedule();
+					
+					$("#dailySchedule > form").data("startDate",data.range.startDate);
+					//Read the data from list.
+					var resultList = data.result
+					for(var result in resultList){
+						if(resultList[result] != null){
+							var dailyMovie = resultList[result];
+							var innerElement = "<div class='component' id='" + dailyMovie.date + "'><div class='card-header component-header'>" + convertDate(dailyMovie.date) + "</div>";
+							innerElement += "<div class='card-body px-0'><div class='media-group collapse hide'>" +
+											"<input type='hidden' name='groupId' value='" + dailyMovie.date + "'/>";
+							
+							var movieList = dailyMovie.list;
+							if(movieList != null){
+								for(var index in movieList){
+									var movie = movieList[index];
+									var defaultVal = 100 / movieList.length;
+									innerElement += "<div class='media' style='align-items: stretch'>" +
+													"<img class='mr-3' src='" + movie.picURL + "' alt='Generic placeholder image'>" +
+													"<div class='media-body' style='align-items: stretch'>" +
+													"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
+													"<div class='slidecontainer'>" + 
+													"<div class='input-group'>" + 
+													"<div class='input-group-prepend  w-25'>" + 
+													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" + 
+													"<select name='" + dailyMovie.date + ".timePrefer' class='form-select form-control'>" + 
+													"<option value='1'>General</option>" +
+													"<option value='2'>Day</option>" +
+													"<option value='3'>Night</option>" +
+													"</select></div>" +
+													"<div class='input-group'>" + 
+													"<div class='input-group-prepend w-25'>" + 
+													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
+													"<select name='" + dailyMovie.date + ".theatrePrefer' class='form-select form-control'>" + retrieveTheatreAsOption() + 
+													"</select>" + 
+													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent'/>" +
+													"<input type='hidden' name='" + dailyMovie.date + ".movieId' value='" + movie.movieId + "'/>" +
+													"</div></div></div></div><div class='my-2'></div>";
+								}
+							}
+							else{
+								innerElement += "<p class='emptyMovie'>No movie Available</p>";
+							}
+							innerElement += "</div></div></div>";
+							$("#dailySchedule > form").append(innerElement);
+						}
+						else{
+							console.log("No movie Available");
+						}
+					}
+					
+					var buttonElement = "</div>" + 
+					"<div class='form-group row m-0'>" +
+					"<div class='col-sm-5'></div>" + 
+					"<div class='col-sm-2 text-center'>" +
+					"<button class='btn-primary btn' type='button' id='submiDaily'>Apply</button>" +
+					"</div>" +
+					"<div class='col-sm-5'></div></div>";
+					
+					$("#dailySchedule > form").append(buttonElement);
+					
+					activateClickListener();
+					synchronizeSliderValue(0); //sync the range value maintain at 100
+					$("#dailySchedule").slideDown();
+					setupSlider(); //setup legend
+					addListenerToDailyButton();
+				} else {
+					bootbox.alert(data.error);
+				}
+			})
+		}
+		
+		function addListenerToDailyButton(){
+			
+			$("#dailySchedule #submiDaily").on('click',function(){
+				var form = $("#dailySchedule > form");
+				$.ajax("schedule/configureScheduleByDaily.json?" + form.serialize(),{
+					method : "GET",
+					accepts : "application/json",
+					dataType : "json",
+					}).done(function(data) {
+						console.log(data.result);
+						console.log(data.location);
+						var dataResult = JSON.parse(data.result);
+						var dataLocation = JSON.parse(data.location);
+						var calendarEl = document.getElementById('calendar');
+						console.log(dataResult);
+						console.log(dataLocation);
+						 var calendar = new FullCalendar.Calendar(calendarEl, {
+							 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+						      now: new Date(form.data("startDate")),
 						      editable: true,
 						      slotDuration:'00:15:00',
 						      slotLabelInterval:'00:15:00',
@@ -432,84 +565,10 @@
 						    });
 
 						    calendar.render();
-						    $("#calendar").fullCalendar('removeEvents');
-						    $("#calendar").fullCalendar('addEventSource', dataResult);
-						    $("#calendar").fullCalendar('rerenderEvents');
-						console.log(calendar.getEventSources());
+
 					});
 				
 			});
-		}
-		
-		<!-- Retrieve Movie that grouped by Daily-->
-		function configureByDaily() {
-			var startDate = $("#startDate").val();
-			$.ajax(
-					"schedule/retriveDailyAvailableMovie.json?"
-							+ $("#dateOption").serialize() + "&startdate="
-							+ startDate, {
-						method : "GET",
-						accepts : "application/json",
-						dataType : "json",
-					}).done(function(data) {
-				if (data.error == null) {
-					hideAllSchedule();
-					
-					//Read the data from list.
-					var resultList = data.result
-					for(var result in resultList){
-						if(resultList[result] != null){
-							var dailyMovie = resultList[result];
-							var innerElement = "<div class='component' id='" + dailyMovie.date + "'><div class='card-header component-header'>" + convertDate(dailyMovie.date) + "</div>";
-							innerElement += "<div class='card-body px-0'><div class='media-group collapse hide'>" +
-											"<input type='hidden' name='scheduleId' value='" + dailyMovie.date + "'/>";
-							
-							var movieList = dailyMovie.list;
-							if(movieList != null){
-								for(var index in movieList){
-									var movie = movieList[index];
-									var defaultVal = 100 / movieList.length;
-									innerElement += "<div class='media' style='align-items: stretch'>" +
-													"<img class='mr-3' src='" + movie.picURL + "' alt='Generic placeholder image'>" +
-													"<div class='media-body' style='align-items: stretch'>" +
-													"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
-													"<div class='slidecontainer'>" + 
-													"<div class='input-group'>" + 
-													"<div class='input-group-prepend  w-25'>" + 
-													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" + 
-													"<select name='timePrefer' class='form-select form-control'>" + 
-													"<option value='1'>General</option>" +
-													"<option value='2'>Day</option>" +
-													"<option value='3'>Night</option>" +
-													"</select></div>" +
-													"<div class='input-group'>" + 
-													"<div class='input-group-prepend w-25'>" + 
-													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
-													"<select name='theatrePrefer' class='form-select form-control'>" + retrieveTheatreAsOption() + 
-													"</select>" + 
-													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent'/>" +
-													"<input type='hidden' name='" + dailyMovie.date + ".movieId' value='" + movie.movieId + "'/>" +
-													"</div></div></div></div><div class='my-2'></div>";
-								}
-							}
-							else{
-								innerElement += "<p class='emptyMovie'>No movie Available</p>";
-							}
-							innerElement += "</div></div></div>";
-							$("#dailySchedule > form").append(innerElement);
-						}
-						else{
-							console.log("No movie Available");
-						}
-					}
-					activateClickListener();
-					synchronizeSliderValue(0); //sync the range value maintain at 100
-					$("#dailySchedule").slideDown();
-					setupSlider(); //setup legend
-				} else {
-					bootbox.alert(data.error);
-				}
-			})
 		}
 
 		<!-- Retrieve Movie that grouped by Overall-->
@@ -599,14 +658,16 @@
 						console.log(dataLocation);
 						 var calendar = new FullCalendar.Calendar(calendarEl, {
 							 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-						      now: '2021-02-10',
+						      now: new Date(form.data("startDate")),
 						      editable: true,
 						      slotDuration:'00:15:00',
 						      slotLabelInterval:'00:15:00',
+						      snapDuration:'00:05:00',
 						      aspectRatio: 3,
 						      themeSystem: 'bootstrap',
 						      scrollTime: '09:00:00',
-						      minTime: "09:00:00",
+						      eventOverlap: false,
+						      eventDurationEditable: false,
 						      contentHeight: 'auto',
 						      headerToolbar: {
 						        left: 'today prev,next',
@@ -629,10 +690,7 @@
 						    });
 
 						    calendar.render();
-						    $("#calendar").fullCalendar('removeEvents');
-						    $("#calendar").fullCalendar('addEventSource', dataResult);
-						    $("#calendar").fullCalendar('rerenderEvents');
-						console.log(calendar.getEventSources());
+
 					});
 				
 			});
