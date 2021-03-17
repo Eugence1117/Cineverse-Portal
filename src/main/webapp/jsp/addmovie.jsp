@@ -768,7 +768,6 @@
 				},
 				releaseDate : {
 					required : true,
-					AdvancedDateFormat : true
 				},
 				censorship : {
 					required : true,

@@ -2,11 +2,13 @@ package com.ms.Movie;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Movie{
 	
 	private String movieId;
@@ -22,5 +24,5 @@ public class Movie{
 	private String synopsis;
 	private String movietype;
 	private String censorship;
-	
+	private int originalTime;
 }

@@ -13,4 +13,5 @@ public class Event {
 	private String resourceId;
 	private String start;
 	private String end;
+	private String color;
 }

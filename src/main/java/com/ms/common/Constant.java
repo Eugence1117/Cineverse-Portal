@@ -38,7 +38,10 @@ public class Constant {
 	public static final String EA_ENABLE = "Enable"; //Early Access
 	public static final String EA_DISABLED = "Disable";
 	
-	public static final int DEFAULT_TIME_GRAIN = 15;
+	public static final String SCHEDULE_TYPE_MOVIE = "Movie";
+	public static final String SCHEDULE_TYPE_CLEANING = "Cleaning";
+	
+	public static final int DEFAULT_TIME_GRAIN = 5;
 	public static final int DEFAULT_TIME_RANGE = 13;
 	
 	public static final String FILE_PATTERN = ".[a-zA-Z0-9]+";

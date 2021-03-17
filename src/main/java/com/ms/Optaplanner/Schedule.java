@@ -26,7 +26,6 @@ public class Schedule {
 	
 	private TimeGrain startTime;
 	
-	
 	public Schedule(String scheduleId, MovieConfig movie) {
 		this.scheduleId = scheduleId;
 		this.movie = movie;
@@ -36,6 +35,10 @@ public class Schedule {
 	public LocalTime getEndTime() {
 		return startTime == null ? null : startTime.getTime().plusMinutes(movie.getTotalTime());
 		
+	}
+	
+	public LocalTime calcMovieEndTime() {
+		return startTime == null ? null : startTime.getTime().plusMinutes(movie.getOriginalTime());
 	}
 
 	public String getScheduleId() {
@@ -86,6 +89,7 @@ public class Schedule {
 	public void setStartTime(TimeGrain startTime) {
 		this.startTime = startTime;
 	}
+
 	
 	
 }

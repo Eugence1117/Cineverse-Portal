@@ -137,7 +137,7 @@ public class MovieDao {
 					String desc = Util.trimString((String)row.get("censorshipId"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new Movie(id,name,earlyAccess,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc);
+					result = new Movie(id,name,earlyAccess,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
 				}
 			}
 		}

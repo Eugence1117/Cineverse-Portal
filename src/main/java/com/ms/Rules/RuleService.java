@@ -67,8 +67,8 @@ public class RuleService {
 					LocalTime startTime = LocalTime.parse(timeArray[0]);
 					LocalTime endTime = LocalTime.parse(timeArray[1]);
 					
-					startTime = startTime.getMinute() % 15 == 0? startTime : startTime.minusMinutes(startTime.getMinute() % 15);
-					endTime = endTime.getMinute() % 15 == 0? endTime : endTime.minusMinutes(endTime.getMinute() % 15);
+					startTime = startTime.getMinute() % Constant.DEFAULT_TIME_GRAIN == 0? startTime : startTime.minusMinutes(startTime.getMinute() % Constant.DEFAULT_TIME_GRAIN);
+					endTime = endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN == 0? endTime : endTime.minusMinutes(endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN);
 					do {
 						timeList.add(startTime);
 						startTime = startTime.plusMinutes(Constant.DEFAULT_TIME_GRAIN);
