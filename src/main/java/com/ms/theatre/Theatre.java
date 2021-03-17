@@ -10,7 +10,7 @@ import lombok.Setter;
 public class Theatre {
 	
 	private String id;
-	private char name;
+	private char title;
 	private int seatrow;
 	private int seatcol;
 	private String theatretype;

@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.ms.Movie.ResponseMovieResult;
-import com.ms.branch.BranchController;
 import com.ms.schedule.Model.AvailableMovie;
-import com.ms.theatre.TheatreType;
+import com.ms.theatre.Theatre;
 
 @Controller
 public class ScheduleController {
@@ -45,7 +43,7 @@ public class ScheduleController {
 			model.addAttribute("startDate",dateRange.get(0));
 			model.addAttribute("endDate",dateRange.get(1));
 			if(theatreTypeJson.equals("")) {
-				model.addAttribute("errorMsg","Unable to retrieve the theatre's information. Please try again later or contact with the support team.");
+				model.addAttribute("errorMsg","Unable to retrieve the theatre's information. Please your branch have at least one theatre activated. Otherwise, Please try again later or contact with the support team.");
 			}
 			else {
 				model.addAttribute("theatre",theatreTypeJson);
@@ -53,6 +51,7 @@ public class ScheduleController {
 		}	
 		return "scheduleMovie";
 	}
+	
 	
 	@RequestMapping( value= {"/schedule/retriveDailyAvailableMovie.json"})
 	@ResponseBody
@@ -86,26 +85,26 @@ public class ScheduleController {
 	
 	@RequestMapping( value= {"/schedule/configureScheduleByOverall.json"})
 	@ResponseBody
-	public Map<String,String> getOverallConfiguration(Model model, HttpServletRequest req){
+	public Map<String,String> getOverallConfiguration(Model model, HttpServletRequest req, String theatres){
 		log.info("Entered /schedule/configureScheduleByOverall.json");
-		Map<String,String> result = service.generateOverallSchedule(req);
+		Map<String,String> result = service.generateOverallSchedule(req,theatres);
 		return result;
 	}
 	
 
 	@RequestMapping( value= {"/schedule/configureScheduleByWeekly.json"})
 	@ResponseBody
-	public Map<String,String> getWeeklyConfiguration(Model model, HttpServletRequest req){
+	public Map<String,String> getWeeklyConfiguration(Model model, HttpServletRequest req, String theatres){
 		log.info("Entered /schedule/configureScheduleByWeekly.json");
-		Map<String,String> result = service.generateWeeklySchedule(req);
+		Map<String,String> result = service.generateWeeklySchedule(req,theatres);
 		return result;
 	}
 	
 	@RequestMapping( value= {"/schedule/configureScheduleByDaily.json"})
 	@ResponseBody
-	public Map<String,String> getDailyConfiguration(Model model, HttpServletRequest req){
+	public Map<String,String> getDailyConfiguration(Model model, HttpServletRequest req, String theatres){
 		log.info("Entered /schedule/configureScheduleByWeekly.json");
-		Map<String,String> result = service.generateDailySchedule(req);
+		Map<String,String> result = service.generateDailySchedule(req,theatres);
 		return result;
 	}
 }
