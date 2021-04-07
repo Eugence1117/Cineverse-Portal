@@ -350,14 +350,6 @@
 											"<div class='slidecontainer'>" + 
 											"<div class='input-group'>" + 
 											"<div class='input-group-prepend w-25'>" + 
-											"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" + 
-											"<select name='timePrefer' class='form-select form-control'>" + 
-											"<option value='1'>General</option>" +
-											"<option value='2'>Day</option>" +
-											"<option value='3'>Night</option>" +
-											"</select></div>" +
-											"<div class='input-group'>" + 
-											"<div class='input-group-prepend w-25'>" + 
 											"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
 											"<select name='theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
 											"</select>" + 
@@ -402,6 +394,186 @@
 					dataType : "json",
 					}).done(function(data) {
 						
+						if(data.error != "" && data.error != null){
+							bootbox.alert(data.error);
+						}
+						else{
+							console.log(data.score);
+							var dataResult = JSON.parse(data.result);
+							var dataLocation = JSON.parse(data.location);
+							var calendarEl = document.getElementById('calendar');
+							 var calendar = new FullCalendar.Calendar(calendarEl, {
+								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+							      now: new Date(form.data("startDate")),
+							      editable: true,
+							      slotLabelFormat:{
+							    	  hour: 'numeric',
+							    	  minute: '2-digit',
+							    	  omitZeroMinute: false,
+							    	  meridiem: true
+	  
+							      },
+							      slotDuration:'00:15:00',
+							      slotLabelInterval:'00:15:00',
+							      snapDuration:'00:05:00',
+							      aspectRatio: 3,
+							      themeSystem: 'bootstrap',
+							      scrollTime: '09:00:00',
+							      eventOverlap: false,
+							      eventDurationEditable: false,
+							      contentHeight: 'auto',
+							      headerToolbar: {
+							        left: 'today prev,next',
+							        center: 'title',
+							        right: 'resourceTimelineByDay,resourceTimeGridByDay'
+							      },
+							      initialView: 'resourceTimelineByDay',
+							      views:{
+							    	  resourceTimeGridByDay:{
+							    		  type: 'resourceTimeGrid',
+							    		  duration:{days:1},
+							    		  buttonText: 'Vertical' 
+							    	  },
+							      	resourceTimelineByDay:{
+							      		 type: 'resourceTimeline',
+								         duration:{days:1},
+								     	 buttonText: 'Horizontal' 
+							      	}
+							      },
+							      resourceAreaWidth: '15%',
+							      resourceAreaColumns: [
+							        {
+							          headerContent: 'Theatre',
+							          field: 'title'
+							        },
+							        {
+							        	headerContent: 'Type',
+							        	field: 'theatretype'
+							        }
+							      ],
+							      slotMinTime: '10:00',
+							      slotMaxTime: '23:59',
+							      resources: dataLocation,
+							      resourceOrder: 'title',
+							      businessHours: {
+							    	  // days of week. an array of zero-based day of week integers (0=Sunday)
+							    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
+
+							    	  startTime: '10:00', // a start time (10am in this example)
+							    	  endTime: '23:59', // an end time (6pm in this example)
+							    	},
+							      events: dataResult,
+							      eventTimeFormat: { // like '14:30:00'
+							    	  hour: 'numeric',
+							    	  minute: '2-digit',
+							    	  omitZeroMinute: false,
+							    	  meridiem: true
+							    	  }
+							    });
+
+							    calendar.render();		
+						}
+					});
+				
+			});
+		}
+		
+		<!-- Retrieve Movie that grouped by Week-->
+		function configureByWeekly() {
+			var startDate = $("#startDate").val();
+			var theatreList = getTheatreList()
+			if(theatreList == null){
+				return false;
+			}
+			
+			$.ajax("schedule/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
+					method : "GET",
+					accepts : "application/json",
+					dataType : "json",
+				}).done(function(data) {
+				if (data.error == null) {
+					hideAllSchedule();
+					
+					//Read the date from list.
+					var resultList = data.result
+					$("#weeklySchedule > form").data("startDate",data.range.startDate);
+					$("#weeklySchedule > form").data("endDate",data.range.endDate);
+					for(var result in resultList){
+						if(resultList[result] != null){
+							var weeklyMovie = resultList[result];
+							var innerElement = "<div class='component' id='" + weeklyMovie.range.startDate + "'><div class='card-header component-header'>" + convertDate(weeklyMovie.range.startDate) + " - " + convertDate(weeklyMovie.range.endDate) +" </div>";
+							innerElement += "<div class='card-body px-0'><div class='media-group collapse hide'>"
+							innerElement += addTheatreElement(theatreList,weeklyMovie.range.startDate) +
+											"<hr/><input type='hidden' name='groupId' value='" + weeklyMovie.range.startDate + "'/>";
+							var groupId = weeklyMovie.range.startDate;
+							var movieList = weeklyMovie.list;
+							if(movieList != null){
+								for(var index in movieList){
+									var movie = movieList[index];
+									var defaultVal = 100 / movieList.length;
+									innerElement += "<div class='media' style='align-items: stretch'>" +
+													"<img class='mr-3' src='" + movie.picURL + "' alt='Generic placeholder image'>" +
+													"<div class='media-body' style='align-items: stretch'>" +
+													"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
+													"<div class='slidecontainer'>" + 
+													"<div class='input-group'>" + 
+													"<div class='input-group-prepend w-25'>" + 
+													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
+													"<select name='"+ groupId +".theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
+													"</select>" + 
+													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='"+ groupId +".percent'/>" +
+													"<input type='hidden' name='"+ groupId +".movieId' value='" + movie.movieId + "'/>" +
+													"</div></div></div></div><div class='my-2'></div>";
+								}
+							}
+							else{
+								innerElement += "<p class='emptyMovie'>No movie Available</p>"
+							}
+							
+							innerElement += "</div></div></div>";
+							$("#weeklySchedule > form").append(innerElement);
+						
+						}
+						else{
+							console.log("No movie Available");
+						}
+					}
+					
+					var buttonElement = "</div>" + 
+					"<div class='form-group row m-0'>" +
+					"<div class='col-sm-5'></div>" + 
+					"<div class='col-sm-2 text-center'>" +
+					"<button class='btn-primary btn' type='button' id='submitWeekly'>Apply</button>" +
+					"</div>" +
+					"<div class='col-sm-5'></div></div>";
+					
+					$("#weeklySchedule > form").append(buttonElement);
+					
+					activateClickListener();
+					synchronizeSliderValue(0);
+					$("#weeklySchedule").slideDown();
+					setupSlider();
+					addListenerToWeeklyButton();
+					theatreSelectionListener(2);
+				} else {
+					bootbox.alert(data.error);
+				}
+			})
+		}
+		
+		function addListenerToWeeklyButton(){
+			$("#weeklySchedule #submitWeekly").on('click',function(){
+				var form = $("#weeklySchedule > form");
+				var theatreSelected = retrieveTheatreSelection(2);
+				if(!theatreSelected){
+					return false;
+				}
+				$.ajax("schedule/configureScheduleByWeekly.json?" + form.serialize() + "&startDate="+ form.data("startDate") + "&endDate=" + form.data("endDate") + "&theatres=" + theatreSelected, {
+					method : "GET",
+					accepts : "application/json",
+					dataType : "json",
+					}).done(function(data) {
+
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
@@ -483,156 +655,6 @@
 			});
 		}
 		
-		<!-- Retrieve Movie that grouped by Week-->
-		function configureByWeekly() {
-			var startDate = $("#startDate").val();
-			var theatreList = getTheatreList()
-			if(theatreList == null){
-				return false;
-			}
-			
-			$.ajax("schedule/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
-					method : "GET",
-					accepts : "application/json",
-					dataType : "json",
-				}).done(function(data) {
-				if (data.error == null) {
-					hideAllSchedule();
-					
-					//Read the date from list.
-					var resultList = data.result
-					$("#weeklySchedule > form").data("startDate",data.range.startDate);
-					$("#weeklySchedule > form").data("endDate",data.range.endDate);
-					for(var result in resultList){
-						if(resultList[result] != null){
-							var weeklyMovie = resultList[result];
-							var innerElement = "<div class='component' id='" + weeklyMovie.range.startDate + "'><div class='card-header component-header'>" + convertDate(weeklyMovie.range.startDate) + " - " + convertDate(weeklyMovie.range.endDate) +" </div>";
-							innerElement += "<div class='card-body px-0'><div class='media-group collapse hide'>"
-							innerElement += addTheatreElement(theatreList,weeklyMovie.range.startDate) +
-											"<hr/><input type='hidden' name='groupId' value='" + weeklyMovie.range.startDate + "'/>";
-							var groupId = weeklyMovie.range.startDate;
-							var movieList = weeklyMovie.list;
-							if(movieList != null){
-								for(var index in movieList){
-									var movie = movieList[index];
-									var defaultVal = 100 / movieList.length;
-									innerElement += "<div class='media' style='align-items: stretch'>" +
-													"<img class='mr-3' src='" + movie.picURL + "' alt='Generic placeholder image'>" +
-													"<div class='media-body' style='align-items: stretch'>" +
-													"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
-													"<div class='slidecontainer'>" + 
-													"<div class='input-group'>" + 
-													"<div class='input-group-prepend w-25'>" + 
-													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" + 
-													"<select name='"+ groupId +".timePrefer' class='form-select form-control'>" + 
-													"<option value='1'>General</option>" +
-													"<option value='2'>Day</option>" +
-													"<option value='3'>Night</option>" +
-													"</select></div>" +
-													"<div class='input-group'>" + 
-													"<div class='input-group-prepend w-25'>" + 
-													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
-													"<select name='"+ groupId +".theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
-													"</select>" + 
-													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='"+ groupId +".percent'/>" +
-													"<input type='hidden' name='"+ groupId +".movieId' value='" + movie.movieId + "'/>" +
-													"</div></div></div></div><div class='my-2'></div>";
-								}
-							}
-							else{
-								innerElement += "<p class='emptyMovie'>No movie Available</p>"
-							}
-							
-							innerElement += "</div></div></div>";
-							$("#weeklySchedule > form").append(innerElement);
-						
-						}
-						else{
-							console.log("No movie Available");
-						}
-					}
-					
-					var buttonElement = "</div>" + 
-					"<div class='form-group row m-0'>" +
-					"<div class='col-sm-5'></div>" + 
-					"<div class='col-sm-2 text-center'>" +
-					"<button class='btn-primary btn' type='button' id='submitWeekly'>Apply</button>" +
-					"</div>" +
-					"<div class='col-sm-5'></div></div>";
-					
-					$("#weeklySchedule > form").append(buttonElement);
-					
-					activateClickListener();
-					synchronizeSliderValue(0);
-					$("#weeklySchedule").slideDown();
-					setupSlider();
-					addListenerToWeeklyButton();
-					theatreSelectionListener(2);
-				} else {
-					bootbox.alert(data.error);
-				}
-			})
-		}
-		
-		function addListenerToWeeklyButton(){
-			$("#weeklySchedule #submitWeekly").on('click',function(){
-				var form = $("#weeklySchedule > form");
-				var theatreSelected = retrieveTheatreSelection(2);
-				if(!theatreSelected){
-					return false;
-				}
-				$.ajax("schedule/configureScheduleByWeekly.json?" + form.serialize() + "&startDate="+ form.data("startDate") + "&endDate=" + form.data("endDate") + "&theatres=" + theatreSelected, {
-					method : "GET",
-					accepts : "application/json",
-					dataType : "json",
-					}).done(function(data) {
-
-						if(data.error != "" && data.error != null){
-							bootbox.alert(data.error);
-						}
-						else{
-							var dataResult = JSON.parse(data.result);
-							var dataLocation = JSON.parse(data.location);
-							var calendarEl = document.getElementById('calendar');
-
-							 var calendar = new FullCalendar.Calendar(calendarEl, {
-								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-							      now: new Date(form.data("startDate")),
-							      editable: true,
-							      slotDuration:'00:15:00',
-							      slotLabelInterval:'00:15:00',
-							      aspectRatio: 3,
-							      themeSystem: 'bootstrap',
-							      scrollTime: '09:00:00',
-							      contentHeight: 'auto',
-							      headerToolbar: {
-							        left: 'today prev,next',
-							        center: 'title',
-							        right: 'resourceTimelineDay'
-							      },
-							      initialView: 'resourceTimelineDay',
-							      resourceAreaWidth: '15%',
-							      resourceOrder: 'title',
-							      resourceAreaColumns: [
-							        {
-							          headerContent: 'Theatre',
-							          field: 'title'
-							        },
-							      ],
-							      resources: dataLocation,
-							      events: dataResult,
-							      eventDataTransform: function( json ) {
-							          return json;
-							      },
-							    });
-
-							    calendar.render();	
-						}
-					});
-				
-			});
-		}
-		
 		<!-- Retrieve Movie that grouped by Daily-->
 		function configureByDaily() {
 			var startDate = $("#startDate").val();
@@ -671,14 +693,6 @@
 													"<div class='media-body' style='align-items: stretch'>" +
 													"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
 													"<div class='slidecontainer'>" + 
-													"<div class='input-group'>" + 
-													"<div class='input-group-prepend  w-25'>" + 
-													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" + 
-													"<select name='" + dailyMovie.date + ".timePrefer' class='form-select form-control'>" + 
-													"<option value='1'>General</option>" +
-													"<option value='2'>Day</option>" +
-													"<option value='3'>Night</option>" +
-													"</select></div>" +
 													"<div class='input-group'>" + 
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
@@ -742,40 +756,74 @@
 							var dataResult = JSON.parse(data.result);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
-
 							 var calendar = new FullCalendar.Calendar(calendarEl, {
 								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 							      now: new Date(form.data("startDate")),
 							      editable: true,
+							      slotLabelFormat:{
+							    	  hour: 'numeric',
+							    	  minute: '2-digit',
+							    	  omitZeroMinute: false,
+							    	  meridiem: true
+	  
+							      },
 							      slotDuration:'00:15:00',
 							      slotLabelInterval:'00:15:00',
+							      snapDuration:'00:05:00',
 							      aspectRatio: 3,
 							      themeSystem: 'bootstrap',
 							      scrollTime: '09:00:00',
-							      minTime: "09:00:00",
+							      eventOverlap: false,
+							      eventDurationEditable: false,
 							      contentHeight: 'auto',
 							      headerToolbar: {
 							        left: 'today prev,next',
 							        center: 'title',
-							        right: 'resourceTimelineDay'
+							        right: 'resourceTimelineByDay,resourceTimeGridByDay'
 							      },
-							      initialView: 'resourceTimelineDay',
+							      initialView: 'resourceTimelineByDay',
+							      views:{
+							    	  resourceTimeGridByDay:{
+							    		  type: 'resourceTimeGrid',
+							    		  duration:{days:1},
+							    		  buttonText: 'Vertical' 
+							    	  },
+							      	resourceTimelineByDay:{
+							      		 type: 'resourceTimeline',
+								         duration:{days:1},
+								     	 buttonText: 'Horizontal' 
+							      	}
+							      },
 							      resourceAreaWidth: '15%',
-							      resourceOrder: 'title',
 							      resourceAreaColumns: [
 							        {
 							          headerContent: 'Theatre',
 							          field: 'title'
 							        },
+							        {
+							        	headerContent: 'Type',
+							        	field: 'theatretype'
+							        }
 							      ],
 							      resources: dataLocation,
-							      events: dataResult,
-							      eventDataTransform: function( json ) {
-							          return json;
-							      },
-							});
+							      resourceOrder: 'title',
+							      businessHours: {
+							    	  // days of week. an array of zero-based day of week integers (0=Sunday)
+							    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
 
-							calendar.render();
+							    	  startTime: '10:00', // a start time (10am in this example)
+							    	  endTime: '23:59', // an end time (6pm in this example)
+							    	},
+							      events: dataResult,
+							      eventTimeFormat: { // like '14:30:00'
+							    	  hour: 'numeric',
+							    	  minute: '2-digit',
+							    	  omitZeroMinute: false,
+							    	  meridiem: true
+							    	  }
+							    });
+
+							    calendar.render();		
 						}
 					});
 				

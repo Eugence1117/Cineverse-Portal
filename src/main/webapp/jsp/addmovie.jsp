@@ -579,6 +579,29 @@
 			scrollMonth : false,
 		}); */
 
+		$("#totalTime").on('change',function(){
+			if($(this).val() < 30){
+				bootbox.confirm({
+					message: "Are you sure the movie length is " + $(this).val() + " ? Short duration of movie might impact the performance of scheduling AI.",
+					buttons:{
+						confirm: {
+							label: "Yes,I understand.",
+							className: "btn-success"
+						},
+						cancel: {
+							label: "No, is a mistake",
+							className: "btn-danger"
+						}
+					},
+					callback:function(result){
+						if(!result){
+							$("#totalTime").val("");
+						}
+					}
+				});
+			}
+		});
+		
 		$('.showPicture').on('click', function() {
 
 			var img = $("input[name=posterImage]").val();

@@ -7,6 +7,10 @@ import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintCollectors;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.Joiners;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.ms.schedule.ScheduleService;
+
 import static org.optaplanner.core.api.score.stream.ConstraintCollectors.*;
 import static org.optaplanner.core.api.score.stream.Joiners.overlapping;
 
@@ -22,12 +26,13 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 		// TODO Auto-generated method stub
 		return new Constraint[] {
 				TheatreConflict(constraintFactory),
+				PreventExceedOperatingTime(constraintFactory),
 				TimeGrainConflict(constraintFactory),
-				DayTimePrefer(constraintFactory),
-				NightTimePrefer(constraintFactory),
 				TheatreBalance(constraintFactory),
-				//PreventLastGrainMovie(constraintFactory),
-				TheatrePrefer(constraintFactory)
+				TheatrePrefer(constraintFactory),
+				AvoidDuplicateMovieAtDifferentTheatre(constraintFactory),
+				AvoidSameTime(constraintFactory),
+				//VariatyOfMovie(constraintFactory),
 		};
 	}
 	
@@ -60,6 +65,27 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				.penalize("TimeGrainConflict", HardSoftScore.ONE_HARD);
 	}
 	
+	public Constraint PreventExceedOperatingTime(ConstraintFactory constraintFactory) {
+		return constraintFactory.from(Schedule.class)
+				.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 || schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) > 0)
+				//.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) > 0 || schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 || schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) >= 0)
+				.penalize("PreventExceedOperatingTime", HardSoftScore.ONE_HARD);
+	}
+	
+	public Constraint AvoidDuplicateMovieAtDifferentTheatre(ConstraintFactory constraintFactory) {
+		return constraintFactory.from(Schedule.class)
+				.join(Schedule.class,Joiners.equal(Schedule::getDate))
+				 .filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
+				 .filter((scheduleA,scheduleB) -> scheduleA.getMovie().getMovieId().equals(scheduleB.getMovie().getMovieId()) && scheduleA.getStartTime().equals(scheduleB.getStartTime()) && !scheduleA.getTheatre().getTheatreId().equals(scheduleB.getTheatre().getTheatreId()))
+				 .penalize("SameMovie", HardSoftScore.ofSoft(5));
+	}
+
+	
+	public Constraint AvoidSameTime(ConstraintFactory constraintFactory) {
+		return constraintFactory.from(Schedule.class)
+			   .groupBy(Schedule::getStartTime,ConstraintCollectors.count())
+			   .penalize("SameStartTime", HardSoftScore.ofSoft(1),(time,count) -> count);
+	}
 	
 	public Constraint TheatreBalance(ConstraintFactory constraintFactory) {
 		return constraintFactory.from(Schedule.class)
@@ -74,43 +100,5 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				.penalize("TheatrePrefer", HardSoftScore.ONE_SOFT);
 	}
 	
-	public Constraint DayTimePrefer(ConstraintFactory constraintFactory) {
-		return constraintFactory.from(Schedule.class)
-				.filter(schedule -> schedule.getMovie().getPreferableTime() == 2)
-				.filter(schedule -> schedule.getStartTime().getTime().compareTo(LocalTime.of(19, 0)) >= 0)
-				.penalize("DayTimePrefer", HardSoftScore.ONE_SOFT);
-	}
-	
-	public Constraint NightTimePrefer(ConstraintFactory constraintFactory) {
-		return constraintFactory.from(Schedule.class)
-				.filter(schedule -> schedule.getMovie().getPreferableTime() == 3)
-				.filter(schedule -> schedule.getStartTime().getTime().compareTo(LocalTime.of(19, 0)) < 0)
-				.penalize("NightTimePrefer", HardSoftScore.ONE_SOFT);
-	}
-	
-	public Constraint PreventLastGrainMovie(ConstraintFactory constraintFactory) {
-		return constraintFactory.from(Schedule.class)
-				.groupBy(max(Schedule::getStartTime))
-				//.filter(schedule -> schedule.getStartTime() != null)
-				.penalize("PreventLastGrainMovie", HardSoftScore.ONE_SOFT, value -> value.getIndex());
-	}
-	
-//	public Constraint ScheduleGap(ConstraintFactory constraintFactory) {
-//		return constraintFactory.from(Schedule.class)
-//				.join(Schedule.class, Joiners.equal(Schedule::getTheatre))
-//				.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-//				.filter((scheduleA,scheduleB) -> scheduleB.calculateTimeRange().getHours() == scheduleA.getTimeGrain().getTime().getHours())
-//				.filter((scheduleA,scheduleB) -> scheduleB.calculateTimeRange().getMinutes() - scheduleA.getTimeGrain().getTime().getMinutes() < 15)
-//				.penalize("ScheduleGap", HardSoftScore.ONE_SOFT);
-//	}
-//	
-	public Constraint MovieLoadBalance(ConstraintFactory constraintFactory) {
-		return constraintFactory.from(Schedule.class)
-			  .join(Schedule.class,Joiners.equal(Schedule::getDate))
-			  .filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-			  .groupBy((scheduleA,scheduleB) -> scheduleA.getMovie().equals(scheduleB.getMovie()),ConstraintCollectors.countBi())
-			  .filter((statement,count) -> statement == true)
-			  .penalize("MovieBalance", HardSoftScore.ofSoft(4),(statement,count) -> count * 2);
-	}
 
 }
