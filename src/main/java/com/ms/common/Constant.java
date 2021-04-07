@@ -43,6 +43,7 @@ public class Constant {
 	
 	public static final int DEFAULT_TIME_GRAIN = 5;
 	public static final int DEFAULT_TIME_RANGE = 13;
+	public static final int DEFAULT_TIME_GAP = 5;
 	
 	public static final String FILE_PATTERN = ".[a-zA-Z0-9]+";
 

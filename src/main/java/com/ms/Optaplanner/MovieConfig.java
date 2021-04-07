@@ -18,7 +18,6 @@ public class MovieConfig {
 	
 	private int totalTime;
 	
-	private int preferableTime;
 	
 	private String theatrePrefer;
 	

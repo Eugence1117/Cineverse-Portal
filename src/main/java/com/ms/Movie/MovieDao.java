@@ -110,6 +110,46 @@ public class MovieDao {
 		return result;
 	}
 	
+	public List<Movie> getAllMovie() {
+		List<Movie> movies = null;
+		try{
+			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.earlyaccess, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
+					   .append("m.releasedate, m.synopsis, m.movietype, m.censorshipId FROM movie m ")
+					   .append("WHERE m.seqid = ?");
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString());
+			
+			if(rows.size() > 0) {
+				movies = new ArrayList<Movie>();
+				for(Map<String,Object> row : rows) {
+					String id = Util.trimString((String)row.get("seqid"));
+					String name = Util.trimString((String)row.get("movieName"));
+					int earlyAccess = (int)row.get("earlyaccess");
+					String picurl = Util.trimString((String)row.get("picURL"));
+					int totalTime = (int)row.get("totaltime");
+					String language = Util.trimString((String)row.get("language"));
+					String distributor = Util.trimString((String)row.get("distributor"));
+					String cast = Util.trimString((String)row.get("cast"));
+					String director = Util.trimString((String)row.get("director"));
+					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
+					String synopsis = Util.trimString((String)row.get("synopsis"));
+					String movieType = Util.trimString((String)row.get("movietype"));
+					String desc = Util.trimString((String)row.get("censorshipId"));
+					
+					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
+					Movie newMovie = new Movie(id,name,earlyAccess,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
+					movies.add(newMovie);
+				}
+			}
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			return null;
+		}
+		
+		return result;
+		}
+	}
+	
 	public Movie getMovieDetails(String movieId){
 		Movie result = null;
 		//TODO Need to select based on the branch manager id
@@ -333,8 +373,8 @@ public class MovieDao {
 	
 	public boolean insertMovieAvailable(ExistMovieForm form, String branchId) {
 		try {
-			StringBuffer query = new StringBuffer().append("INSERT INTO movieavailable VALUES(?,?,?,?)");
-			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate());
+			StringBuffer query = new StringBuffer().append("INSERT INTO movieavailable VALUES(?,?,?,?,?)");
+			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_MOVIE_CODE);
 			if(result > 0) {
 				return true;
 			}
