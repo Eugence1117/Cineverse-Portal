@@ -414,15 +414,18 @@ public class ScheduleService {
 								&& movieidList.length == typeList.length) {
 							LocalDate start = new Timestamp(Long.parseLong(startDate)).toLocalDateTime().toLocalDate();
 							LocalDate end = new Timestamp(Long.parseLong(endDate)).toLocalDateTime().toLocalDate();
+							int largestMovieTime = 0;
 							
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							for (int i = 0; i < movieidList.length; i++) {
 
 								Movie movie = movieDao.getMovieDetails(movieidList[i]);
 								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieidList[i]);
-								int remain = movie.getTotalTime() % 15;
-								movie.setTotalTime(movie.getTotalTime() - remain + 15); // Increment to nearest % 15
-																						// number
+								int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
+								movie.setTotalTime(newMovieTime); // Increment to nearest % 15
+								largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
+								
 								if(movie == null || moviePeriod == null) {
 									log.error("Unable to retrieve movie information from database.");
 									response = new LinkedHashMap<String, String>();
@@ -601,6 +604,7 @@ public class ScheduleService {
 							LocalDate startDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
 							int rangeToEndOfWeek = 7 - startDate.getDayOfWeek().getValue();
 							LocalDate endDate = (startDate.plusDays(rangeToEndOfWeek)).compareTo(scheduleEnd) <= 0 ? startDate.plusDays(rangeToEndOfWeek) : scheduleEnd;
+							int largestMovieTime = 0;
 							
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							if (movieIds.length == preferableTimeList.length && preferableTimeList.length == percentList.length
@@ -609,9 +613,10 @@ public class ScheduleService {
 									
 									Movie movie = movieDao.getMovieDetails(movieIds[i]);
 									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
-									int remain = movie.getTotalTime() % 15;
-									movie.setTotalTime(movie.getTotalTime() - remain + 15); // Increment to nearest % 15
-																							// number
+									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
+									movie.setTotalTime(newMovieTime); // Increment to nearest % 15
+									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 
 									Configuration config = new Configuration(movieIds[i], preferableTimeList[i],
 											percentList[i], theatrePrefer[i], movie,moviePeriod);
