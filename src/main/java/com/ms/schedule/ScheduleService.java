@@ -519,10 +519,9 @@ public class ScheduleService {
 								Movie movie = movieDao.getMovieDetails(movieidList[i]);
 								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieidList[i]);
 								int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
+								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
 								movie.setTotalTime(newMovieTime); // Increment to nearest % 15
 								largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
-								movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
 								
 								if(movie == null || moviePeriod == null) {
 									log.error("Unable to retrieve movie information from database.");
@@ -739,10 +738,9 @@ public class ScheduleService {
 									Movie movie = movieDao.getMovieDetails(movieIds[i]);
 									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
+									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
 									movie.setTotalTime(newMovieTime); // Increment to nearest % 15
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
-									movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
 																							// number
 									Configuration config = new Configuration(movieIds[i],
 											percentList[i], theatrePrefer[i], movie,moviePeriod);
@@ -894,6 +892,7 @@ public class ScheduleService {
 							double[] percentList = Stream.of(req.getParameterValues(groupId + ".percent")).mapToDouble(Double::parseDouble)
 									.toArray();
 							LocalDate scheduleDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
+							int largestMovieTime = 0;
 							
 							List<String> theatreSelected = (ArrayList<String>) maps.get(groupId + ".theatreSelection");
 							//Filter unactivated theatre
@@ -914,8 +913,9 @@ public class ScheduleService {
 									Movie movie = movieDao.getMovieDetails(movieIds[i]);
 									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-									movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
-																							// number
+									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
+									movie.setTotalTime(newMovieTime);
+									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;										
 
 									Configuration config = new Configuration(movieIds[i],
 											percentList[i], theatrePrefer[i], movie,moviePeriod);
