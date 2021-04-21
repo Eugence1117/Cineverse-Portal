@@ -1120,7 +1120,7 @@ public class ScheduleService {
 		}
 		return timeGrains;
 	}
-
+  
 	public int calculateOperatingTimeInMinute() {
 		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
 		LocalTime startTime = operatingHours.getStartTime();
