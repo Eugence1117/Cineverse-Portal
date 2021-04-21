@@ -923,7 +923,15 @@
 				}
 				
 				if(isEmpty){
-					bootbox.alert("Please make sure at least one theatre is selected for every week.");
+					var string = "Error occrued from: <br/>";
+					for(var i in weeks){
+						var startDate = weeks[i];
+						var endDate = new Date();
+						var endDate = endDate.setDate(startDate.getDate() - startDate.getDay() + 7);
+					
+						string += "-\t" + toDate(startDate) + " - " + toDate(endDate) + "<br/>";
+					}
+					bootbox.alert("Please make sure at least one theatre is selected for every week.<br/>" + string);
 					return false;
 				}
 			}
@@ -951,7 +959,12 @@
 				}
 				
 				if(isEmpty){
-					bootbox.alert("Please make sure at least one theatre is selected for every day.");
+					var string = "Error occrued from: <br/>";
+					for(var i in days){
+						var day = days[i];
+						string += "-\t" + toDate(day) + "<br/>";
+					}
+					bootbox.alert("Please make sure at least one theatre is selected for every day.<br/>" + string);
 					return false;
 				}
 			}
@@ -1108,7 +1121,7 @@
 		//Utility Function
 		function convertDate(milisec){
 			var date = new Date(milisec);
-			return date.getDate() + "-" + (date.getMonth()+1) + "-" + date.getFullYear();
+			return toDate(date);
 		}
 		
 		//Used for debug
@@ -1118,6 +1131,13 @@
 				total += +$(this).val();
 			});
 			console.log(total);
+		}
+		
+		function toDate(date){
+			var year = new Intl.DateTimeFormat('en',{year:'numeric'}).format(date);
+			var month = new Intl.DateTimeFormat('en',{month:'short'}).format(date);
+			var day = new Intl.DateTimeFormat('en',{day:'2-digit'}).format(date);
+			return day + " " + month + " " + year;
 		}
 	</script>
 </body>
