@@ -15,8 +15,8 @@
   <!-- Optimization algorithms configuration -->
   <termination>
   	<terminationCompositionStyle>OR</terminationCompositionStyle>
-    <secondsSpentLimit>20</secondsSpentLimit>
-    <unimprovedSecondsSpentLimit>8</unimprovedSecondsSpentLimit>
+    <secondsSpentLimit>60</secondsSpentLimit>
+    <unimprovedSecondsSpentLimit>30</unimprovedSecondsSpentLimit>
     <bestScoreFeasible>true</bestScoreFeasible>
   </termination>
 </solver>

@@ -2,6 +2,7 @@ package com.ms.Optaplanner;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -26,16 +27,22 @@ public class Schedule {
 	
 	private TimeGrain startTime;
 	
+	private List<LocalTime> operatingTime;
 	
-	public Schedule(String scheduleId, MovieConfig movie) {
+	public Schedule(String scheduleId, MovieConfig movie, List<LocalTime> operatingTime) {
 		this.scheduleId = scheduleId;
 		this.movie = movie;
+		this.operatingTime = operatingTime;
 	}
 	
 	
 	public LocalTime getEndTime() {
 		return startTime == null ? null : startTime.getTime().plusMinutes(movie.getTotalTime());
 		
+	}
+	
+	public LocalTime calcMovieEndTime() {
+		return startTime == null ? null : startTime.getTime().plusMinutes(movie.getOriginalTime());
 	}
 
 	public String getScheduleId() {
@@ -86,6 +93,25 @@ public class Schedule {
 	public void setStartTime(TimeGrain startTime) {
 		this.startTime = startTime;
 	}
+
+
+	public List<LocalTime> getOperatingTime() {
+		return operatingTime;
+	}
+
+
+	public void setOperatingTime(List<LocalTime> operatingTime) {
+		this.operatingTime = operatingTime;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Schedule [scheduleId=" + scheduleId + ", movie=" + movie + ", theatre=" + theatre + ", date=" + date
+				+ ", startTime=" + startTime + "]";
+	}
+
+
 	
 	
 }

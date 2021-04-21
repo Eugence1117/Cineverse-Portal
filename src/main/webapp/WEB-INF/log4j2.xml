@@ -33,7 +33,7 @@
         	<AppenderRef ref="file-log"/>
         </Logger>
         
-        <Logger name="org.optaplanner" level="info">
+        <Logger name="org.optaplanner" level="warn">
         	<AppenderRef ref="OP-log"/>
         </Logger>
         

@@ -36,6 +36,34 @@ public class TheatreDAO {
 	}
 	
 	//TheatreType is shared by every branch
+	public List<TheatreType> groupByTheatreType(String branchid){
+		List<TheatreType> typeList = null;
+		try {
+			String query = "SELECT b.seqid, b.description, b.seatSize, b.price FROM theatre t, theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid";
+			List<Map<String,Object>> results = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
+			if(results.size() > 0) {
+				typeList = new ArrayList<TheatreType>();
+				for(Map<String,Object> result : results) {
+					String id = (String)result.get("seqid");
+					String desc = (String)result.get("description");
+					int seatSize = (int)result.get("seatSize");
+					double price = (double)result.get("price");
+					
+					TheatreType type = new TheatreType(id,desc,seatSize,price);
+					typeList.add(type);
+				}
+			}
+			else {
+				return new ArrayList<TheatreType>();//Empty List to indicate Empty record
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex);
+			return null;
+		}
+		return typeList;
+	}
+	
 	public List<TheatreType> getTheatreType(){
 		List<TheatreType> typeList = null;
 		try {

@@ -13,6 +13,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +38,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.drools.core.rule.Forall;
 import org.optaplanner.core.api.score.ScoreExplanation;
 import org.optaplanner.core.api.score.ScoreManager;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
@@ -50,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ms.Movie.MovieDao;
@@ -94,6 +98,7 @@ public class ScheduleService {
 
 	SolverFactory<Theatre_Schedule> solverFactory = SolverFactory.createFromXmlResource("SolverConfig.xml",
 			ScheduleService.class.getClassLoader());
+	
 	public List<String> getDefaultDate(String branchID) {
 
 		try {
@@ -114,9 +119,30 @@ public class ScheduleService {
 		}
 
 	}
-
+	
+	public Object[] convertToObject(String base64) {
+		Decoder decoder = Base64.getDecoder();
+		byte[] bytes = decoder.decode(base64);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			return mapper.readValue(bytes, Object[].class);
+		}
+		catch(Exception ex) {
+			log.error("Exception ::" + ex);
+			return null;
+		}
+		
+	}
+	
+	public String convertToString(String base64) {
+		byte[] bytes = Base64.getDecoder().decode(base64);
+		String newStr = new String(bytes);
+		return newStr;
+	}
+	
 	public String getTheatreType() {
-		List<TheatreType> list = theatreDao.getTheatreType();
+		String branchid = (String) session.getAttribute("branchid");
+		List<TheatreType> list = theatreDao.groupByTheatreType(branchid);
 		if (list == null) {
 			return null;
 		} else {
@@ -325,7 +351,7 @@ public class ScheduleService {
 		}
 			//Check size is same
 			
-		log.info("Segmented" + segments.size());
+		log.info("Schedule segmented into " + segments.size() + " for the date range " + startDate + " to " + endDate);
 		return segments;
 			
 	}
@@ -334,7 +360,7 @@ public class ScheduleService {
 		int total = 0;
 		for(Configuration config : configs) {
 			total += config.getPercent();
-			log.info(config.getPercent());
+			
 		}
 		
 		if(total < 100) {
@@ -348,60 +374,115 @@ public class ScheduleService {
 	public List<Schedule> createSchedule(List<Configuration> configs, int theatreCount) {
 		log.info("Generate Schedule Progress Report: Total Movie = " + configs.size());
 
-		int operatingMinutes = calculateOperatingTimeInMinute() * theatreCount;
-		log.info("Operating time: " + operatingMinutes);
-		int minuteUsed = 0;
+		int operatingMinutes = calculateOperatingTimeInMinute();
+		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
+		
+		List<LocalTime> operatingTime = new ArrayList<LocalTime>();
+		operatingTime.add(operatingHours.getStartTime());
+		log.info("Start Time: " + operatingHours.getStartTime());
+		operatingTime.add(operatingHours.getEndTime());
+		log.info("End Time: " + operatingHours.getEndTime());
+		
 		List<Schedule> scheduleList = new LinkedList<Schedule>();
-		double value = validatePercentage(configs);
-		for (Configuration config : configs) {
-			double percentage = value == 0? config.getPercent() : (double)config.getPercent() / value;
-			int timeAvailable = (int) Math.round(operatingMinutes * percentage / 100);
-			int movieAvailable = timeAvailable / config.getMovie().getTotalTime();
-			log.info("Movie count: " + movieAvailable);
+		log.info("Operating time: " + operatingMinutes);
+		
+		for(int count = 0 ; count < theatreCount; count++) {
+			int minuteUsed = 0;
+			double value = validatePercentage(configs);
+			
+			for (Configuration config : configs) {
+				double percentage = value == 0? config.getPercent() : (double)config.getPercent() / value;
+				int timeAvailable = (int) Math.round(operatingMinutes * percentage / 100);
+				int movieAvailable = timeAvailable / config.getMovie().getTotalTime();
 
-			Movie model = config.getMovie();
-			minuteUsed += model.getTotalTime() * movieAvailable;
-			MovieConfig movie = new MovieConfig(model.getMovieId(), model.getMovieName(), model.getTotalTime(),
-					config.getTimePrefer(), config.getTheatrePrefer());
-			for (int i = 0; i < movieAvailable; i++) {
-				scheduleList.add(new Schedule(UUID.randomUUID().toString(), movie));
-			}
-		}
-
-		Configuration[] newConfig = new Configuration[configs.size()];
-		do {
-			int minutesRemained = operatingMinutes - minuteUsed;
-			newConfig = Stream.of(configs.toArray())
-					.filter(config -> ((Configuration) config).getMovie().getTotalTime() <= minutesRemained)
-					.toArray(Configuration[]::new);
-			if (newConfig.length > 0) {
-				for (int i = 0; i < newConfig.length; i++) {
-					Configuration config = newConfig[i];
-					if (config.getMovie().getTotalTime() <= operatingMinutes - minuteUsed) {
-						Movie movie = config.getMovie();
-						scheduleList.add(new Schedule(UUID.randomUUID().toString(),
-								new MovieConfig(movie.getMovieId(), movie.getMovieName(), movie.getTotalTime(),
-										config.getTimePrefer(), config.getTheatrePrefer())));
-						minuteUsed += movie.getTotalTime();
-
-					}
+				Movie model = config.getMovie();
+				minuteUsed += model.getTotalTime() * movieAvailable;
+				//minuteUsed += Constant.DEFAULT_TIME_GAP * movieAvailable;
+				MovieConfig movie = new MovieConfig(model.getMovieId(), model.getMovieName(), model.getTotalTime(),
+						config.getTheatrePrefer(),model.getOriginalTime());
+				for (int i = 0; i < movieAvailable; i++) {
+					scheduleList.add(new Schedule(UUID.randomUUID().toString(), movie,operatingTime));
 				}
 			}
-		} while (newConfig.length > 0);
+			
 
+			Configuration[] newConfig = new Configuration[configs.size()];
+			do {
+				int minutesRemained = operatingMinutes - minuteUsed;
+				newConfig = Stream.of(configs.toArray())
+						.filter(config -> ((Configuration) config).getMovie().getTotalTime() <= minutesRemained)
+						.toArray(Configuration[]::new);
+				if (newConfig.length > 0) {
+					for (int i = 0; i < newConfig.length; i++) {
+						Configuration config = newConfig[i];
+						if (config.getMovie().getTotalTime() <= operatingMinutes - minuteUsed) {
+							Movie movie = config.getMovie();
+							scheduleList.add(new Schedule(UUID.randomUUID().toString(),
+									new MovieConfig(movie.getMovieId(), movie.getMovieName(), movie.getTotalTime(),
+											config.getTheatrePrefer(), movie.getOriginalTime()),operatingTime));
+							minuteUsed += movie.getTotalTime();
+
+						}
+					}
+				}
+			} while (newConfig.length > 0);
+			
+			log.info("Time used: " + minuteUsed);
+			
+			//Random remove on some theatre
+			//When schedule too tight
+			if(count % 2 == 0) {
+				if(minuteUsed + 15>= operatingMinutes) {
+					Schedule shortestSchedule = scheduleList.get(0);
+					for(Schedule s : scheduleList) {
+						if(s.getMovie().getTotalTime() < shortestSchedule.getMovie().getTotalTime()) {
+							shortestSchedule = s;
+						}
+					}
+					minuteUsed -= shortestSchedule.getMovie().getTotalTime();
+					scheduleList.remove(shortestSchedule);
+					log.info("Time used after trim: " + minuteUsed);
+				}
+			}
+			
+		}
 		return scheduleList;
 	}
+	
+	public HashMap<String, Object> getJsonAsMap(String json)
+	{
+	    try
+	    {
+	        ObjectMapper mapper = new ObjectMapper();
+	        TypeReference<Map<String,Object>> typeRef = new TypeReference<Map<String,Object>>() {};
+	        HashMap<String, Object> result = mapper.readValue(json, typeRef);
 
-	public Map<String, String> generateOverallSchedule(HttpServletRequest req) {
+	        return result;
+	    }
+	    catch (Exception e)
+	    {
+	        throw new RuntimeException("Couldnt parse json:" + json, e);
+	    }
+	}
+
+	public Map<String, String> generateOverallSchedule(HttpServletRequest req, String base64Theatre) {
 		Map<String, String> response = null;
 		String branchid = (String) session.getAttribute("branchid");
 		try {
+			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			
+			List<String> theatreSelected = (ArrayList<String>) maps.get("theatreSelection");
 			String[] movieidList = req.getParameterValues("movieId");
-			int[] preferableTimeList = Stream.of(req.getParameterValues("timePrefer")).mapToInt(Integer::parseInt)
-					.toArray();
+			
 			double[] percentList = Stream.of(req.getParameterValues("percent")).mapToDouble(Double::parseDouble)
 					.toArray();
+			String strm = "Stream ";
+			for(double value : percentList) {
+				strm += value + " ";
+			}
+			log.info(strm);
 			String[] typeList = req.getParameterValues("theatrePrefer");
+	
 			String startDate = req.getParameter("startDate");
 			String endDate = req.getParameter("endDate");
 			int dateRange = getDateRange(startDate, endDate);
@@ -409,8 +490,24 @@ public class ScheduleService {
 				List<Theatre> theatreList = retrieveTheatreList();
 				log.info("Generate Schedule for " + dateRange + " day(s)");
 				if (theatreList != null) {
+					
+					List<Theatre> removableItem = new ArrayList<Theatre>();
+					for(Theatre theatre : theatreList) {
+						boolean isFound = false;
+						for(String theatreId : theatreSelected) {
+							if(theatreId.equals(theatre.getId())) {
+								isFound = true;
+							}
+						}
+						
+						if(!isFound) {
+							removableItem.add(theatre);
+						}
+					}
+					
+					theatreList.removeAll(removableItem);					
 					if (theatreList.size() > 0) {
-						if (movieidList.length == preferableTimeList.length && movieidList.length == percentList.length
+						if (movieidList.length == percentList.length
 								&& movieidList.length == typeList.length) {
 							LocalDate start = new Timestamp(Long.parseLong(startDate)).toLocalDateTime().toLocalDate();
 							LocalDate end = new Timestamp(Long.parseLong(endDate)).toLocalDateTime().toLocalDate();
@@ -425,14 +522,15 @@ public class ScheduleService {
 								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
 								movie.setTotalTime(newMovieTime); // Increment to nearest % 15
 								largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
+								movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
 								
 								if(movie == null || moviePeriod == null) {
 									log.error("Unable to retrieve movie information from database.");
 									response = new LinkedHashMap<String, String>();
-									response.put("Error", "Unable to retrieve movie information. Action abort. Please try again later.");
+									response.put("error", "Unable to retrieve movie information. Action abort. Please try again later.");
 									return response;
 								}
-								Configuration config = new Configuration(movieidList[i], preferableTimeList[i],
+								Configuration config = new Configuration(movieidList[i],
 										percentList[i], typeList[i], movie,moviePeriod);
 								configuration.add(config);
 							}
@@ -441,17 +539,18 @@ public class ScheduleService {
 							List<TimeGrain> timeList = getOperatingTimeGrain();
 							if (timeList == null) {
 								response = new LinkedHashMap<String, String>();
-								response.put("Error", "Unable to retrieve branch information. Please try again later.");
+								response.put("error", "Unable to retrieve branch information. Please try again later.");
 								return response;
 							}
-
+							
+							
 							List<TheatreType> types = theatreDao.getTheatreType();
 
 							List<com.ms.Optaplanner.Theatre> theatres = new ArrayList<com.ms.Optaplanner.Theatre>();
 							for (Theatre theatre : theatreList) {
 								for (TheatreType type : types) {
 									if (theatre.getTheatretype().equals(type.getSeqid())) {
-										theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(), theatre.getName(),
+										theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(), theatre.getTitle(),
 												theatre.getSeatcol() * theatre.getSeatrow(), type));
 									}
 								}
@@ -462,6 +561,7 @@ public class ScheduleService {
 							SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 							
 							List<Event> eventList = new ArrayList<Event>();
+							int finalScore = 0;
 							for(Map.Entry<LocalDate, List<Configuration>> entry : segment.entrySet()) {
 								List<Schedule> scheduleList = createSchedule(entry.getValue(), theatreList.size());
 								log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
@@ -470,14 +570,19 @@ public class ScheduleService {
 								// Overall configuration
 								if (dateList == null) {
 									response = new LinkedHashMap<String, String>();
-									response.put("Error", "Unable to process the date specified. Please try again later.");
+									response.put("error", "Unable to process the date specified. Please try again later.");
 									return response;
 								}
 
 								Collections.shuffle(scheduleList);
 								Theatre_Schedule problem = new Theatre_Schedule(scheduleList, theatres, dateList, timeList,
 										null);
-								List<Schedule> solution = solveProblem(problem);
+								
+								Map<String,Object> results = solveProblem(problem);
+								List<Schedule> solution = (List<Schedule>)results.get("result");
+								int score = (int)results.get("score");
+								finalScore += score;
+								int UnprocessedProblemCount = 0;
 
 								int counter = 0;
 								
@@ -490,14 +595,17 @@ public class ScheduleService {
 											Date startTime = Constant.SQL_DATE_FORMAT
 													.parse(date + " " + s.getStartTime().getTime() + ":00");
 											LocalDate nextDate = date;
-											if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+											if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
 													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT
-													.parse(nextDate + " " + s.getEndTime() + ":00");
+													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime)));
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
+											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+											 
 										} else {
 											counter++;
 										}
@@ -507,6 +615,8 @@ public class ScheduleService {
 
 							}
 							
+							
+							
 							response = new LinkedHashMap<String, String>();
 							ObjectMapper mapper = new ObjectMapper();
 							mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -515,6 +625,7 @@ public class ScheduleService {
 								String locationJsonData = mapper.writeValueAsString(theatreList);
 								response.put("result", jsonData);
 								response.put("location", locationJsonData);
+								response.put("score",String.format("%d",finalScore));
 							} catch (JsonProcessingException e) {
 								e.printStackTrace();
 							}
@@ -522,24 +633,24 @@ public class ScheduleService {
 
 						} else {
 							response = new LinkedHashMap<String, String>();
-							response.put("Error", "Unable to retrieve complete data. Please try again later.");
+							response.put("error", "Unable to retrieve complete data. Please try again later.");
 							return response;
 						}
 					} else { // TheatreList size check
 						response = new LinkedHashMap<String, String>();
-						response.put("Error",
+						response.put("error",
 								"No theatre are available. Please add new theatre or activate theatre before continue.");
 						return response;
 					}
 
 				} else { // TheatreList null check
 					response = new LinkedHashMap<String, String>();
-					response.put("Error", "Receive invalid data from request. Please try again later.");
+					response.put("error", "Receive invalid data from request. Please try again later.");
 					return response;
 				}
 			} else {// Date Range check
 				response = new LinkedHashMap<String, String>();
-				response.put("Error", "Receive invalid date from request. Please try again later.");
+				response.put("error", "Receive invalid date from request. Please try again later.");
 				return response;
 			}
 
@@ -547,7 +658,7 @@ public class ScheduleService {
 			log.error("NullPointerException ex:: " + ne.getMessage());
 			response = new LinkedHashMap<String, String>();
 
-			response.put("Error", "Unable to receive data from user, please try again later.");
+			response.put("error", "Unable to receive data from user, please try again later.");
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			ne.printStackTrace(printWriter);
@@ -557,16 +668,18 @@ public class ScheduleService {
 		} catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
 			response = new LinkedHashMap<String, String>();
-			response.put("Error", "Unexpected error occured, please try again later.");
+			response.put("error", "Unexpected error occured, please try again later.");
 			return response;
 		}
 
 	}
 
-	public Map<String,String> generateWeeklySchedule(HttpServletRequest req){
+	public Map<String,String> generateWeeklySchedule(HttpServletRequest req, String base64Theatre){
 		Map<String,String> response = null;
 		String branchid = (String) session.getAttribute("branchid");
 		try {
+			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			
 			String[] groupIds = req.getParameterValues("groupId");
 			if(groupIds.length > 0) {
 				List<Theatre> theatreList = retrieveTheatreList(); 
@@ -584,7 +697,7 @@ public class ScheduleService {
 				for(Theatre theatre : theatreList) {
 					for(TheatreType type : types) {
 						if(theatre.getTheatretype().equals(type.getSeqid())) {
-							theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(),theatre.getName(),theatre.getSeatcol() * theatre.getSeatrow(), type));
+							theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
 						}
 					}
 				}
@@ -594,11 +707,12 @@ public class ScheduleService {
 						List<Event> eventList = new ArrayList<Event>();
 						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 						LocalDate scheduleEnd = new Timestamp(Long.parseLong(ScheduleEndDate)).toLocalDateTime().toLocalDate();
+						int finalScore = 0;
 						for(String groupId : groupIds) {
+							
+							
 							String[] movieIds = req.getParameterValues(groupId + ".movieId");
 							String[] theatrePrefer = req.getParameterValues(groupId + ".theatrePrefer");
-							int[] preferableTimeList = Stream.of(req.getParameterValues(groupId + ".timePrefer")).mapToInt(Integer::parseInt)
-									.toArray();
 							double[] percentList = Stream.of(req.getParameterValues(groupId + ".percent")).mapToDouble(Double::parseDouble)
 									.toArray();
 							LocalDate startDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
@@ -606,9 +720,20 @@ public class ScheduleService {
 							LocalDate endDate = (startDate.plusDays(rangeToEndOfWeek)).compareTo(scheduleEnd) <= 0 ? startDate.plusDays(rangeToEndOfWeek) : scheduleEnd;
 							int largestMovieTime = 0;
 							
+							List<String> theatreSelected = (ArrayList<String>) maps.get(groupId + ".theatreSelection");
+							//Filter unactivated theatre
+							List<com.ms.Optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.Optaplanner.Theatre>();
+							for(com.ms.Optaplanner.Theatre theatre : theatres) {
+								for(String theatreId : theatreSelected) {
+									if(theatreId.equals(theatre.getTheatreId())) {
+										filteredTheatre.add(theatre);
+									}
+								}
+							}
+
 							List<Configuration> configuration = new ArrayList<Configuration>();
-							if (movieIds.length == preferableTimeList.length && preferableTimeList.length == percentList.length
-									&& preferableTimeList.length == theatrePrefer.length) {
+							if (movieIds.length == percentList.length
+									&& percentList.length == theatrePrefer.length) {
 								for (int i = 0; i < movieIds.length; i++) {
 									
 									Movie movie = movieDao.getMovieDetails(movieIds[i]);
@@ -617,8 +742,9 @@ public class ScheduleService {
 									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN;
 									movie.setTotalTime(newMovieTime); // Increment to nearest % 15
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
-
-									Configuration config = new Configuration(movieIds[i], preferableTimeList[i],
+									movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
+																							// number
+									Configuration config = new Configuration(movieIds[i],
 											percentList[i], theatrePrefer[i], movie,moviePeriod);
 									configuration.add(config);
 								}
@@ -626,21 +752,25 @@ public class ScheduleService {
 								//Segment 
 								Map<LocalDate,List<Configuration>> segment = segmentOverallSchedule(configuration,startDate,endDate);
 								for(Map.Entry<LocalDate, List<Configuration>> entry : segment.entrySet()) {
-									List<Schedule> scheduleList = createSchedule(entry.getValue(), theatreList.size());
+									List<Schedule> scheduleList = createSchedule(entry.getValue(), filteredTheatre.size());
 									log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
 									
 									List<LocalDate> dateList = getFirstDateInRange(entry.getKey());
 									if (dateList == null) {
 										response = new LinkedHashMap<String, String>();
-										response.put("Error", "Unable to process the date specified. Please try again later.");
+										response.put("error", "Unable to process the date specified. Please try again later.");
 										return response;
 									}
 									log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
 									
 									Collections.shuffle(scheduleList);
-									Theatre_Schedule problem = new Theatre_Schedule(scheduleList,theatres,dateList,timeList,null);
+									Theatre_Schedule problem = new Theatre_Schedule(scheduleList,filteredTheatre,dateList,timeList,null);
 									
-									List<Schedule> solution = solveProblem(problem);
+									Map<String,Object> results = solveProblem(problem);
+									
+									List<Schedule> solution = (List<Schedule>)results.get("result");
+									int score = (int)results.get("score");
+									finalScore += score;
 
 									int UnprocessedProblemCount = 0;
 									
@@ -653,67 +783,31 @@ public class ScheduleService {
 												Date startTime = Constant.SQL_DATE_FORMAT
 														.parse(date + " " + s.getStartTime().getTime() + ":00");
 												LocalDate nextDate = date;
-												if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+												if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
 														&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 													nextDate = nextDate.plusDays(1);
 												}
 												Date endTime = Constant.SQL_DATE_FORMAT
-														.parse(nextDate + " " + s.getEndTime() + ":00");
+														.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
 												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime)));
+														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+												Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
+												eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 											} else {
 												UnprocessedProblemCount++;
 											}
 										}
 									}
 									log.info("Remaining problem:" + UnprocessedProblemCount);
-									
-									
-									//problemList[counter] = problem;
-									//firstOfWeekList.add(startDate);
-									//counter++;
-									
-									
 								}
 							}
 							else {
 								response = new LinkedHashMap<String, String>();
-								response.put("Error", "Unable to retrieve complete data. Please try again later.");
+								response.put("error", "Unable to retrieve complete data. Please try again later.");
 								return response;
 							}
 						}
-						//Escape For loop
-//						for(int i = 0 ; i < problemList.length; i++) {
-//							Theatre_Schedule problem = problemList[i];
-//							LocalDate startDate = firstOfWeekList.get(i);
-//							
-//							List<Schedule> solution = solveProblem(problem);
-//
-//							int UnprocessedProblemCount = 0;
-//							//scheduleList.addAll(solution);
-//							List<LocalDate> scheduleDateList = getScheduledDate(startDate,startDate.plusDays(6));
-//							// Update the date
-//							for (Schedule s : solution) {
-//								for (LocalDate date : scheduleDateList) {
-//									if (s.getStartTime() != null) {
-//										Date startTime = Constant.SQL_DATE_FORMAT
-//												.parse(date + " " + s.getStartTime().getTime() + ":00");
-//										LocalDate nextDate = date;
-//										if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-//												&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-//											nextDate = nextDate.plusDays(1);
-//										}
-//										Date endTime = Constant.SQL_DATE_FORMAT
-//												.parse(nextDate + " " + s.getEndTime() + ":00");
-//										eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-//												s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime)));
-//									} else {
-//										UnprocessedProblemCount++;
-//									}
-//								}
-//							}
-//							log.info("Unprocessed item: " + UnprocessedProblemCount);
-//						}
+						
 					    log.info("Total Schedule:" + eventList.size());
 					    response = new LinkedHashMap<String, String>();
 						ObjectMapper mapper = new ObjectMapper();
@@ -723,6 +817,7 @@ public class ScheduleService {
 							String locationJsonData = mapper.writeValueAsString(theatreList);
 							response.put("result", jsonData);
 							response.put("location", locationJsonData);
+							response.put("score",String.format("%d",finalScore));
 						} catch (JsonProcessingException e) {
 							e.printStackTrace();
 						}
@@ -731,26 +826,25 @@ public class ScheduleService {
 					}
 					else { // TheatreList size check
 						response = new LinkedHashMap<String, String>();
-						response.put("Error",
+						response.put("error",
 								"No theatre are available. Please add new theatre or activate theatre before continue.");
 						return response;
 					}
 
 				} else { // TheatreList null check
 					response = new LinkedHashMap<String, String>();
-					response.put("Error", "Receive invalid data from request. Please try again later.");
+					response.put("error", "Receive invalid data from request. Please try again later.");
 					return response;
 				}
 			}
 			else {
 				response = new LinkedHashMap<String, String>();
-				response.put("Error", "Unable to read the data from request. Please try again later.");
+				response.put("error", "Unable to read the data from request. Please try again later.");
 				return response;
 			}
 			
 					
 		}catch(Exception ex){
-			log.error("Exception ::" + ex);
 			response = new LinkedHashMap<String, String>();
 			response.put("error", "Unexpected error occured, please try again later.");
 			StringWriter writer = new StringWriter();
@@ -762,7 +856,174 @@ public class ScheduleService {
 		}
 	}
 
-	public List<Schedule> solveProblem(Theatre_Schedule problem) {
+	public Map<String,String> generateDailySchedule(HttpServletRequest req, String base64Theatre){
+		Map<String,String> response = null;
+		String branchid = (String) session.getAttribute("branchid");
+		try {
+			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			
+			String[] groupIds = req.getParameterValues("groupId");
+			if(groupIds.length > 0) {
+				List<Theatre> theatreList = retrieveTheatreList(); 
+				List<TheatreType> types =  theatreDao.getTheatreType();
+				
+				List<TimeGrain> timeList = getOperatingTimeGrain();
+				if(timeList == null) {
+					response = new LinkedHashMap<String, String>();
+					response.put("error", "Unable to retrieve branch information. Please try again later.");
+					return response;
+				}
+				
+				List<com.ms.Optaplanner.Theatre> theatres = new ArrayList<com.ms.Optaplanner.Theatre>();
+				for(Theatre theatre : theatreList) {
+					for(TheatreType type : types) {
+						if(theatre.getTheatretype().equals(type.getSeqid())) {
+							theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
+						}
+					}
+				}
+				
+				if(theatreList != null) {
+					if(theatreList.size() > 0) {
+						List<Event> eventList = new ArrayList<Event>();
+						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+						int finalScore = 0;
+						for(String groupId : groupIds) {
+							String[] movieIds = req.getParameterValues(groupId + ".movieId");
+							String[] theatrePrefer = req.getParameterValues(groupId + ".theatrePrefer");
+							double[] percentList = Stream.of(req.getParameterValues(groupId + ".percent")).mapToDouble(Double::parseDouble)
+									.toArray();
+							LocalDate scheduleDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
+							
+							List<String> theatreSelected = (ArrayList<String>) maps.get(groupId + ".theatreSelection");
+							//Filter unactivated theatre
+							List<com.ms.Optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.Optaplanner.Theatre>();
+							for(com.ms.Optaplanner.Theatre theatre : theatres) {
+								for(String theatreId : theatreSelected) {
+									if(theatreId.equals(theatre.getTheatreId())) {
+										filteredTheatre.add(theatre);
+									}
+								}
+							}
+							
+							List<Configuration> configuration = new ArrayList<Configuration>();
+							if (movieIds.length == percentList.length
+									&& percentList.length == theatrePrefer.length) {
+								for (int i = 0; i < movieIds.length; i++) {
+									
+									Movie movie = movieDao.getMovieDetails(movieIds[i]);
+									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
+									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+									movie.setTotalTime(movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0)); // Increment to nearest % 5
+																							// number
+
+									Configuration config = new Configuration(movieIds[i],
+											percentList[i], theatrePrefer[i], movie,moviePeriod);
+									configuration.add(config);
+								}
+								
+								//Segment 
+								List<Schedule> scheduleList = createSchedule(configuration, filteredTheatre.size());								
+									
+								List<LocalDate> dateList = new ArrayList<LocalDate>();
+								dateList.add(scheduleDate);
+										
+								log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
+								
+								Collections.shuffle(scheduleList);
+								Theatre_Schedule problem = new Theatre_Schedule(scheduleList,filteredTheatre,dateList,timeList,null);
+									
+								Map<String,Object> results = solveProblem(problem);
+								
+								List<Schedule> solution = (List<Schedule>)results.get("result");
+								int score = (int)results.get("score");
+								finalScore += score;
+								int UnprocessedProblemCount = 0;
+									
+								List<LocalDate> scheduleDateList = getScheduledDate(scheduleDate,scheduleDate); //Return only 1
+									// Update the date
+								for (Schedule s : solution) {
+									for (LocalDate date : scheduleDateList) {
+										if (s.getStartTime() != null) {
+											Date startTime = Constant.SQL_DATE_FORMAT
+													.parse(date + " " + s.getStartTime().getTime() + ":00");
+											LocalDate nextDate = date;
+											if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+												nextDate = nextDate.plusDays(1);
+											}
+											Date endTime = Constant.SQL_DATE_FORMAT
+													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
+											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
+											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+										} else {
+											UnprocessedProblemCount++;
+										}
+									}
+								}
+								log.info("Remaining problem:" + UnprocessedProblemCount);
+							}
+							else {
+								response = new LinkedHashMap<String, String>();
+								response.put("error", "Unable to retrieve complete data. Please try again later.");
+								return response;
+							}
+						}
+						
+					    log.info("Total Schedule:" + eventList.size());
+					    response = new LinkedHashMap<String, String>();
+						ObjectMapper mapper = new ObjectMapper();
+						mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+						try {
+							String jsonData = mapper.writeValueAsString(eventList);
+							String locationJsonData = mapper.writeValueAsString(theatreList);
+							response.put("result", jsonData);
+							response.put("location", locationJsonData);
+							response.put("score",String.format("%d",finalScore));
+						} catch (JsonProcessingException e) {
+							e.printStackTrace();
+						}
+						return response;
+						
+					}
+					else { // TheatreList size check
+						response = new LinkedHashMap<String, String>();
+						response.put("error",
+								"No theatre are available. Please add new theatre or activate theatre before continue.");
+						return response;
+					}
+
+				} else { // TheatreList null check
+					response = new LinkedHashMap<String, String>();
+					response.put("error", "Receive invalid data from request. Please try again later.");
+					return response;
+				}
+			}
+			else {
+				response = new LinkedHashMap<String, String>();
+				response.put("error", "Unable to read the data from request. Please try again later.");
+				return response;
+			}
+		}
+		catch(Exception ex) {
+			response = new LinkedHashMap<String, String>();
+			response.put("error", "Unexpected error occured, please try again later.");
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ex.printStackTrace(printWriter);
+			printWriter.flush();
+			log.error(writer.toString());
+			return response;
+		}
+		
+	}
+	
+	public Map<String,Object> solveProblem(Theatre_Schedule problem) {
+		Map<String,Object> response = new LinkedHashMap<String, Object>();
+		
+		List<Schedule> result = new ArrayList<Schedule>();
 		Solver<Theatre_Schedule> solver = solverFactory.buildSolver();
 		SolverManager<Theatre_Schedule, UUID> solverManager = SolverManager.create(solverFactory,
 				new SolverManagerConfig());
@@ -776,6 +1037,10 @@ public class ScheduleService {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new IllegalStateException("Solved	Failed.", e);
 		}
+		result = solution.getScheduleList();
+		response.put("result",result);
+		
+		int hardScore = 0;
 		ScoreManager<Theatre_Schedule, HardSoftScore> scoreManager = ScoreManager.create(solverFactory);
 		ScoreExplanation<Theatre_Schedule, HardSoftScore> scoreExplanation = scoreManager.explainScore(solution);
 
@@ -785,7 +1050,7 @@ public class ScheduleService {
 			String constraintName = constraintMatchTotal.getConstraintName();
 			// The score impact of that constraint
 			HardSoftScore totalScore = constraintMatchTotal.getScore();
-
+			hardScore += totalScore.getHardScore();
 			for (ConstraintMatch<HardSoftScore> constraintMatch : constraintMatchTotal.getConstraintMatchSet()) {
 				List<Object> justificationList = constraintMatch.getJustificationList();
 				HardSoftScore score = constraintMatch.getScore();
@@ -793,8 +1058,8 @@ public class ScheduleService {
 			}
 		}
 		log.info(scoreManager.explainScore(solution));
-
-		return solution.getScheduleList();
+		response.put("score",hardScore);
+		return response;
 	}
 
 	public int getDateRange(String startDate, String endDate) {
@@ -860,10 +1125,15 @@ public class ScheduleService {
 		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
 		LocalTime startTime = operatingHours.getStartTime();
 		LocalTime endTime = operatingHours.getEndTime();
-
-		long remaining = endTime.toNanoOfDay() - startTime.toNanoOfDay();
+		long nextDayNano = 0;
+		if(endTime.compareTo(LocalTime.of(0, 0)) >= 0 && endTime.compareTo(startTime) < 0) {
+			LocalTime officialEndTime = endTime;
+			endTime = LocalTime.of(23,59);
+			nextDayNano = officialEndTime.toNanoOfDay() - LocalTime.of(0, 0).toNanoOfDay(); 
+		}
+		long remaining = endTime.toNanoOfDay() - startTime.toNanoOfDay() + nextDayNano;
 		int remainMinute = (int) (remaining / 1000000000) / 60;
-		return remainMinute % 15 == 0 ? remainMinute : remainMinute - (remainMinute % 15);
+		return remainMinute % Constant.DEFAULT_TIME_GRAIN == 0 ? remainMinute : remainMinute - (remainMinute % Constant.DEFAULT_TIME_GRAIN);
 	}
 
 	public Map<Boolean, String> validateDateRange(String fromdate, String todate) {

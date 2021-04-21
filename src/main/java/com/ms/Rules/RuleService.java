@@ -67,14 +67,33 @@ public class RuleService {
 					LocalTime startTime = LocalTime.parse(timeArray[0]);
 					LocalTime endTime = LocalTime.parse(timeArray[1]);
 					
-					startTime = startTime.getMinute() % 15 == 0? startTime : startTime.minusMinutes(startTime.getMinute() % 15);
-					endTime = endTime.getMinute() % 15 == 0? endTime : endTime.minusMinutes(endTime.getMinute() % 15);
-					do {
+					startTime = startTime.getMinute() % Constant.DEFAULT_TIME_GRAIN == 0? startTime : startTime.minusMinutes(startTime.getMinute() % Constant.DEFAULT_TIME_GRAIN);
+					endTime = endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN == 0? endTime : endTime.minusMinutes(endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN);
+					if(endTime.compareTo(LocalTime.of(0, 0)) >= 0 && endTime.compareTo(startTime) < 0){
+						LocalTime officialEndTime = endTime;
+						endTime = LocalTime.of(23, 59);
+						endTime = endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN == 0? endTime : endTime.minusMinutes(endTime.getMinute() % Constant.DEFAULT_TIME_GRAIN);
+						do {
+							timeList.add(startTime);
+							startTime = startTime.plusMinutes(Constant.DEFAULT_TIME_GRAIN);
+						}while(startTime.compareTo(endTime) < 0);
 						timeList.add(startTime);
-						startTime = startTime.plusMinutes(Constant.DEFAULT_TIME_GRAIN);
-					}while(startTime.compareTo(endTime) < 0);
-					timeList.add(startTime);
-					return timeList;
+						startTime = LocalTime.of(0, 0);
+						do {
+							timeList.add(startTime);
+							startTime = startTime.plusMinutes(Constant.DEFAULT_TIME_GRAIN);
+						}while(startTime.compareTo(officialEndTime) < 0);
+						timeList.add(startTime);
+						return timeList;
+					}
+					else {
+						do {
+							timeList.add(startTime);
+							startTime = startTime.plusMinutes(Constant.DEFAULT_TIME_GRAIN);
+						}while(startTime.compareTo(endTime) < 0);
+						timeList.add(startTime);
+						return timeList;
+					}
 				}
 			}
 			
