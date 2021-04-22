@@ -24,28 +24,26 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.ms.Optaplanner.Schedule;
+import com.ms.optaplanner.Schedule;
 import com.ms.common.Constant;
 
 
 @Repository
 public class ScheduleDAO {
 	
-	
 	private JdbcTemplate jdbc;
 	
+	@Autowired
+	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbc = new JdbcTemplate(dataSource);
+	}
+	
 	private SimpleJdbcCall jdbcProcedure;
-
 	
 	public static Logger log = LogManager.getLogger(ScheduleDAO.class);
 	
 	@Autowired
 	HttpSession session;
-	
-	@Autowired
-	public void setDataSource(@Qualifier("dataSource") DataSource source) {
-		jdbc = new JdbcTemplate(source);
-	}
 	
 	public String getLatestSchedule(String branchId) {
 		String latestDate = null;
@@ -66,7 +64,7 @@ public class ScheduleDAO {
 	
 	public String insertMultipleSchedules(List<Schedule> scheduleList) {
 		try {
-			String query = "INSERT INTO SCHEDULE VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO masp.SCHEDULE VALUES(?,?,?,?,?)";
 			
 //				int result = jdbc.batchUpdate(query,new BatchPreparedStatementSetter() {
 //				});

@@ -21,10 +21,10 @@ import lombok.extern.log4j.Log4j2;
 public class LoginDAO{
 	
 	private JdbcTemplate jdbc;
-
+	
 	@Autowired
-	public void setDataSource(@Qualifier("dataSource") DataSource source) {
-		jdbc = new JdbcTemplate(source);
+	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbc = new JdbcTemplate(dataSource);
 	}
 	
 	public Staff findByUsername(Map<String,String> staffInfo, UserGroup usergroup) {
@@ -44,7 +44,7 @@ public class LoginDAO{
 	public Map<String,String> findUser(String username){
 		Map<String,String> staff = null;
 		try {
-			StringBuffer query = new StringBuffer().append("select seqid, username, password, usergroup, status, branchid FROM STAFF WHERE status = ? AND username = ?");
+			StringBuffer query = new StringBuffer().append("select seqid, username, password, usergroup, status, branchid FROM masp.STAFF WHERE status = ? AND username = ?");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString(),Constant.ACTIVE_STATUS_CODE,username);
 			if(result.size() > 0) {
 				staff = new HashMap<String,String>();
@@ -76,7 +76,7 @@ public class LoginDAO{
 	public UserGroup getUserGroup(String usergroupId, List<Menu> menuList) {
 		UserGroup group = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT groupid, groupname, groupdesc FROM user_group WHERE enabled = 1 AND groupid = ?");
+			StringBuffer query = new StringBuffer().append("SELECT groupid, groupname, groupdesc FROM masp.user_group WHERE enabled = 1 AND groupid = ?");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString(),usergroupId);
 			if(result.size() > 0) {
 				for(Map<String,Object> row : result) {
@@ -97,7 +97,7 @@ public class LoginDAO{
 	public List<String> getMenuList(String groupid){
 		List<String> menuList = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT menuid FROM group_menu where groupid = ?");
+			StringBuffer query = new StringBuffer().append("SELECT menuid FROM masp.group_menu where groupid = ?");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString(),groupid);
 			if(result.size() > 0) {
 				menuList = new ArrayList<String>();
@@ -118,7 +118,7 @@ public class LoginDAO{
 	public List<Menu> getAllMenu(){
 		List<Menu> menuList = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT menuid,menuname,icon,url,parentid,seq FROM menu_item WHERE enabled = 1");
+			StringBuffer query = new StringBuffer().append("SELECT menuid,menuname,icon,url,parentid,seq FROM masp.menu_item WHERE enabled = 1");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString());
 			if(result.size() > 0) {
 				menuList = new ArrayList<Menu>();

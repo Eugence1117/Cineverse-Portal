@@ -24,22 +24,22 @@ import com.ms.common.Util;
 public class TheatreDAO {
 	
 	private JdbcTemplate jdbc;
-
+	
+	@Autowired
+	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbc = new JdbcTemplate(dataSource);
+	}
+	
 	public static Logger log = LogManager.getLogger(TheatreDAO.class);
 	
 	@Autowired
 	HttpSession session;
 	
-	@Autowired
-	public void setDataSource(@Qualifier("dataSource") DataSource source) {
-		jdbc = new JdbcTemplate(source);
-	}
-	
 	//TheatreType is shared by every branch
 	public List<TheatreType> groupByTheatreType(String branchid){
 		List<TheatreType> typeList = null;
 		try {
-			String query = "SELECT b.seqid, b.description, b.seatSize, b.price FROM theatre t, theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid";
+			String query = "SELECT b.seqid, b.description, b.seatSize, b.price FROM masp.theatre t, theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid";
 			List<Map<String,Object>> results = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
 			if(results.size() > 0) {
 				typeList = new ArrayList<TheatreType>();
@@ -67,7 +67,7 @@ public class TheatreDAO {
 	public List<TheatreType> getTheatreType(){
 		List<TheatreType> typeList = null;
 		try {
-			String query = "SELECT * FROM theatretype";
+			String query = "SELECT * FROM masp.theatretype";
 			List<Map<String,Object>> results = jdbc.queryForList(query);
 			if(results.size() > 0) {
 				typeList = new ArrayList<TheatreType>();
@@ -95,7 +95,7 @@ public class TheatreDAO {
 	public List<Theatre> getTheatreList(String branchid){
 		List<Theatre> theatreList = null;
 		try {
-			String query = "SELECT seqid,theatrename, seatrow, seatcol, theatretype, createddate FROM theatre where branchid = ? AND status = ?";
+			String query = "SELECT seqid,theatrename, seatrow, seatcol, theatretype, createddate FROM masp.theatre where branchid = ? AND status = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
 			theatreList = new ArrayList<Theatre>();
 			if(rows.size() > 0) {

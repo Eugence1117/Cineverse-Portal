@@ -38,22 +38,26 @@
 		<property name="suffix" value=".jsp"/>
 	</bean>
 	
-	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="jdbc/masp"/>
-		<property name="resourceRef" value="true"/>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name ="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+		<property name="url" value="jdbc:sqlserver://cinerverse-private.database.windows.net:1433;database=cineverse;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"/>
+		<property name="username" value="Eugence1117"/>
+		<property name="password" value="Eugence0679."/>
 	</bean>
 
+	<!-- 
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
 	
-	<tx:annotation-driven transaction-manager="transactionManager" />
+	<tx:annotation-driven transaction-manager="transactionManager" />-->
 
 
-<!-- JPA Transaction Manager -->
+	<!-- JPA Transaction Manager
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory"/>
-	</bean>
+	</bean> -->
 	
-	<!-- JPA entity manager factory -->
+	<!-- JPA entity manager factory
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan" value="com.ms"/>
@@ -63,10 +67,11 @@
         	</props>
         </property>
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
-    </bean>
-
-	<!-- Configure Spring Data JPA Support -->
-	<jpa:repositories base-package="com.ms"/>
+    </bean> -->
+	
+	<!-- Configure Spring Data JPA Support
+	<jpa:repositories base-package="com.ms"/> -->
+	 
 	
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basename" value="WEB-INF/messages" />
