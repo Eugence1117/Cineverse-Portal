@@ -1,9 +1,9 @@
 package com.ms.movie;
 
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 
@@ -35,6 +39,12 @@ public class MovieService {
 	
 	@Autowired
 	HttpSession session;
+	
+	@Autowired
+	CloudBlobContainer cloudBlobContainer;
+	
+	@Autowired
+	CloudBlobClient cloudBlobClient;
 	
 	@Autowired
 	MovieDao dao;
@@ -227,35 +237,41 @@ public class MovieService {
 			return new ResponseMovieInfo(result);
 		}
 	}
-
+	
 	@Transactional(rollbackFor= Exception.class)
 	public boolean insertMovieRecord(NewMovieForm form) {
 		
 		boolean status = false;
 		String uuid = UUID.randomUUID().toString();
-		String[] filePath = createFilePath(form.getPosterImage().getOriginalFilename(), uuid);
-		if(filePath[0] == null || filePath[1] == null) {
+		String format = getFileFormat(form.getPosterImage().getOriginalFilename());
+		form.setMovieId(uuid);
+		URI uri = uploadFileToAzure(uuid + format,form.getPosterImage());
+		if(uri == null) {
+			log.info("Unable to upload. Action abort.");
 			return false;
 		}
 		else {
-			form.setMovieId(uuid);
-			status = dao.insertNewMovie(form, filePath[1]);
-			if(status) {
-				if(!uploadFile(filePath[0],form.getPosterImage())) {
-					log.info("Uploaded File Deleted. Database will rollback.");
-					throw new RuntimeException("Error Occured When Store Image");
-				}
-				else {
-					log.info("Upload Successful");
+			try {
+				log.info("Uploading image");
+				URL url = uri.toURL();
+				log.info(url.toString());
+				status = dao.insertNewMovie(form,uri.toString());
+				if(status) {
+					log.info("Movie insert successful.");
 					return true;
 				}
+				else {
+					log.error("Insert to database failed.");
+					deleteFile(uuid + format);
+					return false;
+				}
 			}
-			else {
-				log.error("Insert Database Failed.");
-				return status;
+			catch(Exception ex) {
+				log.error("Exception ::" + ex.getMessage());
+				return false;
 			}
+			
 		}
-		
 	}
 	
 	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {
@@ -297,81 +313,56 @@ public class MovieService {
 		return response;
 	}
 	
-	public String[] createFilePath(String filename, String seqid) {
+	public String getFileFormat(String filename) {
 		String format = "";
 		Pattern ptn = Pattern.compile(Constant.FILE_PATTERN);
 		Matcher matcher = ptn.matcher(filename);
 		
 		while(matcher.find()) {
-			format = matcher.group(); //get the extension
+			format = matcher.group();
 		}
-		String filePath = seqid + format;
 		
-		String fullPath = Constant.IMG_STORE_PATH + filePath;
-		String storedPath = Constant.IMG_DB_PATH + filePath;
-		boolean sameName = true;
-		boolean isDeleted = false;
-		try {
-			
-			File directory = new File(Constant.IMG_STORE_PATH + File.separator);
-			log.info("Directory {}", directory.getAbsolutePath());
-			log.info("Directory Exists {}", directory.exists());
-		    if (!directory.exists()){
-		        boolean create = directory.mkdirs();
-		        log.info("create Directory {}", create);
-		    }
-		    //Avoid Same File Name
-		    
-		    File[] listofFile = directory.listFiles();
-				
-			for(int i = 0 ; i < listofFile.length; i++) {
-				if(listofFile[i].isFile()) {
-					if(listofFile[i].getName().equals(filePath)) {
-						sameName = false;
-						isDeleted = listofFile[i].delete();
-					}
-						
-				}
-			}
-		    
-			if(!sameName) {
-				if(!isDeleted) {
-					log.error("Error occured when removed file. Operation abort.");
-					return new String[]{null,null};
-				}
-				else {
-					log.info("File Deleted.");
-					return new String[]{fullPath,storedPath};
-				}
-			}
-			else {
-				log.info("No Duplicate File");
-				return new String[]{fullPath,storedPath};
-			}
-
-			
-	    }catch(Exception ex) {
-	    	log.error("CreateFilePath:: " + ex.getMessage());
-	    	return new String[]{null,null};
-	    }
-		
+		return format;
 	}
 	
-	public boolean uploadFile(String filepath, MultipartFile mpf) {
-		log.info("Picture insert to " + filepath);
-		try{
-			File uploadfile = new File(filepath);	    	
-	    	byte[] photoBytes = mpf.getBytes();
-	    	BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadfile));
-	    	stream.write(photoBytes);
-			stream.flush();
-			stream.close();
-			
-			return true;
+	
+	public URI uploadFileToAzure(String filename, MultipartFile mpf) {
+		URI uri = null;
+		CloudBlockBlob blob = null;
+		try {
+			blob = cloudBlobContainer.getBlockBlobReference(filename);
+			blob.upload(mpf.getInputStream(), -1);
+			uri = blob.getUri();
 		}
-		catch(Exception ex) {
-			log.error("CreateFilePath:: " + ex.getMessage());
-			return false;
+		catch(URISyntaxException e) {
+			log.error("URISyntaxException :" + e.getMessage());
+		}
+		catch(StorageException ex) {
+			log.error("StorageException :" + ex.getMessage());
+		}
+		catch(IOException ep) {
+			log.error("IOException :" + ep.getLocalizedMessage());
+		}
+		return uri;
+	}
+	
+	public void deleteFile(String fileName) {
+		try {
+			CloudBlobContainer container = cloudBlobClient.getContainerReference(Constant.IMAGE_CONTAINER_NAME);
+			CloudBlockBlob pendingDelete = container.getBlockBlobReference(fileName);
+			boolean status = pendingDelete.deleteIfExists();
+			if(status) {
+				log.info("Image " + fileName + " removed");
+			}
+			else {
+				log.info("Image " + fileName + " unable to delete.");
+			}
+		}
+		catch(URISyntaxException e) {
+			log.error("URISyntaxException :" + e.getMessage());
+		}
+		catch(StorageException ex) {
+			log.error("StorageException :" + ex.getMessage());
 		}
 	}
 

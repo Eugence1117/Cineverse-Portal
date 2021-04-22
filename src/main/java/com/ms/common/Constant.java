@@ -47,9 +47,10 @@ public class Constant {
 	
 	public static final String FILE_PATTERN = ".[a-zA-Z0-9]+";
 
-	public static final String IMG_STORE_PATH = "B:" + File.separator + "Program Files (x86)" + File.separator + "Tomcat8.5" + File.separator+"webapps"+File.separator+"MovieImg"+File.separator;
-	public static final String IMG_DB_PATH = File.separator + "MovieImg"+ File.separator;
+	//public static final String IMG_STORE_PATH = "B:" + File.separator + "Program Files (x86)" + File.separator + "Tomcat8.5" + File.separator+"webapps"+File.separator+"MovieImg"+File.separator;
+	//public static final String IMG_DB_PATH = File.separator + "MovieImg"+ File.separator;
 	
+	public static final String IMAGE_CONTAINER_NAME = "movieimg";
 	public static final String DEFAULT_TIME = " 00:00:00";
 	public static final SimpleDateFormat SQL_DATE_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

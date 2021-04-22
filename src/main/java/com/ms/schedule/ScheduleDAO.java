@@ -4,10 +4,14 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,12 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlInOutParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
 import com.ms.optaplanner.Schedule;
+
 import com.ms.common.Constant;
 
 
@@ -40,6 +46,11 @@ public class ScheduleDAO {
 	
 	private SimpleJdbcCall jdbcProcedure;
 	
+	@Autowired
+	public void setJdbcProcedure(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbcProcedure = new SimpleJdbcCall(dataSource);
+	}
+	
 	public static Logger log = LogManager.getLogger(ScheduleDAO.class);
 	
 	@Autowired
@@ -48,11 +59,19 @@ public class ScheduleDAO {
 	public String getLatestSchedule(String branchId) {
 		String latestDate = null;
 		try {
-			jdbcProcedure = new SimpleJdbcCall(jdbc).withProcedureName("GetLatestScheduleTime");
-			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchId);
-			Map<String,Object> out = jdbcProcedure.execute(in);
 			
-			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)out.get("enddate"));
+			CallableStatement stmt = jdbcProcedure.getJdbcTemplate().getDataSource().getConnection().prepareCall("{call masp.GetLatestScheduleTime(?,?)}");
+			stmt.setString(1,branchId);
+			stmt.registerOutParameter(2, Types.);
+			jdbcProcedure = new SimpleJdbcCall(jdbc).withProcedureName("GetLatestScheduleTime");
+			SqlParameterSource in = new MapSqlParameterSource().addValue("@branchId", branchId);
+			
+//			jdbcProcedure.withCatalogName("masp");
+//			
+//			Map<String,Object> out = jdbcProcedure.execute(in);
+			stmt.executeUpdate();
+			
+			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)stmt.getTimestamp("endDate"));
 			log.info(latestDate);
 		}
 		catch(Exception ex) {

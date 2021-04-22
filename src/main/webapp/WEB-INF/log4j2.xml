@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Configuration> <!-- to remove the "No grammar constraints (DTD or XML Schema) referenced in the document" warning  -->
-<Configuration status="warn">
+<Configuration status="warn" packages="com.microsoft.applicationinsights.log4j.v2">
 
 <!-- Development .194 -->
     <Appenders>
@@ -23,6 +23,8 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
+        
+         <ApplicationInsightsAppender name="aiAppender" instrumentationKey="[APPLICATION_INSIGHTS_KEY]" />
     </Appenders>
     
     <Loggers>
@@ -32,7 +34,9 @@
         <Logger name="org.hibernate.SQL" level="all" additivity="false">
         	<AppenderRef ref="file-log"/>
         </Logger>
-        
+        <logger level="trace" name="com.ms">
+        	<AppenderRef ref="aiAppender"/>
+        </logger>
         <Logger name="org.optaplanner" level="warn">
         	<AppenderRef ref="OP-log"/>
         </Logger>

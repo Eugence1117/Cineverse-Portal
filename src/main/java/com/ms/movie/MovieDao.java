@@ -253,7 +253,7 @@ public class MovieDao {
 			}
 			else {
 				StringBuffer query = new StringBuffer().append("SELECT seqid,moviename,picurl ")
-						   .append("FROM movie order by releasedate desc");
+						   .append("FROM masp.movie order by releasedate desc");
 				rows = jdbc.queryForList(query.toString());
 			}
 			

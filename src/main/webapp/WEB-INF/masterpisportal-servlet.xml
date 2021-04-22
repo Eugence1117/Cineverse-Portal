@@ -25,10 +25,7 @@
 		<mvc:cache-control max-age="86400" must-revalidate="true"/>
 	</mvc:resources>
 	
-	<!-- Auto create proxy for target class for any advisors found
-	     List of advisor we are using: 
-	     	- com.fl.starhub.flprs.log.RequestPerfLogger, used to log the time used to process each request
-	 -->
+	<!-- Auto create proxy for target class for any advisors found-->
 	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
         <property name="proxyTargetClass" value="true"/>
     </bean>

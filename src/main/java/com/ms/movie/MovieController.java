@@ -29,7 +29,7 @@ public class MovieController {
 	@Autowired
 	MovieService service;
 	
-	@RequestMapping( value = {"//addMovie.htm"})
+	@RequestMapping( value = {"/addMovie.htm"})
 	public String addNewMovie(Model model) {
 		log.info("Entered /addMovie.htm");
 		String usergroupid = httpSession.getAttribute("usergroupid").toString();
