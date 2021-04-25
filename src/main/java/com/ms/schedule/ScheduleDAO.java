@@ -4,10 +4,14 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,43 +23,52 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlInOutParameter;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.ms.Optaplanner.Schedule;
+import com.ms.optaplanner.Schedule;
+
 import com.ms.common.Constant;
 
 
 @Repository
 public class ScheduleDAO {
 	
-	
 	private JdbcTemplate jdbc;
 	
+	@Autowired
+	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbc = new JdbcTemplate(dataSource);
+	}
+	
 	private SimpleJdbcCall jdbcProcedure;
-
+	
+	@Autowired
+	public void setJdbcProcedure(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbcProcedure = new SimpleJdbcCall(dataSource);
+	}
 	
 	public static Logger log = LogManager.getLogger(ScheduleDAO.class);
 	
 	@Autowired
 	HttpSession session;
 	
-	@Autowired
-	public void setDataSource(@Qualifier("dataSource") DataSource source) {
-		jdbc = new JdbcTemplate(source);
-	}
-	
 	public String getLatestSchedule(String branchId) {
 		String latestDate = null;
 		try {
-			jdbcProcedure = new SimpleJdbcCall(jdbc).withProcedureName("GetLatestScheduleTime");
-			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchId);
-			Map<String,Object> out = jdbcProcedure.execute(in);
 			
-			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)out.get("enddate"));
-			log.info(latestDate);
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withCatalogName("cineverse").withProcedureName("GetLatestScheduleTime");
+			jdbcCall.addDeclaredParameter(new SqlOutParameter("endDate",Types.TIMESTAMP));
+			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchId);
+			
+			Map<String, Object> result = jdbcCall.execute(in);
+			
+			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)result.get("endDate"));
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
@@ -66,7 +79,7 @@ public class ScheduleDAO {
 	
 	public String insertMultipleSchedules(List<Schedule> scheduleList) {
 		try {
-			String query = "INSERT INTO SCHEDULE VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO masp.SCHEDULE VALUES(?,?,?,?,?)";
 			
 //				int result = jdbc.batchUpdate(query,new BatchPreparedStatementSetter() {
 //				});

@@ -22,19 +22,19 @@ import com.ms.common.Util;
 public class BranchDAO {
 
 	private JdbcTemplate jdbc;
-
+	
 	@Autowired
-	public void setDataSource(@Qualifier("dataSource") DataSource source) {
-		jdbc = new JdbcTemplate(source);
+	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
+	    this.jdbc = new JdbcTemplate(dataSource);
 	}
-
+	
 	public static Logger log = LogManager.getLogger(BranchDAO.class);
 
 	public ResponseBranchInfo getBranchDetails(int statusCode) {
 		ResponseBranchInfo result = null;
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM masp.branch b, masp.district d, state s ")
 					.append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid AND b.status = ?");
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString(), statusCode);
 			if (rows.size() > 0) {
@@ -64,7 +64,7 @@ public class BranchDAO {
 		ResponseBranchInfo result = null;
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM masp.branch b, masp.district d, masp.state s ")
 					.append("WHERE b.seqid = ? AND b.districtid = d.seqid AND d.stateid = s.seqid");
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString(), seqid);
 			if (rows.size() > 0) {
@@ -94,7 +94,7 @@ public class BranchDAO {
 		ResponseBranchInfo result = null;
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM branch b, district d, state s ")
+					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM masp.branch b, masp.district d, masp.state s ")
 					.append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid");
 
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString());
@@ -125,7 +125,7 @@ public class BranchDAO {
 	public String deleteBranch(String branchID) {
 		String message = null;
 		try {
-			StringBuffer query = new StringBuffer().append("UPDATE branch SET status = ? WHERE seqid = ?");
+			StringBuffer query = new StringBuffer().append("UPDATE masp.branch SET status = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(), Constant.REMOVED_BRANCH_CODE, branchID);
 			if (result > 0) {
 				message = "Branch removed.";
@@ -142,7 +142,7 @@ public class BranchDAO {
 	public String updateStatus(int statusCode, String branchId) {
 		String message = null;
 		try {
-			StringBuffer query = new StringBuffer().append("UPDATE branch SET status = ? WHERE seqid = ?");
+			StringBuffer query = new StringBuffer().append("UPDATE masp.branch SET status = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(), statusCode, branchId);
 			if (result > 0) {
 				message = "Status updated";
@@ -159,7 +159,7 @@ public class BranchDAO {
 	public List<States.Result> retrieveAllState() {
 		List<States.Result> states = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT seqid, stateName FROM state");
+			StringBuffer query = new StringBuffer().append("SELECT seqid, stateName FROM masp.state");
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString());
 			if (rows.size() > 0) {
 				states = new LinkedList<States.Result>();
@@ -182,7 +182,7 @@ public class BranchDAO {
 		List<Districts.Result> districts = null;
 		try {
 			StringBuffer query = new StringBuffer()
-					.append("SELECT seqid, districtname FROM district where stateid = ?");
+					.append("SELECT seqid, districtname FROM masp.district where stateid = ?");
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString(), stateId);
 			if (rows.size() > 0) {
 				districts = new LinkedList<Districts.Result>();
@@ -203,7 +203,7 @@ public class BranchDAO {
 
 	public Boolean findBranchByName(String branchName) {
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT seqid from branch where branchname = ?");
+			StringBuffer query = new StringBuffer().append("SELECT seqid from masp.branch where branchname = ?");
 			List<Map<String, Object>> records = jdbc.queryForList(query.toString(), branchName);
 			if (records.size() > 0) {
 				return false;
@@ -220,7 +220,7 @@ public class BranchDAO {
 		Map<String, String> response = new HashMap<String, String>();
 		try {
 			StringBuffer query = new StringBuffer()
-					.append("INSERT INTO branch (seqid,branchName,address,postcode,districtid) values(?,?,?,?,?)");
+					.append("INSERT INTO masp.branch (seqid,branchName,address,postcode,districtid) values(?,?,?,?,?)");
 			int result = jdbc.update(query.toString(), seqid, form.getBranchname(), form.getAddress(),
 					form.getPostcode(), form.getDistrict());
 			if (result > 0) {
@@ -242,7 +242,7 @@ public class BranchDAO {
 	public String updateBranch(String seqid, NewBranchForm form) {
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"UPDATE branch SET branchName = ?, address = ?, postcode = ?, districtid = ? WHERE seqid = ?");
+					"UPDATE masp.branch SET branchName = ?, address = ?, postcode = ?, districtid = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(), form.getBranchname(), form.getAddress(), form.getPostcode(),
 					form.getDistrict(), seqid);
 			if (result > 0) {

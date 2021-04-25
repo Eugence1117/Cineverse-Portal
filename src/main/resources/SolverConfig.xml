@@ -2,12 +2,12 @@
 <solver xmlns="https://www.optaplanner.org/xsd/solver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://www.optaplanner.org/xsd/solver https://www.optaplanner.org/xsd/solver/solver.xsd">
   <!-- Domain model configuration -->
-  <solutionClass>com.ms.Optaplanner.Theatre_Schedule</solutionClass>
-  <entityClass>com.ms.Optaplanner.Schedule</entityClass>
+  <solutionClass>com.ms.optaplanner.Theatre_Schedule</solutionClass>
+  <entityClass>com.ms.optaplanner.Schedule</entityClass>
  
   <!-- Score configuration -->
   <scoreDirectorFactory>
-    <constraintProviderClass>com.ms.Optaplanner.ScheduleConstraintProvider</constraintProviderClass>
+    <constraintProviderClass>com.ms.optaplanner.ScheduleConstraintProvider</constraintProviderClass>
     
     <!--<scoreDrl>org/optaplanner/examples/cloudbalancing/solver/cloudBalancingConstraints.drl</scoreDrl>-->
   </scoreDirectorFactory>

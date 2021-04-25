@@ -343,7 +343,7 @@
     		});
     		$("body").materializeInputs();
     		$("#synopsis").readMore({
-    			readMoreHeight:90,
+    			readMoreHeight: 90,
     			readMoreText:"Read More",
     			readLessText:"Collapse"
     		});
@@ -477,9 +477,7 @@
     		 	$("#imageSlide").slick('slickAdd',"<img src='" + result[i].picURL + "' style='width:290px'/>");
     		}
     		getMovieInfo(result[0].movieId);
-    		setTimeout(function(){
-    			addAndRemoveReadMore();
-    		},50);
+    		
     	}
     	
     	function getMovieInfo(activeId){
@@ -497,12 +495,19 @@
 				},
     		}).done(function(data){
     			if(data.error == null || data.error == ""){
-					injectData(data.result,activeId);
+					waitInjection(data.result,activeId);
+    				//injectData(data.result,activeId);
+					//addAndRemoveReadMore();
 				}
 				else{
 					bootbox.alert(data.error);
 				}
     		});
+    	}
+    	
+    	async function waitInjection(data,id){
+    		await injectData(data,id);
+    		await addAndRemoveReadMore();
     	}
     	
     	function clearInputField(){
@@ -526,7 +531,7 @@
 			}
     	}
     	
-    	function injectData(data,id){
+    	async function injectData(data,id){
     		$("#movieInfo .data").each(function(index,element){
     			var key = $(this).data('json-key');
 	            if (key && data.hasOwnProperty(key)) {
@@ -559,8 +564,9 @@
     		}
     	}
     	
-    	function addAndRemoveReadMore(){
+    	async function addAndRemoveReadMore(){
     		var scrollHeight = $("#synopsis")[0].scrollHeight;
+    		console.log(scrollHeight)
     		if(scrollHeight > 90){
     			$(".read-more__link").show();
     		}

@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
@@ -56,16 +57,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ms.Movie.MovieDao;
-import com.ms.Movie.Movie;
-import com.ms.Optaplanner.MovieConfig;
-import com.ms.Optaplanner.Schedule;
-import com.ms.Optaplanner.Theatre_Schedule;
-import com.ms.Optaplanner.TimeGrain;
-import com.ms.Rules.OperatingHours;
-import com.ms.Rules.RuleService;
+import com.ms.movie.MovieDao;
+import com.ms.movie.Movie;
+import com.ms.optaplanner.MovieConfig;
+import com.ms.optaplanner.Schedule;
+import com.ms.optaplanner.Theatre_Schedule;
+import com.ms.optaplanner.TimeGrain;
 import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
+import com.ms.rules.OperatingHours;
+import com.ms.rules.RuleService;
 import com.ms.schedule.ConfigurationModel.Configuration;
 import com.ms.schedule.ConfigurationModel.MovieAvailablePeriod;
 import com.ms.schedule.Model.AvailableMovie;
@@ -545,11 +546,11 @@ public class ScheduleService {
 							
 							List<TheatreType> types = theatreDao.getTheatreType();
 
-							List<com.ms.Optaplanner.Theatre> theatres = new ArrayList<com.ms.Optaplanner.Theatre>();
+							List<com.ms.optaplanner.Theatre> theatres = new ArrayList<com.ms.optaplanner.Theatre>();
 							for (Theatre theatre : theatreList) {
 								for (TheatreType type : types) {
 									if (theatre.getTheatretype().equals(type.getSeqid())) {
-										theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(), theatre.getTitle(),
+										theatres.add(new com.ms.optaplanner.Theatre(theatre.getId(), theatre.getTitle(),
 												theatre.getSeatcol() * theatre.getSeatrow(), type));
 									}
 								}
@@ -573,7 +574,7 @@ public class ScheduleService {
 									return response;
 								}
 
-								Collections.shuffle(scheduleList);
+								//Collections.shuffle(scheduleList);
 								Theatre_Schedule problem = new Theatre_Schedule(scheduleList, theatres, dateList, timeList,
 										null);
 								
@@ -692,11 +693,11 @@ public class ScheduleService {
 					return response;
 				}
 				
-				List<com.ms.Optaplanner.Theatre> theatres = new ArrayList<com.ms.Optaplanner.Theatre>();
+				List<com.ms.optaplanner.Theatre> theatres = new ArrayList<com.ms.optaplanner.Theatre>();
 				for(Theatre theatre : theatreList) {
 					for(TheatreType type : types) {
 						if(theatre.getTheatretype().equals(type.getSeqid())) {
-							theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
+							theatres.add(new com.ms.optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
 						}
 					}
 				}
@@ -721,8 +722,8 @@ public class ScheduleService {
 							
 							List<String> theatreSelected = (ArrayList<String>) maps.get(groupId + ".theatreSelection");
 							//Filter unactivated theatre
-							List<com.ms.Optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.Optaplanner.Theatre>();
-							for(com.ms.Optaplanner.Theatre theatre : theatres) {
+							List<com.ms.optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.optaplanner.Theatre>();
+							for(com.ms.optaplanner.Theatre theatre : theatres) {
 								for(String theatreId : theatreSelected) {
 									if(theatreId.equals(theatre.getTheatreId())) {
 										filteredTheatre.add(theatre);
@@ -872,11 +873,11 @@ public class ScheduleService {
 					return response;
 				}
 				
-				List<com.ms.Optaplanner.Theatre> theatres = new ArrayList<com.ms.Optaplanner.Theatre>();
+				List<com.ms.optaplanner.Theatre> theatres = new ArrayList<com.ms.optaplanner.Theatre>();
 				for(Theatre theatre : theatreList) {
 					for(TheatreType type : types) {
 						if(theatre.getTheatretype().equals(type.getSeqid())) {
-							theatres.add(new com.ms.Optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
+							theatres.add(new com.ms.optaplanner.Theatre(theatre.getId(),theatre.getTitle(),theatre.getSeatcol() * theatre.getSeatrow(), type));
 						}
 					}
 				}
@@ -896,8 +897,8 @@ public class ScheduleService {
 							
 							List<String> theatreSelected = (ArrayList<String>) maps.get(groupId + ".theatreSelection");
 							//Filter unactivated theatre
-							List<com.ms.Optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.Optaplanner.Theatre>();
-							for(com.ms.Optaplanner.Theatre theatre : theatres) {
+							List<com.ms.optaplanner.Theatre> filteredTheatre = new ArrayList<com.ms.optaplanner.Theatre>();
+							for(com.ms.optaplanner.Theatre theatre : theatres) {
 								for(String theatreId : theatreSelected) {
 									if(theatreId.equals(theatre.getTheatreId())) {
 										filteredTheatre.add(theatre);

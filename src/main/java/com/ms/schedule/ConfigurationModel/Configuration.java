@@ -1,6 +1,6 @@
 package com.ms.schedule.ConfigurationModel;
 
-import com.ms.Movie.Movie;
+import com.ms.movie.Movie;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
