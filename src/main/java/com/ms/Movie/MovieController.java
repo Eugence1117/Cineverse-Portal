@@ -1,4 +1,4 @@
-package com.ms.Movie;
+package com.ms.movie;
 
 import java.util.List;
 import java.util.Map;
