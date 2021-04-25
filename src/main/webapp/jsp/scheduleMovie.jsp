@@ -265,6 +265,7 @@
 		//Check Error on load
 		$(document).ready(function() {
 			var error = "${errorMsg}";
+			
 			if (error != "") {
 				bootbox.alert({
 					message : error,

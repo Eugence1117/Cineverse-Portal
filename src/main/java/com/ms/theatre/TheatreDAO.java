@@ -39,7 +39,7 @@ public class TheatreDAO {
 	public List<TheatreType> groupByTheatreType(String branchid){
 		List<TheatreType> typeList = null;
 		try {
-			String query = "SELECT b.seqid, b.description, b.seatSize, b.price FROM masp.theatre t, masp.theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid";
+			String query = "SELECT b.seqid, b.description, b.seatSize, b.price FROM masp.theatre t, masp.theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid,b.description,b.seatSize,b.price";
 			List<Map<String,Object>> results = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
 			if(results.size() > 0) {
 				typeList = new ArrayList<TheatreType>();

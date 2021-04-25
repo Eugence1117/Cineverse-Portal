@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlInOutParameter;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
@@ -60,19 +62,13 @@ public class ScheduleDAO {
 		String latestDate = null;
 		try {
 			
-			CallableStatement stmt = jdbcProcedure.getJdbcTemplate().getDataSource().getConnection().prepareCall("{call masp.GetLatestScheduleTime(?,?)}");
-			stmt.setString(1,branchId);
-			stmt.registerOutParameter(2, Types.);
-			jdbcProcedure = new SimpleJdbcCall(jdbc).withProcedureName("GetLatestScheduleTime");
-			SqlParameterSource in = new MapSqlParameterSource().addValue("@branchId", branchId);
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withCatalogName("cineverse").withProcedureName("GetLatestScheduleTime");
+			jdbcCall.addDeclaredParameter(new SqlOutParameter("endDate",Types.TIMESTAMP));
+			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchId);
 			
-//			jdbcProcedure.withCatalogName("masp");
-//			
-//			Map<String,Object> out = jdbcProcedure.execute(in);
-			stmt.executeUpdate();
+			Map<String, Object> result = jdbcCall.execute(in);
 			
-			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)stmt.getTimestamp("endDate"));
-			log.info(latestDate);
+			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)result.get("endDate"));
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
