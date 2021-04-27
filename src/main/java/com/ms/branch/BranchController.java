@@ -28,7 +28,7 @@ public class BranchController {
 	@Autowired
 	BranchService service;
 	
-	@RequestMapping (value = {"/viewbranch.htm"})
+	@RequestMapping (value = {"/viewBranch.htm"})
 	public String getBranchPage(Model model) {
 		log.info("Entered /viewbranch");
 		int usergroup = (int)session.getAttribute("usergroupid");

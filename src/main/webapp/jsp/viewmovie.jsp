@@ -225,14 +225,12 @@
 				</div>
 			</div>
 		</div>
-		
-		
-		<footer>
-			<p class="text-center">
-				<small><fmt:message key="common.flcopyright" /></small>
-			</p>
-		</footer>
 	</div>
+	<footer>
+		<p class="text-center">
+			<small><fmt:message key="common.copyright" /></small>
+		</p>
+	</footer>
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>

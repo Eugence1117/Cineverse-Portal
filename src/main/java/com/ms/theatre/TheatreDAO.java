@@ -48,8 +48,9 @@ public class TheatreDAO {
 					String desc = (String)result.get("description");
 					int seatSize = (int)result.get("seatSize");
 					double price = (double)result.get("price");
+					int seatOccupied = (int)result.get("seatOccupied");
 					
-					TheatreType type = new TheatreType(id,desc,seatSize,price);
+					TheatreType type = new TheatreType(id,desc,seatSize,price,seatOccupied);
 					typeList.add(type);
 				}
 			}
@@ -76,8 +77,9 @@ public class TheatreDAO {
 					String desc = (String)result.get("description");
 					int seatSize = (int)result.get("seatSize");
 					double price = (double)result.get("price");
+					int seatOccupied = (int)result.get("seatOccupied");
 					
-					TheatreType type = new TheatreType(id,desc,seatSize,price);
+					TheatreType type = new TheatreType(id,desc,seatSize,price,seatOccupied);
 					typeList.add(type);
 				}
 			}
@@ -90,6 +92,32 @@ public class TheatreDAO {
 			return null;
 		}
 		return typeList;
+	}
+	
+	public TheatreType getTheatreType(String typeId) {
+		TheatreType type = null;
+		try {
+			String query = "SELECT * FROM masp.theatretype where seqid = ?";
+			List<Map<String,Object>> results = jdbc.queryForList(query,typeId);
+			if(results.size() > 0) {
+				Map<String,Object> result = results.get(0); 
+				String id = (String)result.get("seqid");
+				String desc = (String)result.get("description");
+				int seatSize = (int)result.get("seatSize");
+				double price = (double)result.get("price");
+				int seatOccupied = (int)result.get("seatOccupied");
+				
+				type = new TheatreType(id,desc,seatSize,price,seatOccupied);
+				return type;
+			}
+			else {
+				return null;
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex);
+			return null;
+		}
 	}
 	
 	public List<Theatre> getTheatreList(String branchid){

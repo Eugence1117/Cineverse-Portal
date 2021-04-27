@@ -103,7 +103,7 @@
 		
 		<footer>
 			<p class="text-center">
-				<small><fmt:message key="common.flcopyright" /></small>
+				<small><fmt:message key="common.copyright" /></small>
 			</p>
 		</footer>
 		

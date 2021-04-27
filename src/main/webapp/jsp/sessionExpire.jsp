@@ -44,6 +44,11 @@ a:hover {
 				class="btn-success">Return previous page</a>
 		</p>
 	</div>
+	<footer>
+		<p class="text-center">
+			<small><fmt:message key="common.copyright" /></small>
+		</p>
+	</footer>
 
 
 </body>

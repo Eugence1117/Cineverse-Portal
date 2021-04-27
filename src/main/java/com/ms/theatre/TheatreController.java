@@ -1,6 +1,8 @@
 package com.ms.theatre;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -29,5 +31,26 @@ public class TheatreController {
 		log.info("entered /theatre/getTheatreList");
 		String branchid = session.getAttribute("branchid").toString();
 		return service.retrieveAvailableTheatre(branchid);
+	}
+	
+	@RequestMapping (value= {"/theatre/getTheatreType.json"})
+	@ResponseBody
+	public Response getTheatreType(Model model, String typeId) {
+		log.info("entered /theatre/getTheatreType");
+		return service.retrieveTheatreType(typeId);
+	}
+	
+	@RequestMapping( value= {"/createTheatre.htm"})
+	public String loadCreateTheatrePage(Model model){
+		log.info("Entered /manager/createTheatre.htm");
+		List<TheatreType> typeList = service.retrieveTheatreTypes();
+		if(typeList == null) {
+			model.addAttribute("errorMsg","Unable to retrieve information from server. Please try again later.");
+		}
+		else {
+			model.addAttribute("theatreTypes",typeList);
+		}
+		return "createTheatre";
+		
 	}
 }

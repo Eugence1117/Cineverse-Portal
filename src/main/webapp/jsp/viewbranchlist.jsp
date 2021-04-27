@@ -67,7 +67,12 @@
 				</table>
 			</div>
 		</div>
-	</div>	
+	</div>
+	<footer>
+		<p class="text-center">
+			<small><fmt:message key="common.copyright" /></small>
+		</p>
+	</footer>	
 	
 	<!-- View Modal -->
 		<div class="modal fade" id="viewBranch" tabindex="-1" role="dialog">

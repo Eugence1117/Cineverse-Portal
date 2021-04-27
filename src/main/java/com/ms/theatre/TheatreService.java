@@ -37,5 +37,32 @@ public class TheatreService {
 		}
 	}
 	
+	public Response retrieveTheatreType(String typeId) {
+		if(Util.trimString(typeId).equals("")) {
+			return new Response("No theatre type is selected.");
+		}
+		else {
+			TheatreType type = dao.getTheatreType(typeId);
+			if(type == null) {
+				return new Response("Unable to retrieve the information. If problem exist, please kindly contact support team.");
+			}
+			else {
+				return new Response(type);
+			}
+		}
+	}
+	
+	public List<TheatreType> retrieveTheatreTypes(){
+		log.info("Retrieving theatre type list...");
+		List<TheatreType> typeList = dao.getTheatreType();
+		if(typeList == null) {
+			log.error("Unable to retrieve information.");
+		}
+		else {
+			log.info("Total theatre type: " + typeList.size());
+		}
+		return typeList;
+	}
+	
 	
 }

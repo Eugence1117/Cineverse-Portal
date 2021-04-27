@@ -16,4 +16,6 @@ public class TheatreType {
 	private int seatSize;
 	
 	private double price;
+	
+	private int seatOccupied;
 }
