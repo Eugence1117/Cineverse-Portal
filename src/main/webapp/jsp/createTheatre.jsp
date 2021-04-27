@@ -83,12 +83,13 @@
 					<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
 						<p class="text-center w-100 p-1 bg-light screen">Screen</p>
 					</div>
+					<p class="my-5 text-center"> Please finish the configuration to continue</p>
 				</div>
 				<div class="col col-md-1"></div>
 			</div>
 		</div>
 		<div class="text-center my-3">
-			<button class="btn btn-primary" onClick="submitForm()">Confirm</button>
+			<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Confirm</button>
 		</div>
 		
 	<footer>
@@ -184,8 +185,11 @@
 				})
 			}
 			
-			$("#createTheatre").modal();
 			
+			$("#DropdownButton").attr("disabled",true);
+			$("#btnDeselectAll").attr("disabled",true);
+			$("#btnSubmit").attr("disabled",true);
+			$("#btnSelectAll").attr("disabled",true);
 			
 		});
 		
@@ -368,8 +372,9 @@
 					updateCounter();
 				});
 			}
-			
-			
+			$("#DropdownButton").attr("disabled",false);
+			$("#btnDeselectAll").attr("disabled",false);
+			$("#btnSubmit").attr("disabled",false);
 			updateCounter();
 		}
 		
