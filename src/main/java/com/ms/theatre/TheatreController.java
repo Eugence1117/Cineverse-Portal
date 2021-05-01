@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -51,6 +56,20 @@ public class TheatreController {
 			model.addAttribute("theatreTypes",typeList);
 		}
 		return "createTheatre";
+		
+	}
+	
+	@RequestMapping( value= {"/theatre/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response getLayoutJSON(Model model, @RequestBody Map<String,Object> payload) {
+		log.info("Entered /theatre/submitLayout.json");
+		String branchid = session.getAttribute("branchid").toString();
+		if(payload == null) {
+			return new Response("Unable to receive your data. Please try again.");
+		}
+		else {
+			return service.createTheatre(payload, branchid);
+		}
 		
 	}
 }

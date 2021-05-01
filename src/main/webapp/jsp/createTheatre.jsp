@@ -137,7 +137,7 @@
 		      </div>
 		      <div class="modal-footer">
 		      	<div class="mx-auto">
-			        <button type="button" class="btn btn-primary m-2" onClick="constructLayout()">Proceed</button>
+			        <button type="button" class="btn btn-primary m-2" onClick="constructLayout(false)">Proceed</button>
 		        </div>
 		      </div>
 		    </div>
@@ -184,7 +184,6 @@
 					}
 				})
 			}
-			
 			
 			$("#DropdownButton").attr("disabled",true);
 			$("#btnDeselectAll").attr("disabled",true);
@@ -233,46 +232,20 @@
 			}
 		});
 		
-		function copyElementData(){
-			var array = [];
-			$(".clickable").each(function(){
-				var obj = new Object();
-				if($(this).hasClass("checked")){
-					obj.id = $(this).attr('id');
-					obj.isBind = $(this).data('isBind');
-					obj.reference = $(this).data('reference');
-					array.push(obj);
-				}
-			});
-			return array;
-		}
-		
-		function restoreElementData(array){
-			for(var i = 0 ; i < array.length; i++){
-				var element = $("#" + array[i].id);
-				var reference = $("#" + array[i].reference);
-				if(document.body.contains(document.getElementById(array[i].id)) && document.body.contains(document.getElementById(array[i].reference))){
-					$(element).data('isBind',array[i].isBind);
-					$(element).data('reference',array[i].reference);
-				}
-				else{
-					$(element).removeClass("checked");
-					$(reference).removeClass("checked");
-				}
-			}
-		}
-		
-		function  constructLayout(){
+		function  constructLayout(isSkip){
 			var validator = $( "#theatreForm" ).validate();
 			if(!validator.form()){
 				return false;
 			}
 			
-			var status = getSelectedType();
-			if(!status){
-				return false;
+			if(!isSkip){
+				var status = getSelectedType();
+				if(!status){
+					return false;
+				}
+
 			}
-			
+						
 			$("#seatLayout").find("*").not(".screen").remove();
 			var element = '<svg xmlns="http://www.w3.org/2000/svg" width="25.695" height="20.695" viewBox="0 0 6.798 5.476"><rect width="6.598" height="5.276" x="36.921" y="65.647" ry=".771" stroke="#3636bb" stroke-width=".2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(-36.821 -65.547)"/></svg>'
 			
@@ -431,7 +404,20 @@
 				var obj = data[row].column;
 				if(obj != null){
 					for(var col = 0 ; col < obj.length; col++){
-						$("#seatLayout").find("#" + obj[col]).addClass("checked");
+						var element = $("#seatLayout").find("#" + obj[col].seatNum);
+						//If double seat
+						if(obj[col].isBind){
+							if(document.body.contains(document.getElementById(obj[col].seatNum)) && document.body.contains(document.getElementById(obj[col].reference))){
+								$(element).data('isBind',obj[col].isBind);
+								$(element).data('reference',obj[col].reference);
+								element.addClass("checked");
+							}
+						}
+						else{ //Not double seat
+							element.addClass("checked");
+							element.data('isBind',obj[col].isBind);
+							element.data('reference',obj[col].reference);
+						}
 					}
 				}
 			}
@@ -445,14 +431,25 @@
 					var row = $(this).attr('id').charAt(0);
 					var index = row.charCodeAt(0) % 65;
 					var seatNum = $(this).attr('id');
+					var obj = new Object();
+					
 					if(colAry[index] == null){
 						var array = [];
 						array.push(seatNum);
+						obj.seatNum = seatNum;
+						obj.isBind = $(this).data('isBind');
+						obj.reference = $(this).data('reference');
+						
+						array.push(obj);
 						colAry[index] =  array;
 					}
 					else{
 						var array = colAry[index];
-						array.push(seatNum);
+						obj.seatNum = seatNum;
+						obj.isBind = $(this).data('isBind');
+						obj.reference = $(this).data('reference');
+						
+						array.push(obj);
 						colAry[index] = array;
 					}
 				}
@@ -474,30 +471,75 @@
 			var capacity = selectedTheatreType.seatSize;
 			var counter = calculateCounter();
 			if(counter > capacity){
-				bootbox.alert("The seat you selected is exceed the maximum capacity. Please revise your layout.");
+				bootbox.alert("The seat you placed is exceed the maximum capacity. Please revise your layout.");
 				return false;
 			}
 			
+			var msg = (counter >= (capacity/2)) ? "Are you sure this is your final layout?" : "It is recommended to have at least <b>" + (capacity/2) + "</b> seats for this layout. Your current seat placed is <b>" + counter + "</b>. Are you sure this is your final layout?";
 			bootbox.confirm({
 				size: "medium",
-				message: "Are you sure this is your final layout?",
+				message: msg,
+				buttons:{
+					confirm:{
+						label:"Yes, I'm sure",
+					},
+					cancel:{
+						label: "No"
+					}
+				},
 				callback: function(result){
 					if(result){
-						var data = JSON.stringify(convertToJSON);
-						console.log("ready for ajax");
+						var data = btoa(JSON.stringify(convertToJSON()));
+						var formData = $("#theatreForm").serializeObject();
+						formData["layout"] = data;
+						formData["totalSeat"] = counter;
+						
+						$.ajax("theatre/submitLayout.json", {
+							method : "POST",
+							accepts : "application/json",
+							dataType : "json",
+							contentType:"application/json; charset=utf-8",
+							data: JSON.stringify(formData),
+							headers:{
+								"X-CSRF-Token": CSRF_TOKEN
+							},
+							async: false
+						}).done(function(data){
+							console.log(data);
+							if(data.errorMsg != null){
+								bootbox.alert(data.errorMsg);
+							}
+							else{
+								bootbox.alert(data.result);
+								resetForm();
+							}
+						});
 					}
 				}
 			})
+		}
+		
+		function resetForm(){
+			selectedTheatreType = null;
+			$("#theatreForm")[0].reset();
+			$("#theatreForm input").attr("value",null);
+			$("#theatreForm select").attr("value",null);
+			
+			$("#seatLayout").find("*").not(".screen").remove();
+			$("#seatLayout").append('<p class="my-5 text-center"> Please finish the configuration to continue</p>');
+			
+			$("#DropdownButton").attr("disabled",true);
+			$("#btnDeselectAll").attr("disabled",true);
+			$("#btnSubmit").attr("disabled",true);
+			$("#btnSelectAll").attr("disabled",true);
 		}
 		
 		function addNewRow(){
 			var existingVal = +$("#inputRow").val();
 			$("#inputRow").val(existingVal+1);
 			var data = convertToJSON();
-			var elementData = copyElementData();
-			constructLayout();
+			constructLayout(true);
 			fillLayoutWithJSON(data);
-			restoreElementData(elementData);
 			
 		}
 		
@@ -505,20 +547,16 @@
 			var existingVal = +$("#inputRow").val();
 			$("#inputRow").val(existingVal-1);
 			var data = convertToJSON();
-			var elementData = copyElementData();
-			constructLayout();
+			constructLayout(true);
 			fillLayoutWithJSON(data);
-			restoreElementData(elementData);
 		}
 		
 		function addNewColumn(){
 			var existingVal = +$("#inputCol").val();
 			$("#inputCol").val(existingVal+1);
 			var data = convertToJSON();
-			var elementData = copyElementData();
-			constructLayout();
+			constructLayout(true);
 			fillLayoutWithJSON(data);
-			restoreElementData(elementData);
 		}
 		
 		
@@ -526,10 +564,8 @@
 			var existingVal = +$("#inputCol").val();
 			$("#inputCol").val(existingVal-1);
 			var data = convertToJSON();
-			var elementData = copyElementData();
-			constructLayout();
+			constructLayout(true);
 			fillLayoutWithJSON(data);
-			restoreElementData(elementData);
 		}
 		
 		$.validator.setDefaults({
@@ -576,7 +612,21 @@
 			}
 		});
 		
-			
+		$.fn.serializeObject = function() {
+	        var o = {};
+	        var a = this.serializeArray();
+	        $.each(a, function() {
+	            if (o[this.name]) {
+	                if (!o[this.name].push) {
+	                    o[this.name] = [o[this.name]];
+	                }
+	                o[this.name].push(this.value || '');
+	            } else {
+	                o[this.name] = this.value || '';
+	            }
+	        });
+	        return o;
+	    };
 		
 	</script>
 </body>

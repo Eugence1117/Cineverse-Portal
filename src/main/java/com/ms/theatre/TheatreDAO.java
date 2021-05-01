@@ -1,6 +1,9 @@
 package com.ms.theatre;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +16,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 
@@ -25,6 +34,8 @@ public class TheatreDAO {
 	
 	private JdbcTemplate jdbc;
 	
+	//SQLServerException
+	//CannotGetJdbcConnectionException
 	@Autowired
 	public void setJdbcTemplate(@Qualifier("dataSource")DataSource dataSource) {
 	    this.jdbc = new JdbcTemplate(dataSource);
@@ -147,6 +158,48 @@ public class TheatreDAO {
 		}
 		
 		return theatreList;
+	}
+	
+	public char getTheatreName(String branchid) {
+		char name = ' ';
+		try {
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withCatalogName("cineverse").withProcedureName("GetNextTheatreId");
+			jdbcCall.addDeclaredParameter(new SqlOutParameter("name",Types.INTEGER));
+			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchid);
+			
+			Map<String, Object> result = jdbcCall.execute(in);
+			
+			int code = (int)result.get("name");
+			name = (char) code;
+			
+			return name;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			return ' ';
+		}
+	}
+	
+	public String createNewTheatre(Theatre theatre) {
+		log.info(theatre.toString());
+		try {
+			String query = "INSERT INTO masp.theatre VALUES(?,?,?,?,?,?,?,?,?,?)";
+			int result = jdbc.update(query,theatre.getId(),Character.toString(theatre.getTitle()),theatre.getSeatrow(),theatre.getSeatcol(),theatre.getTheatretype(),theatre.getCreateddate(),theatre.getBranchid(),Constant.ACTIVE_THEATRE_CODE,theatre.getTotalSeat(),theatre.getTheatreLayout());
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return "Unable to create theatre. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost:: " + ge.getMessage());
+			return "Connection to database is lost.";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			return "Unexpected error occured. Please try again later.";
+		}
 	}
 	
 }
