@@ -379,13 +379,11 @@ public class ScheduleService {
 		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
 		
 		List<LocalTime> operatingTime = new ArrayList<LocalTime>();
-		operatingTime.add(operatingHours.getStartTime());
-		log.info("Start Time: " + operatingHours.getStartTime());
+		operatingTime.add(operatingHours.getStartTime());		
 		operatingTime.add(operatingHours.getEndTime());
-		log.info("End Time: " + operatingHours.getEndTime());
 		
 		List<Schedule> scheduleList = new LinkedList<Schedule>();
-		log.info("Operating time: " + operatingMinutes);
+		List<Configuration> removeBuffer = new LinkedList<Configuration>();
 		
 		for(int count = 0 ; count < theatreCount; count++) {
 			int minuteUsed = 0;
@@ -396,16 +394,22 @@ public class ScheduleService {
 				int timeAvailable = (int) Math.round(operatingMinutes * percentage / 100);
 				int movieAvailable = timeAvailable / config.getMovie().getTotalTime();
 
-				Movie model = config.getMovie();
-				minuteUsed += model.getTotalTime() * movieAvailable;
-				//minuteUsed += Constant.DEFAULT_TIME_GAP * movieAvailable;
-				MovieConfig movie = new MovieConfig(model.getMovieId(), model.getMovieName(), model.getTotalTime(),
-						config.getTheatrePrefer(),model.getOriginalTime());
-				for (int i = 0; i < movieAvailable; i++) {
-					scheduleList.add(new Schedule(UUID.randomUUID().toString(), movie,operatingTime));
+				if(movieAvailable != 0) {
+					Movie model = config.getMovie();
+					minuteUsed += model.getTotalTime() * movieAvailable;
+					//minuteUsed += Constant.DEFAULT_TIME_GAP * movieAvailable;
+					MovieConfig movie = new MovieConfig(model.getMovieId(), model.getMovieName(), model.getTotalTime(),
+							config.getTheatrePrefer(),model.getOriginalTime());
+					for (int i = 0; i < movieAvailable; i++) {
+						scheduleList.add(new Schedule(UUID.randomUUID().toString(), movie,operatingTime));
+					}
+				}
+				else {
+					removeBuffer.add(config);
 				}
 			}
 			
+			configs.removeAll(removeBuffer);			
 
 			Configuration[] newConfig = new Configuration[configs.size()];
 			do {
@@ -466,26 +470,26 @@ public class ScheduleService {
 	    }
 	}
 
-	public Map<String, String> generateOverallSchedule(HttpServletRequest req, String base64Theatre) {
+	@SuppressWarnings("unchecked")
+	public Map<String, String> generateOverallSchedule(Map<String,Object> payload) {
 		Map<String, String> response = null;
 		String branchid = (String) session.getAttribute("branchid");
 		try {
-			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
 			
-			List<String> theatreSelected = (ArrayList<String>) maps.get("theatreSelection");
-			String[] movieidList = req.getParameterValues("movieId");
+			List<String> theatreSelected = (ArrayList<String>)maps.get("theatreSelection");
+			List<String> movieidList = (ArrayList<String>)payload.get("movieId");
 			
-			double[] percentList = Stream.of(req.getParameterValues("percent")).mapToDouble(Double::parseDouble)
-					.toArray();
+			double[] percentList = ((ArrayList<String>)payload.get("percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
 			String strm = "Stream ";
 			for(double value : percentList) {
 				strm += value + " ";
 			}
 			log.info(strm);
-			String[] typeList = req.getParameterValues("theatrePrefer");
+			List<String> typeList = (ArrayList<String>)payload.get("theatrePrefer");
 	
-			String startDate = req.getParameter("startDate");
-			String endDate = req.getParameter("endDate");
+			Long startDate = (Long)payload.get("startDate");
+			Long endDate =(Long)payload.get("endDate");
 			int dateRange = getDateRange(startDate, endDate);
 			if (dateRange != -1) {
 				List<Theatre> theatreList = retrieveTheatreList();
@@ -508,17 +512,17 @@ public class ScheduleService {
 					
 					theatreList.removeAll(removableItem);					
 					if (theatreList.size() > 0) {
-						if (movieidList.length == percentList.length
-								&& movieidList.length == typeList.length) {
-							LocalDate start = new Timestamp(Long.parseLong(startDate)).toLocalDateTime().toLocalDate();
-							LocalDate end = new Timestamp(Long.parseLong(endDate)).toLocalDateTime().toLocalDate();
+						if (movieidList.size() == percentList.length
+								&& movieidList.size() == typeList.size()) {
+							LocalDate start = new Timestamp(startDate).toLocalDateTime().toLocalDate();
+							LocalDate end = new Timestamp(endDate).toLocalDateTime().toLocalDate();
 							int largestMovieTime = 0;
 							
 							List<Configuration> configuration = new ArrayList<Configuration>();
-							for (int i = 0; i < movieidList.length; i++) {
-
-								Movie movie = movieDao.getMovieDetails(movieidList[i]);
-								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieidList[i]);
+							for (int i = 0; i < movieidList.size(); i++) {
+								String movieId = movieidList.get(i);
+								Movie movie = movieDao.getMovieDetails(movieId);
+								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
 								int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
 								movie.setTotalTime(newMovieTime); // Increment to nearest % 15
@@ -530,8 +534,8 @@ public class ScheduleService {
 									response.put("error", "Unable to retrieve movie information. Action abort. Please try again later.");
 									return response;
 								}
-								Configuration config = new Configuration(movieidList[i],
-										percentList[i], typeList[i], movie,moviePeriod);
+								Configuration config = new Configuration(movieId,
+										percentList[i], typeList.get(i), movie,moviePeriod);
 								configuration.add(config);
 							}
 							
@@ -594,15 +598,21 @@ public class ScheduleService {
 										if (s.getStartTime() != null) {
 											Date startTime = Constant.SQL_DATE_FORMAT
 													.parse(date + " " + s.getStartTime().getTime() + ":00");
+											
 											LocalDate nextDate = date;
-											if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+											if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT
 													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
 													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+											
+											nextDate = date;
+											if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+												nextDate = nextDate.plusDays(1);
+											}
 											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
 											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 											 
@@ -669,22 +679,28 @@ public class ScheduleService {
 			log.error("Exception ex:: " + ex.getMessage());
 			response = new LinkedHashMap<String, String>();
 			response.put("error", "Unexpected error occured, please try again later.");
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ex.printStackTrace(printWriter);
+			printWriter.flush();
+			log.error(writer.toString());
 			return response;
 		}
 
 	}
 
-	public Map<String,String> generateWeeklySchedule(HttpServletRequest req, String base64Theatre){
+	@SuppressWarnings("unchecked")
+	public Map<String,String> generateWeeklySchedule(Map<String,Object> payload){
 		Map<String,String> response = null;
 		String branchid = (String) session.getAttribute("branchid");
 		try {
-			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
 			
-			String[] groupIds = req.getParameterValues("groupId");
-			if(groupIds.length > 0) {
+			List<String> groupIds = (ArrayList<String>)payload.get("groupId");
+			if(groupIds.size() > 0) {
 				List<Theatre> theatreList = retrieveTheatreList(); 
 				List<TheatreType> types =  theatreDao.getTheatreType();
-				String ScheduleEndDate = req.getParameter("endDate");
+				Long ScheduleEndDate = (Long)payload.get("endDate");
 				
 				List<TimeGrain> timeList = getOperatingTimeGrain();
 				if(timeList == null) {
@@ -706,15 +722,15 @@ public class ScheduleService {
 					if(theatreList.size() > 0) {
 						List<Event> eventList = new ArrayList<Event>();
 						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-						LocalDate scheduleEnd = new Timestamp(Long.parseLong(ScheduleEndDate)).toLocalDateTime().toLocalDate();
+						LocalDate scheduleEnd = new Timestamp(ScheduleEndDate).toLocalDateTime().toLocalDate();
 						int finalScore = 0;
 						for(String groupId : groupIds) {
+							log.info("Group ID: " + groupId);
 							
+							List<String> movieIds = (ArrayList<String>)payload.get(groupId + ".movieId");
+							List<String> theatrePrefer = (ArrayList<String>)payload.get(groupId + ".theatrePrefer");
+							double[] percentList = ((ArrayList<String>)payload.get(groupId + ".percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
 							
-							String[] movieIds = req.getParameterValues(groupId + ".movieId");
-							String[] theatrePrefer = req.getParameterValues(groupId + ".theatrePrefer");
-							double[] percentList = Stream.of(req.getParameterValues(groupId + ".percent")).mapToDouble(Double::parseDouble)
-									.toArray();
 							LocalDate startDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
 							int rangeToEndOfWeek = 7 - startDate.getDayOfWeek().getValue();
 							LocalDate endDate = (startDate.plusDays(rangeToEndOfWeek)).compareTo(scheduleEnd) <= 0 ? startDate.plusDays(rangeToEndOfWeek) : scheduleEnd;
@@ -732,19 +748,20 @@ public class ScheduleService {
 							}
 
 							List<Configuration> configuration = new ArrayList<Configuration>();
-							if (movieIds.length == percentList.length
-									&& percentList.length == theatrePrefer.length) {
-								for (int i = 0; i < movieIds.length; i++) {
+							if (movieIds.size() == percentList.length
+									&& percentList.length == theatrePrefer.size()) {
+								for (int i = 0; i < movieIds.size(); i++) {
+									String movieId = movieIds.get(i);
 									
-									Movie movie = movieDao.getMovieDetails(movieIds[i]);
-									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
+									Movie movie = movieDao.getMovieDetails(movieId);
+									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid,movieId);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
 									movie.setTotalTime(newMovieTime); // Increment to nearest % 15
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 																							// number
-									Configuration config = new Configuration(movieIds[i],
-											percentList[i], theatrePrefer[i], movie,moviePeriod);
+									Configuration config = new Configuration(movieId,
+											percentList[i], theatrePrefer.get(i), movie,moviePeriod);
 									configuration.add(config);
 								}
 								
@@ -782,14 +799,19 @@ public class ScheduleService {
 												Date startTime = Constant.SQL_DATE_FORMAT
 														.parse(date + " " + s.getStartTime().getTime() + ":00");
 												LocalDate nextDate = date;
-												if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-														&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+												if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 													nextDate = nextDate.plusDays(1);
 												}
 												Date endTime = Constant.SQL_DATE_FORMAT
 														.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
 												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
 														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+												
+												nextDate = date;
+												if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+														&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+													nextDate = nextDate.plusDays(1);
+												}
 												Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
 												eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 											} else {
@@ -855,14 +877,15 @@ public class ScheduleService {
 		}
 	}
 
-	public Map<String,String> generateDailySchedule(HttpServletRequest req, String base64Theatre){
+	@SuppressWarnings("unchecked")
+	public Map<String,String> generateDailySchedule(Map<String,Object> payload){
 		Map<String,String> response = null;
 		String branchid = (String) session.getAttribute("branchid");
 		try {
-			Map<String,Object> maps = getJsonAsMap(convertToString(base64Theatre));
+			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
 			
-			String[] groupIds = req.getParameterValues("groupId");
-			if(groupIds.length > 0) {
+			List<String> groupIds = (ArrayList<String>)payload.get("groupId");
+			if(groupIds.size() > 0) {
 				List<Theatre> theatreList = retrieveTheatreList(); 
 				List<TheatreType> types =  theatreDao.getTheatreType();
 				
@@ -888,10 +911,10 @@ public class ScheduleService {
 						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 						int finalScore = 0;
 						for(String groupId : groupIds) {
-							String[] movieIds = req.getParameterValues(groupId + ".movieId");
-							String[] theatrePrefer = req.getParameterValues(groupId + ".theatrePrefer");
-							double[] percentList = Stream.of(req.getParameterValues(groupId + ".percent")).mapToDouble(Double::parseDouble)
-									.toArray();
+							List<String> movieIds = (ArrayList<String>)payload.get(groupId + ".movieId");
+							List<String> theatrePrefer = (ArrayList<String>)payload.get(groupId + ".theatrePrefer");
+							double[] percentList = ((ArrayList<String>)payload.get(groupId + ".percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
+									
 							LocalDate scheduleDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
 							int largestMovieTime = 0;
 							
@@ -907,19 +930,20 @@ public class ScheduleService {
 							}
 							
 							List<Configuration> configuration = new ArrayList<Configuration>();
-							if (movieIds.length == percentList.length
-									&& percentList.length == theatrePrefer.length) {
-								for (int i = 0; i < movieIds.length; i++) {
+							if (movieIds.size() == percentList.length
+									&& percentList.length == theatrePrefer.size()) {
+								for (int i = 0; i < movieIds.size(); i++) {
+									String movieId = movieIds.get(i);
 									
-									Movie movie = movieDao.getMovieDetails(movieIds[i]);
-									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieIds[i]);
+									Movie movie = movieDao.getMovieDetails(movieId);
+									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
 									movie.setTotalTime(newMovieTime);
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;										
 
-									Configuration config = new Configuration(movieIds[i],
-											percentList[i], theatrePrefer[i], movie,moviePeriod);
+									Configuration config = new Configuration(movieId,
+											percentList[i], theatrePrefer.get(i), movie,moviePeriod);
 									configuration.add(config);
 								}
 								
@@ -949,14 +973,19 @@ public class ScheduleService {
 											Date startTime = Constant.SQL_DATE_FORMAT
 													.parse(date + " " + s.getStartTime().getTime() + ":00");
 											LocalDate nextDate = date;
-											if (s.calcMovieEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+											if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT
 													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
 													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+											
+											nextDate = date;
+											if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+												nextDate = nextDate.plusDays(1);
+											}
 											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
 											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 										} else {
@@ -1078,6 +1107,22 @@ public class ScheduleService {
 			return day;
 		}
 	}
+	
+	public int getDateRange(Long startDate, Long endDate) {
+		LocalDate sDate = new Timestamp(startDate).toLocalDateTime().toLocalDate();
+		LocalDate eDate = new Timestamp(endDate).toLocalDateTime().toLocalDate();
+		if (sDate.compareTo(eDate) > 0) {
+			return -1;
+		} else {
+			int day = 1;
+			while (sDate.compareTo(eDate) != 0) {
+				sDate = sDate.plusDays(1);
+				day++;
+			}
+
+			return day;
+		}
+	}
 
 	
 	public List<LocalDate> getScheduledDate(LocalDate startDate, LocalDate endDate) {
@@ -1103,7 +1148,7 @@ public class ScheduleService {
 	
 	public List<Theatre> retrieveTheatreList() {
 		String branchid = (String) session.getAttribute("branchid");
-		List<Theatre> theatre = theatreDao.getTheatreList(branchid);
+		List<Theatre> theatre = theatreDao.getActiveTheatreList(branchid);
 		if (theatre == null) {
 			log.error("Unable to retrieve Theatre List from branch: " + branchid);
 			return null;

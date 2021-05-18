@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 public class ScheduleConstraintProvider implements ConstraintProvider{
 	
+	// overconstrained planning
 	@Override
 	public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
 		// TODO Auto-generated method stub
@@ -67,7 +68,7 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 	
 	public Constraint PreventExceedOperatingTime(ConstraintFactory constraintFactory) {
 		return constraintFactory.from(Schedule.class)
-				.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 && schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(1)) > 0)
+				.filter(schedule -> !(schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(0)) > 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) < 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) > 0))
 				//.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) > 0 || schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 || schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) >= 0)
 				.penalize("PreventExceedOperatingTime", HardSoftScore.ONE_HARD);
 	}

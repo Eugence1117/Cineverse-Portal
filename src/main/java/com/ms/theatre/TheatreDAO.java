@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import javax.sql.DataSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -131,7 +133,76 @@ public class TheatreDAO {
 		}
 	}
 	
-	public List<Theatre> getTheatreList(String branchid){
+	public Theatre getTheatreInfo(String theatreid) {
+		Theatre theatre = null;
+		try {
+			String query = "SELECT seqid, theatrename, seatrow, seatcol, theatretype, createddate,status FROM masp.theatre where seqid = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,theatreid);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row: rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					char name = ((String)row.get("theatrename")).charAt(0);
+					int seatRow = (int)row.get("seatrow");
+					int seatCol = (int)row.get("seatcol");
+					String theatreType = (String)row.get("theatretype");
+					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					int status = (int)row.get("status");
+					
+					theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,null,status);
+					return theatre;
+				}
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Exception ex::" + ce.getStackTrace().toString());
+			throw new JDBCConnectionException("Connection to database lost.", null);
+		}
+		catch(Exception ex) {
+			log.error(ex.getCause().getMessage());
+			log.error("Exception ex::" + ex.getStackTrace().toString());
+			return null;
+		}
+		return theatre;
+	}
+	
+	public List<Theatre> getAllTheatre(String branchid){
+		List<Theatre> theatreList = null;
+		try {
+			String query = "SELECT seqid,theatrename,theatretype, status FROM masp.theatre where branchid = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid);
+			theatreList = new ArrayList<Theatre>();
+			if(rows.size() > 0) {
+				for(Map<String,Object> row: rows) {
+					
+					Theatre theatre = new Theatre();
+					String seqid = Util.trimString((String)row.get("seqid"));
+					char name = ((String)row.get("theatrename")).charAt(0);
+					String theatreType = (String)row.get("theatretype");
+					int status = (int)row.get("status");
+					
+					theatre.setId(seqid);
+					theatre.setTitle(name);
+					theatre.setTheatretype(theatreType);
+					theatre.setStatus(status);
+					
+					theatreList.add(theatre);
+				}
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Exception ex::" + ce.getStackTrace().toString());
+			throw new JDBCConnectionException("Connection to database lost.", null);
+		}
+		catch(Exception ex) {
+			log.error(ex.getCause().getMessage());
+			log.error("Exception ex::" + ex.getStackTrace().toString());
+			return null;
+		}
+		
+		return theatreList;
+	}
+	
+	public List<Theatre> getActiveTheatreList(String branchid){
 		List<Theatre> theatreList = null;
 		try {
 			String query = "SELECT seqid,theatrename, seatrow, seatcol, theatretype, createddate FROM masp.theatre where branchid = ? AND status = ?";
@@ -146,7 +217,7 @@ public class TheatreDAO {
 					String theatreType = (String)row.get("theatretype");
 					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
 					
-					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid);
+					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid,Constant.ACTIVE_THEATRE_CODE);
 					theatreList.add(theatre);
 				}
 			}
@@ -202,4 +273,24 @@ public class TheatreDAO {
 		}
 	}
 	
+	public String updateTheatre(EditTheatreForm theatreForm) {
+		try {
+			String query = "UPDATE masp.theatre SET theatretype = ?, seatrow = ?, seatcol = ? , status = ?, totalSeat = ?, theatreLayout = ?, createddate = ? where seqid = ?";
+			int result = jdbc.update(query,theatreForm.getTheatretype(),theatreForm.getRow(),theatreForm.getCol(),theatreForm.getStatus(),theatreForm.getTotalSeat(),theatreForm.getLayout(),theatreForm.getTheatreid(),Constant.SQL_DATE_FORMAT.format(new Date()));
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return "Unable to update the theatre. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost: " + ge.getMessage());
+			return "Connection to database is lost";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex" + ex.getMessage());
+			return "Unexpected error occured. Please try again later.";
+		}
+	}
 }

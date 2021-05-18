@@ -2,6 +2,8 @@ package com.ms.theatre;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -30,14 +33,55 @@ public class TheatreService {
 	@Autowired
 	TheatreDAO dao;
 	
+	public Response retrieveAllTheatre(String branchid) {
+		log.info("Retrieving theatre list...");
+		if(Util.trimString(branchid).equals("")) {
+			log.info("receive branchid:null from controller.");
+			return new Response("Unable to recognize client's branch.");
+		}
+		else {
+			try {
+				List<Theatre> theatreList = dao.getAllTheatre(branchid);
+				log.info("Total Theatre: " + theatreList.size());
+				theatreList.sort(Comparator.comparing(Theatre::getTitle));
+				return new Response(theatreList);
+			}
+			catch(JDBCConnectionException ex) {
+				return new Response("Connection to database lost.");
+			}
+		}
+	}
+	
+	public Response getTheatreDetails(String theatreid) {
+		log.info("Retrieving theatre " + theatreid + " info");
+		if(Util.trimString(theatreid).equals("")) {
+			log.info("receive theatreid:null from controller.");
+			return new Response("Data required are missing from client's request.");
+		}
+		else {
+			try {
+				Theatre theatre = dao.getTheatreInfo(theatreid);
+				if(theatre == null) {
+					return new Response("Unable to retrieve information from database");
+				}
+				else {
+					return new Response(theatre);
+				}
+			}
+			catch(JDBCConnectionException ex) {
+				return new Response("Connection to database lost.");
+			}
+		}
+	}
+	
 	public List<Theatre> retrieveAvailableTheatre(String branchid){
 		log.info("Retrieving theatre list...");
 		if(Util.trimString(branchid).equals("")) {
-			log.info("receive null from controller.");
+			log.info("receive branchid:null from controller.");
 			return null;
 		}
 		else {
-			List<Theatre> theatreList = dao.getTheatreList(branchid);
+			List<Theatre> theatreList = dao.getActiveTheatreList(branchid);
 			log.info("Theatre count: " + theatreList.size());
 			return theatreList;
 		}
@@ -87,7 +131,7 @@ public class TheatreService {
 				//Create Theatre
 				String theatreId = UUID.randomUUID().toString();
 				Theatre theatre = new Theatre(theatreId,name,form.getRow(),form.getCol(),form.getTheatretype(),
-											  Constant.SQL_DATE_FORMAT.format(new Date()),branchid,form.getTotalSeat(),form.getLayout());
+											  Constant.SQL_DATE_FORMAT.format(new Date()),branchid,form.getTotalSeat(),Constant.ACTIVE_THEATRE_CODE,form.getLayout());
 				
 				String errorMsg = dao.createNewTheatre(theatre);
 				if(errorMsg == null) {
@@ -104,6 +148,30 @@ public class TheatreService {
 			return new Response("Unexpected error occured. Please try again later.");
 		}
 		
+	}
+	
+	public Response updateTheatre(Map<String,Object> payload) {
+		try {
+			EditTheatreForm form = new EditTheatreForm( (String)payload.get("theatreid"),(String)payload.get("theatretype"),
+					 Integer.parseInt((String)payload.get("row")),
+					 Integer.parseInt((String)payload.get("col")),
+					 (String)payload.get("layout"),
+					 (int)payload.get("totalSeat"),Integer.parseInt((String)payload.get("status")));
+			
+			String errorMsg = dao.updateTheatre(form);
+			if(errorMsg == null) {
+				return new Response((Object)("Thetre has been updated to latest information."));
+			}
+			else {
+				return new Response(errorMsg);
+			}
+		}
+		catch(NullPointerException ne) {
+			return new Response("Unable to get required data from client's request.");
+		}
+		catch(Exception ex) {
+			return new Response("Unexpected error occured. Please try again later.");
+		}
 	}
 	
 }

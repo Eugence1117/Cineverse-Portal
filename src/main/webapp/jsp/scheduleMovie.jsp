@@ -389,10 +389,20 @@
 				if(!theatreSelected){
 					return false;
 				}
-				$.ajax("schedule/configureScheduleByOverall.json?" + form.serialize() + "&startDate="+ form.data("startDate") + "&endDate=" + form.data("endDate") + "&theatres=" + theatreSelected, {
-					method : "GET",
+				var formData = form.serializeObject();
+				formData["startDate"] = form.data("startDate");
+				formData["endDate"] = form.data("endDate");
+				formData["theatres"] = theatreSelected;
+				
+				$.ajax("schedule/configureScheduleByOverall.json", {
+					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
+					contentType:"application/json; charset=utf-8",
+					data: JSON.stringify(formData),
+					headers:{
+						"X-CSRF-Token": CSRF_TOKEN
+					},
 					}).done(function(data) {
 						
 						if(data.error != "" && data.error != null){
@@ -504,11 +514,11 @@
 							var weeklyMovie = resultList[result];
 							var innerElement = "<div class='component' id='" + weeklyMovie.range.startDate + "'><div class='card-header component-header'>" + convertDate(weeklyMovie.range.startDate) + " - " + convertDate(weeklyMovie.range.endDate) +" </div>";
 							innerElement += "<div class='card-body px-0'><div class='media-group collapse hide'>"
-							innerElement += addTheatreElement(theatreList,weeklyMovie.range.startDate) +
-											"<hr/><input type='hidden' name='groupId' value='" + weeklyMovie.range.startDate + "'/>";
 							var groupId = weeklyMovie.range.startDate;
 							var movieList = weeklyMovie.list;
 							if(movieList != null){
+									innerElement += addTheatreElement(theatreList,weeklyMovie.range.startDate) +
+													"<hr/><input type='hidden' name='groupId' value='" + groupId + "'/>";
 								for(var index in movieList){
 									var movie = movieList[index];
 									var defaultVal = 100 / movieList.length;
@@ -569,10 +579,21 @@
 				if(!theatreSelected){
 					return false;
 				}
-				$.ajax("schedule/configureScheduleByWeekly.json?" + form.serialize() + "&startDate="+ form.data("startDate") + "&endDate=" + form.data("endDate") + "&theatres=" + theatreSelected, {
-					method : "GET",
+				
+				var formData = form.serializeObject();
+				formData["startDate"] = form.data("startDate");
+				formData["endDate"] = form.data("endDate");
+				formData["theatres"] = theatreSelected;
+				
+				$.ajax("schedule/configureScheduleByWeekly.json?", {
+					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
+					contentType:"application/json; charset=utf-8",
+					data: JSON.stringify(formData),
+					headers:{
+						"X-CSRF-Token": CSRF_TOKEN
+					},
 					}).done(function(data) {
 
 						if(data.error != "" && data.error != null){
@@ -593,8 +614,8 @@
 							    	  meridiem: true
 	  
 							      },
-							      slotDuration:'00:15:00',
-							      slotLabelInterval:'00:15:00',
+							      slotDuration:'00:05:00',
+							      slotLabelInterval:'00:05:00',
 							      snapDuration:'00:05:00',
 							      aspectRatio: 3,
 							      themeSystem: 'bootstrap',
@@ -679,13 +700,11 @@
 						if(resultList[result] != null){
 							var dailyMovie = resultList[result];
 							var innerElement = "<div class='component' id='" + dailyMovie.date + "'><div class='card-header component-header'>" + convertDate(dailyMovie.date) + "</div>";
-							innerElement += "<div class='card-body px-0'>" +
-											"<div class='media-group collapse hide'>"
-							innerElement += addTheatreElement(theatreList,dailyMovie.date)
-							innerElement +=	"<hr/><input type='hidden' name='groupId' value='" + dailyMovie.date + "'/>";
-							
+							innerElement += "<div class='card-body px-0'>" + "<div class='media-group collapse hide'>"
 							var movieList = dailyMovie.list;
 							if(movieList != null){
+								innerElement += addTheatreElement(theatreList,dailyMovie.date)
+								innerElement +=	"<hr/><input type='hidden' name='groupId' value='" + dailyMovie.date + "'/>";
 								for(var index in movieList){
 									var movie = movieList[index];
 									var defaultVal = 100 / movieList.length;
@@ -744,10 +763,18 @@
 				if(!theatreSelected){
 					return false;
 				}
-				$.ajax("schedule/configureScheduleByDaily.json?" + form.serialize() + "&theatres=" + theatreSelected,{
-					method : "GET",
+				var formData = form.serializeObject();
+				formData["theatres"] = theatreSelected;
+				
+				$.ajax("schedule/configureScheduleByDaily.json",{
+					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
+					contentType:"application/json; charset=utf-8",
+					data: JSON.stringify(formData),
+					headers:{
+						"X-CSRF-Token": CSRF_TOKEN
+					},
 					}).done(function(data) {
 						
 						if(data.error != "" && data.error != null){
@@ -901,16 +928,18 @@
 			}
 			else if (mode == 2){
 				$("#weeklySchedule > form > .component").each(function(){
-					var preId = $(this).attr("id");
-					var key = preId + ".theatreSelection";
-					var theatres = [];
-					$("input[name=" + preId + "\\" + ".theatreSelection]").each(function(){
-						console.log($(this).prop("checked"))
-						if($(this).prop("checked")){	
-							theatres.push($(this).attr("id").split(".")[1]);	
-						}
-					})
-					objects[key] = theatres;
+					if(!$(this).find(".emptyMovie").length){
+						var preId = $(this).attr("id");
+						var key = preId + ".theatreSelection";
+						var theatres = [];
+						$("input[name=" + preId + "\\" + ".theatreSelection]").each(function(){
+							console.log($(this).prop("checked"))
+							if($(this).prop("checked")){	
+								theatres.push($(this).attr("id").split(".")[1]);	
+							}
+						})
+						objects[key] = theatres;
+					}
 				});
 				
 				var isEmpty = false;
@@ -925,11 +954,19 @@
 				
 				if(isEmpty){
 					var string = "Error occrued from: <br/>";
+					var lastConfiguredDay = new Date($("#weeklySchedule > form").data("endDate"));
+					console.log(lastConfiguredDay);
 					for(var i in weeks){
 						var startDate = weeks[i];
 						var endDate = new Date();
-						var endDate = endDate.setDate(startDate.getDate() - startDate.getDay() + 7);
-					
+						endDate.setDate(startDate.getDate() - startDate.getDay() + 7);
+						endDate.setHours(0,0,0,0);
+						
+						var status = endDate > lastConfiguredDay ? "true" :"false";
+						while(endDate.getTime() > lastConfiguredDay.getTime()){
+							endDate.setDate(endDate.getDate() - 1);
+						}
+						
 						string += "-\t" + toDate(startDate) + " - " + toDate(endDate) + "<br/>";
 					}
 					bootbox.alert("Please make sure at least one theatre is selected for every week.<br/>" + string);
@@ -938,15 +975,17 @@
 			}
 			else{
 				$("#dailySchedule > form > .component").each(function(){
-					var preId = $(this).attr("id");
-					var key = preId + ".theatreSelection";
-					var theatres = [];
-					$("input[name=" + preId + "\\" + ".theatreSelection]").each(function(){
-						if($(this).prop("checked")){	
-							theatres.push($(this).attr("id").split(".")[1]);	
-						}
-					})
-					objects[key] = theatres;
+					if(!$(this).find(".emptyMovie").length){
+						var preId = $(this).attr("id");
+						var key = preId + ".theatreSelection";
+						var theatres = [];
+						$("input[name=" + preId + "\\" + ".theatreSelection]").each(function(){
+							if($(this).prop("checked")){	
+								theatres.push($(this).attr("id").split(".")[1]);	
+							}
+						})
+						objects[key] = theatres;
+					}
 				});
 				
 				var isEmpty = false;
@@ -1140,6 +1179,22 @@
 			var day = new Intl.DateTimeFormat('en',{day:'2-digit'}).format(date);
 			return day + " " + month + " " + year;
 		}
+		
+		$.fn.serializeObject = function() {
+	        var o = {};
+	        var a = this.serializeArray();
+	        $.each(a, function() {
+	            if (o[this.name]) {
+	                if (!o[this.name].push) {
+	                    o[this.name] = [o[this.name]];
+	                }
+	                o[this.name].push(this.value || '');
+	            } else {
+	                o[this.name] = this.value || '';
+	            }
+	        });
+	        return o;
+	    };
 	</script>
 </body>
 

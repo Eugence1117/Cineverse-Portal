@@ -27,8 +27,6 @@
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/seatLayout/seatLayout.css'/>">
 
 <style>
 #seatLayout{
@@ -164,8 +162,6 @@
 		src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/seatLayout/seatLayout.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript">

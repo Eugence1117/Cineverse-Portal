@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.schedule.Model.AvailableMovie;
@@ -85,28 +88,28 @@ public class ScheduleController {
 		
 	}
 	
-	@RequestMapping( value= {"/schedule/configureScheduleByOverall.json"})
+	@RequestMapping( value= {"/schedule/configureScheduleByOverall.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> getOverallConfiguration(Model model, HttpServletRequest req, String theatres){
+	public Map<String,String> getOverallConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByOverall.json");
-		Map<String,String> result = service.generateOverallSchedule(req,theatres);
+		Map<String,String> result = service.generateOverallSchedule(payload);
 		return result;
 	}
 	
 
-	@RequestMapping( value= {"/schedule/configureScheduleByWeekly.json"})
+	@RequestMapping( value= {"/schedule/configureScheduleByWeekly.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> getWeeklyConfiguration(Model model, HttpServletRequest req, String theatres){
+	public Map<String,String> getWeeklyConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByWeekly.json");
-		Map<String,String> result = service.generateWeeklySchedule(req,theatres);
+		Map<String,String> result = service.generateWeeklySchedule(payload);
 		return result;
 	}
 	
-	@RequestMapping( value= {"/schedule/configureScheduleByDaily.json"})
+	@RequestMapping( value= {"/schedule/configureScheduleByDaily.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> getDailyConfiguration(Model model, HttpServletRequest req, String theatres){
-		log.info("Entered /schedule/configureScheduleByWeekly.json");
-		Map<String,String> result = service.generateDailySchedule(req,theatres);
+	public Map<String,String> getDailyConfiguration(Model model, @RequestBody Map<String,Object> payload){
+		log.info("Entered /schedule/configureScheduleByDaily.json");
+		Map<String,String> result = service.generateDailySchedule(payload);
 		return result;
 	}
 }

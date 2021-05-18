@@ -47,7 +47,7 @@ public class TheatreController {
 	
 	@RequestMapping( value= {"/createTheatre.htm"})
 	public String loadCreateTheatrePage(Model model){
-		log.info("Entered /manager/createTheatre.htm");
+		log.info("Entered /createTheatre.htm");
 		List<TheatreType> typeList = service.retrieveTheatreTypes();
 		if(typeList == null) {
 			model.addAttribute("errorMsg","Unable to retrieve information from server. Please try again later.");
@@ -71,5 +71,34 @@ public class TheatreController {
 			return service.createTheatre(payload, branchid);
 		}
 		
+	}
+	
+	@RequestMapping (value = {"/theatre/updateTheatre.json"} ,method= {RequestMethod.PUT})
+	@ResponseBody
+	public Response updateTheatre(Model model, @RequestBody Map<String,Object> payload) {
+		log.info("Entered /theatre/updateTheatre.json");
+		Response res = service.updateTheatre(payload);
+		return res;
+	}
+	
+	@RequestMapping( value= {"/viewTheatre.htm"})
+	public String loadViewTheatrePage(Model model) {
+		log.info("Entered /viewTheatre.htm");
+		String branchid = session.getAttribute("branchid").toString();
+		Response res = service.retrieveAllTheatre(branchid);
+		if(res.getErrorMsg() != null) {
+			model.addAttribute("errorMsg",res.getErrorMsg());
+		}
+		else {
+			model.addAttribute("theatres",res.getResult());
+		}
+		return "viewTheatre";
+	}
+	
+	@RequestMapping( value= {"/theatre/getTheatreInfo.json"})
+	@ResponseBody
+	public Response getTheatreInfo(Model model, String theatreid) {
+		log.info("Entered /theatre/getTheatreInfo.json");
+		return service.getTheatreDetails(theatreid);
 	}
 }
