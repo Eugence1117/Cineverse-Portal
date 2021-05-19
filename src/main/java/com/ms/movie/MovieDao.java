@@ -355,7 +355,7 @@ public class MovieDao {
 			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
 			String sqlDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getReleaseDate() + Constant.DEFAULT_TIME));
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),form.getEarlyAccess(),picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
+			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),1,picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
 			if(result > 0) {
 				return true;
 			}

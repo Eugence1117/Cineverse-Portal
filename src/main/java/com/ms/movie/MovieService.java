@@ -239,7 +239,7 @@ public class MovieService {
 	}
 	
 	@Transactional(rollbackFor= Exception.class)
-	public boolean insertMovieRecord(NewMovieForm form) {
+	public Response insertMovieRecord(NewMovieForm form) {
 		
 		boolean status = false;
 		String uuid = UUID.randomUUID().toString();
@@ -248,7 +248,7 @@ public class MovieService {
 		URI uri = uploadFileToAzure(uuid + format,form.getPosterImage());
 		if(uri == null) {
 			log.info("Unable to upload. Action abort.");
-			return false;
+			return new Response("Unable to upload the image. Please try again later.");
 		}
 		else {
 			try {
@@ -258,20 +258,20 @@ public class MovieService {
 				status = dao.insertNewMovie(form,uri.toString());
 				if(status) {
 					log.info("Movie insert successful.");
-					return true;
+					return new Response((Object)"The movie " + form.getMovieName() + " has been inserted.");
 				}
 				else {
 					log.error("Insert to database failed.");
 					deleteFile(uuid + format);
-					return false;
+					return new Response("Unable to insert the data into database.");
 				}
 			}
 			catch(Exception ex) {
 				log.error("Exception ::" + ex.getMessage());
-				return false;
+				return new Response("Unexpected error occured. Please try again later.");
 			}
-			
 		}
+		
 	}
 	
 	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {

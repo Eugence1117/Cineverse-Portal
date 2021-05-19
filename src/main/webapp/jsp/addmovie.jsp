@@ -32,10 +32,29 @@
 </style>
 </head>
 
-<body>
-
-	<%@ include file="include/navbar.jsp"%>
-	<%@ include file="include/js.jsp"%>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">Add Movie to Branch</h1>
+			        </div>
+			        
+				 </div>
+			</div>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
+		</div>
+	</div>
+	
 	<div class="container mt-4">
 		<input type="hidden" id="movieList" value="${movieList}">
 		<input type="hidden" id="usergroupid" value="${usergroup}">
@@ -508,19 +527,15 @@
 		</div>
 	</div>
 	<!-- /.container -->
-
+	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datatables/js/dataTables.bootstrap4.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
