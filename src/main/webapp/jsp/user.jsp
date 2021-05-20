@@ -57,7 +57,6 @@
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
 </head>
 
 <body id="page-top">
@@ -183,7 +182,7 @@
 															value="${branch.branchname}" /></option>
 												</c:forEach>
 											</select>
-											<label for="branchname">Branch Name</label>
+											<label for="branchname">Branch</label>
 										</div>
 									</div>
 								</div>
@@ -198,7 +197,7 @@
 						<button type="reset" class="btn btn-danger m-2"
 							onclick=clearInsertField()>Reset</button>
 						<button type="button" class="btn btn-secondary m-2"
-							data-dismiss="modal">Cancel</button>
+							data-bs-dismiss="modal">Cancel</button>
 					</div>
 				</div>
 			</div>
@@ -228,7 +227,7 @@
 						<p class="d-inline data col-sm-6" data-json-key="usergroup"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Branch Name</b></label> <label
+						<label class="col-sm-4"><b>Branch</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="branchname"></p>
 					</div>
@@ -246,7 +245,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary mx-auto"
-						data-dismiss="modal">Close</button>
+						data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
@@ -291,7 +290,7 @@
 													<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}" /></option>
 												</c:forEach>
 											</select>
-											<label for="branchname">Branch Name</label>
+											<label for="branchname">Branch</label>
 										</div>
 									</div>
 								</div>
@@ -306,7 +305,7 @@
 						<button type="reset" class="btn btn-danger m-2"
 							onclick=resetEditBtn()>Reset</button>
 						<button type="button" class="btn btn-secondary m-2"
-							data-dismiss="modal">Cancel</button>
+							data-bs-dismiss="modal">Cancel</button>
 					</div>
 				</div>
 			</div>
@@ -316,11 +315,9 @@
 
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
@@ -346,24 +343,8 @@
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
-				
-				/*   if (element.parent('col-md-10').length) {
-				      error.insertAfter(element.parent());
-				  }
-				  else if(element.prop('type') === 'file'){
-				  	error.insertAfter(element.next());
-				  }
-				  else {
-				      error.insertAfter(element);
-				  } */
 			}
 		});
-    	
-    	/* $(".dropdown").each(function(){
-    		$(this).attr("value",$(this).val());
-    	}); */
-    	
-    	$("#status").attr("value",0);
     	
     	var status1 = "<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
     	var status2 = "<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
@@ -384,6 +365,7 @@
 			//clearInsertField();
 		});
 		
+		//View Function
 		function readyFunction(){
 			$.ajax("user/retrieveInfo.json?",{
 				method : "GET",
@@ -422,56 +404,6 @@
 				attach :'.deactiveBtn',
 				content : 'Deactivate'
 			})
-		}
-		
-		function clearInsertField(){
-			$("#newUserForm input").each(function(){
-				$(this).val("");
-			})
-			
-			$("#newUserForm select").each(function(){
-				$(this).val("");
-			});
-		}
-		
-		$("#usergroup").on("change",function(){
-			if(this.value == 2){
-				$("#branchname").prop("disabled",false);
-				$("#branchname").removeClass("ignore");
-				$("#branchname").attr("value","");
-				$("#branchname").val("");
-			
-			}
-			else{
-				$("#branchname").prop("disabled",true);
-				$("#branchname").addClass("ignore");
-				$("#branchname").attr("value","");
-				$("#branchname").val("");
-				$("#branchname").val("");
-				$("#branchname-error").css("display","none");
-			}
-			
-		});
-		
-		$("#Editusergroup").on("change",function(){
-			checkDropdownValue(this);
-		})
-		
-		function checkDropdownValue(element){
-			if(element.value == 2){
-				$("#Editbranchname").prop("disabled",false);
-				$("#Editbranchname").removeClass("ignore");
-				$("#Editbranchname").attr("value","");
-				$("#Editbranchname").val("");
-			
-			}
-			else{
-				$("#Editbranchname").prop("disabled",true);
-				$("#Editbranchname").addClass("ignore");
-				$("#Editbranchname").attr("value","");
-				$("#Editbranchname").val("");
-				$("#Editbranchname-error").css("display","none");
-			}
 		}
 		
 		function getResultDataTable() {
@@ -546,174 +478,6 @@
 			});
 		}
 		
-		function activateAndDeactivateUser(element,newStatus){
-			bootbox.confirm({
-			    message: "Are you sure you want to update the status?",
-			    buttons: {
-			        confirm: {
-			            label: 'Yes',
-			            className: 'btn-success'
-			        },
-			        cancel: {
-			            label: 'No',
-			            className: 'btn-danger'
-			        }
-			    },
-			    callback: function (result) {
-			    	if(result == true){
-				    	var userid = element.id;
-						$.ajax("user/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
-							method : "GET",
-							accepts : "application/json",
-							dataType : "json",
-						}).done(function(data){
-							bootbox.alert({
-							    title: "Notification",
-							    message: data.result,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});
-						});
-			    	}
-			    }
-			});
-			
-		}
-		
-		function resetEditBtn(){
-			var id = $("#editUserForm #seqid").val();
-			getEditInfo(id);
-		}
-		
-		function clearEditField(){
-			$("#editUserForm select").each(function(){
-				$(this).val("");
-				$(this).attr("value","");
-			});
-			$("#editUserForm select > option").each(function(){
-				$(this).attr("selected",false);
-			});
-		}
-		
-		function getEditInfo(userid){
-			$.ajax("user/getEditInfo.json?userid=" + userid,{
-				method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-			}).done(function(data){
-				console.log(data.msg);
-				if(data.msg != ""){
-					bootbox.alert(data.msg);
-				}
-				else{	
-					clearEditField();
-					$("#editUserForm #seqid").val(data.seqid);
-					$("#editUser .modal-title").html("Editing user: " + data.username);
-					$("#editUserForm select[name=Editusergroup] > option").each(function(){
-						if(data.usergroupid == $(this).val()){
-							$(this).attr("selected",true);
-							$("#editUserForm select[name=Editusergroup]").attr("value",$(this).val());
-							$("#editUserForm select[name=Editusergroup]").val($(this).val());
-						}
-						
-					});
-					checkDropdownValue($("#editUserForm select[name=Editusergroup]")[0]);
-					if(data.usergroupid == 2){
-						$("#editUserForm select[name=Editbranchid] > option").each(function(){
-							if(data.branchid == $(this).val()){
-								$(this).attr("selected",true);
-								$("#editUserForm select[name=Editbranchid]").attr("value",$(this).val());
-								$("#editUserForm select[name=Editbranchid]").val($(this).val());
-							}
-							
-						});
-					}
-					$("#editUser").toggle();
-				}
-				
-			});
-		}
-		
-		$("#editUserForm").validate({
-			ignore : ".ignore",
-			focusInvalid:true,
-			rules : {
-				Editusergroup:{
-					required:true
-				},
-				Editbranchid:{
-					required:true
-				}
-				
-			},
-			invalidHandler: function() {
-				$(this).find(":input.has-error:first").focus();
-			}
-		});
-		
-		function editUser(element){
-			
-			var validator = $( "#editUserForm" ).validate();
-			if(!validator.form()){
-				return false;
-			}
-			$("#editUser").modal('hide');
-			$.ajax("user/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
-				method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-			}).done(function(data){
-				bootbox.alert({
-				    title: "Notification",
-				    message: data.msg,
-				    callback: function(){
-				    	if(data.status == "true"){
-				    		readyFunction();
-				    		clearEditField();
-				    	}
-				    	else{
-				    		$("#editUser").toggle();
-				    	}
-					}
-				});
-			});
-		}
-		
-		function deleteUser(element){
-			bootbox.confirm({
-			    message: "Are you sure you want to delete this staff?",
-			    buttons: {
-			        confirm: {
-			            label: 'Yes',
-			            className: 'btn-success'
-			        },
-			        cancel: {
-			            label: 'No',
-			            className: 'btn-danger'
-			        }
-			    },
-			    callback: function (result) {
-			    	if(result == true){
-				    	var userid = element.id;
-						$.ajax("user/deleteUser.json?userid=" + userid,{
-							method : "GET",
-							accepts : "application/json",
-							dataType : "json",
-						}).done(function(data){
-							bootbox.alert({
-							    title: "Notification",
-							    message: data.result,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});
-						});
-			    	}
-			    }
-			});
-		}
-		
 		function getUserDetails(element){
 			var userid = element.id;
 			$.ajax("user/viewUser.json?userid=" + userid,{
@@ -730,14 +494,28 @@
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
-					$("#viewUser").toggle();
+					
+					if(!$("#viewUser").hasClass("show")){
+						$("#viewUser").modal("show");
+					}
+					//$("#viewUser").toggle();
 				}
 				else{
 					bootbox.alert(data.error);
 				}
 			});
 		}
-		    
+		
+		
+		function clearViewUser(){
+			$("#viewUser .data").each(function(){
+				$(this).text("");
+			});
+		}
+		//END View Function
+		
+		//Add Function
+				    
 		function checkUsername(username){
 			 var status = false;
 			 $.ajax({
@@ -808,13 +586,207 @@
 				return false;
 			}
 			
-			if($("input[name=username]").siblings(".redundant-block").hasClass("has-error")){
-				$("input[name=username]").focus();
+			$("#addUser").modal('hide');
+			$.ajax("user/addUser.json?" + $("#newUserForm").serialize(),{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+			}).done(function(data){
+				bootbox.alert({
+				    title: "Notification",
+				    message: data.msg
+				});
+				
+				if(data.status == "true"){
+					console.log("true");
+					readyFunction();
+		    		clearInsertField();
+				}
+				else{
+					$("#addUser").modal('show');
+				}
+			});
+		}
+		
+		function clearInsertField(){
+			$("#newUserForm input").each(function(){
+				$(this).val("");
+				//clear validation
+				$(this).removeClass("is-valid").removeClass("is-invalid");
+			})
+			
+			$("#newUserForm select").each(function(){
+				$(this).val("");
+				$(this).removeClass("is-valid").removeClass("is-invalid");
+			});
+			//Clear validation
+			
+		}
+		
+		$("#usergroup").on("change",function(){
+			if(this.value == 2){
+				$("#branchname").prop("disabled",false);
+				$("#branchname").removeClass("ignore");
+				$("#branchname").attr("value","");
+				$("#branchname").val("");
+			
+			}
+			else{
+				$("#branchname").prop("disabled",true);
+				$("#branchname").addClass("ignore");
+				$("#branchname").removeClass("is-valid");
+				$("#branchname").removeClass("is-invalid");
+				$("#branchname").attr("value","");
+				$("#branchname").val("");
+				$("#branchname").val("");
+				$("#branchname-error").css("display","none");
+			}
+			
+		});
+		
+		$("#Editusergroup").on("change",function(){
+			checkDropdownValue(this);
+		})
+		
+		function checkDropdownValue(element){
+			if(element.value == 2){
+				$("#Editbranchname").prop("disabled",false);
+				$("#Editbranchname").removeClass("ignore");
+				$("#Editbranchname").attr("value","");
+				$("#Editbranchname").val("");
+			
+			}
+			else{
+				$("#Editbranchname").prop("disabled",true);
+				$("#Editbranchname").addClass("ignore");
+				$("#Editbranchname").attr("value","");
+				$("#Editbranchname").val("");
+				$("#Editbranchname-error").css("display","none");
+			}
+		}
+		//END Add Function
+		
+		//Activate & Deactivate Function
+		function activateAndDeactivateUser(element,newStatus){
+			bootbox.confirm({
+			    message: "Are you sure you want to update the status?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true){
+				    	var userid = element.id;
+						$.ajax("user/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
+							method : "GET",
+							accepts : "application/json",
+							dataType : "json",
+						}).done(function(data){
+							bootbox.alert({
+							    title: "Notification",
+							    message: data.result,
+							    callback: function(){
+							    	readyFunction();
+								}
+							});
+						});
+			    	}
+			    }
+			});
+			
+		}
+		//END Activate & Deactivate Function
+		
+		//Edit function
+		function resetEditBtn(){
+			var id = $("#editUserForm #seqid").val();
+			getEditInfo(id);
+		}
+		
+		function clearEditField(){
+			$("#editUserForm select").each(function(){
+				$(this).val("");
+			});
+			$("#editUserForm select > option").each(function(){
+				$(this).attr("selected",false);
+			});
+		}
+		
+		function getEditInfo(userid){
+			$.ajax("user/getEditInfo.json?userid=" + userid,{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+			}).done(function(data){
+				console.log(data.msg);
+				if(data.msg != ""){
+					bootbox.alert(data.msg);
+				}
+				else{	
+					clearEditField();
+					$("#editUserForm #seqid").val(data.seqid);
+					$("#editUser .modal-title").html("Editing user: " + data.username);
+					$("#editUserForm select[name=Editusergroup] > option").each(function(){
+						if(data.usergroupid == $(this).val()){
+							$(this).attr("selected",true);
+							$("#editUserForm select[name=Editusergroup]").attr("value",$(this).val());
+							$("#editUserForm select[name=Editusergroup]").val($(this).val());
+						}
+						
+					});
+					checkDropdownValue($("#editUserForm select[name=Editusergroup]")[0]);
+					if(data.usergroupid == 2){
+						$("#editUserForm select[name=Editbranchid] > option").each(function(){
+							if(data.branchid == $(this).val()){
+								$(this).attr("selected",true);
+								$("#editUserForm select[name=Editbranchid]").attr("value",$(this).val());
+								$("#editUserForm select[name=Editbranchid]").val($(this).val());
+							}
+							
+						});
+					}
+					if(!$("#editUser").hasClass("show")){
+						$("#editUser").modal("show");
+					}
+					//$("#editUser").toggle();
+				}
+				
+			});
+		}
+		
+		$("#editUserForm").validate({
+			ignore : ".ignore",
+			focusInvalid:true,
+			rules : {
+				Editusergroup:{
+					required:true
+				},
+				Editbranchid:{
+					required:true
+				}
+				
+			},
+			invalidHandler: function() {
+				$(this).find(":input.has-error:first").focus();
+			}
+		});
+		
+		function editUser(element){
+			
+			var validator = $( "#editUserForm" ).validate();
+			if(!validator.form()){
 				return false;
 			}
 			
-			$("#addUser").modal('hide');
-			$.ajax("user/addUser.json?" + $("#newUserForm").serialize(),{
+			$("#editUser").modal("hide");
+			
+			$.ajax("user/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
@@ -825,25 +797,52 @@
 				    callback: function(){
 				    	if(data.status == "true"){
 				    		readyFunction();
-				    		clearInsertField();
+				    		clearEditField();
 				    	}
 				    	else{
-				    		$("#addUser").toggle();
+				    		$("#editUser").modal('show');
 				    	}
 					}
 				});
 			});
 		}
-			
-		function clearViewUser(){
-			$("#viewUser .data").each(function(){
-				$(this).text("");
+		//END Edit function
+		
+		//Delete function
+		function deleteUser(element){
+			bootbox.confirm({
+			    message: "Are you sure you want to delete this staff?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true){
+				    	var userid = element.id;
+						$.ajax("user/deleteUser.json?userid=" + userid,{
+							method : "GET",
+							accepts : "application/json",
+							dataType : "json",
+						}).done(function(data){
+							bootbox.alert({
+							    title: "Notification",
+							    message: data.result,
+							    callback: function(){
+							    	readyFunction();
+								}
+							});
+						});
+			    	}
+			    }
 			});
 		}
-		
-		$(".dropdown").on('change',function(){
-			$(this).attr("value",$(this).val());
-		});
+		//END Delete function
 	</script>
 </body>
 

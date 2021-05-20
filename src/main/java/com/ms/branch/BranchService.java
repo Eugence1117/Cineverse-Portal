@@ -46,6 +46,7 @@ public class BranchService {
 		}
 		return result;
 	}
+
 	
 	public ResponseBranchInfo getBranchDetails(String branchId) {
 		log.info("Retrieving branch Information.");

@@ -12,13 +12,8 @@
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
-<link rel="stylesheet" href="<spring:url value='/plugins/bootstrap/css/bootstrap.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/datatables/datatables.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/float-label/input-material.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>">
 
 <style>
 .fontBtn:hover{
@@ -34,179 +29,205 @@
 	}
 </style>
 </head>
-<body>
-	<%@ include file="include/navbar.jsp"%>
-	<div class="container col-md-10 my-3 py-5">
-		<div class="card">
-			<div class="card-header">
-				<span class="card-title">
-					<span class="fa fa-fw fa-store-alt"></span>
-					<span>Branches</span>
-				</span>
-				<div class="fa-pull-right d-inline-block">
-					<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="showInsert">
-						<span class="fas fa-plus-circle" aria-hidden="true"></span>
-						<span>Add New Branch</span>
-					</a>
-  				</div>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">View Branches</h1>
+			        </div>
+			        
+			        <div class="card">
+						<div class="card-header">
+							<div class="fa-pull-right d-inline-block">
+								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="showInsert" data-bs-toggle="modal" data-bs-target="#addBranch">
+									<span class="fas fa-plus-circle" aria-hidden="true"></span>
+									<span>Add New Branch</span>
+								</a>
+			  				</div>
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table id="branchInfo" class="table table-bordered" style="width:100% !important">
+									<thead>
+										<tr>
+											<th>Branch ID</th>
+											<th>Branch Name</th>
+											<th>Address</th>
+											<th>Postcode</th>
+											<th>District</th>
+											<th>State</th>
+											<th>Status</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				 </div>
 			</div>
-			<div class="card-body">
-				<table id="branchInfo" style="width:100% !important">
-					<thead>
-						<tr>
-							<th>Branch ID</th>
-							<th>Branch Name</th>
-							<th>Address</th>
-							<th>Postcode</th>
-							<th>District</th>
-							<th>State</th>
-							<th>Status</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-				</table>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
+		</div>
+	</div>
+
+	<!-- View Modal -->
+	<div class="modal fade" id="viewBranch" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Branch Details</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<label class="col-sm-4"><b>Branch ID</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Branch Name</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="branchName"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Address</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="address"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Postcode</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="postcode"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>District</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="districtName"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>State</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="stateName"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Status</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="status"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary mx-auto"
+						data-bs-dismiss="modal">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
-	<footer>
-		<p class="text-center">
-			<small><fmt:message key="common.copyright" /></small>
-		</p>
-	</footer>	
-	
-	<!-- View Modal -->
-		<div class="modal fade" id="viewBranch" tabindex="-1" role="dialog">
-		  <div class="modal-dialog modal-dialog-centered" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title">Branch Details</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Branch ID</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Branch Name</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="branchName"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Address</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="address"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Postcode</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="postcode"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>District</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="districtName"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>State</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="stateName"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Status</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="status"></p>
-		        </div>
-		      </div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-primary mx-auto" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		  </div>
+
+	<div class="modal" tabindex="-1" role="dialog" id="addBranch">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Please Fill in the blank</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h3 class="text-center">
+						<span class="fas fa-plus"></span>New Branch
+					</h3>
+					<div class="">
+						<form class="p-0 mt-5" id="newBranchForm">
+							<div class="col-sm-10 mx-auto">
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<input type="text" class="form-control" name="branchname" id="branchname" placeholder="Write something here..."/>
+											<label for="branchname">Branch Name</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<input type="text" class="form-control" name="address" id="address" placeholder="Write something here..."/>
+											<label for="address">Address</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<input type="text" class="form-control" name="postcode" id="postcode" placeholder="Write something here..."/>
+											<label for="postcode">Postcode</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="state" id="state" class="form-control form-select" aria-label="Select an option">
+												<option  hidden selected value="">Select an option</option>
+							        			<!-- <c:forEach items="${state.result}" var="state">
+							        				<option value="<c:out value='${state.seqid}'/>"><c:out value="${state.stateName}"/></option>
+							        			</c:forEach> -->
+											</select> <label for="state">State</label>
+										</div>
+									</div>
+								</div>
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="district" id="district" class="form-control form-select" disabled aria-label="Select an option">
+												<option  hidden selected value="">Select an option</option>
+							        			<!--<c:forEach items="${district.result}" var="district">
+							        				<option value="<c:out value='${district.seqid}'/>"><c:out value="${district.districtname}"/></option>
+							        			</c:forEach> -->
+											</select> <label for="branchname">District</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="mx-auto">
+						<button type="button" class="btn btn-primary m-2"
+							onclick=addBranch()>Submit</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=clearInsertField()>Reset</button>
+						<button type="button" class="btn btn-secondary m-2"
+							data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		
-		<div class="modal" tabindex="-1" role="dialog" id="addBranch">
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title">Please Fill in the blank</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		      	<h3 class="text-center"><span class="fas fa-plus"></span>New Branch</h3>
-		      	<div class="">
-			        <form class="p-0 mt-5" id="newBranchForm">
-				        <div class="col-sm-10 mx-auto">
-				        	<div class="row form-group input-material">
-				        		<input type="text" class="form-control" name="branchname" id="branchname"/> 
-				        		<label for="branchname">Branch Name</label>
-				        		<p class="redundant-block d-none">This name is taken by others branch.</p>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material">
-				        		<input type="text" class="form-control" name="address" id="address"/> 
-				        		<label for="address">Address</label>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material">
-				        		<input type="text" class="form-control" name="postcode" id="postcode"/> 
-				        		<label for="postcode">Postcode</label>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material">
-				        		<select name="state" id="state" class="form-control dropdown">
-				        				<!-- <option  hidden selected ></option>
-					        			<c:forEach items="${state.result}" var="state">
-					        				<option value="<c:out value='${state.seqid}'/>"><c:out value="${state.stateName}"/></option>
-					        			</c:forEach> -->
-					        	</select>
-					        	<label for="state">State</label>
-				        	</div>
-				        	<div class="row form-group input-material">
-				        		<select name="district" id="district" class="form-control dropdown" disabled>
-				        				<!--<option hidden selected ></option>
-					        			<c:forEach items="${district.result}" var="district">
-					        				<option value="<c:out value='${district.seqid}'/>"><c:out value="${district.districtname}"/></option>
-					        			</c:forEach> -->
-					        	</select>
-					        	<label for="branchname">District</label>
-				        	</div>
-			        	</div>
-			        </form>
-		        </div>
-		      </div>
-		      <div class="modal-footer">
-		      	<div class="mx-auto">
-			        <button type="button" class="btn btn-primary m-2" onclick=addBranch()>Submit</button>
-			        <button type="reset" class="btn btn-danger m-2" onclick=clearInsertField()>Reset</button> 
-			        <button type="button" class="btn btn-secondary m-2" data-dismiss="modal">Cancel</button>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		</div>
-	
-<%@ include file="include/js.jsp"%>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
-		<script type="text/javascript"
-		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>	
+	</div>
+
+	<%@ include file="include/js.jsp"%>
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
@@ -218,7 +239,6 @@
 		});
     	<!--FOR DISPLAY DATA TABLE-->
     	function readyFunction(){
-    		$("body").materializeInputs();
 			$.ajax("branch/retrieveInfo.json",{
 				method : "GET",
 				accepts : "application/json",
@@ -331,7 +351,7 @@
 		<!--FOR SHOW INSERT FORM-->
 		$("#showInsert").on('click',function(){
 			retrieveState();
-			$("#addBranch").modal();
+			$("#addBranch").modal("show");
 		});
 		
 		$("input[name=branchname]").on('input',function(){
@@ -358,33 +378,24 @@
 		}
 		
 		$.validator.setDefaults({
-			errorElement : "p",
-			errorClass : "help-block",
+			errorElement : "div",
+			errorClass : "invalid-feedback",
 			highlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control').removeClass(
-							'has-success').addClass('has-error');
+							'is-valid').addClass('is-invalid');
 				}
 			},
 			unhighlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control')
-							.removeClass('has-error').addClass('has-success');
+							.removeClass('is-invalid').addClass('is-valid');
 				}
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
-				/*   if (element.parent('col-md-10').length) {
-				      error.insertAfter(element.parent());
-				  }
-				  else if(element.prop('type') === 'file'){
-				  	error.insertAfter(element.next());
-				  }
-				  else {
-				      error.insertAfter(element);
-				  } */
 			}
 		});
 		
@@ -394,6 +405,17 @@
 			rules : {
 				branchname:{
 					required:true,
+					remote:{
+						url:"branch/checkBranchName.json",
+						type:"get",
+						data:{
+							branchname:function(){return $("input[name=branchname]").val();}
+						},
+						dataFilter: function(data){
+							var result = JSON.parse(data);
+							return result.status;
+						}
+					}
 				},
 				address:{
 					required:true
@@ -408,7 +430,11 @@
 				district:{
 					required:true
 				}
-				
+			},
+			messages:{
+				branchname:{
+					remote: "This name is taken by others branch."
+				}
 			},
 			invalidHandler: function() {
 				
@@ -451,12 +477,10 @@
 		
 		function clearInsertField(){
 			$("#newBranchForm input").each(function(){
-				$(this).attr("value","");
 				$(this).val("");
 			});
 			
 			$("#newUserForm select").each(function(){
-				$(this).attr("value","");
 				$(this).val("");
 			});
 		}
@@ -473,9 +497,7 @@
 					$.each(data.resultList,function(key,entry){
 						optionList += "<option value='" + entry.seqid + "'>" + entry.statename + "</option>";
 					})
-					stateList.html(optionList);
-					stateList.attr("value","");
-					stateList.val("");
+					stateList.append(optionList);
 				}
 				else{
 					bootbox.alert(data.error);
@@ -483,9 +505,6 @@
 			})
 		}
 		
-		$(".dropdown").on('change',function(){
-			$(this).attr("value",$(this).val());
-		});
 		
 		$("#state").on("change",function(){
 			var stateId = this.value;
@@ -504,9 +523,8 @@
 					$.each(data.resultList,function(key,entry){
 						optionList += "<option value='" + entry.seqid + "'>" + entry.districtname + "</option>";
 					})
-					districtList.html(optionList);
+					districtList.append(optionList);
 					districtList.prop("disabled",false);
-					districtList.attr("value","");
 					districtList.val("");
 				}
 				else{
@@ -573,7 +591,9 @@
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
-					$("#viewBranch").modal();
+					if(!$("#viewBranch").hasClass("show")){
+						$("#viewBranch").modal("show");
+					}
 				}
 				else{
 					bootbox.alert(data.error);

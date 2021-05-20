@@ -197,14 +197,18 @@ public class MovieService {
 		else {
 			log.info("Movie:" + result.size() + " record(s) retrieved from database");
 			if(extMovie != null) {
+				log.info("Exist Movie Size: " + extMovie.size());
 				log.info("Start Filtering Existing Movie");
+				List<Map<String,String>> pendingRemove = new ArrayList<Map<String,String>>();
 				for(int x = 0 ; x < result.size() ; x++) {
 					for(int y = 0 ; y < extMovie.size(); y++) {
 						if(result.get(x).get("id").equals(extMovie.get(y))) {
-							result.remove(x);
+							//result.remove(x);
+							pendingRemove.add(result.get(x));
 						}
 					}
 				}
+				result.removeAll(pendingRemove);
 				return result;
 			}
 			else {
@@ -281,7 +285,9 @@ public class MovieService {
 			return new ResponseResultJson("Cannot find relavant branch.");
 		}
 		else {
-			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),form.getPublishDate());
+			//Get publish date
+			String publishDate = dao.getMoviePublishDate(form.getMovieId());
+			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
 			if(result.containsKey(false)) {
 				return new ResponseResultJson(result.get(false));
 			}

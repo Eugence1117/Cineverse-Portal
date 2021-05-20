@@ -75,6 +75,10 @@
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
+    	
+    	$(document).ready(function(){
+    		bootbox.alert("Welcome to my new look and Happy 520! <i class='far fa-smile-wink'></i>")
+    	});
 	</script>
 </body>
 

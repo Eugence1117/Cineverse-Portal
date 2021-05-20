@@ -11,5 +11,4 @@ public class ExistMovieForm {
 	private String movieId;
 	private String startDate;
 	private String endDate;
-	private String publishDate;
 }

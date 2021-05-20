@@ -11,24 +11,8 @@
 <title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/bootstrap/css/bootstrap.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/datatables.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/float-label/input-material.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/Fullcalendar-5.5.1/main.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 
 <style>
 #scheduleOption .nav-link:hover, .card-header>a, .component-header {
@@ -123,98 +107,107 @@
 </style>
 </head>
 
-<body>
-
-	<%@ include file="include/navbar.jsp"%>
-
-	<div class="container col-md-10 card my-3 py-5">
-		<div class="card m-4">
-			<div class="card-header bg-light border-1">
-				<a data-toggle="collapse" data-target="#dateOption"><span
-					class="fa fa-search"></span> Configure Date Range</a>
-			</div>
-			<div class="card-body p-0">
-				<form id="dateOption" class="collapse show">
-					<div class="list-group-item">
-						<div class="form-group row">
-							<div class="col-sm-1"></div>
-							<label class="col-form-label col-sm-2">Start Date</label> <label
-								class="col-form-label colon">:</label>
-							<div class="col-sm-3">
-								<input class="form-control col-sm-10 date" type="date"
-									name="startdate" value="${startDate}" id="startDate" disabled>
-							</div>
-
-							<label class="col-form-label col-sm-2">End Date</label> <label
-								class="col-form-label colon">:</label>
-							<div class="col-sm-3">
-								<input class="form-control col-sm-10 date" type="date"
-									name="enddate" value="${endDate}" id="endDate"
-									min="${startDate}">
-							</div>
-							<div class="col-sm-1"></div>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">Template</h1>
+			        </div>
+			        
+			        <div class="card m-4">
+						<div class="card-header bg-light border-1">
+							<a data-toggle="collapse" data-target="#dateOption"><span
+								class="fa fa-search"></span> Configure Date Range</a>
 						</div>
-						<div class="form-group row m-0">
-							<div class="col-sm-5"></div>
-							<div class="col-sm-2">
-								<button class="btn-success btn" type="button" id="searchByDate">
-									<span class="fas fa-wrench"></span> Configure
-								</button>
-							</div>
-							<div class="col-sm-5"></div>
-						</div>
-					</div>
-
-				</form>
-			</div>
-		</div>
-		<div class="card m-4">
-			<div class="card-header">
-				<a data-toggle="collapse" data-target="#scheduleOption"><span
-					class="fa fa-calendar-alt"></span> Configure Schedule</a>
-			</div>
-			<div class="card-body">
-				<div id="scheduleOption" class="collapse show">
-					<ul class="nav nav-pills nav-fill">
-						<li class="nav-item col-sm-4"><a
-							class="nav-link active text-center"
-							onclick="configureByOverall()" id="defaultNav">Overall</a></li>
-						<li class="nav-item col-sm-4"><a class="nav-link text-center"
-							onclick="configureByWeekly()">Weekly</a></li>
-						<li class="nav-item col-sm-4"><a class="nav-link text-center"
-							onclick="configureByDaily()">Daily</a></li>
-					</ul>
-					<div class="row px-3 mt-3">
-						<div class="col-sm-12">
-							<!--  Template for Daily -->
-							<div class="hide" id="dailySchedule">
-								<form>
-								</form>
-							</div>
-							
-							<!-- Template for Weekly -->
-							<div class="hide" id="weeklySchedule">
-								<form>
-								</form>
-							</div>
-
-							<!--  Template for Overall -->
-							<div class="hide" id="overallSchedule">
-								<form>
-								</form>
-							</div> <!--  End of Overall Template -->
+						<div class="card-body p-0">
+							<form id="dateOption" class="collapse show">
+								<div class="list-group-item">
+									<div class="form-group row">
+										<div class="col-sm-1"></div>
+										<label class="col-form-label col-sm-2">Start Date :</label>
+										<div class="col-sm-3">
+											<input class="form-control col-sm-10 date" type="date"
+												name="startdate" value="${startDate}" id="startDate" disabled>
+										</div>
+			
+										<label class="col-form-label col-sm-2">End Date :</label>
+										<div class="col-sm-3">
+											<input class="form-control col-sm-10 date" type="date"
+												name="enddate" value="${endDate}" id="endDate"
+												min="${startDate}">
+										</div>
+										<div class="col-sm-1"></div>
+									</div>
+									<div class="form-group row m-0">
+										<div class="col-sm-5"></div>
+										<div class="col-sm-2">
+											<button class="btn-success btn" type="button" id="searchByDate">
+												<span class="fas fa-wrench"></span> Configure
+											</button>
+										</div>
+										<div class="col-sm-5"></div>
+									</div>
+								</div>
+			
+							</form>
 						</div>
 					</div>
-				</div>
+					<div class="card m-4">
+						<div class="card-header">
+							<a data-toggle="collapse" data-target="#scheduleOption"><span
+								class="fa fa-calendar-alt"></span> Configure Schedule</a>
+						</div>
+						<div class="card-body">
+							<div id="scheduleOption" class="collapse show">
+								<ul class="nav nav-pills nav-fill">
+									<li class="nav-item col-sm-4"><a
+										class="nav-link active text-center"
+										onclick="configureByOverall()" id="defaultNav">Overall</a></li>
+									<li class="nav-item col-sm-4"><a class="nav-link text-center"
+										onclick="configureByWeekly()">Weekly</a></li>
+									<li class="nav-item col-sm-4"><a class="nav-link text-center"
+										onclick="configureByDaily()">Daily</a></li>
+								</ul>
+								<div class="row px-3 mt-3">
+									<div class="col-sm-12">
+										<!--  Template for Daily -->
+										<div class="hide" id="dailySchedule">
+											<form>
+											</form>
+										</div>
+										
+										<!-- Template for Weekly -->
+										<div class="hide" id="weeklySchedule">
+											<form>
+											</form>
+										</div>
+			
+										<!--  Template for Overall -->
+										<div class="hide" id="overallSchedule">
+											<form>
+											</form>
+										</div> <!--  End of Overall Template -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="calendar" class="calendar"></div>
+			     </div>
 			</div>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
 		</div>
-		<div id="calendar" class="calendar"></div>
-		<footer>
-			<p class="text-center">
-				<small><fmt:message key="common.copyright" /></small>
-			</p>
-		</footer>
-	</div>
+	</div> 
 	
 	<div class="modal" tabindex="-1" role="dialog">
 	  <div class="modal-dialog modal-lg" role="document">
@@ -238,26 +231,12 @@
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");

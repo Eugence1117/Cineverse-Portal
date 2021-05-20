@@ -14,19 +14,7 @@
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet"
-	href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/bootstrap/css/bootstrap.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/datatables.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/float-label/input-material.css'/>">
-<link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>">
 
 <style>
 #seatLayout{
@@ -49,55 +37,64 @@
 </style>
 </head>
 
-<body>
-
-	<%@ include file="include/navbar.jsp"%>
-
-	<div class="container col-md-10 card my-3 pt-5 pb-2">
-		<h2 class='text-center'>Theatre layout</h2>
-		<div class="row pb-2" style="justify-content:right">
-			<div class="col-md-1"></div>
-			<div class="col-md-10" id="actionPanel">
-				<button class="btn btn-primary float-left mx-1" onClick="$('#createTheatre').modal()"> <span class='fas fa-wrench'></span> Configuration</button>
-				<button class="btn btn-secondary float-right mx-1" onClick="deSelectAllClickable()" id="btnDeselectAll"><span class='fas fa-times'> </span> Deselect all</button>
-				<button class='btn btn-primary float-right' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
-				<div class="dropdown d-inline-block">
-					<button class="dropdown-toggle btn btn-secondary" id="DropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fas fa-list"></span> Row & Column</button>
-					<div class="dropdown-menu" aria-labelledby="DropdownButton">
-						<button class="dropdown-item" onClick="addNewRow()"><span class="fas fa-plus"></span> Add a row</button>
-						<button class="dropdown-item" onClick="deleteRow()"><span class="fas fa-minus"></span> Delete a row</button>						
-						 <div class="dropdown-divider"></div>
-						<button class="dropdown-item" onClick="addNewColumn()"><span class="fas fa-plus"></span> Add a column</button>
-						<button class="dropdown-item" onClick="deleteColumn()"><span class="fas fa-minus"></span> Delete a column</button>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">Create New Theatre</h1>
+			        </div>
+			        
+			        <h2 class='text-center'>Theatre layout</h2>
+					<div class="row pb-2" style="justify-content:right">
+						<div class="col-md-1"></div>
+						<div class="col-md-10" id="actionPanel">
+							<button class="btn btn-primary float-left mx-1" onClick="$('#createTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
+							<button class="btn btn-secondary float-right mx-1" onClick="deSelectAllClickable()" id="btnDeselectAll"><span class='fas fa-times'> </span> Deselect all</button>
+							<button class='btn btn-primary float-right' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
+							<div class="dropdown d-inline-block">
+								<button class="dropdown-toggle btn btn-secondary" id="DropdownButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fas fa-list"></span> Row & Column</button>
+								<div class="dropdown-menu" aria-labelledby="DropdownButton">
+									<button class="dropdown-item" onClick="addNewRow()"><span class="fas fa-plus"></span> Add a row</button>
+									<button class="dropdown-item" onClick="deleteRow()"><span class="fas fa-minus"></span> Delete a row</button>						
+									 <div class="dropdown-divider"></div>
+									<button class="dropdown-item" onClick="addNewColumn()"><span class="fas fa-plus"></span> Add a column</button>
+									<button class="dropdown-item" onClick="deleteColumn()"><span class="fas fa-minus"></span> Delete a column</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-1"></div>
 					</div>
-				</div>
-			</div>
-			<div class="col-md-1"></div>
-		</div>
-		<div class="row m-0" style="justify-content:center">
-			<div class="p-0 row col-md-12">
-				<div class="col col-md-1"></div>
-				<div class="col col-md-10 p-0" id="seatLayout">
-					<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
-						<p class="text-center w-100 p-1 bg-light screen">Screen</p>
+					<div class="row m-0" style="justify-content:center">
+						<div class="p-0 row col-md-12">
+							<div class="col col-md-1"></div>
+							<div class="col col-md-10 p-0" id="seatLayout">
+								<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
+									<p class="text-center w-100 p-1 bg-light screen">Screen</p>
+								</div>
+								<p class="my-5 text-center"> Please finish the configuration to continue</p>
+							</div>
+							<div class="col col-md-1"></div>
+						</div>
 					</div>
-					<p class="my-5 text-center"> Please finish the configuration to continue</p>
-				</div>
-				<div class="col col-md-1"></div>
+					<div class="text-center my-3">
+						<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Confirm</button>
+					</div>
+				 </div>
 			</div>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
 		</div>
-		<div class="text-center my-3">
-			<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Confirm</button>
-		</div>
-		
-	<footer>
-		<p class="text-center">
-			<small><fmt:message key="common.copyright" /></small>
-		</p>
-	</footer>
 	</div>
 
-	
 	<div class="modal" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
@@ -108,28 +105,36 @@
 		      	<h3 class="text-center">Create new theatre</h3>
 		      	<div class="">
 			        <form class="p-0 mt-5" id="theatreForm">
-				        <div class="col-sm-10 mx-auto">				   
-				        	<div class="row form-group input-material">
-				        		<select name="theatretype" class="form-control dropdown" id="dropdownTheatreTypes">
-				        			<option selected hidden value="0"></option>
-					        			<c:forEach items="${theatreTypes}" var="group">
-					        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.seqid}"/> - Maximum capacity: <c:out value="${group.seatSize}"/></option>
-					        			</c:forEach>
-					        	</select>
-					        	<label for="theatretype">Theatre Type</label>
-				        	</div>
-				        	<div class="row form-group input-material">
-				        		<div class="col col-md-5 p-0">
-				        			<input name="row" class="form-control" id="inputRow"/>
-				        			<label for="row">Total Row</label>
+				        <div class="mx-1">
+				        	<div class="row form-group">
+				        		<div class="col-md">
+				        			<div class="form-floating">
+				        				<select name="theatretype" class="form-control form-select" id="dropdownTheatreTypes">
+						        			<option selected hidden value="0"></option>
+							        			<c:forEach items="${theatreTypes}" var="group">
+							        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.seqid}"/> - Maximum capacity: <c:out value="${group.seatSize}"/></option>
+							        			</c:forEach>
+							        	</select>
+							        	<label for="theatretype">Theatre Type</label>
+				        			</div>
 				        		</div>
-				        		<div class="col col-md-2"></div>
-				        		<div class="col col-md-5 p-0">
-				        			<input name="col" class="form-control" id="inputCol"/>
-				        			<label for="col">Total Column</label>
-				        		</div>
-				        	</div>
-			        	</div>
+						    </div>
+						    
+							<div class="row form-group g2">
+								<div class="col-md">
+									<div class="form-floating">
+										<input name="row" class="form-control" id="inputRow" />
+										<label for="row">Total Row</label>
+									</div>
+								</div>
+								<div class="col-md">
+									<div class="form-floating">
+										<input name="col" class="form-control" id="inputCol" />
+											<label for="col">Total Column</label>
+									</div>
+								</div>
+							</div>
+						</div>
 			        </form>
 		        </div>
 		      </div>
@@ -147,23 +152,17 @@
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
-	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
+		src="<spring:url value='/plugins/datatables/js/dataTables.bootstrap4.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>
+		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
@@ -565,27 +564,26 @@
 		}
 		
 		$.validator.setDefaults({
-			errorElement : "p",
-			errorClass : "help-block",
+			errorElement : "div",
+			errorClass : "invalid-feedback",
 			highlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control').removeClass(
-							'has-success').addClass('has-error');
+							'is-valid').addClass('is-invalid');
 				}
 			},
 			unhighlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control')
-							.removeClass('has-error').addClass('has-success');
+							.removeClass('is-invalid').addClass('is-valid');
 				}
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
 			}
-		});
-		
+		});		
 		$('#theatreForm').validate({
 			ignore : ".ignore",
 			rules : {

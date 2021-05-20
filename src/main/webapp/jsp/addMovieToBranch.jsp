@@ -11,18 +11,8 @@
 <title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/morrisjs/morris.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/css/dataTables.bootstrap4.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
 @media only screen and (max-width: 640px) {
 	.card-title>h2 {
@@ -100,8 +90,7 @@
 								</div>
 								<div class="card-body collapse" id="details-collapse">
 									<input name="movieId" class="extdata" type="hidden"
-										data-json-key="movieId"> <input name="publishDate"
-										class="extdate" type="hidden" data-json-key="releasedate" />
+										data-json-key="movieId">
 									<div class="list-group-item">
 										<div class="form-group row ">
 											<label class="font-weight-bold col-form-label col-sm-3">Movie Name</label>
@@ -264,49 +253,32 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 id="extModal-title" class="modal-title"></h4>
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
 				</div>
 				<div class="modal-body">
-					<div class="form-group row">
-						<label class="font-weight-bold col-form-label col-sm-5">Movie
-							Start Date</label> <label class="col-form-label colon col-sm-1">:</label>
-						<input type="date" name="startDate" class="form-control col-sm-5"
-							required>
-					</div>
-					<div class="form-group row">
-						<label class="font-weight-bold col-form-label col-sm-5">Movie
-							End Date</label> <label class="col-form-label colon col-sm-1">:</label> <input
-							type="date" name="endDate" class="form-control col-sm-5" required>
-					</div>
+					<form id="dateForm">
+						<div class="form-group row">
+							<label class="font-weight-bold col-form-label col-sm-5">Movie
+								Start Date</label> <label class="col-form-label colon col-sm-1">:</label>
+							<input type="date" name="startDate" class="form-control col-sm-5"
+								required>
+						</div>
+						<div class="form-group row">
+							<label class="font-weight-bold col-form-label col-sm-5">Movie
+								End Date</label> <label class="col-form-label colon col-sm-1">:</label> <input
+								type="date" name="endDate" class="form-control col-sm-5" required>
+						</div>
+					</form>
 				</div>
 				<div class="modal-footer">
 					<button type="button" id="ext-btn-addMovie" class="btn btn-success">Submit</button>
-					<button type="button" id="ext-btn-cancel" data-dismiss="modal"
+					<button type="button" id="ext-btn-cancel" data-bs-dismiss="modal"
 						class="btn btn-danger">Cancel</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="modal fade" tabindex="-1" role="dialog"
-		id="notificationModal">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Notification</h5>
-					<button type="button" class="close" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<p>
-						<c:out value="${description}" />
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
 	<!-- /.container -->
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
@@ -375,11 +347,10 @@
 		$("#ext-btn-add").on("click",function(){
 			var movieName = $("#extmovieName").val();
 			$("#extModal-title").html(movieName);
-			$("#extModal").modal();
-			$("input[name=publishDate]").val($("#extreleaseDate").val());
-			
+			$("#extModal").modal('show');
+
 			$("#ext-btn-addMovie").on("click",function(){
-			$.ajax("addMovie/AddExistMovie.json?" + $("#addMovieForm").serialize(),{
+			$.ajax("addMovie/AddExistMovie.json?" + $("#addMovieForm").serialize() + "&" +$("#dateForm").serialize(),{
 						method : "GET",
 						accepts : "application/json",
 						dataType : "json",
@@ -390,7 +361,7 @@
 						bootbox.alert({
 							message: data.result.message,
 							callback: function(){
-								window.location.href = "addMovie.htm";
+								window.location.href = "addMovieToBranch.htm";
 							}
 						});
 					}
@@ -398,7 +369,7 @@
 						bootbox.alert({
 							message: data.error,
 							callback: function(){
-								$("#extModal").modal();
+								$("#extModal").modal('show');
 							}
 						});
 						
