@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="schedule.add.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
@@ -115,7 +115,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Template</h1>
+			        	<h1 class="h3 mb-0 text-gray-800">Schedule</h1>
 			        </div>
 			        
 			        <div class="card m-4">

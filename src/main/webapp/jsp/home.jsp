@@ -8,13 +8,11 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title>Dashboard</title>
+<title><fmt:message key="home.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/datatables.css'/>">
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 </head>
@@ -65,19 +63,20 @@
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
-	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/js/confetti.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
     	$(document).ready(function(){
-    		bootbox.alert("Welcome to my new look and Happy 520! <i class='far fa-smile-wink'></i>")
+    		bootbox.alert({
+    			message: "Welcome to my new look and Happy 520! <i class='far fa-smile-wink'></i>",
+    		});
+    		
     	});
 	</script>
 </body>

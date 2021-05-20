@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="movie.add.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"

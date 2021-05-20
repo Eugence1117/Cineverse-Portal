@@ -52,7 +52,7 @@
 </style>
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="user.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">

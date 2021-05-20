@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="movie.view.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
@@ -74,8 +74,8 @@
 			            	<h1 class="h3 mb-0 text-gray-800">View Movie</h1>
 			            	<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
 			            </div>
-				  		<div class="container">
-							<div class="card m-4">
+			            
+				  			<div class="card m-4">
 								<div class="card-header bg-light border-1">
 									<a  data-bs-toggle="collapse" data-bs-target="#dateOption"><span class="fa fa-search"></span> Search By Date Range</a>
 								</div>
@@ -253,7 +253,6 @@
 									</div>
 								</div>
 							</div>
-						</div>
 				  </div>
 			</div>
 			<footer class="sticky-footer bg-white">

@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" />Create theatre</title>
+<title><fmt:message key="theatre.add.title" />Create theatre</title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"
