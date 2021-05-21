@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Login</title>
+<title><fmt:message key="user.login.title" /></title>
 <%@ include file="include/css.jsp"%>
 	<style>
 	@media only screen and (max-width: 640px) {
@@ -18,7 +18,6 @@
 </head>
 
 <body>
-	<%@ include file="include/navbar.jsp"%>
 	<div class="container mt-4">
 		<div class="row">
 			<div class="col-sm-2"></div>

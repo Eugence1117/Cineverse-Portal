@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,35 +36,24 @@ public class MovieController {
 		log.info("Entered /addMovie.htm");
 		String usergroupid = httpSession.getAttribute("usergroupid").toString();
 		String username = httpSession.getAttribute("username").toString();
+		model.addAttribute("usergroup",usergroupid);
 		if(Integer.parseInt(usergroupid) == 1) {
 			model.addAttribute("movieList", service.getMovieNameList());
 			model.addAttribute("censorship",service.getCensorship());
+			return "addNewMovie";
 		}
 		else {
 			model.addAttribute("exMovieList", service.getMovieName(username));
+			return "addMovieToBranch";
 		}
-		model.addAttribute("usergroup",usergroupid);
-		return "addmovie";
 	}
 	
-	@RequestMapping( value = {"/addMovie/uploadnewmovie.json"}, method = RequestMethod.POST,consumes = "multipart/form-data")
-	public String addNewMovie(Model model, @ModelAttribute("form") NewMovieForm form, BindingResult binding, RedirectAttributes attr) {
-		
-		boolean status = service.insertMovieRecord(form);
-		model.addAttribute("status",status);
-		model.addAttribute("usergroup",httpSession.getAttribute("usergroupid").toString());
-		if(status) {
-			model.addAttribute("description","The Movie " + form.getMovieName() +" is successfully inserted.");
-			log.info("Return to home page after click");
-			return "addmovie";
-		}
-		else {
-			model.addAttribute("description","The Movie " + form.getMovieName() +" insert failed.");
-			log.info("Remain to page after click");
-			return "addmovie";
-		}
-		
-		
+	@RequestMapping( value = {"/addMovie/uploadnewmovie.json"}, method = {RequestMethod.POST})
+	@ResponseBody
+	public Response addNewMovie(Model model, @ModelAttribute NewMovieForm form) {
+		log.info("Entered /addMovie/uploadnewmovie.json");
+		Response status = service.insertMovieRecord(form);
+		return status;
 	}
 	
 	@RequestMapping(value= {"/addMovie/ViewExistMovie.json"})

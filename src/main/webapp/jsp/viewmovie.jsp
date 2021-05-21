@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="movie.view.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
@@ -63,174 +63,207 @@
 </style>
 </head>
 
-<body>
-
-	<%@ include file="include/navbar.jsp"%>
-
-	<div class="container">
-		
-		<div class="card m-4">
-			<div class="card-header bg-light border-1">
-				<a  data-toggle="collapse" data-target="#dateOption"><span class="fa fa-search"></span> Search By Date Range</a>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				  <div class="container-fluid">
+					  	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			            	<h1 class="h3 mb-0 text-gray-800">View Movie</h1>
+			            	<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
+			            </div>
+			            
+				  			<div class="card m-4">
+								<div class="card-header bg-light border-1">
+									<a  data-bs-toggle="collapse" data-bs-target="#dateOption"><span class="fa fa-search"></span> Search By Date Range</a>
+								</div>
+								<div class="card-body p-0">
+									<form id="dateOption" class="collapse show">
+										<div class="py-3 px-2">				
+											<div class="form-group row">
+												<div class="col-sm-1"></div>
+												<label class="col-form-label col-sm-2">Start Date :</label>
+												<div class="col-sm-3">
+													<input class="form-control col-sm-10 date" type="date" name="startdate" value="${startDate}">
+												</div>
+					
+												<label class="col-form-label col-sm-2" >End Date :</label>
+												<div class="col-sm-3">
+													<input class="form-control col-sm-10 date" type="date" name="enddate" value="${endDate}">
+												</div>
+												<div class="col-sm-1"></div>
+											</div>
+											<div class="form-group row m-0">
+												<div class="col-sm-5"></div>
+												<div class="col-sm-2">
+													<button class="btn-success btn" type="button" id="searchByDate"><span class="fa fa-search"></span> Search</button>
+												</div>
+												<div class="col-sm-5"></div>
+											</div>
+										</div>
+									
+									</form>
+								</div>
+							</div>
+							
+							<div class="card m-4">
+								<div class="card-header bg-light border-1">
+									<a  data-bs-toggle="collapse" data-bs-target="#nameOption"><span class="fa fa-search"></span> Search By Name</a>
+								</div>
+								<div class="card-body p-0">
+									<form id="nameOption" class="collapse">
+										<div class="py-3 px-2">				
+											<div class="form-group row">
+												<div class="col-sm-4"></div>
+												<div class="col-sm-8 row">
+													<label class="col-form-label col-sm-3">Movie Name</label>
+													<label class="col-form-label colon col-sm-1">:</label>
+													<div class="col-sm-4">
+														<input class="form-control col-sm-10 date" type="text" name="movieName">
+													</div>
+												</div>
+											</div>
+											<div class="form-group row m-0">
+												<div class="col-sm-5"></div>
+												<div class="col-sm-2">
+													<button class="btn-success btn" type="button" id="searchByName"><span class="fa fa-search"></span> Search</button>
+												</div>
+												<div class="col-sm-5"></div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							
+							<div class="card m-4">
+								<div class="card-header bg-light" >
+									<a data-bs-toggle="collapse" data-bs-target="#movieDetails"><span class="fa fa-info"></span> Movie</a>
+								</div>
+								<div class="collapse" id="movieDetails">
+									<div class="card-body">
+										<div id="hidden-id" class="slideNav"></div>
+										<div id="slide-title" class="row col-sm-3 text-center m-auto slideNav"></div>
+										<div id="imageSlide" class="row col-sm-3 text-center mx-auto mb-3"></div>
+										<div class="card col-sm-12 row p-0 m-0">
+											<div class="card-header">
+												<span>Movie Details</span>
+												<c:if test="${usergroupid == 1}">
+												<span style="float:right" class="btn border btn-secondary" id="editBtn"><span class="far fa-edit"></span><span class="text"> Enable Edit</span></span>
+												</c:if>
+											</div>
+											<div class="card-body d-none" id="movieInfo">
+												<div class="" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
+												<form id="movieEditForm">
+												<div class="row mt-1 mb-4">
+													<div class="col-md">
+														<div class="form-floating">
+														<textarea id="synopsis" class="form-control text-center floatLabel" maxlength="8000" name="synopsis" disabled style="resize:none;height:120px;" placeholder="Write something here..."></textarea>
+														<label for="synopsis">Synopsis</label>
+													</div>
+													</div>
+												</div>
+												<div class="row g-2 my-1">
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="movieId" type="text" class="form-control floatLabel data" name="movieId" data-json-key="movieId" disabled>
+															<label for="movieId">Movie ID</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<select id="earlyAccess" class="form-select form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled aria-label="Select an option">
+																<option>Enable</option>
+																<option>Disable</option>
+															</select>
+															<!-- <input id="earlyAccess" type="text" class="form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled> -->
+															<label for="earlyAccess">Early Access</label>
+														</div>
+													</div>
+												</div>
+												<div class="row g-2 my-1">
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="releaseDate" type="date" class="form-control floatLabel data" name="releasedate" data-json-key="releasedate" disabled placeholder="Write something here...">
+															<label for="releaseDate">Release Date</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="totalTime" type="text" class="form-control floatLabel data" name="totalTime" data-json-key="totalTime" disabled placeholder="Write something here...">
+															<label for="totalTime">Total Time</label>
+														</div>
+													</div>
+												</div>
+												<div class="row g-2 my-1">
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="language" type="text" class="form-control floatLabel data" name="language" data-json-key="language" disabled placeholder="Write something here...">
+															<label for="language">Language</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="distributor" type="text" class="form-control floatLabel data" name="distributor" data-json-key="distributor" disabled placeholder="Write something here...">
+															<label for="distributor">Distributor</label>
+														</div>
+													</div>
+												</div>
+												<div class="row g-2 my-1">
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="director" type="text" class="form-control floatLabel data" name="director" data-json-key="director" disabled placeholder="Write something here...">
+															<label for="director">Director</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="cast" type="text" class="form-control floatLabel data" name="cast" data-json-key="cast" disabled placeholder="Write something here...">
+															<label for="cast">Cast</label>
+														</div>
+													</div>
+												</div>
+												<div class="row g-2 my-1">
+													<div class="col-md">
+														<div class="form-floating">
+															<select id="censorship" class="form-select form-control floatLabel data" name="censorship" data-json-key="censorship" disabled placeholder="Select an option">
+																<c:forEach items="${censorship}" var="data">
+																	<option value="${data.id}"><c:out value="${data.id}" /></option>
+																</c:forEach>
+															</select>
+															<!-- <input id="censorship" list="censorshipList" type="text" class="form-control floatLabel data" name="censorship" data-json-key="censorship" readonly> -->
+															<label for="censorship">Censorship</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="type" type="text" class="form-control floatLabel data" name="movietype" data-json-key="movietype" disabled placeholder="Write something here...">
+															<label for="type">Genre</label>
+														</div>
+													</div>
+												</div>
+												<div class="text-center d-none" id="editAccessBtn">
+													<button type="button" id="submitEdit" class="m-2 btn btn-primary">Apply Changes</button>
+													<button type="button" class="m-2 btn btn-secondary" onclick=getNewMovieInfo()>Reset</button>
+												</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+				  </div>
 			</div>
-			<div class="card-body p-0">
-				<form id="dateOption" class="collapse show">
-					<div class="list-group-item">				
-						<div class="form-group row">
-							<div class="col-sm-1"></div>
-							<label class="col-form-label col-sm-2">Start Date</label>
-							<label class="col-form-label colon">:</label>
-							<div class="col-sm-3">
-								<input class="form-control col-sm-10 date" type="date" name="startdate" value="${startDate}">
-							</div>
-
-							<label class="col-form-label col-sm-2" >End Date</label>
-							<label class="col-form-label colon">:</label>
-							<div class="col-sm-3">
-								<input class="form-control col-sm-10 date" type="date" name="enddate" value="${endDate}">
-							</div>
-							<div class="col-sm-1"></div>
-						</div>
-						<div class="form-group row m-0">
-							<div class="col-sm-5"></div>
-							<div class="col-sm-2">
-								<button class="btn-success btn" type="button" id="searchByDate"><span class="fa fa-search"></span> Search</button>
-							</div>
-							<div class="col-sm-5"></div>
-						</div>
-					</div>
-				
-				</form>
-			</div>
-		</div>
-		
-		<div class="card m-4">
-			<div class="card-header bg-light border-1">
-				<a  data-toggle="collapse" data-target="#nameOption"><span class="fa fa-search"></span> Search By Name</a>
-			</div>
-			<div class="card-body p-0">
-				<form id="nameOption" class="collapse">
-					<div class="list-group-item">				
-						<div class="form-group row">
-							<div class="col-sm-4"></div>
-							<div class="col-sm-8 row">
-								<label class="col-form-label col-sm-3">Movie Name</label>
-								<label class="col-form-label colon">:</label>
-								<div class="col-sm-4">
-									<input class="form-control col-sm-10 date" type="text" name="movieName">
-								</div>
-							</div>
-						</div>
-						<div class="form-group row m-0">
-							<div class="col-sm-5"></div>
-							<div class="col-sm-2">
-								<button class="btn-success btn" type="button" id="searchByName"><span class="fa fa-search"></span> Search</button>
-							</div>
-							<div class="col-sm-5"></div>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-		
-		<div class="card m-4">
-			<div class="card-header bg-light" >
-				<a data-toggle="collapse" data-target="#movieDetails"><span class="fa fa-info"></span> Movie</a>
-			</div>
-			<div class="collapse" id="movieDetails">
-				<div class="card-body">
-					<div id="hidden-id" class="slideNav"></div>
-					<div id="slide-title" class="row col-sm-3 text-center m-auto slideNav"></div>
-					<div id="imageSlide" class="row col-sm-3 text-center mx-auto mb-3"></div>
-					<div class="card col-sm-12 row p-0 m-0">
-						<div class="card-header">
-							<span>Movie Details</span>
-							<c:if test="${usergroupid == 1}">
-							<span style="float:right" class="btn border btn-secondary" id="editBtn"><span class="far fa-edit"></span><span class="text"> Enable Edit</span></span>
-							</c:if>
-						</div>
-						<div class="card-body d-none" id="movieInfo">
-							<div class="" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
-							<form id="movieEditForm">
-							<div class="row input-material form-group">
-								<textarea id="synopsis" class="form-control floatLabel text-center border-0" maxlength="8000" name="synopsis" disabled style="color:black;resize:none"></textarea>
-								<label for="synopsis">Synopsis</label>
-							</div>
-							<div class="row">
-								<div class="input-material form-group col-sm-6">
-									<input id="movieId" type="text" class="form-control floatLabel data" name="movieId" data-json-key="movieId" disabled>
-									<label for="movieId">Movie ID</label>
-								</div>
-								<div class="input-material form-group col-sm-6">
-									<select id="earlyAccess" class="form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled>
-										<option>Enable</option>
-										<option>Disable</option>
-									</select>
-									<!-- <input id="earlyAccess" type="text" class="form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled> -->
-									<label for="earlyAccess">Early Access</label>
-								</div>
-							</div>
-							<div class="row">
-								<div class="input-material form-group col-sm-6">
-									<input id="releaseDate" type="date" class="form-control floatLabel data" name="releasedate" data-json-key="releasedate" disabled>
-									<label for="releaseDate">Release Date</label>
-								</div>
-								<div class="input-material form-group col-sm-6">
-									<input id="totalTime" type="text" class="form-control floatLabel data" name="totalTime" data-json-key="totalTime" disabled>
-									<label for="totalTime">Total Time</label>
-								</div>
-							</div>
-							<div class="row">
-								<div class="input-material form-group col-sm-6">
-									<input id="language" type="text" class="form-control floatLabel data" name="language" data-json-key="language" disabled>
-									<label for="language">Language</label>
-								</div>
-								<div class="input-material form-group col-sm-6">
-									<input id="distributor" type="text" class="form-control floatLabel data" name="distributor" data-json-key="distributor" disabled>
-									<label for="distributor">Distributor</label>
-								</div>
-							</div>
-							<div class="row">
-								<div class="input-material form-group col-sm-6">
-									<input id="director" type="text" class="form-control floatLabel data" name="director" data-json-key="director" disabled>
-									<label for="director">Director</label>
-								</div>
-								<div class="input-material form-group col-sm-6">
-									<input id="cast" type="text" class="form-control floatLabel data" name="cast" data-json-key="cast" disabled>
-									<label for="cast">Cast</label>
-								</div>
-							</div>
-							<div class="row">
-								<div class="input-material form-group col-sm-6">
-									<select id="censorship" class="form-control floatLabel data" name="censorship" data-json-key="censorship" disabled>
-										<c:forEach items="${censorship}" var="data">
-											<option value="${data.id}"><c:out value="${data.id}" /></option>
-										</c:forEach>
-									</select>
-									<!-- <input id="censorship" list="censorshipList" type="text" class="form-control floatLabel data" name="censorship" data-json-key="censorship" readonly> -->
-									<label for="censorship">Censorship</label>
-								</div>
-								<div class="input-material form-group col-sm-6">
-									<input id="type" type="text" class="form-control floatLabel data" name="movietype" data-json-key="movietype" disabled>
-									<label for="type">Genre</label>
-								</div>
-							</div>
-							<div class="text-center d-none" id="editAccessBtn">
-								<button type="button" id="submitEdit" class="m-2 btn btn-primary">Apply Changes</button>
-								<button type="button" class="m-2 btn btn-secondary" onclick=getNewMovieInfo()>Reset</button>
-							</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
 		</div>
 	</div>
-	<footer>
-		<p class="text-center">
-			<small><fmt:message key="common.copyright" /></small>
-		</p>
-	</footer>
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
@@ -239,7 +272,6 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/slick_slider/slick_slider.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>	
 	<script type="text/javascript" src="<spring:url value='/plugins/readmore/readmore.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/dataInjection.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
@@ -254,20 +286,20 @@
 			scrollMonth : false,
     	}); */
     	$.validator.setDefaults({
-			errorElement : "p",
-			errorClass : "help-block",
+			errorElement : "div",
+			errorClass : "invalid-feedback",
 			highlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control').removeClass(
-							'has-success').addClass('has-error');
+							'is-valid').addClass('is-invalid');
 				}
 			},
 			unhighlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control')
-							.removeClass('has-error').addClass('has-success');
+							.removeClass('is-invalid').addClass('is-valid');
 				}
 			},
 			errorPlacement : function(error, element) {
@@ -321,6 +353,9 @@
 				},
 				censorship : {
 					required : true,
+				},
+				earlyAccess:{
+					required:  true,
 				}
 			}
 		});
@@ -340,17 +375,7 @@
     			arrows:false
     		});
     		$("body").materializeInputs();
-    		$("#synopsis").readMore({
-    			readMoreHeight: 90,
-    			readMoreText:"Read More",
-    			readLessText:"Collapse"
-    		});
-    		$(".read-more__link").on('click',function(){
-    			$("#synopsis").scrollTop(0);
-        		/* if($("#synopsis").hasClass("expanded")){
-        			$("#synopsis").css("height","500px");
-        		} */
-        	});
+
     		$("input").bind('keypress keydown keyup', function(e){
     		       if(e.keyCode == 13) { e.preventDefault(); }
     		    });
@@ -418,6 +443,9 @@
     			$(this).find(".text").html(" Enable Edit");
     			$("#editAccessBtn").removeClass("d-block").addClass("d-none");
     			$("#movieEditForm .floatLabel").attr("disabled",true);
+    			$("#movieEditForm .floatLabel").removeClass("is-valid");
+    			$("#movieEditForm .floatLabel").removeClass("is-invalid");
+    			getNewMovieInfo();
     		}
     		else{
     			$(this).addClass("active");
@@ -429,12 +457,6 @@
     		}
     		
     	})
-    	
-    	$("#synopsis").on("input",function(){
-    		setTimeout(function(){
-    			addAndRemoveReadMore();
-    		},50);
-    	});
     	
     	$("#submitEdit").on('click',function(){
     		var formValidation = $("#movieEditForm").validate();
@@ -449,6 +471,7 @@
     		}).done(function(data){
     			if(typeof data.false == "undefined"){
     				bootbox.alert(data.true);
+    				$("#editBtn").click();
     			}
     			else{
     				bootbox.alert(data.false);
@@ -478,7 +501,7 @@
     		
     	}
     	
-    	function getMovieInfo(activeId){
+    	async function getMovieInfo(activeId){
     		$.ajax("viewMovie/getMovieInfo.json?movieId=" + activeId,{
 				method : "GET",
 				accepts : "application/json",
@@ -505,7 +528,6 @@
     	
     	async function waitInjection(data,id){
     		await injectData(data,id);
-    		await addAndRemoveReadMore();
     	}
     	
     	function clearInputField(){
@@ -533,15 +555,12 @@
     		$("#movieInfo .data").each(function(index,element){
     			var key = $(this).data('json-key');
 	            if (key && data.hasOwnProperty(key)) {
-	                $(this).attr("value",data[key] || "");
 	                $(this).val(data[key]||"");
 	            }
     		});
-    		$("#movieId").attr("value",id);
     		$("#movieId").val(id);
     		if(data.synopsis != ""){
     			$("#synopsis").val(data.synopsis);
-    			$("#synopsis").attr("value","1");
     		}
     		
     	}
@@ -562,24 +581,12 @@
     		}
     	}
     	
-    	async function addAndRemoveReadMore(){
-    		var scrollHeight = $("#synopsis")[0].scrollHeight;
-    		console.log(scrollHeight)
-    		if(scrollHeight > 90){
-    			$(".read-more__link").show();
-    		}
-    		else{
-    			$(".read-more__link").hide();
-    		}
-    	}
+
     	
-    	function getNewMovieInfo(){
+    	async function getNewMovieInfo(){
     		clearInputField();
     		var activeId = $("#hidden-id .slick-current").attr("value");
-    		getMovieInfo(activeId);
-    		setTimeout(function(){
-    			addAndRemoveReadMore();
-    		},50);
+    		await getMovieInfo(activeId);
     	}
     	
     	$("#imageSlide").on('afterChange',function(slick,currentSlide){

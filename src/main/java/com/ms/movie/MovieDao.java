@@ -14,6 +14,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -355,7 +356,7 @@ public class MovieDao {
 			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
 			String sqlDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getReleaseDate() + Constant.DEFAULT_TIME));
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),form.getEarlyAccess(),picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
+			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),1,picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
 			if(result > 0) {
 				return true;
 			}
@@ -393,5 +394,30 @@ public class MovieDao {
 			response.put(false,ex.getMessage());
 			return response;
 		}
+	}
+	
+	public String getMoviePublishDate(String movieId) {
+		String date = null;
+		try {
+			String query = "SELECT releasedate FROM masp.movie WHERE seqid = ?";
+			List<Map<String,Object>> result = jdbc.queryForList(query,movieId);
+			if(result.size() > 0) {
+				for(Map<String,Object> o : result) {
+					date = Constant.SQL_DATE_FORMAT.format((Timestamp)o.get("releasedate"));
+				}
+			}
+			else {
+				return null;
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("CannotGetJdbcConnectionException ex::" + ge.getMessage());
+			return null;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return null;
+		}
+		return date;
 	}
 }

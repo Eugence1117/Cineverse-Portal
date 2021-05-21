@@ -224,7 +224,7 @@ public class BranchDAO {
 			int result = jdbc.update(query.toString(), seqid, form.getBranchname(), form.getAddress(),
 					form.getPostcode(), form.getDistrict());
 			if (result > 0) {
-				response.put("msg", "Branch created.");
+				response.put("msg", "Branch " + form.getBranchname() + " created.");
 				response.put("status", "true");
 			} else {
 				response.put("msg", "Unable to create branch");

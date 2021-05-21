@@ -52,289 +52,300 @@
 </style>
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="driver.label.title.driverdetailsedit" /></title>
+<title><fmt:message key="user.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.css' />">
-<link rel="stylesheet" href="<spring:url value='/plugins/bootstrap/css/bootstrap.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/datatables/datatables.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/float-label/input-material.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>">
 </head>
 
-<body>
-
-	<%@ include file="include/navbar.jsp"%>
-
-	<div class="container col-md-10 my-3 py-5">
-		<div class="card ">
-			<div class="card-header">
-				<span class="card-title">
-					<span class="fa fa-user-circle"></span>
-					<span>User</span>
-				</span>
-				<div class="fa-pull-right d-inline-block">
-					<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="showInsert">
-						<span class="fa fa-user-plus" aria-hidden="true"></span>
-						<span>Add New User</span>
-					</a>
-  				</div>
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">Users</h1>
+			        </div>
+					<div class="card m-4">
+						<div class="card-header">
+							<span class="fa fa-user-circle"></span> <span>Users</span>
+							<div class="fa-pull-right d-inline-block">								
+								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
+									id="showInsert" data-bs-toggle="modal" data-bs-target="#addUser"><span class="fa fa-user-plus"
+									aria-hidden="true"></span> <span>Add New User</span>
+								</a>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table id="userInfo" class="table table-bordered" style="width: 100% !important">
+									<thead>
+										<tr>
+											<th>User ID</th>
+											<th>Username</th>
+											<th>User Group</th>
+											<th>Branch</th>
+											<th>Status</th>
+											<th>Create Date</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="card-body">
-				<table id="userInfo" style="width:100% !important">
-					<thead>
-						<tr>
-							<th>User ID</th>
-							<th>Username</th>
-							<th>User Group</th>
-							<th>Branch</th>
-							<th>Status</th>
-							<th>Create Date</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-				</table>
-				<a id="resetBtn">Reset</a>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
+		</div>
+	</div>
+
+
+	<!-- Insert Modal -->
+	<div class="modal" tabindex="-1" role="dialog" id="addUser">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add New User</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h3 class="text-center">User Registration Form</h3>
+					<div class="">
+						<form class="p-0 mt-5" id="newUserForm">
+							<div class="col-sm-10 mx-auto">
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<input type="text" class="form-control" name="username" id="username" placeholder="Write something here..."/>
+											<label for="username">Username</label>
+											<div class="redundant-block d-none invalid-feedback">This username is taken.</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<input type="password" class="form-control" name="password" id="password" placeholder="Write something here..."/>
+											<label for="password">Password</label>
+										</div>
+									</div>
+									
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="status" class="form-control form-select" aria-label="Select an option">
+													<option hidden selected value="">Select an option</option>
+												<option value="1">Active</option>
+												<option value="0">Inactive</option>
+											</select>									
+											<label for="status">Status</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="usergroup" id="usergroup" class="form-control form-select" aria-label="Select an option">
+												<option hidden selected value="">Select an option</option>
+												<c:forEach items="${group.result}" var="group">
+													<option value="<c:out value='${group.seqid}'/>"><c:out
+															value="${group.groupname}" /></option>
+												</c:forEach>
+											</select>
+											<label for="usergroup">User Group</label>
+										</div>
+									</div>
+								</div>
+								<div class="row form-group">
+								<div class="col-md">
+										<div class="form-floating">
+											<select name="branchid" id="branchname" class="form-control form-select" aria-label="Select an option">
+												<option hidden selected value="">Select an option</option>
+												<c:forEach items="${branch.result}" var="branch">
+													<option value="<c:out value='${branch.seqid}'/>"><c:out
+															value="${branch.branchname}" /></option>
+												</c:forEach>
+											</select>
+											<label for="branchname">Branch</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="mx-auto">
+						<button type="button" class="btn btn-primary m-2"
+							onclick=addUser()>Submit</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=clearInsertField()>Reset</button>
+						<button type="button" class="btn btn-secondary m-2"
+							data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</div>
 			</div>
 		</div>
-		
-		
-		<footer>
-			<p class="text-center">
-				<small><fmt:message key="common.copyright" /></small>
-			</p>
-		</footer>
-		
-		<!-- Insert Modal -->
-		<div class="modal" tabindex="-1" role="dialog" id="addUser">
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title">Please Fill in the blank</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		      	<h3 class="text-center">New User Form</h3>
-		      	<div class="">
-			        <form class="p-0 mt-5" id="newUserForm">
-				        <div class="col-sm-10 mx-auto">
-				        	<div class="row form-group input-material">
-				        		<input type="text" class="form-control" name="username" id="username"/> 
-				        		<label for="username">Username</label>
-				        		<p class="redundant-block d-none">This username is taken.</p>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material">
-				        		<input type="password" class="form-control" name="password" id="password"/> 
-				        		<label for="password">Password</label>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material" style="margin-bottom:10px !important">
-								<input type="text" class="form-control d-none" name="status" id="status"/>
-				        		<label for="status">Status</label>
-				        	</div>
-				        	<div class="row form-group">
-				        		<input type="checkbox" data-style="slow" id="statusToggle"
-												data-toggle="toggle" data-onstyle="success"
-												data-offstyle="warning" data-on="Enable" data-off="Disable"
-												data-size="sm" data-width="80"/>
-				        	</div>
-				        	
-				        	<div class="row form-group input-material">
-				        		<select name="usergroup" id="usergroup" class="form-control dropdown">
-				        				<option  hidden selected ></option>
-					        			<c:forEach items="${group.result}" var="group">
-					        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.groupname}"/></option>
-					        			</c:forEach>
-					        	</select>
-					        	<label for="usergroup">User Group</label>
-				        	</div>
-				        	<div class="row form-group input-material">
-				        		<select name="branchid" id="branchname" class="form-control dropdown">
-				        				<option hidden selected ></option>
-					        			<c:forEach items="${branch.result}" var="branch">
-					        				<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}"/></option>
-					        			</c:forEach>
-					        	</select>
-					        	<label for="branchname">Branch Name</label>
-				        	</div>
-			        	</div>
-			        </form>
-		        </div>
-		      </div>
-		      <div class="modal-footer">
-		      	<div class="mx-auto">
-			        <button type="button" class="btn btn-primary m-2" onclick=addUser()>Submit</button>
-			        <button type="reset" class="btn btn-danger m-2" onclick=clearInsertField()>Reset</button> 
-			        <button type="button" class="btn btn-secondary m-2" data-dismiss="modal">Cancel</button>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
+	</div>
+
+	<!-- View Modal -->
+	<div class="modal fade" id="viewUser" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<label class="col-sm-4"><b>User ID</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>User Group</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="usergroup"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Branch</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="branchname"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>User Status</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="status"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Created Date</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6 border-0"
+							data-json-key="createddate"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary mx-auto"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
 		</div>
-		
-		<!-- View Modal -->
-		<div class="modal fade" id="viewUser" tabindex="-1" role="dialog">
-		  <div class="modal-dialog modal-dialog-centered" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title"></h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		        <div class="row">
-		        	<label class="col-sm-4"><b>User ID</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>User Group</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="usergroup"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Branch Name</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="branchname"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>User Status</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6" data-json-key="status"></p>
-		        </div>
-		        <div class="row">
-		        	<label class="col-sm-4"><b>Created Date</b></label>
-		        	<label class="col-sm-1 colon">:</label>
-		        	<p class="d-inline data col-sm-6 border-0" data-json-key="createddate"></p>
-		        </div>
-		      </div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-primary mx-auto" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		  </div>
+	</div>
+
+	<!-- Edit Modal -->
+	<div class="modal" tabindex="-1" role="dialog" id="editUser">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h3 class="text-center">Edit User</h3>
+					<div class="">
+						<form class="p-0 mt-5" id="editUserForm">
+							<div class="col-sm-10 mx-auto">
+								<input type="hidden" id="seqid" />
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="Editusergroup" id="Editusergroup" class="form-control dropdown">
+												<option hidden selected></option>
+												<c:forEach items="${group.result}" var="group">
+													<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.groupname}" /></option>
+												</c:forEach>
+											</select>
+											<label for="usergroup">User Group</label>
+										</div>
+									</div>
+								</div>
+								<div class="row form-group">
+									<div class="col-md">
+										<div class="form-floating">
+											<select name="Editbranchid" id="Editbranchname" class="form-control dropdown">
+												<option hidden selected></option>
+												<c:forEach items="${branch.result}" var="branch">
+													<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}" /></option>
+												</c:forEach>
+											</select>
+											<label for="branchname">Branch</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="mx-auto">
+						<button type="button" class="btn btn-primary m-2"
+							onclick=editUser()>Save Changes</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=resetEditBtn()>Reset</button>
+						<button type="button" class="btn btn-secondary m-2"
+							data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
 		</div>
-	
-		<!-- Edit Modal -->
-		<div class="modal" tabindex="-1" role="dialog" id="editUser">
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title"></h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		      	<h3 class="text-center">Edit User</h3>
-		      	<div class="">
-			        <form class="p-0 mt-5" id="editUserForm">
-				        <div class="col-sm-10 mx-auto">				   
-				        	<input type="hidden" id="seqid"/>     	
-				        	<div class="row form-group input-material">
-				        		<select name="Editusergroup" id="Editusergroup" class="form-control dropdown">
-				        				<option  hidden selected ></option>
-					        			<c:forEach items="${group.result}" var="group">
-					        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.groupname}"/></option>
-					        			</c:forEach>
-					        	</select>
-					        	<label for="usergroup">User Group</label>
-				        	</div>
-				        	<div class="row form-group input-material">
-				        		<select name="Editbranchid" id="Editbranchname" class="form-control dropdown">
-				        				<option hidden selected ></option>
-					        			<c:forEach items="${branch.result}" var="branch">
-					        				<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}"/></option>
-					        			</c:forEach>
-					        	</select>
-					        	<label for="branchname">Branch Name</label>
-				        	</div>
-			        	</div>
-			        </form>
-		        </div>
-		      </div>
-		      <div class="modal-footer">
-		      	<div class="mx-auto">
-			        <button type="button" class="btn btn-primary m-2" onclick=editUser()>Save Changes</button>
-			        <button type="reset" class="btn btn-danger m-2" onclick=resetEditBtn()>Reset</button> 
-			        <button type="button" class="btn btn-secondary m-2" data-dismiss="modal">Cancel</button>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		</div>
-		
-		
 	</div>
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootstrap/js/bootstrap.min.js'/>"></script>
-		<script type="text/javascript"
-		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/toggle/bootstrap4-toggle.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/float-label/materialize-inputs.jquery.js'/>"></script>	
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
     	$.validator.setDefaults({
-			errorElement : "p",
-			errorClass : "help-block",
+			errorElement : "div",
+			errorClass : "invalid-feedback",
 			highlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control').removeClass(
-							'has-success').addClass('has-error');
+							'is-valid').addClass('is-invalid');
 				}
 			},
 			unhighlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
 					$(element).closest('.form-control')
-							.removeClass('has-error').addClass('has-success');
+							.removeClass('is-invalid').addClass('is-valid');
 				}
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
-				/*   if (element.parent('col-md-10').length) {
-				      error.insertAfter(element.parent());
-				  }
-				  else if(element.prop('type') === 'file'){
-				  	error.insertAfter(element.next());
-				  }
-				  else {
-				      error.insertAfter(element);
-				  } */
 			}
 		});
-    	
-    	/* $(".dropdown").each(function(){
-    		$(this).attr("value",$(this).val());
-    	}); */
-    	
-    	$("#status").attr("value",0);
-    	
-    	$("#showInsert").on('click',function(){
-    		$("#addUser").modal();	
-    	});
     	
     	var status1 = "<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
     	var status2 = "<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
@@ -355,8 +366,8 @@
 			//clearInsertField();
 		});
 		
+		//View Function
 		function readyFunction(){
-			$("body").materializeInputs();
 			$.ajax("user/retrieveInfo.json?",{
 				method : "GET",
 				accepts : "application/json",
@@ -394,68 +405,6 @@
 				attach :'.deactiveBtn',
 				content : 'Deactivate'
 			})
-		}
-		
-		function clearInsertField(){
-			$("#newUserForm input").each(function(){
-				
-				if(this.id == "statusToggle"){
-					$(this).bootstrapToggle('off');
-				}
-				else if(this.name =="status"){
-					$(this).attr("value","0");
-					$(this).val("0");
-				}
-				else{
-					$(this).attr("value","");
-					$(this).val("");
-				}
-			})
-			
-			$("#newUserForm select").each(function(){
-				$(this).attr("value","");
-				$(this).val("");
-			});
-		}
-		
-		$("#usergroup").on("change",function(){
-			if(this.value == 2){
-				$("#branchname").prop("disabled",false);
-				$("#branchname").removeClass("ignore");
-				$("#branchname").attr("value","");
-				$("#branchname").val("");
-			
-			}
-			else{
-				$("#branchname").prop("disabled",true);
-				$("#branchname").addClass("ignore");
-				$("#branchname").attr("value","");
-				$("#branchname").val("");
-				$("#branchname").val("");
-				$("#branchname-error").css("display","none");
-			}
-			
-		});
-		
-		$("#Editusergroup").on("change",function(){
-			checkDropdownValue(this);
-		})
-		
-		function checkDropdownValue(element){
-			if(element.value == 2){
-				$("#Editbranchname").prop("disabled",false);
-				$("#Editbranchname").removeClass("ignore");
-				$("#Editbranchname").attr("value","");
-				$("#Editbranchname").val("");
-			
-			}
-			else{
-				$("#Editbranchname").prop("disabled",true);
-				$("#Editbranchname").addClass("ignore");
-				$("#Editbranchname").attr("value","");
-				$("#Editbranchname").val("");
-				$("#Editbranchname-error").css("display","none");
-			}
 		}
 		
 		function getResultDataTable() {
@@ -530,6 +479,195 @@
 			});
 		}
 		
+		function getUserDetails(element){
+			var userid = element.id;
+			$.ajax("user/viewUser.json?userid=" + userid,{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+			}).done(function(data){
+				clearViewUser();
+				if(data.error == null || data.error == ""){
+					$("#viewUser").find(".modal-title").html("User :  <b>" + data.result.username + "</b>");
+					$("#viewUser .modal-body .data").each(function(index,element){
+						var key = $(this).data('json-key');
+			            if (key && data.result.hasOwnProperty(key)) {
+			                $(this).text("	" + data.result[key] || "	-");
+			            }
+					});
+					
+					if(!$("#viewUser").hasClass("show")){
+						$("#viewUser").modal("show");
+					}
+					//$("#viewUser").toggle();
+				}
+				else{
+					bootbox.alert(data.error);
+				}
+			});
+		}
+		
+		
+		function clearViewUser(){
+			$("#viewUser .data").each(function(){
+				$(this).text("");
+			});
+		}
+		//END View Function
+		
+		//Add Function
+				    
+		function checkUsername(username){
+			 var status = false;
+			 $.ajax({
+				 url:"user/checkUsername.json?username=" + username,
+				 type:"GET",
+				 async:false,
+				 fail:function(){
+					 bootbox.alert("Unable to verify username availability");
+					 status = false;
+				 },
+				 done:function(data){
+					 status =  data.status;
+				 }
+			 });
+			 return status;
+		}
+		
+		$("#newUserForm").validate({
+			ignore : ".ignore",
+			focusInvalid:true,
+			rules : {
+				username:{
+					required:true,
+					remote:{
+						url:"user/checkUsername.json",
+						type:"get",
+						data:{
+							username: function(){
+								return $("#username").val();
+							}
+						},
+						dataFilter: function(data){
+							var result = JSON.parse(data);
+							return result.status;
+						}
+					}
+				},
+				password:{
+					required:true
+				},
+				usergroup:{
+					required:true
+				},
+				branchid:{
+					required:true
+				},
+				status:{
+					required:true
+				}
+			},
+			messages:{
+				username:{
+					remote: "This username is taken."
+				}
+			},
+			invalidHandler: function() {
+				
+				$(this).find(":input.has-error:first").focus();
+			}
+		});
+		
+		function addUser(){
+			/* if(!checkEmptyField()){
+				return false;
+			} */
+			var validator = $( "#newUserForm" ).validate();
+			if(!validator.form()){
+				return false;
+			}
+			
+			$("#addUser").modal('hide');
+			$.ajax("user/addUser.json?" + $("#newUserForm").serialize(),{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+			}).done(function(data){
+				bootbox.alert({
+				    title: "Notification",
+				    message: data.msg
+				});
+				
+				if(data.status == "true"){
+					console.log("true");
+					readyFunction();
+		    		clearInsertField();
+				}
+				else{
+					$("#addUser").modal('show');
+				}
+			});
+		}
+		
+		function clearInsertField(){
+			$("#newUserForm input").each(function(){
+				$(this).val("");
+				//clear validation
+				$(this).removeClass("is-valid").removeClass("is-invalid");
+			})
+			
+			$("#newUserForm select").each(function(){
+				$(this).val("");
+				$(this).removeClass("is-valid").removeClass("is-invalid");
+			});
+			//Clear validation
+			
+		}
+		
+		$("#usergroup").on("change",function(){
+			if(this.value == 2){
+				$("#branchname").prop("disabled",false);
+				$("#branchname").removeClass("ignore");
+				$("#branchname").attr("value","");
+				$("#branchname").val("");
+			
+			}
+			else{
+				$("#branchname").prop("disabled",true);
+				$("#branchname").addClass("ignore");
+				$("#branchname").removeClass("is-valid");
+				$("#branchname").removeClass("is-invalid");
+				$("#branchname").attr("value","");
+				$("#branchname").val("");
+				$("#branchname").val("");
+				$("#branchname-error").css("display","none");
+			}
+			
+		});
+		
+		$("#Editusergroup").on("change",function(){
+			checkDropdownValue(this);
+		})
+		
+		function checkDropdownValue(element){
+			if(element.value == 2){
+				$("#Editbranchname").prop("disabled",false);
+				$("#Editbranchname").removeClass("ignore");
+				$("#Editbranchname").attr("value","");
+				$("#Editbranchname").val("");
+			
+			}
+			else{
+				$("#Editbranchname").prop("disabled",true);
+				$("#Editbranchname").addClass("ignore");
+				$("#Editbranchname").attr("value","");
+				$("#Editbranchname").val("");
+				$("#Editbranchname-error").css("display","none");
+			}
+		}
+		//END Add Function
+		
+		//Activate & Deactivate Function
 		function activateAndDeactivateUser(element,newStatus){
 			bootbox.confirm({
 			    message: "Are you sure you want to update the status?",
@@ -564,7 +702,9 @@
 			});
 			
 		}
+		//END Activate & Deactivate Function
 		
+		//Edit function
 		function resetEditBtn(){
 			var id = $("#editUserForm #seqid").val();
 			getEditInfo(id);
@@ -573,7 +713,6 @@
 		function clearEditField(){
 			$("#editUserForm select").each(function(){
 				$(this).val("");
-				$(this).attr("value","");
 			});
 			$("#editUserForm select > option").each(function(){
 				$(this).attr("selected",false);
@@ -613,7 +752,10 @@
 							
 						});
 					}
-					$("#editUser").modal();
+					if(!$("#editUser").hasClass("show")){
+						$("#editUser").modal("show");
+					}
+					//$("#editUser").toggle();
 				}
 				
 			});
@@ -642,7 +784,9 @@
 			if(!validator.form()){
 				return false;
 			}
-			$("#editUser").modal('hide');
+			
+			$("#editUser").modal("hide");
+			
 			$.ajax("user/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
@@ -663,7 +807,9 @@
 				});
 			});
 		}
+		//END Edit function
 		
+		//Delete function
 		function deleteUser(element){
 			bootbox.confirm({
 			    message: "Are you sure you want to delete this staff?",
@@ -697,136 +843,7 @@
 			    }
 			});
 		}
-		
-		function getUserDetails(element){
-			var userid = element.id;
-			$.ajax("user/viewUser.json?userid=" + userid,{
-				method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-			}).done(function(data){
-				clearViewUser();
-				if(data.error == null || data.error == ""){
-					$("#viewUser").find(".modal-title").html("User :  <b>" + data.result.username + "</b>");
-					$("#viewUser .modal-body .data").each(function(index,element){
-						var key = $(this).data('json-key');
-			            if (key && data.result.hasOwnProperty(key)) {
-			                $(this).text("	" + data.result[key] || "	-");
-			            }
-					});
-					$("#viewUser").modal();
-				}
-				else{
-					bootbox.alert(data.error);
-				}
-			});
-		}
-			
-		function checkUsername(username){
-				$.ajax("user/checkUsername.json?username=" + username,{
-		    		method : "GET",
-					accepts : "application/json",
-					dataType : "json",
-					async:true,
-		    }).done(function(data){
-				if(data.status == true){
-					$("input[name=username]").siblings(".redundant-block").removeClass("d-block").addClass("d-none");
-					$("input[name=username]").siblings(".redundant-block").removeClass("has-error");
-				}
-				else{
-					$("input[name=username]").siblings(".redundant-block").removeClass("d-none").addClass("d-block");
-					$("input[name=username]").siblings(".redundant-block").addClass("has-error");
-			
-				}
-			});
-		}
-		
-		$("input[name=username]").on('input',function(){
-			checkUsername(this.value);
-		});
-		
-		$("#newUserForm").validate({
-			ignore : ".ignore",
-			focusInvalid:true,
-			rules : {
-				username:{
-					required:true,
-				},
-				password:{
-					required:true
-				},
-				usergroup:{
-					required:true
-				},
-				branchid:{
-					required:true
-				}
-				
-			},
-			invalidHandler: function() {
-				
-				$(this).find(":input.has-error:first").focus();
-			}
-		});
-		
-		function addUser(){
-			/* if(!checkEmptyField()){
-				return false;
-			} */
-			var validator = $( "#newUserForm" ).validate();
-			if(!validator.form()){
-				return false;
-			}
-			
-			if($("input[name=username]").siblings(".redundant-block").hasClass("has-error")){
-				$("input[name=username]").focus();
-				return false;
-			}
-			
-			$("#addUser").modal('hide');
-			$.ajax("user/addUser.json?" + $("#newUserForm").serialize(),{
-				method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-			}).done(function(data){
-				bootbox.alert({
-				    title: "Notification",
-				    message: data.msg,
-				    callback: function(){
-				    	if(data.status == "true"){
-				    		readyFunction();
-				    		clearInsertField();
-				    	}
-				    	else{
-				    		$("#addUser").modal('show');
-				    	}
-					}
-				});
-			});
-		}
-			
-		function clearViewUser(){
-			$("#viewUser .data").each(function(){
-				$(this).text("");
-			});
-		}
-		
-		$(".dropdown").on('change',function(){
-			$(this).attr("value",$(this).val());
-		});
-    	
-		$("#statusToggle").on('change',function(){
-			if($("#statusToggle").prop("checked") == true){
-				$("#status").attr("value",1);
-				$("#status").val(1);
-			}
-			else{
-				$("#status").attr("value",0);
-				$("#status").val(0);
-		    	
-			}
-			
-		});
+		//END Delete function
 	</script>
 </body>
 

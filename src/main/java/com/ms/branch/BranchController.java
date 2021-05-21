@@ -54,11 +54,20 @@ public class BranchController {
 		return service.getBranchDetails(usergroup, username);
 	}
 	
-	@RequestMapping( value= {"/branch/branchDetails.json"})
+	@RequestMapping( value= {"/branch/branchDetails.json"}) //For Admin used
 	@ResponseBody
 	public ResponseBranchInfo getBranchDetails(Model model, String branchID) {
 		log.info("Entered /branch/branchDetails.json");
 		return service.getBranchDetails(branchID);
+	}
+	
+	@RequestMapping( value= {"/getBranchInfo.json"}) //For owner used
+	@ResponseBody
+	public ResponseBranchInfo getOwnBranchInfo(Model model) {
+		log.info("Entered /getBranchInfo.json");
+		int usergroup = (int)session.getAttribute("usergroupid");
+		String username = (String)session.getAttribute("username".toString());
+		return service.getBranchDetails(usergroup, username);
 	}
 	
 	@RequestMapping( value= {"/branch/deleteBranch.json"})

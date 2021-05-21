@@ -197,14 +197,18 @@ public class MovieService {
 		else {
 			log.info("Movie:" + result.size() + " record(s) retrieved from database");
 			if(extMovie != null) {
+				log.info("Exist Movie Size: " + extMovie.size());
 				log.info("Start Filtering Existing Movie");
+				List<Map<String,String>> pendingRemove = new ArrayList<Map<String,String>>();
 				for(int x = 0 ; x < result.size() ; x++) {
 					for(int y = 0 ; y < extMovie.size(); y++) {
 						if(result.get(x).get("id").equals(extMovie.get(y))) {
-							result.remove(x);
+							//result.remove(x);
+							pendingRemove.add(result.get(x));
 						}
 					}
 				}
+				result.removeAll(pendingRemove);
 				return result;
 			}
 			else {
@@ -239,7 +243,7 @@ public class MovieService {
 	}
 	
 	@Transactional(rollbackFor= Exception.class)
-	public boolean insertMovieRecord(NewMovieForm form) {
+	public Response insertMovieRecord(NewMovieForm form) {
 		
 		boolean status = false;
 		String uuid = UUID.randomUUID().toString();
@@ -248,7 +252,7 @@ public class MovieService {
 		URI uri = uploadFileToAzure(uuid + format,form.getPosterImage());
 		if(uri == null) {
 			log.info("Unable to upload. Action abort.");
-			return false;
+			return new Response("Unable to upload the image. Please try again later.");
 		}
 		else {
 			try {
@@ -258,20 +262,20 @@ public class MovieService {
 				status = dao.insertNewMovie(form,uri.toString());
 				if(status) {
 					log.info("Movie insert successful.");
-					return true;
+					return new Response((Object)"The movie " + form.getMovieName() + " has been inserted.");
 				}
 				else {
 					log.error("Insert to database failed.");
 					deleteFile(uuid + format);
-					return false;
+					return new Response("Unable to insert the data into database.");
 				}
 			}
 			catch(Exception ex) {
 				log.error("Exception ::" + ex.getMessage());
-				return false;
+				return new Response("Unexpected error occured. Please try again later.");
 			}
-			
 		}
+		
 	}
 	
 	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {
@@ -281,7 +285,9 @@ public class MovieService {
 			return new ResponseResultJson("Cannot find relavant branch.");
 		}
 		else {
-			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),form.getPublishDate());
+			//Get publish date
+			String publishDate = dao.getMoviePublishDate(form.getMovieId());
+			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
 			if(result.containsKey(false)) {
 				return new ResponseResultJson(result.get(false));
 			}
