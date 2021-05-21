@@ -40,8 +40,9 @@
 			        	<h1 class="h3 mb-0 text-gray-800">View Branches</h1>
 			        </div>
 			        
-			        <div class="card">
+			        <div class="card m-4">
 						<div class="card-header">
+							<span class="fa fa-store-alt"></span> <span>Branches</span>
 							<div class="fa-pull-right d-inline-block">
 								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="showInsert" data-bs-toggle="modal" data-bs-target="#addBranch">
 									<span class="fas fa-plus-circle" aria-hidden="true"></span>

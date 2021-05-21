@@ -69,9 +69,10 @@
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
 			        	<h1 class="h3 mb-0 text-gray-800">Users</h1>
 			        </div>
-					<div class="card ">
+					<div class="card m-4">
 						<div class="card-header">
-							<div class="fa-pull-right d-inline-block">
+							<span class="fa fa-user-circle"></span> <span>Users</span>
+							<div class="fa-pull-right d-inline-block">								
 								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
 									id="showInsert" data-bs-toggle="modal" data-bs-target="#addUser"><span class="fa fa-user-plus"
 									aria-hidden="true"></span> <span>Add New User</span>

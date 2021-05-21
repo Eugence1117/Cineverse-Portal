@@ -37,7 +37,7 @@
 			        	<h1 class="h3 mb-0 text-gray-800">My Cinema</h1>
 			        </div>
 
-					<div class="card">
+					<div class="card m-4">
 						<div class="card-header">
 							<span class="card-title">
 								<span class="btn">

@@ -34,10 +34,10 @@
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
-					<div class="border-0 mb-2">
+					<div class="border-0 m-4">
 						<div class="card">
 							<div class="card-header">
-								<span class="card-title">Search Movie</span>
+								<span class="card-title"><span class="fa fa-search"></span> Search Movie</span>
 							</div>
 							<div class="card-body">
 								<form id="extMovieForm">

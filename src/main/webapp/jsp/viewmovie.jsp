@@ -81,7 +81,7 @@
 								</div>
 								<div class="card-body p-0">
 									<form id="dateOption" class="collapse show">
-										<div class="list-group-item">				
+										<div class="py-3 px-2">				
 											<div class="form-group row">
 												<div class="col-sm-1"></div>
 												<label class="col-form-label col-sm-2">Start Date :</label>
@@ -114,7 +114,7 @@
 								</div>
 								<div class="card-body p-0">
 									<form id="nameOption" class="collapse">
-										<div class="list-group-item">				
+										<div class="py-3 px-2">				
 											<div class="form-group row">
 												<div class="col-sm-4"></div>
 												<div class="col-sm-8 row">

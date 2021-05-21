@@ -44,8 +44,8 @@
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
-					<div class="border-0">
-						<div class="card-body">
+					<div class="m-4 card">						
+						<div class="">
 							<form id="newMovieForm" method="post" enctype="multipart/form-data"
 								action="addMovie/uploadnewmovie.json?${_csrf.parameterName}=${_csrf.token}">
 								<div class="list-group-item">
