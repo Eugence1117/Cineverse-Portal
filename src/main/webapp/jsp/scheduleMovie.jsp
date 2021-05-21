@@ -19,6 +19,11 @@
 	cursor: pointer;
 }
 
+#loading{
+	padding:100px;
+	text-align:center;
+}
+
 .media>img {
 	height: 120px;
 	width: 81px;
@@ -190,7 +195,11 @@
 										<div class="hide" id="overallSchedule">
 											<form>
 											</form>
-										</div> <!--  End of Overall Template -->
+										</div>
+										<!--  End of Overall Template -->
+										<div class="hide" id="loading">
+											<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -298,6 +307,8 @@
 		
 		<!-- Retrieve Movie that grouped by Overall-->
 		function configureByOverall() {
+			hideAllSchedule();
+			$("#loading").show();
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
@@ -309,8 +320,9 @@
 						accepts : "application/json",
 						dataType : "json",
 					}).done(function(data) {
+						$("#loading").hide();
 				if (data.error == null) {
-					hideAllSchedule();
+					//hideAllSchedule();
 					
 					
 					//Read data
@@ -369,6 +381,9 @@
 					return false;
 				}
 				var formData = form.serializeObject();
+				traverseObject(formData); //Only used if configure 1 movie
+				
+				
 				formData["startDate"] = form.data("startDate");
 				formData["endDate"] = form.data("endDate");
 				formData["theatres"] = theatreSelected;
@@ -470,6 +485,8 @@
 		
 		<!-- Retrieve Movie that grouped by Week-->
 		function configureByWeekly() {
+			hideAllSchedule();
+			$("#loading").show();
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
@@ -481,8 +498,9 @@
 					accepts : "application/json",
 					dataType : "json",
 				}).done(function(data) {
+				$("#loading").hide();
 				if (data.error == null) {
-					hideAllSchedule();
+					//hideAllSchedule();
 					
 					//Read the date from list.
 					var resultList = data.result
@@ -551,6 +569,17 @@
 			})
 		}
 		
+		function traverseObject(obj){
+			for (const key of Object.keys(obj)) {
+				  if(!Array.isArray(obj[key])){
+				  	//ConvertToArray
+				  	var array = [];
+				  	array.push(obj[key]);
+				  	obj[key] = array;
+				  }
+				}
+		}
+		
 		function addListenerToWeeklyButton(){
 			$("#weeklySchedule #submitWeekly").on('click',function(){
 				var form = $("#weeklySchedule > form");
@@ -560,6 +589,8 @@
 				}
 				
 				var formData = form.serializeObject();
+				traverseObject(formData);
+				
 				formData["startDate"] = form.data("startDate");
 				formData["endDate"] = form.data("endDate");
 				formData["theatres"] = theatreSelected;
@@ -658,6 +689,8 @@
 		
 		<!-- Retrieve Movie that grouped by Daily-->
 		function configureByDaily() {
+			hideAllSchedule();
+			$("#loading").show();
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
@@ -669,9 +702,9 @@
 					accepts : "application/json",
 					dataType : "json",
 				}).done(function(data) {
+				$("#loading").hide();
 				if (data.error == null) {
-					hideAllSchedule();
-					
+					//clearAllSchedule();
 					$("#dailySchedule > form").data("startDate",data.range.startDate);
 					//Read the data from list.
 					var resultList = data.result
@@ -743,6 +776,7 @@
 					return false;
 				}
 				var formData = form.serializeObject();
+				traverseObject(formData); //Only used if configure 1 movie
 				formData["theatres"] = theatreSelected;
 				
 				$.ajax("schedule/configureScheduleByDaily.json",{
@@ -1062,7 +1096,7 @@
 			$("#overallSchedule").hide()
 			$("#overallSchedule > form").html("");
 		}
-		
+
 		<!-- Append the legend into the range slider-->
 		function setupSlider() {
 			var options = ["0%","50%","100%"]
