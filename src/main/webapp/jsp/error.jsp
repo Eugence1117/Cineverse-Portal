@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title>Access Denied</title>
+<title>Error | <c:out value='${code}'/></title>
 
 <%@ include file="include/css.jsp"%>
 </head>
@@ -21,9 +21,9 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 		        	<div class="text-center">
-			            <div class="error mx-auto" data-text="403">403</div>
-			            <p class="lead text-gray-800 mb-5">Access Denied</p>
-			            <p class="text-gray-500 mb-0">It looks like you do not have permission to visit this page...</p>
+			            <div class="error mx-auto" data-text="<c:out value='${code}'/>"><c:out value='${code}'/></div>
+			            <p class="lead text-gray-800 mb-5"><c:out value='${title}'/></p>
+			            <p class="text-gray-500 mb-0"><c:out value='${errorMsg}'/></p>
 			            <a href="home.htm">&larr; Back to Dashboard</a>
 			        </div>
 		        </div>

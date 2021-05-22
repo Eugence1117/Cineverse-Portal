@@ -154,10 +154,6 @@
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/dataTables.bootstrap4.min.js'/>"></script>
-	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>

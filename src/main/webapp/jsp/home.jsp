@@ -66,8 +66,6 @@
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/js/confetti.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");

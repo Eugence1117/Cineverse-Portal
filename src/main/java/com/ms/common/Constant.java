@@ -32,14 +32,11 @@ public class Constant {
 	public static final int ACTIVE_STATUS_CODE = 1;
 	public static final int INACTIVE_STATUS_CODE = 0;
 	
-	public static final int EA_ENABLE_CODE = 1;
-	public static final int EA_DISABLED_CODE = 0;
-	
-	public static final String EA_ENABLE = "Enable"; //Early Access
-	public static final String EA_DISABLED = "Disable";
-	
 	public static final String SCHEDULE_TYPE_MOVIE = "Movie";
 	public static final String SCHEDULE_TYPE_CLEANING = "Cleaning";
+	
+	public static final String MOVIE_SINGLE_VIEW_COOKIE = "Single";
+	public static final String MOVIE_LIST_VIEW_COOKIE = "List";
 	
 	public static final int DEFAULT_TIME_GRAIN = 5;
 	public static final int DEFAULT_TIME_RANGE = 13;

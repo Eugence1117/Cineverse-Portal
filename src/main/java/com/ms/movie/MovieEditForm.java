@@ -8,7 +8,6 @@ import lombok.Setter;
 public class MovieEditForm {
 	
 	private String movieId;
-	private String earlyAccess;
 	private int totalTime;
 	private String language;
 	private String distributor;

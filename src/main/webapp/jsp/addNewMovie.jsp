@@ -16,12 +16,6 @@
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet"
-	href="<spring:url value='/plugins/morrisjs/morris.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/css/dataTables.bootstrap4.min.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
 @media only screen and (max-width: 640px) {
@@ -84,8 +78,7 @@
 													accept="image/*" data-type='image' />
 												<div class="input-group-append d-inline">
 													<button type="button" id="poster"
-														class="btn btn-primary showPicture" data-bs-toggle="modal"
-														data-bs-target="#myModal">Preview Picture</button>
+														class="btn btn-primary showPicture">Preview Picture</button>
 												</div>
 											</div>
 										</div>
@@ -219,12 +212,12 @@
 		</div>
 	</div>
 
-	<div class="modal fade bd-example-modal-lg" id="myModal">
+	<div class="modal fade bd-example-modal-lg" id="picModal">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 id="myModel-title" class="modal-title"></h4>
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
 				</div>
 				<div id="result" class="modal-body mx-auto">
 					<img id="displaypicture" class="img-fluid">
@@ -242,10 +235,6 @@
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/dataTables.bootstrap4.min.js'/>"></script>
-	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>
@@ -256,18 +245,6 @@
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 
 		$(document).ready(function() {
-			$("#earlyAccess").val("0");
-			$("#EAtoggleBtn").on("change", function() {
-				console.log("reach");
-				if ($("#EAtoggleBtn").prop("checked") == true) {
-					console.log($("#EAtoggleBtn").prop("checked"));
-					$("#earlyAccess").val("1");
-				} else {
-					console.log($("#EAtoggleBtn").prop("checked"));
-					$("#earlyAccess").val("0");
-				}
-			});
-
 			var content = readDescription();
 			new jBox('Tooltip', {
 				attach : '.timetooltip',
@@ -310,10 +287,15 @@
 			var img = $("input[name=posterImage]").val();
 
 			if (img == null || img == "") {
-				bootbox.alert('Error, image not found');
+				bootbox.alert({
+					title:"Error",
+					message:"Image not uploaded."
+				});
+				
 				return false;
 			} else {
 				readURL($("input[name=posterImage]")[0]);
+				$("#picModal").modal('show');
 			}
 
 			$('#myModel-title').text('Poster Image');
@@ -330,7 +312,12 @@
 		});
 		
 		$("#new-btn-submit").on('click',function(event){
-			event.preventDefault();
+			
+			var validator = $("#newMovieForm").validate();
+			if(!validator.form()){
+				return false;
+			}
+			
 			var form = $("#newMovieForm")[0];
 			var data = new FormData(form);
 			
@@ -347,12 +334,13 @@
 				},
 				async: false
 			}).done(function(data){
+				$(this).prop("disabled",false);
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg);
 				}
 				else{
 					bootbox.alert(data.result);
-					$("#btnReset").click();
+					form.reset();
 				}
 			});
 		});

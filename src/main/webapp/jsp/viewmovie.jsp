@@ -12,11 +12,8 @@
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/morrisjs/morris.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider_style.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/float-label/input-material.css'/>">
     <!-- Compiled and minified JavaScript -->
 <style>
 	.read-more__link{
@@ -164,21 +161,11 @@
 													</div>
 													</div>
 												</div>
-												<div class="row g-2 my-1">
+												<div class="row my-1">
 													<div class="col-md">
 														<div class="form-floating">
 															<input id="movieId" type="text" class="form-control floatLabel data" name="movieId" data-json-key="movieId" disabled>
 															<label for="movieId">Movie ID</label>
-														</div>
-													</div>
-													<div class="col-md">
-														<div class="form-floating">
-															<select id="earlyAccess" class="form-select form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled aria-label="Select an option">
-																<option>Enable</option>
-																<option>Disable</option>
-															</select>
-															<!-- <input id="earlyAccess" type="text" class="form-control floatLabel data" name="earlyAccess" data-json-key="earlyAccess" disabled> -->
-															<label for="earlyAccess">Early Access</label>
 														</div>
 													</div>
 												</div>
@@ -269,11 +256,9 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/slick_slider/slick_slider.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/readmore/readmore.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/js/dataInjection.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootstrap/js/bootstrap-maxlength.min.js'/>"></script>
 	<script type="text/javascript">
@@ -374,7 +359,6 @@
     		$("#hidden-id").slick({
     			arrows:false
     		});
-    		$("body").materializeInputs();
 
     		$("input").bind('keypress keydown keyup', function(e){
     		       if(e.keyCode == 13) { e.preventDefault(); }

@@ -25,7 +25,6 @@ public class ResponseMovieInfo {
 	@AllArgsConstructor
 	@Builder
 	public static class Result{
-		private final String earlyAccess;
 		private final int totalTime;
 		private final String language;
 		private final String distributor;

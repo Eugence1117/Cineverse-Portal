@@ -13,7 +13,6 @@ public class Movie{
 	
 	private String movieId;
 	private String movieName;
-	private int earlyAccess;
 	private String picURL;
 	private int totalTime;
 	private String language;

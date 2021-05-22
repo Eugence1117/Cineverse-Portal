@@ -115,7 +115,7 @@ public class MovieDao {
 		Movie result = null;
 		//TODO Need to select based on the branch manager id
 		try{
-			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.earlyaccess, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
+			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
 												   .append("m.releasedate, m.synopsis, m.movietype, m.censorshipId FROM masp.movie m ")
 												   .append("WHERE m.seqid = ?");
 			
@@ -125,7 +125,6 @@ public class MovieDao {
 				for(Map<String,Object> row : rows) {
 					String id = Util.trimString((String)row.get("seqid"));
 					String name = Util.trimString((String)row.get("movieName"));
-					int earlyAccess = (int)row.get("earlyaccess");
 					String picurl = Util.trimString((String)row.get("picURL"));
 					int totalTime = (int)row.get("totaltime");
 					String language = Util.trimString((String)row.get("language"));
@@ -138,7 +137,7 @@ public class MovieDao {
 					String desc = Util.trimString((String)row.get("censorshipId"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new Movie(id,name,earlyAccess,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
+					result = new Movie(id,name,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
 				}
 			}
 		}
@@ -154,7 +153,7 @@ public class MovieDao {
 	public ResponseMovieInfo.Result getMovieInfo(String movieId) {
 		ResponseMovieInfo.Result result = null;
 		try{
-			StringBuffer query = new StringBuffer().append("SELECT earlyaccess, picURL, totaltime, language, distributor, cast, director, ")
+			StringBuffer query = new StringBuffer().append("SELECT picURL, totaltime, language, distributor, cast, director, ")
 												   .append("releasedate, synopsis, movietype, censorshipid FROM masp.movie ")
 												   .append("WHERE seqid = ?");
 			
@@ -162,7 +161,6 @@ public class MovieDao {
 			
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {
-					int earlyAccess = (int)row.get("earlyaccess");
 					int totalTime = (int)row.get("totaltime");
 					String language = Util.trimString((String)row.get("language"));
 					String distributor = Util.trimString((String)row.get("distributor"));
@@ -174,7 +172,7 @@ public class MovieDao {
 					String censorship = Util.trimString((String)row.get("censorshipid"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new ResponseMovieInfo.Result(Util.checkEarlyAccess(earlyAccess),totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
+					result = new ResponseMovieInfo.Result(totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
 				}
 			}
 		}
@@ -355,8 +353,8 @@ public class MovieDao {
 		try {
 			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
 			String sqlDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getReleaseDate() + Constant.DEFAULT_TIME));
-			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),1,picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
+			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
 			if(result > 0) {
 				return true;
 			}
@@ -374,10 +372,10 @@ public class MovieDao {
 		Map<Boolean,String> response = new HashMap<Boolean,String>();
 		try {
 			String newReleaseDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getReleasedate()+Constant.DEFAULT_TIME));
-			StringBuffer query = new StringBuffer().append("UPDATE masp.movie SET earlyAccess = ?, totaltime = ?, language = ?, distributor = ?, ")
+			StringBuffer query = new StringBuffer().append("UPDATE masp.movie SET totaltime = ?, language = ?, distributor = ?, ")
 											       .append("cast = ?, director = ?, releasedate = ?, synopsis = ?, movietype = ?, censorshipId = ? ")
 											       .append("WHERE seqid = ?");
-			int result = jdbc.update(query.toString(),Util.convertEarlyAccess(form.getEarlyAccess()), form.getTotalTime(),form.getLanguage(),form.getDistributor(),
+			int result = jdbc.update(query.toString(), form.getTotalTime(),form.getLanguage(),form.getDistributor(),
 									 form.getCast(),form.getDirector(),newReleaseDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),form.getMovieId());
 			if(result > 0) {
 				response.put(true,"Update success.");
