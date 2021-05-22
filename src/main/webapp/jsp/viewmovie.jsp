@@ -69,7 +69,7 @@
 				  <div class="container-fluid">
 					  	<div class="d-sm-flex align-items-center justify-content-between mb-4">
 			            	<h1 class="h3 mb-0 text-gray-800">View Movie</h1>
-			            	<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
+			            	<a href="viewMovie.htm?pages=List" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
 			            </div>
 			            
 				  			<div class="card m-4">
@@ -252,7 +252,33 @@
 		</div>
 	</div>
 	<!-- /.container -->
-
+	
+	<div class="modal" tabindex="-1" role="dialog" id="preferences">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title">Your preferences</h5>
+	        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <p>Would you wish to set this view as your default view ?</p>
+	        <p class="form-check">
+	        	<input type="checkbox" class="form-check-input" id="ignoreCheck">
+	        	<label class="form-check-label" for="ignoreCheck"><i>Don't show this again.</i></label>
+	        </p>
+	        <input type="hidden" id="cookieValue" value="<c:out value='${cookieValue}'/>"/>
+	        <input type="hidden" id="ignoreValue" value="<c:out value='${ignoreValue}'/>"/>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnIgnore">No</button>
+	        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnSetCookie">Yes</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
@@ -289,15 +315,6 @@
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
-				/*   if (element.parent('col-md-10').length) {
-				      error.insertAfter(element.parent());
-				  }
-				  else if(element.prop('type') === 'file'){
-				  	error.insertAfter(element.next());
-				  }
-				  else {
-				      error.insertAfter(element);
-				  } */
 			}
 		});
     	
@@ -339,14 +356,16 @@
 				censorship : {
 					required : true,
 				},
-				earlyAccess:{
-					required:  true,
-				}
 			}
 		});
     	
     	var synopsis = null;
     	$(document).ready(function(){
+    		var hasCookie = JSON.parse('${hasCookie}');
+    		if(!hasCookie){
+    			$("#preferences").modal("show");
+    		}
+    		
     		$("#imageSlide").slick({
     			arrows:true,
     			asNavFor:".slideNav",
@@ -364,6 +383,26 @@
     		       if(e.keyCode == 13) { e.preventDefault(); }
     		    });
     	});
+    	
+    	$("#btnSetCookie").on('click',function(){
+    		var value = $("#cookieValue").val();
+    		setPreferences(value);
+    	});
+    	
+    	$("#btnIgnore").on('click',function(){
+    		if($("#ignoreCheck").is(':checked')){
+    			var value = $("#ignoreValue").val();
+    			setPreferences(value)
+    		}
+    	});
+    	
+    	function setPreferences(option){
+    		$.ajax("movie/addCookie.json?choice=" + option,{
+    			method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+    		});
+    	}
     	
     	$("#searchByDate").on("click",function(){
 			if($("#nameOption").hasClass("show")){
@@ -447,7 +486,7 @@
     		if(!formValidation.form()){
     			return false;
     		}
-    		var data = movieId=
+    		
     		$.ajax("editMovie/editMovieInfo.json?movieId=" +$("#movieEditForm  input[name=movieId]").val() +"&"+ $("#movieEditForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",

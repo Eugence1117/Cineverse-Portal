@@ -19,14 +19,7 @@
 .fontBtn:hover{
 	cursor:pointer;
 }
-.form-group.input-material{
-		margin-top:50px !important;
-		margin-bottom:25px !important;	
-	}
-	
-	.help-block,.redundant-block{
-		margin:0px !important;
-	}
+
 </style>
 </head>
 <body id="page-top">

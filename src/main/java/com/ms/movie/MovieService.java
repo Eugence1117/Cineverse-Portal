@@ -91,6 +91,30 @@ public class MovieService {
 		}
 	}
 	
+	public Response getMovieList() {
+		Response response = dao.getMovieList();
+		try {
+			if(response.getErrorMsg() == null) {
+				@SuppressWarnings("unchecked")
+				List<Movie> movies = (List<Movie>)response.getResult();
+				for(Movie movie:movies) {
+					String releasedate = movie.getReleasedate();
+					Date date = Constant.SQL_DATE_FORMAT.parse(releasedate);
+					movie.setReleasedate(Constant.UI_DATE_FORMAT.format(date));
+				}
+				return response;
+			}
+			else {
+				return response;
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			return new Response("Unexpected error occured. Please try gain later");
+		}
+		
+	}
+	
 	public ResponseMovieResult getAllMovieInfo(String fromdate, String todate) {
 		
 		try {

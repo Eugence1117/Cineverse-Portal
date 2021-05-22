@@ -37,6 +37,7 @@ public class Constant {
 	
 	public static final String MOVIE_SINGLE_VIEW_COOKIE = "Single";
 	public static final String MOVIE_LIST_VIEW_COOKIE = "List";
+	public static final String MOVIE_COOKIE_IGNORE = "Ignore";
 	
 	public static final int DEFAULT_TIME_GRAIN = 5;
 	public static final int DEFAULT_TIME_RANGE = 13;

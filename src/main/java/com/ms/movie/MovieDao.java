@@ -111,6 +111,50 @@ public class MovieDao {
 		return result;
 	}
 	
+	public Response getMovieList(){
+		List<Movie> movies = null;
+		try {
+			String query = "SELECT seqid, movieName,totaltime,language,releasedate,censorshipId FROM masp.movie";
+			List<Map<String,Object>> rows = jdbc.queryForList(query);
+			
+			if(rows.size() > 0) {
+				movies = new ArrayList<Movie>();
+				for(Map<String,Object> row : rows) {
+					String id = Util.trimString((String)row.get("seqid"));
+					String name = Util.trimString((String)row.get("movieName"));
+					int totalTime = (int)row.get("totaltime");
+					String language = Util.trimString((String)row.get("language"));
+					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
+					String desc = Util.trimString((String)row.get("censorshipId"));
+					
+					Movie movie = new Movie();
+					movie.setMovieId(id);
+					movie.setMovieName(name);
+					movie.setTotalTime(totalTime);
+					movie.setLanguage(language);
+					movie.setCensorship(desc);
+					movie.setReleasedate(releaseDate);
+					
+					movies.add(movie);
+				}
+				return new Response(movies);
+				
+			}
+			else {
+				return new Response("No data to be displayed.");
+			}
+			
+		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			return new Response("Unable to connect to database server. Please try again later.");
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			return new Response("Unexpected error occured. Please try again later.");
+		}
+	}
+	
 	public Movie getMovieDetails(String movieId){
 		Movie result = null;
 		//TODO Need to select based on the branch manager id
@@ -153,7 +197,7 @@ public class MovieDao {
 	public ResponseMovieInfo.Result getMovieInfo(String movieId) {
 		ResponseMovieInfo.Result result = null;
 		try{
-			StringBuffer query = new StringBuffer().append("SELECT picURL, totaltime, language, distributor, cast, director, ")
+			StringBuffer query = new StringBuffer().append("SELECT movieName,picURL, totaltime, language, distributor, cast, director, ")
 												   .append("releasedate, synopsis, movietype, censorshipid FROM masp.movie ")
 												   .append("WHERE seqid = ?");
 			
@@ -161,6 +205,8 @@ public class MovieDao {
 			
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {
+					String name = Util.trimString((String)row.get("movieName"));
+					String url = Util.trimString((String)row.get("picURL"));
 					int totalTime = (int)row.get("totaltime");
 					String language = Util.trimString((String)row.get("language"));
 					String distributor = Util.trimString((String)row.get("distributor"));
@@ -172,7 +218,7 @@ public class MovieDao {
 					String censorship = Util.trimString((String)row.get("censorshipid"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new ResponseMovieInfo.Result(totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
+					result = new ResponseMovieInfo.Result(name,url,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
 				}
 			}
 		}

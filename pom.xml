@@ -234,6 +234,25 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			 <activation>
+       			 <activeByDefault>true</activeByDefault>
+      		</activation>
+			<properties>
+				<spring.cookie.domain>localhost</spring.cookie.domain>
+				<spring.cookie.path>/masterpisportal</spring.cookie.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.cookie.domain>cineverse.azurewebsites.net</spring.cookie.domain>
+				<spring.cookie.path>/</spring.cookie.path>
+			</properties>
+		</profile>
+	</profiles>
 	<build>
 		<finalName>masterpisportal</finalName>
 		<plugins>
@@ -261,5 +280,6 @@
 				</configuration> -->
 			</plugin>
 		</plugins>
+		
 	</build>
 </project>
