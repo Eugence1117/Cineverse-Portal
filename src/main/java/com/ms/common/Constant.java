@@ -12,25 +12,13 @@ public class Constant {
 	public static final int MANAGER_GROUP = 2;
 	public static final int SUPPORT_GROUP = 3;
 	
-	public static final int ACTIVE_BRANCH_CODE = 1;
-	public static final int INACTIVE_BRANCH_CODE = 0;
-	public static final int REMOVED_BRANCH_CODE = -1; 
-	
-	public static final int ACTIVE_MOVIE_CODE = 1;
-	public static final int INACTIVE_MOVIE_CODE = 0;
-	
-	public static final String ACTIVE_BRANCH = "Active";
-	public static final String INACTIVE_BRANCH = "Inactive";
-	public static final String REMOVED_BRANCH = "Removed";
-	
 	public static final String ACTIVE_STATUS = "Active";
 	public static final String INACTIVE_STATUS = "Inactive";
-	
-	public static final int ACTIVE_THEATRE_CODE = 1;
-	public static final int INACTIVE_THEATRE_CODE = 0;
+	public static final String REMOVED_STATUS = "Removed";
 	
 	public static final int ACTIVE_STATUS_CODE = 1;
 	public static final int INACTIVE_STATUS_CODE = 0;
+	public static final int REMOVED_STATUS_CODE = -1;
 	
 	public static final String SCHEDULE_TYPE_MOVIE = "Movie";
 	public static final String SCHEDULE_TYPE_CLEANING = "Cleaning";

@@ -228,9 +228,9 @@ public class MovieController {
 	}
 	
 	
-	 @RequestMapping(value = {"/editMovie/editMovieInfo.json"})
+	 @RequestMapping(value = {"/editMovie/editMovieInfo.json"}, method= {RequestMethod.POST})
 	 @ResponseBody
-	 public Map<Boolean,String> editMovieInfo(Model model, @ModelAttribute("form") MovieEditForm form){
+	 public Map<Boolean,String> editMovieInfo(Model model, @RequestBody MovieEditForm form){
 	 log.info("Movie ID received to update::" + form.getMovieId());
 	 Map<Boolean,String> result = service.editMovieInfo(form);
 	 log.info("Response received.");

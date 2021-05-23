@@ -16,7 +16,7 @@ public class ErrorController{
 	
 	public static Logger log = LogManager.getLogger(ErrorController.class);
 	
-	@RequestMapping("/error")
+	@RequestMapping("/error.htm")
 	public String handleError (HttpServletRequest req, Model model) {
 		Object status = req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 		log.error("Error in HTTP request. " + req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
@@ -25,7 +25,7 @@ public class ErrorController{
 		String errorMsg = "";
 		String title ="";
 		switch(statusCode){
-			case 400:{
+			case 404:{
 				title = "Page Not Found";
 				errorMsg = "It looks like the page is missing...";
 				break;
@@ -46,5 +46,14 @@ public class ErrorController{
 		model.addAttribute("errorMsg",errorMsg);
 		return "error";
 		
+	}
+	
+	@RequestMapping("/sessionExpired.htm")
+	public String handleSessionExpired(HttpServletRequest req, Model model) {
+		model.addAttribute("code","Opps");
+		model.addAttribute("errorMsg","It looks like you idle for too long...");
+		model.addAttribute("title","Session expired");
+		
+		return "sessionExpire";
 	}
 }

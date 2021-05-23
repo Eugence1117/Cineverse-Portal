@@ -161,11 +161,17 @@
 													</div>
 													</div>
 												</div>
-												<div class="row my-1">
+												<div class="row my-1 g-2">
 													<div class="col-md">
 														<div class="form-floating">
 															<input id="movieId" type="text" class="form-control floatLabel data" name="movieId" data-json-key="movieId" disabled>
 															<label for="movieId">Movie ID</label>
+														</div>
+													</div>
+													<div class="col-md">
+														<div class="form-floating">
+															<input id="movieName" type="text" class="form-control floatLabel data" name="movieName" data-json-key="movieName" disabled>
+															<label for="movieName">Movie Name</label>
 														</div>
 													</div>
 												</div>
@@ -487,10 +493,18 @@
     			return false;
     		}
     		
-    		$.ajax("editMovie/editMovieInfo.json?movieId=" +$("#movieEditForm  input[name=movieId]").val() +"&"+ $("#movieEditForm").serialize(),{
-				method : "GET",
+    		var formData = $("#movieEditForm").serializeObject();
+    		formData["movieId"] = $("#movieEditForm input[name=movieId]").val();
+    		
+    		$.ajax("editMovie/editMovieInfo.json",{
+    			method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				data:JSON.stringify(formData),
+				contentType:"application/json; charset=utf-8",
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
     		}).done(function(data){
     			if(typeof data.false == "undefined"){
     				bootbox.alert(data.true);
@@ -616,7 +630,21 @@
     		getNewMovieInfo();
     	});
     	
-    	
+    	$.fn.serializeObject = function() {
+	        var o = {};
+	        var a = this.serializeArray();
+	        $.each(a, function() {
+	            if (o[this.name]) {
+	                if (!o[this.name].push) {
+	                    o[this.name] = [o[this.name]];
+	                }
+	                o[this.name].push(this.value || '');
+	            } else {
+	                o[this.name] = this.value || '';
+	            }
+	        });
+	        return o;
+	    };
     	
 	</script>
 </body>

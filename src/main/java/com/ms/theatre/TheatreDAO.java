@@ -53,7 +53,7 @@ public class TheatreDAO {
 		List<TheatreType> typeList = null;
 		try {
 			String query = "SELECT b.seqid, b.description, b.seatSize, b.price, b.seatOccupied FROM masp.theatre t, masp.theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid,b.description,b.seatSize,b.price,b.seatOccupied";
-			List<Map<String,Object>> results = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
+			List<Map<String,Object>> results = jdbc.queryForList(query,branchid,Constant.ACTIVE_STATUS_CODE);
 			if(results.size() > 0) {
 				typeList = new ArrayList<TheatreType>();
 				for(Map<String,Object> result : results) {
@@ -133,12 +133,12 @@ public class TheatreDAO {
 		}
 	}
 	
-	public Theatre getTheatreInfo(String theatreid) {
-		Theatre theatre = null;
+	public ViewTheatreForm getTheatreInfo(String theatreid) {
+		ViewTheatreForm theatre = null;
 		try {
-			String query = "SELECT seqid, theatrename, seatrow, seatcol, theatretype, createddate,status FROM masp.theatre where seqid = ?";
+			String query = "SELECT seqid, theatrename, seatrow, seatcol, theatretype, createddate,status, totalSeat, theatreLayout FROM masp.theatre where seqid = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,theatreid);
-			if(rows.size() > 0) {
+			if(rows.size() > 0) {				
 				for(Map<String,Object> row: rows) {
 					String seqid = Util.trimString((String)row.get("seqid"));
 					char name = ((String)row.get("theatrename")).charAt(0);
@@ -147,14 +147,17 @@ public class TheatreDAO {
 					String theatreType = (String)row.get("theatretype");
 					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
 					int status = (int)row.get("status");
+					int totalSeat = (int)row.get("totalSeat");
+					String theatreLayout = (String)row.get("theatreLayout");
 					
-					theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,null,status);
+					theatre = new ViewTheatreForm(seqid,name,theatreType,Util.getStatusDesc(status),Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(createddate))
+							  ,seatRow,seatCol,totalSeat,theatreLayout);
 					return theatre;
 				}
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
-			log.error("Exception ex::" + ce.getStackTrace().toString());
+			log.error("Exception ce::" + ce.getStackTrace().toString());
 			throw new JDBCConnectionException("Connection to database lost.", null);
 		}
 		catch(Exception ex) {
@@ -164,14 +167,14 @@ public class TheatreDAO {
 		}
 		return theatre;
 	}
-	
+
 	public List<Theatre> getAllTheatre(String branchid){
 		List<Theatre> theatreList = null;
 		try {
-			String query = "SELECT seqid,theatrename,theatretype, status FROM masp.theatre where branchid = ?";
+			String query = "SELECT seqid,theatrename,theatretype, status, createddate FROM masp.theatre where branchid = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid);
-			theatreList = new ArrayList<Theatre>();
 			if(rows.size() > 0) {
+				theatreList = new ArrayList<Theatre>();
 				for(Map<String,Object> row: rows) {
 					
 					Theatre theatre = new Theatre();
@@ -179,12 +182,13 @@ public class TheatreDAO {
 					char name = ((String)row.get("theatrename")).charAt(0);
 					String theatreType = (String)row.get("theatretype");
 					int status = (int)row.get("status");
+					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
 					
 					theatre.setId(seqid);
 					theatre.setTitle(name);
 					theatre.setTheatretype(theatreType);
 					theatre.setStatus(status);
-					
+					theatre.setCreateddate(createddate);
 					theatreList.add(theatre);
 				}
 			}
@@ -206,7 +210,7 @@ public class TheatreDAO {
 		List<Theatre> theatreList = null;
 		try {
 			String query = "SELECT seqid,theatrename, seatrow, seatcol, theatretype, createddate FROM masp.theatre where branchid = ? AND status = ?";
-			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,Constant.ACTIVE_THEATRE_CODE);
+			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,Constant.ACTIVE_STATUS_CODE);
 			theatreList = new ArrayList<Theatre>();
 			if(rows.size() > 0) {
 				for(Map<String,Object> row: rows) {
@@ -217,7 +221,7 @@ public class TheatreDAO {
 					String theatreType = (String)row.get("theatretype");
 					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
 					
-					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid,Constant.ACTIVE_THEATRE_CODE);
+					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid,Constant.ACTIVE_STATUS_CODE);
 					theatreList.add(theatre);
 				}
 			}
@@ -255,7 +259,7 @@ public class TheatreDAO {
 		log.info(theatre.toString());
 		try {
 			String query = "INSERT INTO masp.theatre VALUES(?,?,?,?,?,?,?,?,?,?)";
-			int result = jdbc.update(query,theatre.getId(),Character.toString(theatre.getTitle()),theatre.getSeatrow(),theatre.getSeatcol(),theatre.getTheatretype(),theatre.getCreateddate(),theatre.getBranchid(),Constant.ACTIVE_THEATRE_CODE,theatre.getTotalSeat(),theatre.getTheatreLayout());
+			int result = jdbc.update(query,theatre.getId(),Character.toString(theatre.getTitle()),theatre.getSeatrow(),theatre.getSeatcol(),theatre.getTheatretype(),theatre.getCreateddate(),theatre.getBranchid(),Constant.ACTIVE_STATUS_CODE,theatre.getTotalSeat(),theatre.getTheatreLayout());
 			if(result > 0) {
 				return null;
 			}
@@ -275,6 +279,7 @@ public class TheatreDAO {
 	
 	public String updateTheatre(EditTheatreForm theatreForm) {
 		try {
+			//validation on status
 			String query = "UPDATE masp.theatre SET theatretype = ?, seatrow = ?, seatcol = ? , status = ?, totalSeat = ?, theatreLayout = ?, createddate = ? where seqid = ?";
 			int result = jdbc.update(query,theatreForm.getTheatretype(),theatreForm.getRow(),theatreForm.getCol(),theatreForm.getStatus(),theatreForm.getTotalSeat(),theatreForm.getLayout(),theatreForm.getTheatreid(),Constant.SQL_DATE_FORMAT.format(new Date()));
 			if(result > 0) {

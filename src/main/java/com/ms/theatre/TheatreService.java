@@ -1,5 +1,6 @@
 package com.ms.theatre;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -42,12 +43,38 @@ public class TheatreService {
 		else {
 			try {
 				List<Theatre> theatreList = dao.getAllTheatre(branchid);
-				log.info("Total Theatre: " + theatreList.size());
-				theatreList.sort(Comparator.comparing(Theatre::getTitle));
-				return new Response(theatreList);
+				if(theatreList == null) {
+					return new Response("No theatre found.");
+				}
+				else {
+					log.info("Total Theatre: " + theatreList.size());
+					theatreList.sort(Comparator.comparing(Theatre::getTitle));
+					List<BriefTheatreForm> formList = new ArrayList<BriefTheatreForm>();
+					for(Theatre theatre: theatreList) {
+						Date createDate = Constant.SQL_DATE_FORMAT.parse(theatre.getCreateddate());
+						Date currentDate = new Date();
+						
+						long differences = currentDate.getTime() - createDate.getTime();
+						int days =(int)(differences / (1000*60*60*24));
+						String msg = "";
+						if(days < 1) {
+							msg = "today";
+						}
+						else {
+							msg = days + " days ago";
+						}
+						BriefTheatreForm t = new BriefTheatreForm(theatre.getId(),theatre.getTitle(),theatre.getTheatretype(),Util.getStatusDesc(theatre.getStatus()),msg);
+						formList.add(t);
+					}
+					return new Response(formList);
+				}
+				
 			}
 			catch(JDBCConnectionException ex) {
 				return new Response("Connection to database lost.");
+			}
+			catch(Exception ex) {
+				return new Response("Unexpected error occured. Please try again later.");
 			}
 		}
 	}
@@ -60,7 +87,7 @@ public class TheatreService {
 		}
 		else {
 			try {
-				Theatre theatre = dao.getTheatreInfo(theatreid);
+				ViewTheatreForm theatre = dao.getTheatreInfo(theatreid);
 				if(theatre == null) {
 					return new Response("Unable to retrieve information from database");
 				}
@@ -131,7 +158,7 @@ public class TheatreService {
 				//Create Theatre
 				String theatreId = UUID.randomUUID().toString();
 				Theatre theatre = new Theatre(theatreId,name,form.getRow(),form.getCol(),form.getTheatretype(),
-											  Constant.SQL_DATE_FORMAT.format(new Date()),branchid,form.getTotalSeat(),Constant.ACTIVE_THEATRE_CODE,form.getLayout());
+											  Constant.SQL_DATE_FORMAT.format(new Date()),branchid,form.getTotalSeat(),Constant.ACTIVE_STATUS_CODE,form.getLayout());
 				
 				String errorMsg = dao.createNewTheatre(theatre);
 				if(errorMsg == null) {

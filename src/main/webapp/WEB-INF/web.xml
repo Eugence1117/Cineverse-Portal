@@ -18,7 +18,7 @@
   </servlet-mapping>
 	
   <error-page>
-    <location>/error</location>
+    <location>/error.htm</location>
   </error-page>
 <filter>
     <filter-name>springSecurityFilterChain</filter-name>
@@ -49,6 +49,6 @@
 	</listener-class>
   </listener>
   <session-config>
-  	<session-timeout>30</session-timeout>
+  	<session-timeout>15</session-timeout>
   </session-config>
 </web-app>

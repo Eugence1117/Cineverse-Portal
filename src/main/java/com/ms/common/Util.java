@@ -20,10 +20,8 @@ public class Util {
 	public static String checkActivation(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : Constant.INACTIVE_STATUS;
 	}
-	public static String getBranchStatus(int code) {
-		return code == Constant.ACTIVE_BRANCH_CODE ? Constant.ACTIVE_BRANCH 
-			   : code == Constant.INACTIVE_BRANCH_CODE ? Constant.INACTIVE_BRANCH
-			   : Constant.REMOVED_BRANCH;
+	public static String getStatusDesc(int code) {
+		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : code == Constant.INACTIVE_STATUS_CODE ? Constant.INACTIVE_STATUS : Constant.REMOVED_STATUS;
 	}
 	
 	public static List<String> generateColorList(){

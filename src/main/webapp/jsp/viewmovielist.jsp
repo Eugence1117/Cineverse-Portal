@@ -494,14 +494,22 @@
     			return false;
     		}
     		
-    		$.ajax("editMovie/editMovieInfo.json?movieId=" +$("#movieForm input[name=movieId]").val() +"&"+ $("#movieForm").serialize(),{
-				method : "GET",
+    		var formData = $("#movieForm").serializeObject();
+    		formData["movieId"] = $("#movieForm input[name=movieId]").val();
+    		$.ajax("editMovie/editMovieInfo.json",{
+    			method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				data:JSON.stringify(formData),
+				contentType:"application/json; charset=utf-8",
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
     		}).done(function(data){
     			if(typeof data.false == "undefined"){
     				$("#movieDetails").modal('hide');
     				bootbox.alert(data.true);
+    				readyFunction();
     			}
     			else{
     				$("#movieDetails").addClass("skip");
@@ -581,6 +589,22 @@
 				},
 			}
 		});
+		
+		$.fn.serializeObject = function() {
+	        var o = {};
+	        var a = this.serializeArray();
+	        $.each(a, function() {
+	            if (o[this.name]) {
+	                if (!o[this.name].push) {
+	                    o[this.name] = [o[this.name]];
+	                }
+	                o[this.name].push(this.value || '');
+	            } else {
+	                o[this.name] = this.value || '';
+	            }
+	        });
+	        return o;
+	    };
 	</script>
 </body>
 

@@ -16,7 +16,6 @@
     	<access-denied-handler error-page="/403.htm" />
     	<intercept-url pattern="/login*" access="permitAll()" />
     	
-    	
     	<intercept-url pattern="/index*" access="isAuthenticated()"/>
     	<intercept-url pattern="/home*" access="isAuthenticated()"/>
     	<intercept-url pattern="/home/*" access="isAuthenticated()"/>
@@ -49,7 +48,7 @@
     	<logout logout-url="/logout.htm" logout-success-url="/login.htm?logout" />
     	<csrf/>
     	<session-management>
-			<concurrency-control max-sessions="1" expired-url="/sessionExpire.jsp"/>
+			<concurrency-control max-sessions="1" expired-url="/sessionExpired.htm"/>
 		</session-management>
     </http>
     

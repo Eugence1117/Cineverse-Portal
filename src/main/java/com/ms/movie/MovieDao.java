@@ -351,7 +351,7 @@ public class MovieDao {
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT m.movieName,m.seqid,m.picURL, a.startDate, a.endDate FROM masp.movie m, masp.movieavailable a")
 												.append(" WHERE a.branchid = ? AND a.movieid = m.seqid AND a.startDate <= ? AND a.endDate >= ? AND a.status = ?");
-			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),branchid,date,date,Constant.ACTIVE_MOVIE_CODE);
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),branchid,date,date,Constant.ACTIVE_STATUS_CODE);
 			if(rows.size() > 0) {
 				movieList = new ArrayList<AvailableMovie.Result>();
 				for(Map<String,Object> row : rows) {
@@ -379,7 +379,7 @@ public class MovieDao {
 	public boolean insertMovieAvailable(ExistMovieForm form, String branchId) {
 		try {
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movieavailable VALUES(?,?,?,?,?)");
-			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_MOVIE_CODE);
+			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_STATUS_CODE);
 			if(result > 0) {
 				return true;
 			}
@@ -418,10 +418,10 @@ public class MovieDao {
 		Map<Boolean,String> response = new HashMap<Boolean,String>();
 		try {
 			String newReleaseDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getReleasedate()+Constant.DEFAULT_TIME));
-			StringBuffer query = new StringBuffer().append("UPDATE masp.movie SET totaltime = ?, language = ?, distributor = ?, ")
+			StringBuffer query = new StringBuffer().append("UPDATE masp.movie SET movieName = ?, totaltime = ?, language = ?, distributor = ?, ")
 											       .append("cast = ?, director = ?, releasedate = ?, synopsis = ?, movietype = ?, censorshipId = ? ")
 											       .append("WHERE seqid = ?");
-			int result = jdbc.update(query.toString(), form.getTotalTime(),form.getLanguage(),form.getDistributor(),
+			int result = jdbc.update(query.toString(), form.getMovieName(),form.getTotalTime(),form.getLanguage(),form.getDistributor(),
 									 form.getCast(),form.getDirector(),newReleaseDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),form.getMovieId());
 			if(result > 0) {
 				response.put(true,"Update success.");

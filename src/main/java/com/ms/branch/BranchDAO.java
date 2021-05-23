@@ -45,7 +45,7 @@ public class BranchDAO {
 					int postcode = (int) row.get("postcode");
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
-					String status = Util.getBranchStatus((int) row.get("status"));
+					String status = Util.getStatusDesc((int) row.get("status"));
 					ResponseBranchInfo.Result branchDetails = new ResponseBranchInfo.Result(id, branchName, address,
 							postcode, district, state, status);
 					result = new ResponseBranchInfo(branchDetails);
@@ -75,7 +75,7 @@ public class BranchDAO {
 					int postcode = (int) row.get("postcode");
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
-					String status = Util.getBranchStatus((int) row.get("status"));
+					String status = Util.getStatusDesc((int) row.get("status"));
 					ResponseBranchInfo.Result branchDetails = new ResponseBranchInfo.Result(id, branchName, address,
 							postcode, district, state, status);
 					result = new ResponseBranchInfo(branchDetails);
@@ -107,7 +107,7 @@ public class BranchDAO {
 					int postcode = (int) row.get("postcode");
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
-					String status = Util.getBranchStatus((int) row.get("status"));
+					String status = Util.getStatusDesc((int) row.get("status"));
 					resultList.add(new ResponseBranchInfo.Result(seqid, branchName, address, postcode, district, state,
 							status));
 				}
@@ -126,7 +126,7 @@ public class BranchDAO {
 		String message = null;
 		try {
 			StringBuffer query = new StringBuffer().append("UPDATE masp.branch SET status = ? WHERE seqid = ?");
-			int result = jdbc.update(query.toString(), Constant.REMOVED_BRANCH_CODE, branchID);
+			int result = jdbc.update(query.toString(), Constant.REMOVED_STATUS_CODE, branchID);
 			if (result > 0) {
 				message = "Branch removed.";
 			} else {

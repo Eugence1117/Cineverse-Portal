@@ -1,55 +1,50 @@
 <%@ include file="include/taglib.jsp"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+    pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
+<meta name="_csrf" content="${_csrf.token}" />
+<meta name="_csrf_header" content="${_csrf.headerName}" />
+
 <head>
 <meta charset="ISO-8859-1">
-<title>Access Denied</title>
+<title>Session Expired</title>
+
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/bootstrap/css/bootstrap.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css'/>">
-<style>
-a:hover {
-	cursor: pointer;
-}
-
-.container {
-	width: 100%;
-}
-
-@media only screen and (max-width: 640px) {
-	.maspLogo {
-		width: 100%;
-	}
-}
-</style>
 </head>
-<body>
-	<div class="container">
-		<p style="text-align: center">
-			<a class="navbar-brand m-0" href="home.htm"><img class="maspLogo"
-				style="height: 55px; text-align: center;"
-				src="<spring:url value='/images/staff-masp-logo.png'/>" alt="MASP" /></a>
-		</p>
-		<h4 style="text-align: center; padding: 15px">Session Expired</h4>
-		<h5 style="text-align: center">It seems like your session is expired.</h5>
-		<h5 style="text-align: center">Please try to log in again. If
-			problem still exist, kindly to contact support team.</h5>
-		<p style="text-align: center; margin-top: 35px">
-			<a onclick="window.history.back()"
-				style="display: inline-block; color: white; text-align: center; padding: 15px"
-				class="btn-success">Return previous page</a>
-		</p>
+
+<body id="page-top">
+	<div id="wrapper">
+		<%@ include file="include/sidebar.jsp" %>
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				 <%@ include file="include/topbar.jsp" %>
+				 <div class="container-fluid">
+		        	<div class="text-center">
+			            <div class="error mx-auto" data-text="Opps">Opps</div>
+			            <p class="lead text-gray-800 mb-5">Session expired</p>
+			            <p class="text-gray-500 mb-0">It looks like you have been afk for too long...</p>
+			            <a href="login.htm">&larr; Login again</a>
+			        </div>
+		        </div>
+		        <!--  END CONTENT -->
+			</div>
+			<footer class="sticky-footer bg-white">
+		        <div class="container my-auto">
+		          <div class="copyright text-center my-auto">
+		            <span><fmt:message key="common.copyright" /></span>
+		          </div>
+		        </div>
+		    </footer>
+		</div>
 	</div>
-	<footer>
-		<p class="text-center">
-			<small><fmt:message key="common.copyright" /></small>
-		</p>
-	</footer>
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	<!-- /.container -->
 
-
+<%@ include file="include/js.jsp"%>
 </body>
+
 </html>

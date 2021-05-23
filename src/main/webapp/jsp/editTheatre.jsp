@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="theatre.add.title" /></title>
+<title><fmt:message key="theatre.edit.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"
@@ -29,9 +29,9 @@
 	background-color:#3636bbff;
 }
 
-.help-block{
-	margin:0px;
-	font-size:15px;
+#loading{
+	text-align:center;
+	padding:50px;
 }
 
 </style>
@@ -45,14 +45,14 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Create New Theatre</h1>
+			        	<h1 class="h3 mb-0 text-gray-800">Edit Theatre</h1>
 			        </div>
 			        
 			        <h2 class='text-center'>Theatre layout</h2>
 					<div class="row pb-2" style="justify-content:right">
 						<div class="col-md-1"></div>
 						<div class="col-md-10" id="actionPanel">
-							<button class="btn btn-primary float-left mx-1" onClick="$('#createTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
+							<button class="btn btn-primary float-left mx-1" onClick="$('#editTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
 							<button class="btn btn-secondary float-right mx-1" onClick="deSelectAllClickable()" id="btnDeselectAll"><span class='fas fa-times'> </span> Deselect all</button>
 							<button class='btn btn-primary float-right' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
 							<div class="dropdown d-inline-block">
@@ -75,13 +75,13 @@
 								<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
 									<p class="text-center w-100 p-1 bg-light screen">Screen</p>
 								</div>
-								<p class="my-5 text-center"> Please finish the configuration to continue</p>
+								<div class="" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
 							</div>
 							<div class="col col-md-1"></div>
 						</div>
 					</div>
 					<div class="text-center my-3">
-						<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Confirm</button>
+						<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Modify</button>
 					</div>
 				 </div>
 			</div>
@@ -95,18 +95,18 @@
 		</div>
 	</div>
 
-	<div class="modal" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
+	<div class="modal" tabindex="-1" role="dialog" id="editTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">
-		        <h5 class="modal-title">Theatre Creation</h5>
+		        <h5 class="modal-title">Theatre Modification</h5>
 		      </div>
 		      <div class="modal-body">
-		      	<h3 class="text-center">Create new theatre</h3>
+		      	<h3 class="text-center">Hall <span id="name"></span></h3>
 		      	<div class="">
 			        <form class="p-0 mt-5" id="theatreForm">
 				        <div class="mx-1">
-				        	<div class="row form-group">
+				        	<div class="row form-group g2">
 				        		<div class="col-md">
 				        			<div class="form-floating">
 				        				<select name="theatretype" class="form-control form-select" id="dropdownTheatreTypes" aria-label="Select an option">
@@ -115,7 +115,16 @@
 							        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.seqid}"/> - Maximum capacity: <c:out value="${group.seatSize}"/></option>
 							        			</c:forEach>
 							        	</select>
-							        	<label for="theatretype">Theatre Type</label>
+							        	<label for="dropdownTheatreTypes">Theatre Type</label>
+				        			</div>
+				        		</div>
+				        		<div class="col-md">
+				        			<div class="form-floating">
+				        				<select name="status" class="form-control form-select" id="dropdownStatus" aria-label="Select an option">
+				        					<option>Active</option>
+				        					<option>Inactive</option>
+				        				</select>
+				        				<label for="dropdownStatus">Status</label>
 				        			</div>
 				        		</div>
 						    </div>
@@ -123,13 +132,13 @@
 							<div class="row form-group g2">
 								<div class="col-md">
 									<div class="form-floating">
-										<input name="row" class="form-control" id="inputRow" placeholder="Write something here"/>
+										<input name="row" class="form-control data" id="inputRow" data-json-key="row" placeholder="Write something here"/>
 										<label for="row">Total Row</label>
 									</div>
 								</div>
 								<div class="col-md">
 									<div class="form-floating">
-										<input name="col" class="form-control" id="inputCol" placeholder="Write something here"/>
+										<input name="col" class="form-control data" id="inputCol" data-json-key="col" placeholder="Write something here"/>
 											<label for="col">Total Column</label>
 									</div>
 								</div>
@@ -166,7 +175,8 @@
 		var selectedTheatreType = null;
 		$(document).ready(function(){
 			var error = "${errorMsg}";
-			
+			var theatreId = "${theatreid}";			
+
 			if(error != ""){
 				bootbox.alert({
 					message : error,
@@ -174,6 +184,9 @@
 						history.back();
 					}
 				})
+			}
+			else{
+				retrieveInformation(theatreId);
 			}
 			
 			$("#DropdownButton").attr("disabled",true);
@@ -183,7 +196,35 @@
 			
 		});
 		
-		
+		function retrieveInformation(theatreid){
+    		if(theatreid != ""){
+    			$.ajax("theatre/getTheatreInfo.json?theatreid=" + theatreid,{
+    				method : "GET",
+    				accepts : "application/json",
+    				dataType : "json",
+    			}).done(function(data){
+    				if(data.errorMsg != null){
+						bootbox.alert(data.errorMsg);
+					}
+    				else{
+        				$("#theatreForm .data").each(function(index,element){
+        	    			var key = $(this).data('json-key');
+        		            if (key && data.result.hasOwnProperty(key)) {
+        		                $(this).val(data.result[key]||"");
+        		            }
+        	    		});
+        				//$("#inputRow").val(data.result["row"])
+        				//$("#inputCol").val(data.result["col"]);
+	        			$("#dropdownTheatreTypes").val(data.result["theatretype"]);
+	        			$("#dropdownStatus").val(data.result["status"]);
+	        			$("#name").text(data.result["title"]);
+	        			getSelectedType();
+	        			constructLayout(true);
+	        			fillLayoutWithJSON(JSON.parse(atob(data.result.theatreLayout)));
+    				}
+    			});
+    		}
+    	}
 		
 		function getSelectedType(){
 			var val = $("#dropdownTheatreTypes").val();
@@ -208,21 +249,6 @@
 			return status;
 		}
 		
-		$("#dropdownTheatreTypes").on('change',function(){
-			if($(this).val() != 0){
-				$(this).attr("value",$(this).val());
-			}
-		});
-		
-		$("input").on('change',function(){
-			if($(this).val() != ""){
-				$(this).attr("value",$(this).val());
-			}
-			else{
-				$(this).attr("value",null);
-			}
-		});
-		
 		function  constructLayout(isSkip){
 			var validator = $( "#theatreForm" ).validate();
 			if(!validator.form()){
@@ -241,8 +267,8 @@
 			var element = '<svg xmlns="http://www.w3.org/2000/svg" width="25.695" height="20.695" viewBox="0 0 6.798 5.476"><rect width="6.598" height="5.276" x="36.921" y="65.647" ry=".771" stroke="#3636bb" stroke-width=".2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(-36.821 -65.547)"/></svg>'
 			
 			//Close Modal if opened
-			if($("#createTheatre").hasClass("show")){
-				$("#createTheatre").modal('toggle');	
+			if($("#editTheatre").hasClass("show")){
+				$("#editTheatre").modal('toggle');	
 			}
 			
 			//Generate HTML
@@ -273,6 +299,7 @@
 				firstLetter += 1;
 			}
 			html +="</div><p id='counter' class='text-right p-3 m-2'></p>";
+			$("#loading").hide();
 			$("#seatLayout").append(html);
 			
 			bindDataToSeat();
@@ -593,6 +620,9 @@
 				theatretype : {
 					required : true,
 					SelectFormat: true
+				},
+				status:{
+					required:true
 				},
 				row : {
 					required : true,

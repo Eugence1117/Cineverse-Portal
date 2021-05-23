@@ -59,6 +59,20 @@ public class TheatreController {
 		
 	}
 	
+	@RequestMapping(value = {"/editTheatre.htm"})
+	public String loadEditTheatrePage(Model model, String theatreId) {
+		log.info("Entered /editTheatre.htm");
+		List<TheatreType> typeList = service.retrieveTheatreTypes();
+		if(typeList == null) {
+			model.addAttribute("errorMsg","Unable to retrieve information from server. Please try again later.");
+		}
+		else {
+			model.addAttribute("theatreTypes",typeList);
+		}
+		model.addAttribute("theatreid",theatreId);
+		return "editTheatre";
+	}
+	
 	@RequestMapping( value= {"/theatre/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
 	public Response getLayoutJSON(Model model, @RequestBody Map<String,Object> payload) {
