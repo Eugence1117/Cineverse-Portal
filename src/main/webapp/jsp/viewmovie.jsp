@@ -403,10 +403,15 @@
     	});
     	
     	function setPreferences(option){
-    		$.ajax("movie/addCookie.json?choice=" + option,{
+    		$.ajax("api/authorize/addCookie.json?choice=" + option,{
     			method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
     		});
     	}
     	
@@ -420,10 +425,15 @@
     		var to = $("input[name=enddate]").val();
     		var result = validateDate(from,to);
     		if(result){
-    			$.ajax("viewMovie/retrieveMovieDetail.json?" + $("#dateOption").serialize(),{
+    			$.ajax("api/authorize/retrieveMovieDetail.json?" + $("#dateOption").serialize(),{
 					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 				}).done(function(data){
 					if(data.error == null || data.error == ""){
 						if(!$("#movieDetails").hasClass("show")){
@@ -434,7 +444,6 @@
 					else{
 						bootbox.alert(data.error);
 					}
-    				
     			});
     			
     		}
@@ -447,10 +456,15 @@
 			if($("#dateOption").hasClass("show")){
 				$("#dateOption").collapse('toggle');
 			}
-    		$.ajax("viewMovie/retrieveMovieDetailwithName.json?" + $("#nameOption").serialize(),{
+    		$.ajax("api/authorize/retrieveMovieDetailwithName.json?" + $("#nameOption").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				if(data.error == null || data.error == ""){
 					if(!$("#movieDetails").hasClass("show")){
@@ -460,7 +474,7 @@
 				}
 				else{
 					bootbox.alert(data.error);
-				}		
+				}	
     		});
 
     	});
@@ -496,7 +510,7 @@
     		var formData = $("#movieEditForm").serializeObject();
     		formData["movieId"] = $("#movieEditForm input[name=movieId]").val();
     		
-    		$.ajax("editMovie/editMovieInfo.json",{
+    		$.ajax("api/admin/editMovieInfo.json",{
     			method : "POST",
 				accepts : "application/json",
 				dataType : "json",
@@ -505,6 +519,11 @@
 				headers:{
 					"X-CSRF-Token": CSRF_TOKEN
 				},
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
     		}).done(function(data){
     			if(typeof data.false == "undefined"){
     				bootbox.alert(data.true);
@@ -513,7 +532,6 @@
     			else{
     				bootbox.alert(data.false);
     			}
-    			
     		});
     		 
     	});
@@ -539,10 +557,15 @@
     	}
     	
     	async function getMovieInfo(activeId){
-    		$.ajax("viewMovie/getMovieInfo.json?movieId=" + activeId,{
+    		$.ajax("api/authorize/getMovieInfo.json?movieId=" + activeId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				},
 				beforeSend:function(){
 					$("#movieInfo .row").hide();
 					$("#loading").show();
@@ -559,7 +582,7 @@
 				}
 				else{
 					bootbox.alert(data.error);
-				}
+				}	
     		});
     	}
     	

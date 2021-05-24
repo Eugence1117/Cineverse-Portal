@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,22 +31,8 @@ public class TheatreController {
 	@Autowired
 	TheatreService service;
 	
-	@RequestMapping( value= {"/theatre/getTheatreList.json"})
-	@ResponseBody
-	public List<Theatre> retrieveTheatreList(Model model){
-		log.info("entered /theatre/getTheatreList");
-		String branchid = session.getAttribute("branchid").toString();
-		return service.retrieveAvailableTheatre(branchid);
-	}
-	
-	@RequestMapping (value= {"/theatre/getTheatreType.json"})
-	@ResponseBody
-	public Response getTheatreType(Model model, String typeId) {
-		log.info("entered /theatre/getTheatreType");
-		return service.retrieveTheatreType(typeId);
-	}
-	
 	@RequestMapping( value= {"/createTheatre.htm"})
+	//@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public String loadCreateTheatrePage(Model model){
 		log.info("Entered /createTheatre.htm");
 		List<TheatreType> typeList = service.retrieveTheatreTypes();
@@ -73,28 +60,6 @@ public class TheatreController {
 		return "editTheatre";
 	}
 	
-	@RequestMapping( value= {"/theatre/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
-	@ResponseBody
-	public Response getLayoutJSON(Model model, @RequestBody Map<String,Object> payload) {
-		log.info("Entered /theatre/submitLayout.json");
-		String branchid = session.getAttribute("branchid").toString();
-		if(payload == null) {
-			return new Response("Unable to receive your data. Please try again.");
-		}
-		else {
-			return service.createTheatre(payload, branchid);
-		}
-		
-	}
-	
-	@RequestMapping (value = {"/theatre/updateTheatre.json"} ,method= {RequestMethod.PUT})
-	@ResponseBody
-	public Response updateTheatre(Model model, @RequestBody Map<String,Object> payload) {
-		log.info("Entered /theatre/updateTheatre.json");
-		Response res = service.updateTheatre(payload);
-		return res;
-	}
-	
 	@RequestMapping( value= {"/viewTheatre.htm"})
 	public String loadViewTheatrePage(Model model) {
 		log.info("Entered /viewTheatre.htm");
@@ -109,7 +74,44 @@ public class TheatreController {
 		return "viewTheatre";
 	}
 	
-	@RequestMapping( value= {"/theatre/getTheatreInfo.json"})
+	@RequestMapping( value= {"/api/authorize/getTheatreList.json"})
+	@ResponseBody
+	public List<Theatre> retrieveTheatreList(Model model){
+		log.info("entered /theatre/getTheatreList");
+		String branchid = session.getAttribute("branchid").toString();
+		return service.retrieveAvailableTheatre(branchid);
+	}
+	
+	@RequestMapping (value= {"/api/authorize/getTheatreType.json"})
+	@ResponseBody
+	public Response getTheatreType(Model model, String typeId) {
+		log.info("entered /theatre/getTheatreType");
+		return service.retrieveTheatreType(typeId);
+	}
+	
+	@RequestMapping( value= {"api/manager/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response getLayoutJSON(Model model, @RequestBody Map<String,Object> payload) {
+		log.info("Entered /theatre/submitLayout.json");
+		String branchid = session.getAttribute("branchid").toString();
+		if(payload == null) {
+			return new Response("Unable to receive your data. Please try again.");
+		}
+		else {
+			return service.createTheatre(payload, branchid);
+		}
+		
+	}
+	
+	@RequestMapping (value = {"api/manager/updateTheatre.json"} ,method= {RequestMethod.POST})
+	@ResponseBody
+	public Response updateTheatre(Model model, @RequestBody EditTheatreForm form) {
+		log.info("Entered /theatre/updateTheatre.json");
+		Response res = service.updateTheatre(form);
+		return res;
+	}
+	
+	@RequestMapping( value= {"/api/authorize/getTheatreInfo.json"})
 	@ResponseBody
 	public Response getTheatreInfo(Model model, String theatreid) {
 		log.info("Entered /theatre/getTheatreInfo.json");

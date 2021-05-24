@@ -125,7 +125,7 @@
 													<div class="input-group-append d-inline">
 														<button type="button" id="poster"
 															class="btn btn-primary display" data-bs-toggle="modal"
-															data-bs-target="#myModal">Preview Picture</button>
+															data-bs-target="#picModal">Preview Picture</button>
 													</div>
 												</div>
 											</div>
@@ -278,6 +278,21 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="modal fade bd-example-modal-lg" id="picModal">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="myModel-title" class="modal-title"></h4>
+					<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+				</div>
+				<div id="result" class="modal-body mx-auto">
+					<img id="displaypicture" class="img-fluid">
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
 
 	<!-- /.container -->
 	<%@ include file="include/js.jsp"%>
@@ -285,10 +300,6 @@
 		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/dataTables.bootstrap4.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
@@ -305,10 +316,15 @@
 				return false;
 			}
 
-			$.ajax("addMovie/ViewExistMovie.json?"+ $('#extMovieForm').serialize(), {
+			$.ajax("api/manager/ViewExistMovie.json?"+ $('#extMovieForm').serialize(), {
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 				}).done(function(data) {
 					if(data != null){
 						$("#details-collapse").toggle(true);
@@ -317,7 +333,6 @@
 					else{
 						bootbox.alert("Unable to retrive the movie details. Please try again later.");
 					}
-
 			});
 		});
 
@@ -350,10 +365,15 @@
 			$("#extModal").modal('show');
 
 			$("#ext-btn-addMovie").on("click",function(){
-			$.ajax("addMovie/AddExistMovie.json?" + $("#addMovieForm").serialize() + "&" +$("#dateForm").serialize(),{
+			$.ajax("api/manager/AddExistMovie.json?" + $("#addMovieForm").serialize() + "&" +$("#dateForm").serialize(),{
 						method : "GET",
 						accepts : "application/json",
 						dataType : "json",
+						statusCode:{
+							401:function(){
+								window.location.href = "expire.htm";
+							}
+						}
 				})
 				.done(function(data){
 					$("#extModal").modal("hide");

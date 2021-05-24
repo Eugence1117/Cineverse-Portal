@@ -64,62 +64,6 @@ public class MovieController {
 		}
 	}
 	
-	@RequestMapping( value = {"/addMovie/uploadnewmovie.json"}, method = {RequestMethod.POST})
-	@ResponseBody
-	public Response addNewMovie(Model model, @ModelAttribute NewMovieForm form) {
-		log.info("Entered /addMovie/uploadnewmovie.json");
-		Response status = service.insertMovieRecord(form);
-		return status;
-	}
-	
-	@RequestMapping(value= {"/addMovie/ViewExistMovie.json"})
-	@ResponseBody
-	public Movie viewMovieDetails(Model model, String movieId) {
-		log.info("Movie ID received: "+ movieId);
-		Movie result = service.getMovieDetail(movieId);
-		model.addAttribute("usergroup",httpSession.getAttribute("usergroupid").toString());
-		if(result != null) {
-			return result;
-		}
-		else {
-			return null;
-		}
-	}
-	
-	@RequestMapping(value = {"/movie/addCookie.json"})
-	@ResponseBody
-	public Response addCookie(HttpServletResponse response,String choice) {
-		log.info("Entered /movie/addCookie.json");
-		try {
-			if(!choice.equals(Constant.MOVIE_LIST_VIEW_COOKIE) && !choice.equals(Constant.MOVIE_SINGLE_VIEW_COOKIE) && !choice.equals(Constant.MOVIE_COOKIE_IGNORE)) {
-				return new Response("Unable to identify data sent. Your request has been cancelled.");
-			}
-			else {
-				Cookie cookie = new Cookie("defaultMovieView",choice);
-				cookie.setMaxAge(30 * 24 * 60 * 60);
-				cookie.setDomain("localhost"); //cineverse.azurewebsites.net
-				cookie.setPath("/masterpisportal");
-				response.addCookie(cookie);
-				log.info("Cookie for movie default view set to " + choice);
-				return new Response((Object)"Your preference has been recorded.");
-			}
-		}
-		catch(Exception ex) {
-			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unexpected error occrued. Please try gain later.");
-		}
-	}
-	
-	@RequestMapping(value= {"/addMovie/AddExistMovie.json"})
-	@ResponseBody
-	public ResponseResultJson addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
-		
-		log.info("Movie ID received: "+ form.getMovieId());
-		String username = (String)httpSession.getAttribute("username");
-		
-		return service.insertMovieAvailable(form, username);
-	}
-	
 	@RequestMapping(value = {"/viewMovie.htm"})
 	public String viewMovie(Model model, @CookieValue(value = "defaultMovieView", defaultValue="") String defaultView, HttpServletResponse response, @RequestParam(required=false) String pages) {
 		log.info("Entered /viewMovie");
@@ -190,7 +134,63 @@ public class MovieController {
 		}
 	}
 	
-	@RequestMapping(value = {"/api/getMovieList.json"})
+	@RequestMapping( value = {"/api/admin/uploadnewmovie.json"}, method = {RequestMethod.POST})
+	@ResponseBody
+	public Response addNewMovie(Model model, @ModelAttribute NewMovieForm form) {
+		log.info("Entered /addMovie/uploadnewmovie.json");
+		Response status = service.insertMovieRecord(form);
+		return status;
+	}
+	
+	@RequestMapping(value= {"/api/manager/ViewExistMovie.json"})
+	@ResponseBody
+	public Movie viewMovieDetails(Model model, String movieId) {
+		log.info("Movie ID received: "+ movieId);
+		Movie result = service.getMovieDetail(movieId);
+		model.addAttribute("usergroup",httpSession.getAttribute("usergroupid").toString());
+		if(result != null) {
+			return result;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	@RequestMapping(value = {"/api/authorize/addCookie.json"})
+	@ResponseBody
+	public Response addCookie(HttpServletResponse response,String choice) {
+		log.info("Entered /movie/addCookie.json");
+		try {
+			if(!choice.equals(Constant.MOVIE_LIST_VIEW_COOKIE) && !choice.equals(Constant.MOVIE_SINGLE_VIEW_COOKIE) && !choice.equals(Constant.MOVIE_COOKIE_IGNORE)) {
+				return new Response("Unable to identify data sent. Your request has been cancelled.");
+			}
+			else {
+				Cookie cookie = new Cookie("defaultMovieView",choice);
+				cookie.setMaxAge(30 * 24 * 60 * 60);
+				cookie.setDomain("localhost"); //cineverse.azurewebsites.net
+				cookie.setPath("/masterpisportal");
+				response.addCookie(cookie);
+				log.info("Cookie for movie default view set to " + choice);
+				return new Response((Object)"Your preference has been recorded.");
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			return new Response("Unexpected error occrued. Please try gain later.");
+		}
+	}
+	
+	@RequestMapping(value= {"/api/manager/AddExistMovie.json"})
+	@ResponseBody
+	public ResponseResultJson addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
+		
+		log.info("Movie ID received: "+ form.getMovieId());
+		String username = (String)httpSession.getAttribute("username");
+		
+		return service.insertMovieAvailable(form, username);
+	}
+	
+	@RequestMapping(value = {"/api/authorize/getMovieList.json"})
 	@ResponseBody
 	public Response getMovieList(Model model) {
 		log.info("Entered /api/getMovieList.json");
@@ -198,7 +198,7 @@ public class MovieController {
 		return service.getMovieList();
 	}
 	
-	@RequestMapping(value = {"/viewMovie/retrieveMovieDetail.json"})
+	@RequestMapping(value = {"/api/authorize/retrieveMovieDetail.json"})
 	@ResponseBody
 	public ResponseMovieResult retrieveMovieList(Model model, String startdate, String enddate) {
 		log.info("Date range received : " + startdate + " - " + enddate);
@@ -208,7 +208,7 @@ public class MovieController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/viewMovie/retrieveMovieDetailwithName.json"})
+	@RequestMapping( value= {"/api/authorize/retrieveMovieDetailwithName.json"})
 	@ResponseBody
 	public ResponseMovieResult retrieveMovieList(Model model, String movieName) {
 		log.info("Movie name received :" + movieName);
@@ -217,7 +217,7 @@ public class MovieController {
 		return result;
 	}
 	
-	@RequestMapping(value = {"/viewMovie/getMovieInfo.json"})
+	@RequestMapping(value = {"/api/authorize/getMovieInfo.json"})
 	@ResponseBody
 	public ResponseMovieInfo getMovieInfo(Model model, String movieId) {
 		log.info("Movie ID received ::" + movieId);
@@ -228,7 +228,7 @@ public class MovieController {
 	}
 	
 	
-	 @RequestMapping(value = {"/editMovie/editMovieInfo.json"}, method= {RequestMethod.POST})
+	 @RequestMapping(value = {"/api/admin/editMovieInfo.json"}, method= {RequestMethod.POST})
 	 @ResponseBody
 	 public Map<Boolean,String> editMovieInfo(Model model, @RequestBody MovieEditForm form){
 	 log.info("Movie ID received to update::" + form.getMovieId());

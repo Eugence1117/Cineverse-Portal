@@ -105,7 +105,15 @@
 		      	<h3 class="text-center">Hall <span id="name"></span></h3>
 		      	<div class="">
 			        <form class="p-0 mt-5" id="theatreForm">
+			        	<input type="hidden" name="theatreid" value='${theatreid}'/>
 				        <div class="mx-1">
+				        	<div class="row">
+				        		<div class="col-md">
+				        			<div class="alert alert-warning" role="alert">
+									 Please note that changing <b>Theatre Type</b> may cause the layout reset.
+									</div>
+				        		</div>
+				        	</div>
 				        	<div class="row form-group g2">
 				        		<div class="col-md">
 				        			<div class="form-floating">
@@ -149,7 +157,8 @@
 		      </div>
 		      <div class="modal-footer">
 		      	<div class="mx-auto">
-			        <button type="button" class="btn btn-primary m-2" onClick="constructLayout(false)">Proceed</button>
+		      		<button type="button" class="btn btn-secondary m-2" id="btnReset">Reset</button>
+			        <button type="button" class="btn btn-primary m-2" onClick="constructLayout()">Proceed</button>
 		        </div>
 		      </div>
 		    </div>
@@ -173,6 +182,7 @@
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 		
 		var selectedTheatreType = null;
+		var appliedData = null;
 		$(document).ready(function(){
 			var error = "${errorMsg}";
 			var theatreId = "${theatreid}";			
@@ -196,32 +206,37 @@
 			
 		});
 		
+		$("#btnReset").on('click',function(){
+			const theatreId = "${theatreid}";
+			retrieveInformation(theatreId);
+		});
+		
 		function retrieveInformation(theatreid){
     		if(theatreid != ""){
-    			$.ajax("theatre/getTheatreInfo.json?theatreid=" + theatreid,{
+    			$.ajax("api/authorize/getTheatreInfo.json?theatreid=" + theatreid,{
     				method : "GET",
     				accepts : "application/json",
     				dataType : "json",
-    			}).done(function(data){
-    				if(data.errorMsg != null){
-						bootbox.alert(data.errorMsg);
+    				statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
 					}
-    				else{
-        				$("#theatreForm .data").each(function(index,element){
-        	    			var key = $(this).data('json-key');
-        		            if (key && data.result.hasOwnProperty(key)) {
-        		                $(this).val(data.result[key]||"");
-        		            }
-        	    		});
-        				//$("#inputRow").val(data.result["row"])
-        				//$("#inputCol").val(data.result["col"]);
-	        			$("#dropdownTheatreTypes").val(data.result["theatretype"]);
-	        			$("#dropdownStatus").val(data.result["status"]);
-	        			$("#name").text(data.result["title"]);
-	        			getSelectedType();
-	        			constructLayout(true);
-	        			fillLayoutWithJSON(JSON.parse(atob(data.result.theatreLayout)));
-    				}
+    			}).done(function(data){
+    				$("#theatreForm .data").each(function(index,element){
+    	    			var key = $(this).data('json-key');
+    		            if (key && data.result.hasOwnProperty(key)) {
+    		                $(this).val(data.result[key]||"");
+    		            }
+    	    		});
+    				//$("#inputRow").val(data.result["row"])
+    				//$("#inputCol").val(data.result["col"]);
+        			$("#dropdownTheatreTypes").val(data.result["theatretype"]);
+        			$("#dropdownStatus").val(data.result["status"]);
+        			$("#name").text(data.result["title"]);
+        			getSelectedType();
+        			generateLayout();
+        			fillLayoutWithJSON(JSON.parse(atob(data.result.theatreLayout)));
     			});
     		}
     	}
@@ -230,13 +245,17 @@
 			var val = $("#dropdownTheatreTypes").val();
 			var status;
 			//Call ajax
-			$.ajax("theatre/getTheatreType.json?typeId="+ val, {
+			$.ajax("api/authorize/getTheatreType.json?typeId="+ val, {
 					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
-					async: false
+					async: false,
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 				}).done(function(data){
-					console.log(data);
 					if(data.errorMsg != null){
 						bootbox.alert(data.errorMsg);
 						status= false;
@@ -244,27 +263,21 @@
 					else{
 						selectedTheatreType = data.result;
 						status =  true;
-					}
+					}	
 				});
 			return status;
 		}
 		
-		function  constructLayout(isSkip){
-			var validator = $( "#theatreForm" ).validate();
-			if(!validator.form()){
-				return false;
-			}
-			
-			if(!isSkip){
-				var status = getSelectedType();
-				if(!status){
-					return false;
-				}
-
-			}
-						
+		function generateLayout(){
 			$("#seatLayout").find("*").not(".screen").remove();
 			var element = '<svg xmlns="http://www.w3.org/2000/svg" width="25.695" height="20.695" viewBox="0 0 6.798 5.476"><rect width="6.598" height="5.276" x="36.921" y="65.647" ry=".771" stroke="#3636bb" stroke-width=".2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(-36.821 -65.547)"/></svg>'
+			
+			var column = $("#inputCol").val();
+			var row= $("#inputRow").val();
+			appliedData = new Object();
+			appliedData["row"] = row;
+			appliedData["col"] = column
+			appliedData["type"] = selectedTheatreType.seqid;
 			
 			//Close Modal if opened
 			if($("#editTheatre").hasClass("show")){
@@ -272,9 +285,6 @@
 			}
 			
 			//Generate HTML
-			var column = $("#inputCol").val();
-			var row= $("#inputRow").val();
-			
 			var firstLetter = 65;			
 			var html = "<div>";
 			
@@ -368,6 +378,89 @@
 			$("#btnSubmit").attr("disabled",false);
 			updateCounter();
 		}
+		
+		function  constructLayout(){
+			var validator = $( "#theatreForm" ).validate();
+			if(!validator.form()){
+				return false;
+			}
+			
+			var theatreType = $("#dropdownTheatreTypes").val();
+			if(selectedTheatreType == null){
+				var status = getSelectedType();
+				if(!status){
+					return false;
+				}
+				generateLayout();
+				return true;
+			}
+			else{
+				if(theatreType != selectedTheatreType.seqid){
+					var status = getSelectedType();
+					if(!status){
+						return false;
+					}
+					generateLayout();
+				}
+				else{
+					var data = convertToJSON();
+					generateLayout();
+					fillLayoutWithJSON(data);
+				}
+				return true;
+			}
+		}
+		
+		$("#editTheatre").on('hidden.bs.modal',function(){
+			if(appliedData == null){
+			}
+			else{
+				var column = $("#inputCol").val();
+				var row= $("#inputRow").val();
+				var type = $("#dropdownTheatreTypes").val();
+				
+				var isMatch = false;
+				if(type == appliedData["type"]){
+					if(column == appliedData["col"] && row == appliedData["row"]){
+						isMatch =  true;
+					}
+				}
+				
+				if(!isMatch){
+					bootbox.confirm({
+						message: "It seems like you have unsaved configuration. Do you wish to apply this configuration ?",
+						buttons:{
+							confirm:{
+								label:"Yes, apply it.",
+							},
+							cancel:{
+								label:"No, cancel it."
+							}
+						},
+						size:"medium",
+						callback: async function(result){
+							if(result){
+								var status = await constructLayout();
+								console.log(status);
+								if(!status){
+									$("#createTheatre").modal("show");
+								}
+							}
+							else{
+								$("#inputCol").val(appliedData["col"]);
+								$("#inputRow").val(appliedData["row"]);
+								$("#dropdownTheatreTypes").val(appliedData["type"]);
+								
+								//reset validator
+								var validator = $("#theatreForm").validate();
+								validator.form()
+							}
+						},
+						
+					})
+				}
+			}
+		})
 		
 		function bindDataToSeat(){
 			$(".clickable").each(function(){
@@ -495,7 +588,7 @@
 				return false;
 			}
 			
-			var msg = (counter >= (capacity/2)) ? "Are you sure this is your final layout?" : "It is recommended to have at least <b>" + (capacity/2) + "</b> seats for this layout. Your current seat placed is <b>" + counter + "</b>. Are you sure this is your final layout?";
+			var msg = (counter >= (capacity/2)) ? "Are you sure to save your changes?" : "It is recommended to have at least <b>" + (capacity/2) + "</b> seats for this layout. Your current seat placed is <b>" + counter + "</b>. Are you sure to save your changes?";
 			bootbox.confirm({
 				size: "medium",
 				message: msg,
@@ -514,7 +607,7 @@
 						formData["layout"] = data;
 						formData["totalSeat"] = counter;
 						
-						$.ajax("theatre/submitLayout.json", {
+						$.ajax("api/manager/updateTheatre.json", {
 							method : "POST",
 							accepts : "application/json",
 							dataType : "json",
@@ -523,16 +616,22 @@
 							headers:{
 								"X-CSRF-Token": CSRF_TOKEN
 							},
-							async: false
+							async: false,
+							statusCode:{
+								401:function(){
+									window.location.href = "expire.htm";
+								}
+							}
 						}).done(function(data){
-							console.log(data);
 							if(data.errorMsg != null){
 								bootbox.alert(data.errorMsg);
 							}
 							else{
-								bootbox.alert(data.result);
-								resetForm();
-							}
+								bootbox.alert(data.result,function(){
+									window.location.href = "viewTheatre.htm";	
+								})
+								
+							}	
 						});
 					}
 				}
@@ -563,7 +662,7 @@
 			var existingVal = +$("#inputRow").val();
 			$("#inputRow").val(existingVal+1);
 			var data = convertToJSON();
-			constructLayout(true);
+			generateLayout();
 			fillLayoutWithJSON(data);
 			
 		}
@@ -572,7 +671,7 @@
 			var existingVal = +$("#inputRow").val();
 			$("#inputRow").val(existingVal-1);
 			var data = convertToJSON();
-			constructLayout(true);
+			generateLayout();
 			fillLayoutWithJSON(data);
 		}
 		
@@ -580,7 +679,7 @@
 			var existingVal = +$("#inputCol").val();
 			$("#inputCol").val(existingVal+1);
 			var data = convertToJSON();
-			constructLayout(true);
+			generateLayout();
 			fillLayoutWithJSON(data);
 		}
 		
@@ -589,7 +688,7 @@
 			var existingVal = +$("#inputCol").val();
 			$("#inputCol").val(existingVal-1);
 			var data = convertToJSON();
-			constructLayout(true);
+			generateLayout();
 			fillLayoutWithJSON(data);
 		}
 		

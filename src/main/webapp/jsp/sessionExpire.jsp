@@ -15,15 +15,13 @@
 
 <body id="page-top">
 	<div id="wrapper">
-		<%@ include file="include/sidebar.jsp" %>
 		<div id="content-wrapper" class="d-flex flex-column">
 			<div id="content">
-				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 		        	<div class="text-center">
-			            <div class="error mx-auto" data-text="Opps">Opps</div>
+			            <div class="error mx-auto d-inline" data-text="Opps" style="width:auto;">Opps</div>
 			            <p class="lead text-gray-800 mb-5">Session expired</p>
-			            <p class="text-gray-500 mb-0">It looks like you have been afk for too long...</p>
+			            <p class="text-gray-500 mb-0">It looks like you have been idle for too long...</p>
 			            <a href="login.htm">&larr; Login again</a>
 			        </div>
 		        </div>

@@ -180,25 +180,30 @@
     	
     	$(".viewBtn").on('click',function(){
     		var id = $(this).siblings(".theatreId");
-    		console.log(id);
     		if(typeof id != "undefined"){
-    			$.ajax("theatre/getTheatreInfo.json?theatreid=" + id.val(),{
+    			$.ajax("api/authorize/getTheatreInfo.json?theatreid=" + id.val(),{
     				method : "GET",
     				accepts : "application/json",
     				dataType : "json",
     			}).done(function(data){
-    				if(data.errorMsg != null){
-						bootbox.alert(data.errorMsg);
-					}
-    				else{
-        				$("#theatreForm .data").each(function(index,element){
-        	    			var key = $(this).data('json-key');
-        		            if (key && data.result.hasOwnProperty(key)) {
-        		                $(this).val(data.result[key]||"");
-        		            }
-        	    		});
-	        			initializeLayout(data.result);
-        				$("#viewModal").modal('show');
+    				if(data.hasOwnProperty("SESSION_EXPIRED")){
+    					if(data["SESSION_EXPIRED"]){
+    						window.location.href = "expire.htm";
+    					}
+    				}else{
+    					if(data.errorMsg != null){
+    						bootbox.alert(data.errorMsg);
+    					}
+        				else{
+            				$("#theatreForm .data").each(function(index,element){
+            	    			var key = $(this).data('json-key');
+            		            if (key && data.result.hasOwnProperty(key)) {
+            		                $(this).val(data.result[key]||"");
+            		            }
+            	    		});
+    	        			initializeLayout(data.result);
+            				$("#viewModal").modal('show');
+        				}	
     				}
     			});
     		}
@@ -217,7 +222,6 @@
     	
     	function initializeLayout(data){
     		var layout = JSON.parse(atob(data["theatreLayout"]));
-    		console.log(layout);
     		
     		var element = '<svg style="visibility:hidden" xmlns="http://www.w3.org/2000/svg" width="25.695" height="20.695" viewBox="0 0 6.798 5.476"><rect width="6.598" height="5.276" x="36.921" y="65.647" ry=".771" stroke="#3636bb" stroke-width=".2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(-36.821 -65.547)"/></svg>'
     		var seat = '<svg xmlns="http://www.w3.org/2000/svg" width="28.112" height="20.976" viewBox="0 0 7.438 5.55"  xmlns:v="https://vecta.io/nano"><path d="M1.008 3.58c-.246 0-.443.297-.443.666s.197.665.443.665H6.46c.246 0 .443-.297.443-.665s-.198-.666-.443-.666zM.847 4.872c-.004.02-.007.041-.007.061v.153c0 .186.157.335.352.335H6.27c.195 0 .352-.149.352-.335v-.153c0-.02-.003-.04-.006-.059-.048.027-.101.044-.156.044H1.008c-.057 0-.111-.017-.161-.047zM.516 2.273a.39.39 0 0 0-.388.392v1.843a.39.39 0 0 0 .388.392h.328l.003-.027c.02.012.041.02.062.027h.02c-.207-.056-.364-.325-.364-.653 0-.369.197-.666.443-.666h.38v-.916A.39.39 0 0 0 1 2.273zm5.921-.059a.39.39 0 0 0-.388.392v.975h.411c.246 0 .443.297.443.666 0 .262-.101.486-.248.594h.265a.39.39 0 0 0 .388-.392V2.605a.39.39 0 0 0-.388-.392zM2.926.129c-.785 0-1.417.632-1.417 1.417v1.896c0 .012.002.024.002.036l.005.102h4.534l.007-.138V1.547c0-.193-.038-.375-.107-.543l-.05-.106-.08-.138C5.813.752 5.807.745 5.801.737 5.76.678 5.714.623 5.665.571L5.622.527C5.567.474 5.508.425 5.445.381L5.332.31C5.27.275 5.222.253 5.173.233l-.04-.014-.111-.036-.057-.014-.109-.021L4.804.14a1.44 1.44 0 0 0-.166-.011z" fill="none" stroke="#000" stroke-width=".257"/></svg>'
@@ -239,7 +243,6 @@
 			html+= "</div>";
 			for(var i = 0; i < row; i++){
 				var rowIndex = String.fromCharCode(firstLetter);
-				console.log(rowIndex)
 				var rowLayout = null;
 				for(var y = 0 ; y < layout.length; y++){
 					if(layout[y].rowLabel == rowIndex){

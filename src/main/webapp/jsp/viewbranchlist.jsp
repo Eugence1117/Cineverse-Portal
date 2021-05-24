@@ -233,10 +233,15 @@
 		});
     	<!--FOR DISPLAY DATA TABLE-->
     	function readyFunction(){
-			$.ajax("branch/retrieveInfo.json",{
+			$.ajax("api/am/retrieveInfo.json",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
 				if(data.error == null || data.error == ""){
@@ -353,11 +358,16 @@
 		});
 		
 		function checkBranchname(name){
-			$.ajax("branch/checkBranchName.json?branchname=" + name,{
+			$.ajax("api/authorize/checkBranchName.json?branchname=" + name,{
 	    		method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				async:true,
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 	    	}).done(function(data){
 				if(data.status == true){
 					$("input[name=branchname]").siblings(".redundant-block").removeClass("d-block").addClass("d-none");
@@ -400,12 +410,22 @@
 				branchname:{
 					required:true,
 					remote:{
-						url:"branch/checkBranchName.json",
+						url:"api/authorize/checkBranchName.json",
 						type:"get",
 						data:{
 							branchname:function(){return $("input[name=branchname]").val();}
 						},
+						statusCode:{
+							401:function(){
+								window.location.href = "expire.htm";
+							}
+						},
 						dataFilter: function(data){
+							if(data.hasOwnProperty("SESSION_EXPIRED")){
+			    				if(data["SESSION_EXPIRED"]){
+			    					window.location.href = "expire.htm";
+			    				}
+			    			}
 							var result = JSON.parse(data);
 							return result.status;
 						}
@@ -448,10 +468,15 @@
 			}
 			
 			$("#addBranch").modal('hide');
-			$.ajax("branch/addBranch.json?" + $("#newBranchForm").serialize(),{
+			$.ajax("api/admin/addBranch.json?" + $("#newBranchForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				bootbox.alert({
 				    title: "Notification",
@@ -465,7 +490,7 @@
 				    		$("#addBranch").modal('show');
 				    	}
 					}
-				});
+				});	
 			});
 		}
 		
@@ -480,10 +505,15 @@
 		}
 		
 		function retrieveState(){
-			$.ajax("getState.json",{
+			$.ajax("api/authorize/getState.json",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){				
 				if(data.error == null || data.error == ""){
 					var stateList = $("#state");
@@ -506,11 +536,16 @@
 		})
 		
 		function retrieveDistrict(stateId){
-			$.ajax("getDistrict.json?stateId=" + stateId,{
+			$.ajax("api/authorize/getDistrict.json?stateId=" + stateId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
-			}).done(function(data){				
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
+			}).done(function(data){	
 				if(data.error == null || data.error == ""){
 					var districtList = $("#district");
 					var optionList = "";
@@ -548,10 +583,15 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
-						$.ajax("branch/updateStatus.json?status=" + status + "&branchId=" + branchId,{
+						$.ajax("api/admin/updateStatus.json?status=" + status + "&branchId=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
+							statusCode:{
+								401:function(){
+									window.location.href = "expire.htm";
+								}
+							}
 						}).done(function(data){
 							bootbox.alert({
 							    title: "Notification",
@@ -572,11 +612,16 @@
 		function getBranchDetails(element){
 			var branchId = element.id;
 			
-			$.ajax("branch/branchDetails.json?branchID=" + branchId,{
+			$.ajax("api/admin/branchDetails.json?branchID=" + branchId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 			}).done(function(data){
+				if(data.hasOwnProperty("SESSION_EXPIRED")){
+    				if(data["SESSION_EXPIRED"]){
+    					window.location.href = "expire.htm";
+    				}
+    			}
 				clearBranchDetails();
 				if(data.error == null || data.error == ""){
 					$("#viewBranch .modal-body .data").each(function(index,element){
@@ -620,10 +665,15 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
-						$.ajax("branch/deleteBranch.json?branchID=" + branchId,{
+						$.ajax("api/admin/deleteBranch.json?branchID=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
+							statusCode:{
+								401:function(){
+									window.location.href = "expire.htm";
+								}
+							}
 						}).done(function(data){
 							bootbox.alert({
 							    title: "Notification",

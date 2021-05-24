@@ -165,11 +165,16 @@
 		});
 		
 		function retrieveState(selectedState){
-			$.ajax("getState.json",{
+			$.ajax("api/authorize/getState.json",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
-			}).done(function(data){				
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
+			}).done(function(data){
 				if(data.error == null || data.error == ""){
 					var stateList = $("#state");
 					var optionList = "";
@@ -192,11 +197,16 @@
 		}
 		
 		function retrieveDistrict(stateId,isFirstTime){
-			$.ajax("getDistrict.json?stateId=" + stateId,{
+			$.ajax("api/authorize/getDistrict.json?stateId=" + stateId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
-			}).done(function(data){				
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
+			}).done(function(data){
 				if(data.error == null || data.error == ""){
 					var districtName = "${branch.districtName}";
 					var districtList = $("#district");
@@ -250,12 +260,22 @@
 				branchname:{
 					required:true,
 					remote:{
-						url:"branch/checkBranchName.json",
+						url:"api/authorize/checkBranchName.json",
 						type:"get",
 						data:{
 							branchname:function(){return $("input[name=branchname]").val();}
 						},
+						statusCode:{
+							401:function(){
+								window.location.href = "expire.htm";
+							}
+						},
 						dataFilter: function(data){
+							if(data.hasOwnProperty("SESSION_EXPIRED")){
+			    				if(data["SESSION_EXPIRED"]){
+			    					window.location.href = "expire.htm";
+			    				}
+			    			}
 							if(branchName != $("input[name=branchname]").val()){
 								var result = JSON.parse(data);
 								return result.status;
@@ -298,10 +318,15 @@
 				return false;
 			}
 			
-			$.ajax("branch/updateBranch.json?seqid=" + $("#seqid").val() + "&" + $("#editBranchForm").serialize(),{
+			$.ajax("api/manager/updateBranch.json?seqid=" + $("#seqid").val() + "&" + $("#editBranchForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				bootbox.alert({
 				    title: "Notification",
@@ -317,11 +342,16 @@
 		
 		<!-- refresh information-->
 		function getBranchDetails(){
-			$.ajax("getBranchInfo.json?seqid=" + $("#seqid").val(),{
+			$.ajax("api/manager/getBranchInfo.json?seqid=" + $("#seqid").val(),{
 				method:"GET",
 				accepts : "application/json",
 				dataType : "json",
 			}).done(function(data){
+				if(data.hasOwnProperty("SESSION_EXPIRED")){
+    				if(data["SESSION_EXPIRED"]){
+    					window.location.href = "expire.htm";
+    				}
+    			}
 				if(data.error != null){
 					bootbox.alert(data.error);
 				}

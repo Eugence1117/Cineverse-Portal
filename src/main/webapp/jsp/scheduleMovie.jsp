@@ -315,12 +315,17 @@
 				return false;
 			}
 			var theatreElement = addTheatreElement(theatreList,"");
-			$.ajax("schedule/retrieveOverallAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
+			$.ajax("api/manager/retrieveOverallAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 						method : "GET",
 						accepts : "application/json",
 						dataType : "json",
+						statusCode:{
+							401:function(){
+								window.location.href = "expire.htm";
+							}
+						}
 					}).done(function(data) {
-						$("#loading").hide();
+				$("#loading").hide();
 				if (data.error == null) {
 					//hideAllSchedule();
 					
@@ -388,7 +393,7 @@
 				formData["endDate"] = form.data("endDate");
 				formData["theatres"] = theatreSelected;
 				
-				$.ajax("schedule/configureScheduleByOverall.json", {
+				$.ajax("api/manager/configureScheduleByOverall.json", {
 					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
@@ -397,8 +402,12 @@
 					headers:{
 						"X-CSRF-Token": CSRF_TOKEN
 					},
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 					}).done(function(data) {
-						
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
@@ -493,10 +502,15 @@
 				return false;
 			}
 			
-			$.ajax("schedule/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
+			$.ajax("api/manager/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
 					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 				}).done(function(data) {
 				$("#loading").hide();
 				if (data.error == null) {
@@ -595,7 +609,7 @@
 				formData["endDate"] = form.data("endDate");
 				formData["theatres"] = theatreSelected;
 				
-				$.ajax("schedule/configureScheduleByWeekly.json?", {
+				$.ajax("api/manager/configureScheduleByWeekly.json?", {
 					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
@@ -604,8 +618,12 @@
 					headers:{
 						"X-CSRF-Token": CSRF_TOKEN
 					},
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 					}).done(function(data) {
-
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
@@ -697,10 +715,15 @@
 				return false;
 			}
 			
-			$.ajax("schedule/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
+			$.ajax("api/manager/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 				}).done(function(data) {
 				$("#loading").hide();
 				if (data.error == null) {
@@ -779,7 +802,7 @@
 				traverseObject(formData); //Only used if configure 1 movie
 				formData["theatres"] = theatreSelected;
 				
-				$.ajax("schedule/configureScheduleByDaily.json",{
+				$.ajax("api/manager/configureScheduleByDaily.json",{
 					method : "POST",
 					accepts : "application/json",
 					dataType : "json",
@@ -788,8 +811,12 @@
 					headers:{
 						"X-CSRF-Token": CSRF_TOKEN
 					},
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					}
 					}).done(function(data) {
-						
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
@@ -875,18 +902,23 @@
 		//General Function
 		function getTheatreList(){
 			var theatreList = null;
-			$.ajax("theatre/getTheatreList.json",{
+			$.ajax("api/authorize/getTheatreList.json",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				async: !1,
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				if (data == null){
 					bootbox.alert("Unable to retrieve theatre information, please try again later.");
 					return null;
 				}else{
 					theatreList = data;
-				}
+				}	
 			});
 			return theatreList;
 		}

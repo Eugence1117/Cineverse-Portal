@@ -277,11 +277,11 @@ public class TheatreDAO {
 		}
 	}
 	
-	public String updateTheatre(EditTheatreForm theatreForm) {
+	public String updateTheatre(EditTheatreForm theatreForm,int statusCode) {
 		try {
 			//validation on status
-			String query = "UPDATE masp.theatre SET theatretype = ?, seatrow = ?, seatcol = ? , status = ?, totalSeat = ?, theatreLayout = ?, createddate = ? where seqid = ?";
-			int result = jdbc.update(query,theatreForm.getTheatretype(),theatreForm.getRow(),theatreForm.getCol(),theatreForm.getStatus(),theatreForm.getTotalSeat(),theatreForm.getLayout(),theatreForm.getTheatreid(),Constant.SQL_DATE_FORMAT.format(new Date()));
+			String query = "UPDATE masp.theatre SET theatretype = ?, seatrow = ?, seatcol = ? , status = ?, totalSeat = ?, theatreLayout = ? where seqid = ?";
+			int result = jdbc.update(query,theatreForm.getTheatretype(),theatreForm.getRow(),theatreForm.getCol(),statusCode,theatreForm.getTotalSeat(),theatreForm.getLayout(),theatreForm.getTheatreid());
 			if(result > 0) {
 				return null;
 			}

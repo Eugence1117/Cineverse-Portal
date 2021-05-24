@@ -6,6 +6,7 @@
 <!-- 20191108 Special Case :: Load Before "bootstrap.min.css" Then only can use it -->
 <script type="text/javascript" src="<spring:url value='/js/jquery-3.4.1.min.js'/>"></script> 
 
+<link rel="icon" href="<spring:url value='/images/favicon.ico'/>"/>
 <link rel="stylesheet" href="<spring:url value='/plugins/pace/pace-theme-minimal.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/bootstrap/css/bootstrap.min.css'/>" type="text/css">
 <link rel="stylesheet" href="<spring:url value='/plugins/font-awesome/css/font-awesome.min.css'/>" type="text/css">

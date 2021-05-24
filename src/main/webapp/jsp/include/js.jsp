@@ -4,6 +4,7 @@
 
 <script type="text/javascript">
 
+
 $('#logOutBtn').on('click', function() {
 	$('#logout-form').submit();
 	return false;

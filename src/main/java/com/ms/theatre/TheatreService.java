@@ -177,21 +177,21 @@ public class TheatreService {
 		
 	}
 	
-	public Response updateTheatre(Map<String,Object> payload) {
+	public Response updateTheatre(EditTheatreForm form) {
 		try {
-			EditTheatreForm form = new EditTheatreForm( (String)payload.get("theatreid"),(String)payload.get("theatretype"),
-					 Integer.parseInt((String)payload.get("row")),
-					 Integer.parseInt((String)payload.get("col")),
-					 (String)payload.get("layout"),
-					 (int)payload.get("totalSeat"),Integer.parseInt((String)payload.get("status")));
+			int statusCode = Util.getStatusCode(form.getStatus());
+			if(statusCode == Constant.INVALID_STATUS_CODE) {
+				return new Response("Received invalid data from client's request. Action abort.");
+			}else {
+				String errorMsg = dao.updateTheatre(form,statusCode);
+				if(errorMsg == null) {
+					return new Response((Object)("Thetre has been updated to latest information."));
+				}
+				else {
+					return new Response(errorMsg);
+				}
+			}
 			
-			String errorMsg = dao.updateTheatre(form);
-			if(errorMsg == null) {
-				return new Response((Object)("Thetre has been updated to latest information."));
-			}
-			else {
-				return new Response(errorMsg);
-			}
 		}
 		catch(NullPointerException ne) {
 			return new Response("Unable to get required data from client's request.");

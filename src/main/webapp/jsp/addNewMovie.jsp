@@ -322,7 +322,7 @@
 			var data = new FormData(form);
 			
 			$(this).prop("disabled",true);
-			$.ajax("addMovie/uploadnewmovie.json", {
+			$.ajax("api/admin/uploadnewmovie.json", {
 				method : "POST",
 				processData: false,
 			    contentType: false,
@@ -332,7 +332,12 @@
 				headers:{
 					"X-CSRF-Token": CSRF_TOKEN
 				},
-				async: false
+				async: false,
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				$(this).prop("disabled",false);
 				if(data.errorMsg != null){
@@ -341,7 +346,7 @@
 				else{
 					bootbox.alert(data.result);
 					form.reset();
-				}
+				}	
 			});
 		});
 

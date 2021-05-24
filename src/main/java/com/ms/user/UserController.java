@@ -37,7 +37,7 @@ public class UserController {
 		return "user";
 	}
 	
-	@RequestMapping( value= {"/user/retrieveInfo.json"})
+	@RequestMapping( value= {"/api/admin/retrieveInfo.json"})
 	@ResponseBody
 	public UserModelList getUserDetails(Model model) {
 		log.info("Entered /user/retrieveInfo");
@@ -47,7 +47,7 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/user/checkUsername.json"})
+	@RequestMapping( value= {"/api/admin/checkUsername.json"})
 	@ResponseBody
 	public Map<String,Boolean> checkUsername(Model model, String username) {
 		log.info("Entered /user/checkUsername");
@@ -56,7 +56,7 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/user/addUser.json"})
+	@RequestMapping( value= {"/api/admin/addUser.json"})
 	@ResponseBody
 	public Map<String,String> addNewUser(Model model, @ModelAttribute("form") NewUserForm form) {
 		log.info("Enter /user/addUser");
@@ -65,7 +65,7 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/user/viewUser.json"})
+	@RequestMapping( value= {"/api/admin/viewUser.json"})
 	@ResponseBody
 	public User getUserDetails(Model model, String userid) {
 		log.info("Enter /user/viewUser");
@@ -74,7 +74,7 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value = {"/user/changeUserStatus.json"})
+	@RequestMapping( value = {"/api/admin/changeUserStatus.json"})
 	@ResponseBody
 	public Map<String,String> updateUserStatus(Model model, String userid, String status) {
 		log.info("Enter /user/changeUserStatus");
@@ -91,14 +91,14 @@ public class UserController {
 		}
 	}
 	
-	@RequestMapping( value = {"/user/getEditInfo.json"})
+	@RequestMapping( value = {"/api/admin/getEditInfo.json"})
 	@ResponseBody
 	public Map<String,String> getEditInfo(Model model, String userid){
 		log.info("Enter /user/getEditInfo");
 		return service.getEditInfo(userid);
 	}
 	
-	@RequestMapping( value= {"/user/editUser.json"})
+	@RequestMapping( value= {"/api/admin/editUser.json"})
 	@ResponseBody
 	public Map<String,String> editUser(Model model, @ModelAttribute("form") UserEditForm form){
 		log.info("Enter /user/editUser");
@@ -107,7 +107,7 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/user/deleteUser.json"})
+	@RequestMapping( value= {"/api/admin/deleteUser.json"})
 	@ResponseBody
 	public Map<String,String> deleteUser(Model model, String userid){
 		log.info("Enter /user/deleteUser");

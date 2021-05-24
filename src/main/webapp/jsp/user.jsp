@@ -368,10 +368,15 @@
 		
 		//View Function
 		function readyFunction(){
-			$.ajax("user/retrieveInfo.json?",{
+			$.ajax("api/admin/retrieveInfo.json?",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
 				if(data.error == null || data.error == ""){
@@ -381,7 +386,7 @@
 				}
 				else{
 					bootbox.alert(data.error);
-				}
+				}	
 			})
 		}
 		function addTooltip(){
@@ -481,10 +486,15 @@
 		
 		function getUserDetails(element){
 			var userid = element.id;
-			$.ajax("user/viewUser.json?userid=" + userid,{
+			$.ajax("api/admin/viewUser.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				clearViewUser();
 				if(data.error == null || data.error == ""){
@@ -520,9 +530,14 @@
 		function checkUsername(username){
 			 var status = false;
 			 $.ajax({
-				 url:"user/checkUsername.json?username=" + username,
+				 url:"api/admin/checkUsername.json?username=" + username,
 				 type:"GET",
 				 async:false,
+				 statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						}
+					},
 				 fail:function(){
 					 bootbox.alert("Unable to verify username availability");
 					 status = false;
@@ -541,14 +556,24 @@
 				username:{
 					required:true,
 					remote:{
-						url:"user/checkUsername.json",
+						url:"api/admin/checkUsername.json",
 						type:"get",
 						data:{
 							username: function(){
 								return $("#username").val();
 							}
 						},
+						statusCode:{
+							401:function(){
+								window.location.href = "expire.htm";
+							}
+						},
 						dataFilter: function(data){
+							 if(data.hasOwnProperty("SESSION_EXPIRED")){
+				    				if(data["SESSION_EXPIRED"]){
+				    					window.location.href = "expire.htm";
+				    				}
+				    		}
 							var result = JSON.parse(data);
 							return result.status;
 						}
@@ -588,10 +613,15 @@
 			}
 			
 			$("#addUser").modal('hide');
-			$.ajax("user/addUser.json?" + $("#newUserForm").serialize(),{
+			$.ajax("api/admin/addUser.json?" + $("#newUserForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				bootbox.alert({
 				    title: "Notification",
@@ -684,10 +714,15 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
-						$.ajax("user/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
+						$.ajax("api/admin/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
+							statusCode:{
+								401:function(){
+									window.location.href = "expire.htm";
+								}
+							}
 						}).done(function(data){
 							bootbox.alert({
 							    title: "Notification",
@@ -720,10 +755,15 @@
 		}
 		
 		function getEditInfo(userid){
-			$.ajax("user/getEditInfo.json?userid=" + userid,{
+			$.ajax("api/admin/getEditInfo.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				console.log(data.msg);
 				if(data.msg != ""){
@@ -787,10 +827,15 @@
 			
 			$("#editUser").modal("hide");
 			
-			$.ajax("user/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
+			$.ajax("api/admin/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
 				bootbox.alert({
 				    title: "Notification",
@@ -826,10 +871,15 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
-						$.ajax("user/deleteUser.json?userid=" + userid,{
+						$.ajax("api/admin/deleteUser.json?userid=" + userid,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
+							statusCode:{
+								401:function(){
+									window.location.href = "expire.htm";
+								}
+							}
 						}).done(function(data){
 							bootbox.alert({
 							    title: "Notification",

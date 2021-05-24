@@ -12,17 +12,46 @@
     <http pattern="/css/**" security="none" />
     <http pattern="/js/**" security="none" />
     
+    <beans:bean id="ajaxSessionFilter" class="com.ms.error.AjaxRequestHandlingFilter"></beans:bean>
     <http use-expressions="true">
-    	<access-denied-handler error-page="/403.htm" />
-    	<intercept-url pattern="/login*" access="permitAll()" />
+    	<custom-filter ref="ajaxSessionFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
     	
+    	<access-denied-handler error-page="/403.htm" />
+    	
+    	<intercept-url pattern="/sessionCheck.htm" access="permitAll()"/>
+    	<intercept-url pattern="/login.htm" access="permitAll()" />
+    	<intercept-url pattern="/expire.htm" access="permitAll()" />
+    	<intercept-url pattern="/error.htm" access="permitAll()" />
+    	
+    	<intercept-url pattern="/home.htm" access="isAuthenticated()"/>
+    	<intercept-url pattern="/" access="isAuthenticated()"/>
+    	<intercept-url pattern="/viewMovie.htm" access="isAuthenticated()"/>
+    	
+    	<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
+    	
+		
+    	<intercept-url pattern="/scheduleMovie.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/createTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/editTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/viewTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	
+    	<intercept-url pattern="/viewBranch.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
+    	<intercept-url pattern="/addMovie.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
+    	
+    	<intercept-url pattern="/api/admin/*" access="hasAnyRole('ROLE_ADMIN')" />
+    	<intercept-url pattern="/api/manager/*" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/api/am/*" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/api/support/*" access="hasAnyRole('ROLE_SUPPORT')" />
+    	<intercept-url pattern="/api/authorize/*" access="isAuthenticated()"/>
+    	<intercept-url pattern="/api/public/*" access="permitAll()"/>
+<!--     	
     	<intercept-url pattern="/index*" access="isAuthenticated()"/>
     	<intercept-url pattern="/home*" access="isAuthenticated()"/>
     	<intercept-url pattern="/home/*" access="isAuthenticated()"/>
     	<intercept-url pattern="/changepassword*" access="isAuthenticated()"/>
+		
 
-		<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/user/*" access="hasAnyRole('ROLE_ADMIN')" />
+
 		
 		<intercept-url pattern="/addMovie.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')" />
 		<intercept-url pattern="/editMovie/*" access="hasAnyRole('ROLE_ADMIN')"/>
@@ -34,7 +63,7 @@
 		<intercept-url pattern="/branch/checkBranchName.json" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
 		<intercept-url pattern="/branch/updateBranch.json" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
 		<intercept-url pattern="/branch/*" access="hasAnyRole('ROLE_ADMIN')"/>
-		
+		 -->	
 
     	<intercept-url pattern="/**" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN','ROLE_SUPPORT')" />
     	
@@ -47,8 +76,8 @@
     		default-target-url="/home.htm" always-use-default-target="true" />
     	<logout logout-url="/logout.htm" logout-success-url="/login.htm?logout" />
     	<csrf/>
-    	<session-management>
-			<concurrency-control max-sessions="1" expired-url="/sessionExpired.htm"/>
+    	<session-management >
+			<concurrency-control max-sessions="1" expired-url="/login.htm"/>
 		</session-management>
     </http>
     

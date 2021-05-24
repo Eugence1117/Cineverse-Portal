@@ -58,7 +58,7 @@ public class ScheduleController {
 	}
 	
 	
-	@RequestMapping( value= {"/schedule/retriveDailyAvailableMovie.json"})
+	@RequestMapping( value= {"/api/manager/retriveDailyAvailableMovie.json"})
 	@ResponseBody
 	public AvailableMovie getDailyAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retriveDailyAvailableMovie.json");
@@ -68,7 +68,7 @@ public class ScheduleController {
 
 	}
 	
-	@RequestMapping( value= {"/schedule/retrieveWeeklyAvailableMovie.json"})
+	@RequestMapping( value= {"/api/manager/retrieveWeeklyAvailableMovie.json"})
 	@ResponseBody
 	public AvailableMovie getWeeklyAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retrieveWeeklyAvailableMovie.json");
@@ -78,7 +78,7 @@ public class ScheduleController {
 		
 	}
 	
-	@RequestMapping( value= {"/schedule/retrieveOverallAvailableMovie.json"})
+	@RequestMapping( value= {"/api/manager/retrieveOverallAvailableMovie.json"})
 	@ResponseBody
 	public AvailableMovie getOverallAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retrieveOverallAvailableMovie.json");
@@ -88,7 +88,7 @@ public class ScheduleController {
 		
 	}
 	
-	@RequestMapping( value= {"/schedule/configureScheduleByOverall.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@RequestMapping( value= {"/api/manager/configureScheduleByOverall.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
 	public Map<String,String> getOverallConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByOverall.json");
@@ -97,7 +97,7 @@ public class ScheduleController {
 	}
 	
 
-	@RequestMapping( value= {"/schedule/configureScheduleByWeekly.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@RequestMapping( value= {"/api/manager/configureScheduleByWeekly.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
 	public Map<String,String> getWeeklyConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByWeekly.json");
@@ -105,7 +105,7 @@ public class ScheduleController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/schedule/configureScheduleByDaily.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@RequestMapping( value= {"/api/manager/configureScheduleByDaily.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
 	public Map<String,String> getDailyConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByDaily.json");

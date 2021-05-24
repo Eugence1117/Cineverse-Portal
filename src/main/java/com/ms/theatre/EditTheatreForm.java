@@ -14,6 +14,11 @@ public class EditTheatreForm {
 	private int col;
 	private String layout;
 	private int totalSeat;
-	private int status;
+	private String status;
+	@Override
+	public String toString() {
+		return "EditTheatreForm [theatreid=" + theatreid + ", theatretype=" + theatretype + ", row=" + row + ", col="
+				+ col + ", layout=" + layout + ", totalSeat=" + totalSeat + ", status=" + status + "]";
+	}
 		
 }

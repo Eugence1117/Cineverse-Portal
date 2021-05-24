@@ -71,9 +71,6 @@
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
     	$(document).ready(function(){
-    		bootbox.alert({
-    			message: "Welcome to my new look and Happy 520! <i class='far fa-smile-wink'></i>",
-    		});
     		
     	});
 	</script>

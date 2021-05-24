@@ -45,7 +45,7 @@ public class BranchController {
 		}
 	}
 	
-	@RequestMapping( value= {"/branch/retrieveInfo.json"})
+	@RequestMapping( value= {"/api/am/retrieveInfo.json"})
 	@ResponseBody
 	public ResponseBranchInfo getBranchesInfo(Model model) {
 		log.info("Entered /branch/retrieveInfo.json");
@@ -54,14 +54,14 @@ public class BranchController {
 		return service.getBranchDetails(usergroup, username);
 	}
 	
-	@RequestMapping( value= {"/branch/branchDetails.json"}) //For Admin used
+	@RequestMapping( value= {"/api/admin/branchDetails.json"}) //For Admin used
 	@ResponseBody
 	public ResponseBranchInfo getBranchDetails(Model model, String branchID) {
 		log.info("Entered /branch/branchDetails.json");
 		return service.getBranchDetails(branchID);
 	}
 	
-	@RequestMapping( value= {"/getBranchInfo.json"}) //For owner used
+	@RequestMapping( value= {"/api/manager/getBranchInfo.json"}) //For owner used
 	@ResponseBody
 	public ResponseBranchInfo getOwnBranchInfo(Model model) {
 		log.info("Entered /getBranchInfo.json");
@@ -70,49 +70,49 @@ public class BranchController {
 		return service.getBranchDetails(usergroup, username);
 	}
 	
-	@RequestMapping( value= {"/branch/deleteBranch.json"})
+	@RequestMapping( value= {"/api/admin/deleteBranch.json"})
 	@ResponseBody
 	public Map<String,String> deleteBranch(Model model, String branchID) {
 		log.info("Entered /branch/deleteBranch.json");
 		return service.deleteBranch(branchID);
 	}
 	
-	@RequestMapping( value= {"/branch/updateStatus.json"})
+	@RequestMapping( value= {"/api/admin/updateStatus.json"})
 	@ResponseBody
 	public Map<String,String> updateBranchStatus(Model model, int status, String branchId){
 		log.info("Entered /branch/updateStatus.json");
 		return service.updateStatus(status, branchId);
 	}
 	
-	@RequestMapping( value= {"/getState.json"})
+	@RequestMapping( value= {"/api/authorize/getState.json"})
 	@ResponseBody
 	public States getAllState(Model model){
 		log.info("Requesting states from /branch/getState.json");
 		return service.getAllState();
 	}
 	
-	@RequestMapping( value= {"/getDistrict.json"})
+	@RequestMapping( value= {"/api/authorize/getDistrict.json"})
 	@ResponseBody
 	public Districts getDistrict(Model model, String stateId){
 		log.info("Requesting district of " + stateId + " from /branch/getDistrict.json");
 		return service.getDistricts(stateId);
 	}
 	
-	@RequestMapping( value= {"/branch/checkBranchName.json"})
+	@RequestMapping( value= {"/api/authorize/checkBranchName.json"})
 	@ResponseBody
 	public Map<String,Boolean> checkBranchName(Model model, String branchname){
 		log.info("Requesting branch name from /branch/checkBranchName.json");
 		return service.checkRedundantBranchName(Util.trimString(branchname));
 	}
 	
-	@RequestMapping( value= {"/branch/addBranch.json"})
+	@RequestMapping( value= {"/api/admin/addBranch.json"})
 	@ResponseBody
 	public Map<String,String> addNewBranch(Model model, @ModelAttribute("form") NewBranchForm form){
 		log.info("Requesting from /branch/addBranch.json");
 		return service.addNewBranch(form);
 	}
 	
-	@RequestMapping( value= {"/branch/updateBranch.json"})
+	@RequestMapping( value= {"/api/manager/updateBranch.json"})
 	@ResponseBody
 	public Map<String,String> updateBranchDetails(Model model, String seqid, @ModelAttribute("form") NewBranchForm form){
 		log.info("Requesting from /branch/updateBranch.json");

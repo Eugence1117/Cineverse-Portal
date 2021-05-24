@@ -16,6 +16,7 @@ public class Constant {
 	public static final String INACTIVE_STATUS = "Inactive";
 	public static final String REMOVED_STATUS = "Removed";
 	
+	public static final int INVALID_STATUS_CODE = -100;
 	public static final int ACTIVE_STATUS_CODE = 1;
 	public static final int INACTIVE_STATUS_CODE = 0;
 	public static final int REMOVED_STATUS_CODE = -1;
