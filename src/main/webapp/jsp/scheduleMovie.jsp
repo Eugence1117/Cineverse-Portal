@@ -102,7 +102,10 @@
 		
 	}
 	
-		
+	.media-group .input-group-text{
+		border-radius: 0px !important;
+    	margin-left: -1px !important;
+	}
 	.media-group .input-group{
 		display:block !important;
 	}
@@ -129,7 +132,7 @@
 			        	<h1 class="h3 mb-0 text-gray-800">Schedule</h1>
 			        </div>
 			        
-			        <div class="card m-4">
+			        <div class="card m-2">
 						<div class="card-header bg-light border-1">
 							<a data-toggle="collapse" data-target="#dateOption"><span
 								class="fa fa-search"></span> Configure Date Range</a>
@@ -177,7 +180,7 @@
 							</form>
 						</div>
 					</div>
-					<div class="card m-4">
+					<div class="card m-2">
 						<div class="card-header">
 							<a data-toggle="collapse" data-target="#scheduleOption"><span
 								class="fa fa-calendar-alt"></span> Configure Schedule</a>
@@ -221,7 +224,7 @@
 							</div>
 						</div>
 					</div>
-					<div id="calendar" class="calendar"></div>
+					<div id="calendar" class="calendar m-2"></div>
 			     </div>
 			</div>
 			<footer class="sticky-footer bg-white">

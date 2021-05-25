@@ -42,7 +42,7 @@
 			        	<a href="viewMovie.htm?pages=Single" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
 			        </div>
 			        
-			        <div class="card m-4">
+			        <div class="card m-2">
 						<div class="card-header">
 							<span class="fa fa-film"></span> <span>Movie</span>
 							<div class="fa-pull-right d-inline-block">

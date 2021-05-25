@@ -56,7 +56,7 @@
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
-					<div class="m-4 card">						
+					<div class="m-2 card">						
 						<div class="">
 							<form id="newMovieForm">
 								<div class="list-group-item">

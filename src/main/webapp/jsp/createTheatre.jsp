@@ -69,8 +69,8 @@
 			        	<h1 class="h3 mb-0 text-gray-800">Create New Theatre</h1>
 			        </div>
 			        
-			        <h2 class='text-center'>Theatre layout</h2>
-					<div class="row pb-2" style="justify-content:right">
+			        <h2 class='text-center m-2'>Theatre layout</h2>
+					<div class="row pb-2 m-2" style="justify-content:right">
 						<div class="col-md" id="actionPanel">
 							<button class="btn btn-primary float-left m-1" onClick="$('#createTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
 							<div class="dropdown d-inline-block m-1 float-left">
@@ -87,7 +87,7 @@
 							<button class='btn btn-primary float-right m-1' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
 						</div>
 					</div>
-					<div class="row m-0" style="justify-content:center">
+					<div class="row m-2" style="justify-content:center">
 						<div class="p-0 row">
 							<div class="col p-0" id="seatLayout">
 								<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
@@ -97,7 +97,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="text-center my-3">
+					<div class="text-center my-3 mx-2">
 						<button class="btn btn-primary" onClick="submitForm()" disabled="disabled" id="btnSubmit">Confirm</button>
 					</div>
 				 </div>

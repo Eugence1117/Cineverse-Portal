@@ -59,7 +59,7 @@
 			            	<a href="viewMovie.htm?pages=List" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
 			            </div>
 			            
-				  			<div class="card m-4">
+				  			<div class="card m-2">
 								<div class="card-header bg-light border-1">
 									<a  data-bs-toggle="collapse" data-bs-target="#dateOption"><span class="fa fa-search"></span> Search By Date Range</a>
 								</div>
@@ -103,7 +103,7 @@
 								</div>
 							</div>
 							
-							<div class="card m-4">
+							<div class="card m-2">
 								<div class="card-header bg-light border-1">
 									<a  data-bs-toggle="collapse" data-bs-target="#nameOption"><span class="fa fa-search"></span> Search By Name</a>
 								</div>
@@ -136,7 +136,7 @@
 								</div>
 							</div>
 							
-							<div class="card m-4">
+							<div class="card m-2">
 								<div class="card-header bg-light" >
 									<a data-bs-toggle="collapse" data-bs-target="#movieDetails"><span class="fa fa-info"></span> Movie</a>
 								</div>

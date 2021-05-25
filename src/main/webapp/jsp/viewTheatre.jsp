@@ -64,7 +64,7 @@
 			        	<a href="createTheatre.htm" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Theatre</a>
 			        </div>
 			        
-			        <div class="row justify-content-around">	
+			        <div class="row justify-content-around m-2">	
 						<c:forEach items="${theatres}" var="theatre">
 							<div class="card w-25 m-2 p-0">
 								<div class="card-header">

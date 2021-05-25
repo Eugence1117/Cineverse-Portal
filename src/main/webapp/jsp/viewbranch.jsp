@@ -45,7 +45,7 @@
 			        	<h1 class="h3 mb-0 text-gray-800">My Cinema</h1>
 			        </div>
 
-					<div class="card m-4">
+					<div class="card m-2">
 						<div class="card-header">
 							<span class="card-title">
 								<span class="btn">
@@ -108,7 +108,7 @@
 
 									<div class="text-center d-none" id="editAccessBtn">
 										<button type="button" id="submitEdit" class="m-2 btn btn-primary" onclick=updateBranch()>Apply Changes</button>
-										<button type="button" class="m-2 btn btn-secondary" onclick=location.reload()>Reset</button>
+										<button type="button" class="m-2 btn btn-secondary" id="btnReset" onclick=getBranchDetails()>Reset</button>
 									</div>
 								</div>
 							</form>
@@ -344,7 +344,7 @@
 				    title: "Notification",
 				    message: data.msg,
 				    callback: function(){
-				    	location.reload();
+				    	$("#editBtn").click();
 				    }
 				});
 			});

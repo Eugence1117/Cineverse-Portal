@@ -42,7 +42,7 @@
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
-					<div class="border-0 m-4">
+					<div class="border-0 m-2">
 						<div class="card my-1">
 							<div class="card-header">
 								<span class="card-title"><span class="fa fa-search"></span> Search Movie</span>

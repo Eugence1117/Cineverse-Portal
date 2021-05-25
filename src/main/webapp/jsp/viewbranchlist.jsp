@@ -37,7 +37,7 @@
 			        	<h1 class="h3 mb-0 text-gray-800">View Branches</h1>
 			        </div>
 			        
-			        <div class="card m-4">
+			        <div class="card m-2">
 						<div class="card-header">
 							<span class="fa fa-store-alt"></span> <span>Branches</span>
 							<div class="fa-pull-right d-inline-block">
