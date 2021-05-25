@@ -108,7 +108,10 @@
 		    </footer>
 		</div>
 	</div>
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
 
 	<!-- Insert Modal -->
 	<div class="modal" tabindex="-1" role="dialog" id="addUser">
@@ -251,7 +254,7 @@
 			</div>
 		</div>
 	</div>
-
+	
 	<!-- Edit Modal -->
 	<div class="modal" tabindex="-1" role="dialog" id="editUser">
 		<div class="modal-dialog modal-lg" role="document">

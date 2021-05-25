@@ -18,11 +18,29 @@
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
-@media only screen and (max-width: 640px) {
+
+@media only screen and (max-width: 768px) {
 	.card-title>h2 {
 		text-align: center;
 	}
+	
+	.colon{
+		display:none;
+	}
+	
+	.label:after{
+		content:":";
+	}
+	
+	.showPicture{
+		margin-top:5px;
+	}
+	
+	form .btn{
+		width:100% !important;
+	}
 }
+
 </style>
 </head>
 
@@ -40,145 +58,162 @@
 					<input type="hidden" id="usergroupid" value="${usergroup}">
 					<div class="m-4 card">						
 						<div class="">
-							<form id="newMovieForm" method="post" enctype="multipart/form-data"
-								action="addMovie/uploadnewmovie.json?${_csrf.parameterName}=${_csrf.token}">
+							<form id="newMovieForm">
 								<div class="list-group-item">
-									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Movie
-											Name</label> <label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="movieName" id="movieName" />
-											</div>
+									<div class="form-group row">
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Movie Name</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="movieName" id="movieName" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Movie
-											Time</label> <label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10 d-inline"
-													type="text" name="totalTime" id="totalTime" />
-												<div class="col-sm-1 timetooltip Tooltip"
-													style="display: inline">
-													<div class="fa fa-question-circle"
-														style="font-size: 1.5em; color: grey"></div>
-												</div>
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Movie Time</label>
 										</div>
-									</div>
-
-									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Poster</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input type="file" class="file" name="posterImage"
-													accept="image/*" data-type='image' />
-												<div class="input-group-append d-inline">
-													<button type="button" id="poster"
-														class="btn btn-primary showPicture">Preview Picture</button>
-												</div>
+										<div class="col-md-1 colon">
+											 <label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="totalTime" id="totalTime" />
+										</div>
+										<div class="col-md-1 text-center">
+											<div class="timetooltip Tooltip form-control border-0 px-0">
+													<div class="fa fa-question-circle"style="font-size: 1.5em; color: grey"></div>
 											</div>
 										</div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Language</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="language" id="language" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Poster</label>	
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>	
+										</div>
+										<div class="col-md-4">
+											<input type="file" class="file" name="posterImage" accept="image/*" data-type='image' />
+										</div>
+										<div class="col-md-3">
+											<button type="button" id="poster" class="btn btn-primary showPicture">Preview Picture</button>
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Distributor</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="distributor" id="distributor" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Language</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="language" id="language" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Cast</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="cast" id="cast" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Distributor</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="distributor" id="distributor" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Director</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="director" id="director" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Cast</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="cast" id="cast" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Release
-											Date</label> <label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="date"
-													name="releaseDate" id="releaseDate" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Director</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label colon col-1">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="director" id="director" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Synopsis</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<textarea class="form-control data col-sm-10"
-													name="synopsis" id="synopsis"></textarea>
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Release Date</label>
 										</div>
+										<div class="col-md-1 colon">
+											 <label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="date" name="releaseDate" id="releaseDate" />
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Movie Type</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<input class="form-control data col-sm-10" type="text"
-													name="movietype" id="movietype" />
-											</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Synopsis</label>
 										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label">:</label>
+										</div>
+										<div class="col-md-7">
+											<textarea class="form-control data" name="synopsis" id="synopsis"></textarea>
+										</div>
+										<div class="col-md-1"></div>
 									</div>
 
 									<div class="form-group row ">
-										<label class="font-weight-bold col-form-label col-3">Censorship</label>
-										<label class="col-form-label colon col-1">:</label>
-										<div class="col-8">
-											<div class="col-sm-10">
-												<select class="form-control data col-sm-10 d-inline"
-													name="censorship" id="censorship">
-													<option value="0">--- Please Select ---</option>
-													<c:forEach items="${censorship}" var="data">
-														<option value="${data.id}"><c:out
-																value="${data.id}" /></option>
-													</c:forEach>
-												</select>
-												<div class="col-sm-1 cstooltip Tooltip"
-													style="display: inline">
-													<div class="fa fa-question-circle"
-														style="font-size: 1.5em; color: grey"></div>
-												</div>
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Movie Type</label>
+										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label colon col-1">:</label>
+										</div>
+										<div class="col-md-7">
+											<input class="form-control data" type="text" name="movietype" id="movietype" />
+										</div>
+										<div class="col-md-1"></div>
+									</div>
+
+									<div class="form-group row ">
+										<div class="col-md-3">
+											<label class="font-weight-bold col-form-label label">Censorship</label>
+										</div>
+										<div class="col-md-1 colon">
+											<label class="col-form-label colon col-1">:</label>
+										</div>
+										<div class="col-md-7">
+											<select class="form-control data" name="censorship" id="censorship">
+												<option value="0" hidden>--- Please Select ---</option>
+												<c:forEach items="${censorship}" var="data">
+													<option value="${data.id}"><c:out value="${data.id}" /></option>
+												</c:forEach>
+											</select>
+										</div>
+										<div class="col-md-1 text-center">
+											<div class="cstooltip Tooltip form-control border-0 px-0">
+												<span class="fa fa-question-circle" style="font-size: 1.5em; color: grey"></span>	
 											</div>
 										</div>
 									</div>
@@ -191,7 +226,7 @@
 											</div>
 											<div class="col-md-1 p-1">
 												<button type="submit" id="new-btn-submit"
-													class="btn btn-success">Submit</button>
+													class="btn btn-primary">Submit</button>
 											</div>
 											<div class="col-md-5"></div>
 										</div>
@@ -211,7 +246,11 @@
 		    </footer>
 		</div>
 	</div>
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 	<div class="modal fade bd-example-modal-lg" id="picModal">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">

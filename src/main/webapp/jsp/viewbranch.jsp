@@ -23,6 +23,14 @@
 	input:disabled, select:disabled{
 		background-color:#fff !important;
 	}
+	
+	@media only screen and (max-width: 650px){
+		#editBtn{
+			float:none !important;
+			display:block;
+			width:100%;
+		}
+	}
 </style>
 </head>
 
@@ -118,7 +126,11 @@
 		</div>
 	</div>
 	<!-- /.container -->
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 <%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>

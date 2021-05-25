@@ -20,6 +20,10 @@
 	cursor:pointer;
 }
 
+@media only screen and (max-width: 768px) {
+
+}
+
 </style>
 </head>
 <body id="page-top">
@@ -73,7 +77,11 @@
 		    </footer>
 		</div>
 	</div>
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 	<!-- View Modal -->
 	<div class="modal fade" id="viewBranch" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -134,7 +142,7 @@
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Please Fill in the blank</h5>
+					<h5 class="modal-title">Add New Branch</h5>
 					<button type="button" class="close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -142,7 +150,7 @@
 				</div>
 				<div class="modal-body">
 					<h3 class="text-center">
-						<span class="fas fa-plus"></span>New Branch
+						Branch Registration Form
 					</h3>
 					<div class="">
 						<form class="p-0 mt-5" id="newBranchForm">
@@ -223,6 +231,7 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
@@ -292,18 +301,10 @@
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				retrieve: true,
 				fixedHeader: true,
-				/* responsive:{
-						details: {
-							display: $.fn.dataTable.Responsive.display.modal( {
-			                    header: function ( row ) {
-			                        var data = row.data();
-			                        return 'Details for User: <b>'+ data.username + "</b>"
-			                    }
-			                } ),
-			                renderer: $.fn.dataTable.Responsive.renderer.tableAll()
-				        }
-				} */
-				responsive:true
+				responsive:true,
+				rowReorder: {
+			            selector: 'td:nth-child(2)'
+			    },
 			});
 		}
 		

@@ -16,29 +16,6 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider_style.css'/>">
     <!-- Compiled and minified JavaScript -->
 <style>
-	.read-more__link{
-		display:block;
-		text-align:center;
-		color:blue;
-		width:100%;
-	}
-	
-	.help-block{
-		margin:0px
-	}
-	
-	.read-more__link:hover,#editBtn:hover,.card-header > a:hover{
-		cursor:pointer
-	}
-	
-	textarea.expanded{
-		height:500px !important;
-		transition:all 0.5s ease !important;
-	}
-	
-	#synopsis{
-		transition:all 0.5s ease
-	}
 	#movieInfo{
 		position:relative;
 		min-height:250px;
@@ -56,7 +33,12 @@
 		margin:auto;
 		vertical-align:middle;
 	}
-	
+
+@media only screen and (max-width: 768px) {
+	form .btn{
+		width:100% !important;
+	}
+}
 </style>
 </head>
 
@@ -80,17 +62,28 @@
 									<form id="dateOption" class="collapse show">
 										<div class="py-3 px-2">				
 											<div class="form-group row">
-												<div class="col-sm-1"></div>
-												<label class="col-form-label col-sm-2">Start Date :</label>
-												<div class="col-sm-3">
-													<input class="form-control col-sm-10 date" type="date" name="startdate" value="${startDate}">
+												<div class="col-md-1"></div>
+												<div class="col-md-5">
+													<div class="row">
+														<div class="col-md">
+															<label class="col-form-label">Start Date :</label>
+														</div>
+														<div class="col-md">
+															<input class="form-control date" type="date" name="startdate" value="${startDate}">
+														</div>
+													</div>
 												</div>
-					
-												<label class="col-form-label col-sm-2" >End Date :</label>
-												<div class="col-sm-3">
-													<input class="form-control col-sm-10 date" type="date" name="enddate" value="${endDate}">
+												<div class="col-md-5">
+													<div class="row">
+														<div class="col-md">
+															<label class="col-form-label" >End Date :</label>
+														</div>
+														<div class="col-md">
+															<input class="form-control date" type="date" name="enddate" value="${endDate}">
+														</div>
+													</div>
 												</div>
-												<div class="col-sm-1"></div>
+												<div class="col-md-1"></div>
 											</div>
 											<div class="form-group row m-0">
 												<div class="col-sm-5"></div>
@@ -113,14 +106,18 @@
 									<form id="nameOption" class="collapse">
 										<div class="py-3 px-2">				
 											<div class="form-group row">
-												<div class="col-sm-4"></div>
-												<div class="col-sm-8 row">
-													<label class="col-form-label col-sm-3">Movie Name</label>
-													<label class="col-form-label colon col-sm-1">:</label>
-													<div class="col-sm-4">
-														<input class="form-control col-sm-10 date" type="text" name="movieName">
+												<div class="col-md-3"></div>
+												<div class="col-md-6">
+													<div class="row">
+														<div class="col-md">
+															<label class="col-form-label">Movie Name :</label>	
+														</div>
+														<div class="col-md">
+															<input class="form-control" type="text" name="movieName">
+														</div>
 													</div>
 												</div>
+												<div class="col-md-3"></div>
 											</div>
 											<div class="form-group row m-0">
 												<div class="col-sm-5"></div>
@@ -258,6 +255,9 @@
 		</div>
 	</div>
 	<!-- /.container -->
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
 	
 	<div class="modal" tabindex="-1" role="dialog" id="preferences">
 	  <div class="modal-dialog" role="document">

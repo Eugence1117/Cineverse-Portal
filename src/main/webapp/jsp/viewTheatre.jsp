@@ -14,13 +14,39 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
-	@media only screen and (max-width: 640px) {
+.seats span{
+	display:block;
+	width:25.695px;
+	height:20.695px
+}
+
+.seats{
+	width:80%;
+	margin:auto;
+	overflow:auto;
+}
+
+@media only screen and (max-width: 1200px) {
 	.card {
-		width:100% !important;
+		width: 100% !important
 	}
-	
-	.btn{
-		width:100% !important;
+}
+
+@media only screen and (max-width: 1300px) {
+	.seats > div{
+		justify-content:start !important;
+	}
+}
+
+@media only screen and (max-width: 1500px) {
+	.value {
+		font-weight: bold;
+	}
+	.row>.colon {
+		display: none;
+	}
+	.label:after {
+		content: ":";
 	}
 }
 </style>
@@ -46,21 +72,22 @@
 								</div>
 								<div class="card-body">
 									<div class="row">
-										<div class="col col-md-4">Type</div>
-										<div class="col col-md-1">:</div>
-										<div class="col col-md-7"><c:out value="${theatre.theatretype}"/></div>
+										<div class="col col-md-4 label">Type</div>
+										<div class="col col-md-1 colon">:</div>
+										<div class="col col-md-7 value"><c:out value="${theatre.theatretype}"/></div>
 									</div>
 									<div class="row">
-										<div class="col col-md-4">Status :</div>
-										<div class="col col-md-1">:</div>
-										<div class="col col-md-7"><c:out value="${theatre.status}"/></div>
+										<div class="col col-md-4 label">Status</div>
+										<div class="col col-md-1 colon">:</div>
+										<div class="col col-md-7 value"><c:out value="${theatre.status}"/></div>
 									</div>
 									<div class="row mt-2">
-										<div class="col col-sm-1"></div>
-										<button class="btn btn-sm btn-primary col-sm-4 col viewBtn">View more</button>
-										<div class="col col-sm-2"></div>
-										<a class="btn btn-sm btn-secondary col-sm-4 col editBtn" href="editTheatre.htm?theatreId=<c:out value='${theatre.theatreid}'/>">Edit</a>
-										<div class="col col-sm-1"></div>
+										<div class="col-md m-1">
+											<button class="btn btn-sm btn-primary viewBtn w-100">View more</button>
+										</div>
+										<div class="col-md m-1">
+											<a class="btn btn-sm btn-secondary editBtn w-100" href="editTheatre.htm?theatreId=<c:out value='${theatre.theatreid}'/>">Edit</a>
+										</div>
 										<input type="hidden" value="${theatre.theatreid}" class="theatreId"/>
 									</div>
 								</div>
@@ -81,6 +108,10 @@
 		    </footer>
 		</div>
 	</div>
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
 	
 	<div class="modal" tabindex="-1" role="dialog" id="viewModal" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
@@ -179,7 +210,7 @@
     	});
     	
     	$(".viewBtn").on('click',function(){
-    		var id = $(this).siblings(".theatreId");
+    		var id = $(this).parent().siblings(".theatreId");
     		if(typeof id != "undefined"){
     			$.ajax("api/authorize/getTheatreInfo.json?theatreid=" + id.val(),{
     				method : "GET",
@@ -226,17 +257,18 @@
     		var element = '<svg style="visibility:hidden" xmlns="http://www.w3.org/2000/svg" width="25.695" height="20.695" viewBox="0 0 6.798 5.476"><rect width="6.598" height="5.276" x="36.921" y="65.647" ry=".771" stroke="#3636bb" stroke-width=".2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(-36.821 -65.547)"/></svg>'
     		var seat = '<svg xmlns="http://www.w3.org/2000/svg" width="28.112" height="20.976" viewBox="0 0 7.438 5.55"  xmlns:v="https://vecta.io/nano"><path d="M1.008 3.58c-.246 0-.443.297-.443.666s.197.665.443.665H6.46c.246 0 .443-.297.443-.665s-.198-.666-.443-.666zM.847 4.872c-.004.02-.007.041-.007.061v.153c0 .186.157.335.352.335H6.27c.195 0 .352-.149.352-.335v-.153c0-.02-.003-.04-.006-.059-.048.027-.101.044-.156.044H1.008c-.057 0-.111-.017-.161-.047zM.516 2.273a.39.39 0 0 0-.388.392v1.843a.39.39 0 0 0 .388.392h.328l.003-.027c.02.012.041.02.062.027h.02c-.207-.056-.364-.325-.364-.653 0-.369.197-.666.443-.666h.38v-.916A.39.39 0 0 0 1 2.273zm5.921-.059a.39.39 0 0 0-.388.392v.975h.411c.246 0 .443.297.443.666 0 .262-.101.486-.248.594h.265a.39.39 0 0 0 .388-.392V2.605a.39.39 0 0 0-.388-.392zM2.926.129c-.785 0-1.417.632-1.417 1.417v1.896c0 .012.002.024.002.036l.005.102h4.534l.007-.138V1.547c0-.193-.038-.375-.107-.543l-.05-.106-.08-.138C5.813.752 5.807.745 5.801.737 5.76.678 5.714.623 5.665.571L5.622.527C5.567.474 5.508.425 5.445.381L5.332.31C5.27.275 5.222.253 5.173.233l-.04-.014-.111-.036-.057-.014-.109-.021L4.804.14a1.44 1.44 0 0 0-.166-.011z" fill="none" stroke="#000" stroke-width=".257"/></svg>'
     		var firstLetter = 65;			
-			var html = "<div>";
+			var html = "<div class='seats'>";
 			var column = data["col"];
 			var row = data["row"];
 			
-			html+= "<div style='display:flex;justify-content: center;'>";
+			var style = row > 13 ? "display:flex;margin:auto":"display:flex;justify-content:center";
+			html+= "<div style='" + style +"'>";
 			for(var i = 0; i <= column; i++){
 				if(i != 0){
 					html += "<div style='padding:10px;width:46px;text-align:center'><span>" + i + "</span></div>";	
 				}
 				else{
-					html += "<div style='padding:10px;width:46px'></div>";
+					html += "<div style='padding:10px;width:46px'><span></span></div>";
 				}
 			}
 			
@@ -249,7 +281,7 @@
 						rowLayout = layout[y];
 					}
 				}
-				html+= "<div style='display:flex;justify-content: center;'>";
+				html+= "<div style='" + style +"'>";
 				html+="<div style='padding:10px;width:46px'><span>" + String.fromCharCode(firstLetter) + "</span></div>"
 				for(var j = 1; j <= column; j++){
 					var elementId = String.fromCharCode(firstLetter) + j;

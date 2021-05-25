@@ -71,7 +71,7 @@
 	}
 }
 
-@media only screen and (max-width: 640px) {
+@media only screen and (max-width: 768px) {
 	.media > img{
 		height: 89px!important;
 		width: 60px!important;
@@ -81,7 +81,12 @@
 		padding-left:0px !important;
 		padding-right:0px !important;
 	}
+	
+	form .btn{
+		width:100% !important;
+	}
 }
+
 
 @media only screen and (max-width: 1160px) {
 	.theatreConfig{
@@ -132,20 +137,30 @@
 							<form id="dateOption" class="collapse show">
 								<div class="py-3 px-2">
 									<div class="form-group row">
-										<div class="col-sm-1"></div>
-										<label class="col-form-label col-sm-2">Start Date :</label>
-										<div class="col-sm-3">
-											<input class="form-control col-sm-10 date" type="date"
-												name="startdate" value="${startDate}" id="startDate" disabled>
+										<div class="col-md-1"></div>
+										<div class="col-md-5">
+											<div class="row">
+												<div class="col-md">
+													<label class="col-form-label">Start Date :</label>
+												</div>
+												<div class="col-md">
+													<input class="form-control date" type="date"
+														name="startdate" value="${startDate}" disabled id='startDate'>
+												</div>
+											</div>
 										</div>
-			
-										<label class="col-form-label col-sm-2">End Date :</label>
-										<div class="col-sm-3">
-											<input class="form-control col-sm-10 date" type="date"
-												name="enddate" value="${endDate}" id="endDate"
-												min="${startDate}">
+										<div class="col-md-5">
+											<div class="row">
+												<div class="col-md">
+													<label class="col-form-label">End Date :</label>
+												</div>
+												<div class="col-md">
+													<input class="form-control date" type="date" name="enddate"
+														value="${endDate}">
+												</div>
+											</div>
 										</div>
-										<div class="col-sm-1"></div>
+										<div class="col-md-1"></div>
 									</div>
 									<div class="form-group row m-0">
 										<div class="col-sm-5"></div>
@@ -217,6 +232,11 @@
 		    </footer>
 		</div>
 	</div> 
+	
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
 	
 	<div class="modal" tabindex="-1" role="dialog">
 	  <div class="modal-dialog modal-lg" role="document">

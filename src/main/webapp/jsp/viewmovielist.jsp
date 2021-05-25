@@ -81,7 +81,11 @@
 		    </footer>
 		</div>
 	</div>
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 	<!-- View Modal -->
 	<div class="modal fade" id="movieDetails" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">

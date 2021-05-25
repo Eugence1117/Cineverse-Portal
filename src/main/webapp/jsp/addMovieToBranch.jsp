@@ -14,11 +14,19 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
-@media only screen and (max-width: 640px) {
+@media only screen and (max-width: 768px) {
 	.card-title>h2 {
 		text-align: center;
 	}
+	.colon{
+		display:none;
+	}
+	
+	form .btn{
+		width:100% !important;
+	}
 }
+
 </style>
 </head>
 
@@ -35,7 +43,7 @@
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
 					<div class="border-0 m-4">
-						<div class="card">
+						<div class="card my-1">
 							<div class="card-header">
 								<span class="card-title"><span class="fa fa-search"></span> Search Movie</span>
 							</div>
@@ -43,15 +51,18 @@
 								<form id="extMovieForm">
 									<div class="list-group-item">
 										<div class="form-group row ">
-											<label class="font-weight-bold col-form-label col-sm-3">Movie
-												Name</label> <label class="col-form-label colon col-sm-1">:</label>
-											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<c:choose>
+											<div class="col-md-1"></div>
+											<div class="col-md-10">
+												<div class="row">
+													<div class="col-md">
+														<label class="font-weight-bold col-form-label">Movie Name :</label>
+													</div>
+													<div class="col-md">
+														<c:choose>
 														<c:when test="${exMovieList != null}">
-															<select class="form-select data col-sm-10"
+															<select class="form-select data"
 																name="movieId" id="movieId">
-																<option value="0">--- Please Select ---</option>
+																<option value="0" hidden>--- Please Select ---</option>
 																<c:forEach items="${exMovieList}" var="data">
 																	<option value="${data.id}"><c:out
 																			value="${data.name}" /></option>
@@ -59,13 +70,13 @@
 															</select>
 														</c:when>
 														<c:otherwise>
-															<select class="form-control data col-sm-10"
+															<select class="form-control data"
 																name="movieId" id="movieId" disabled="disabled">
 																<option value="-1">No Movie Available</option>
 															</select>
 														</c:otherwise>
 													</c:choose>
-
+													</div>
 												</div>
 											</div>
 										</div>
@@ -83,7 +94,7 @@
 								</form>
 							</div>
 						</div>
-						<div class="card">
+						<div class="card my-1">
 							<form id="addMovieForm">
 								<div class="card-header">
 									<span class="card-title">Movie Details</span>
@@ -96,10 +107,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Movie Name</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														id="extmovieName" data-json-key="movieName" disabled />
-												</div>
 											</div>
 										</div>
 
@@ -107,11 +116,9 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Movie
 												Time</label> <label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10 d-inline"
+												<input class="form-control extdata d-inline"
 														type="text" id="exttotalTime" data-json-key="totalTime"
 														disabled />
-												</div>
 											</div>
 										</div>
 
@@ -119,15 +126,13 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Poster</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input type="hidden" data-json-key="picURL" id="extpicurl"
+												<input type="hidden" data-json-key="picURL" id="extpicurl"
 														disabled class="extdata" />
 													<div class="input-group-append d-inline">
 														<button type="button" id="poster"
 															class="btn btn-primary display" data-bs-toggle="modal"
 															data-bs-target="#picModal">Preview Picture</button>
 													</div>
-												</div>
 											</div>
 										</div>
 
@@ -135,10 +140,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Language</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														id="extlanguage" data-json-key="language" disabled />
-												</div>
 											</div>
 										</div>
 
@@ -146,10 +149,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Distributor</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														data-json-key="distributor" id="extdistributor" disabled />
-												</div>
 											</div>
 										</div>
 
@@ -157,10 +158,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Cast</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														data-json-key="cast" disabled id="extcast" />
-												</div>
 											</div>
 										</div>
 
@@ -168,10 +167,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Director</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														data-json-key="director" disabled id="extdirector" />
-												</div>
 											</div>
 										</div>
 
@@ -179,11 +176,9 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Release
 												Date</label> <label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10 ignore"
+												<input class="form-control extdata ignore"
 														type="date" data-json-key="releasedate" disabled
 														id="extreleaseDate" />
-												</div>
 											</div>
 										</div>
 
@@ -191,10 +186,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Synopsis</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<textarea class="form-control extdata col-sm-10"
+												<textarea class="form-control extdata"
 														id="extsynopsis" disabled data-json-key="synopsis"></textarea>
-												</div>
 											</div>
 										</div>
 
@@ -202,10 +195,8 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Movie
 												Type</label> <label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														data-json-key="movietype" disabled id="extmovietype" />
-												</div>
 											</div>
 										</div>
 
@@ -213,13 +204,11 @@
 											<label class="font-weight-bold col-form-label col-sm-3">Censorship</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
-												<div class="col-sm-10">
-													<input class="form-control extdata col-sm-10" type="text"
+												<input class="form-control extdata" type="text"
 														data-json-key="censorship" disabled id="extcensorship" />
-												</div>
 											</div>
 										</div>
-
+											<hr class="sidebar-divider my-0">
 										<div class="text-center mt-3">
 											<div class="row">
 												<div class="col-md-5"></div>
@@ -247,7 +236,11 @@
 		    </footer>
 		</div>
 	</div>
-
+	
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 	<div class="modal fade bd-example-modal-lg" id="extModal">
 		<div class="modal-dialog">
 			<div class="modal-content">

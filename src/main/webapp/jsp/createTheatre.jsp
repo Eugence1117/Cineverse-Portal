@@ -34,6 +34,27 @@
 	font-size:15px;
 }
 
+.seats span{
+	display:block;
+	width:25.695px;
+	height:20.695px
+}
+
+@media only screen and (max-width: 1300px){
+	#actionPanel .float-right, #actionPanel .float-left{
+		float:none !important;
+	}
+	
+	.seats{
+		overflow:scroll;
+	}
+	.seats > div{
+		justify-content:start !important;
+	}
+	
+
+}
+
 </style>
 </head>
 
@@ -50,12 +71,9 @@
 			        
 			        <h2 class='text-center'>Theatre layout</h2>
 					<div class="row pb-2" style="justify-content:right">
-						<div class="col-md-1"></div>
-						<div class="col-md-10" id="actionPanel">
-							<button class="btn btn-primary float-left mx-1" onClick="$('#createTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
-							<button class="btn btn-secondary float-right mx-1" onClick="deSelectAllClickable()" id="btnDeselectAll"><span class='fas fa-times'> </span> Deselect all</button>
-							<button class='btn btn-primary float-right' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
-							<div class="dropdown d-inline-block">
+						<div class="col-md" id="actionPanel">
+							<button class="btn btn-primary float-left m-1" onClick="$('#createTheatre').modal('show')"> <span class='fas fa-wrench'></span> Configuration</button>
+							<div class="dropdown d-inline-block m-1 float-left">
 								<button class="dropdown-toggle btn btn-secondary" id="DropdownButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fas fa-list"></span> Row & Column</button>
 								<div class="dropdown-menu" aria-labelledby="DropdownButton">
 									<button class="dropdown-item" onClick="addNewRow()"><span class="fas fa-plus"></span> Add a row</button>
@@ -65,19 +83,18 @@
 									<button class="dropdown-item" onClick="deleteColumn()"><span class="fas fa-minus"></span> Delete a column</button>
 								</div>
 							</div>
+							<button class="btn btn-secondary float-right m-1" onClick="deSelectAllClickable()" id="btnDeselectAll"><span class='fas fa-times'> </span> Deselect all</button>
+							<button class='btn btn-primary float-right m-1' onClick="selectAllClickable()" id="btnSelectAll"><span class='fas fa-check-double'></span> Select all</button>
 						</div>
-						<div class="col-md-1"></div>
 					</div>
 					<div class="row m-0" style="justify-content:center">
-						<div class="p-0 row col-md-12">
-							<div class="col col-md-1"></div>
-							<div class="col col-md-10 p-0" id="seatLayout">
+						<div class="p-0 row">
+							<div class="col p-0" id="seatLayout">
 								<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
 									<p class="text-center w-100 p-1 bg-light screen">Screen</p>
 								</div>
 								<p class="my-5 text-center"> Please finish the configuration to continue</p>
 							</div>
-							<div class="col col-md-1"></div>
 						</div>
 					</div>
 					<div class="text-center my-3">
@@ -95,6 +112,10 @@
 		</div>
 	</div>
 
+	<a class="scroll-to-top rounded" href="#page-top"> <i
+		class="fas fa-angle-up"></i>
+	</a>
+	
 	<div class="modal" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
@@ -128,13 +149,13 @@
 						    </div>
 						    
 							<div class="row form-group g2">
-								<div class="col-md">
+								<div class="col-md form-group">
 									<div class="form-floating">
 										<input name="row" class="form-control" id="inputRow" placeholder="Write something here"/>
 										<label for="row">Total Row</label>
 									</div>
 								</div>
-								<div class="col-md">
+								<div class="col-md form-group">
 									<div class="form-floating">
 										<input name="col" class="form-control" id="inputCol" placeholder="Write something here"/>
 											<label for="col">Total Column</label>
@@ -243,7 +264,7 @@
 			
 			
 			var firstLetter = 65;			
-			var html = "<div>";
+			var html = "<div class='seats'>";
 			
 			html+= "<div style='display:flex;justify-content: center;'>";
 			for(var i = 0; i <= column; i++){
@@ -251,7 +272,7 @@
 					html += "<div style='padding:10px;width:46px;text-align:center'><span>" + i + "</span></div>";	
 				}
 				else{
-					html += "<div style='padding:10px;width:46px'></div>";
+					html += "<div style='padding:10px;width:46px;'><span></span></div>";
 				}
 			}
 			
