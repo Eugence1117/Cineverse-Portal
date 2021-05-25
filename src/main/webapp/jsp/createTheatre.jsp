@@ -40,7 +40,7 @@
 	height:20.695px
 }
 
-@media only screen and (max-width: 1300px){
+@media only screen and (max-width: 768px){
 	#actionPanel .float-right, #actionPanel .float-left{
 		float:none !important;
 	}

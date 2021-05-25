@@ -354,34 +354,6 @@
 			$("#addBranch").modal("show");
 		});
 		
-		$("input[name=branchname]").on('input',function(){
-			checkBranchname(this.value);
-		});
-		
-		function checkBranchname(name){
-			$.ajax("api/authorize/checkBranchName.json?branchname=" + name,{
-	    		method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-				async:true,
-				statusCode:{
-					401:function(){
-						window.location.href = "expire.htm";
-					}
-				}
-	    	}).done(function(data){
-				if(data.status == true){
-					$("input[name=branchname]").siblings(".redundant-block").removeClass("d-block").addClass("d-none");
-					$("input[name=branchname]").siblings(".redundant-block").removeClass("has-error");
-				}
-				else{
-					$("input[name=branchname]").siblings(".redundant-block").removeClass("d-none").addClass("d-block");
-					$("input[name=branchname]").siblings(".redundant-block").addClass("has-error");
-			
-				}
-			});
-		}
-		
 		$.validator.setDefaults({
 			errorElement : "div",
 			errorClass : "invalid-feedback",

@@ -13,6 +13,7 @@
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.css'/>">
 
 <style>
 #scheduleOption .nav-link:hover, .card-header>a, .component-header {
@@ -163,13 +164,13 @@
 										<div class="col-md-1"></div>
 									</div>
 									<div class="form-group row m-0">
-										<div class="col-sm-5"></div>
-										<div class="col-sm-2">
+										<div class="col-md-4"></div>
+										<div class="col-md-4 text-center">
 											<button class="btn-success btn" type="button" id="searchByDate">
 												<span class="fas fa-wrench"></span> Configure
 											</button>
 										</div>
-										<div class="col-sm-5"></div>
+										<div class="col-md-4"></div>
 									</div>
 								</div>
 			
@@ -266,6 +267,7 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");

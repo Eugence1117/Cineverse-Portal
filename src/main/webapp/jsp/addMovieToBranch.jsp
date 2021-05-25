@@ -83,7 +83,7 @@
 										<div class="text-center mt-3">
 											<div class="row">
 												<div class="col-md-5"></div>
-												<div class="col-md-2 p-1">
+												<div class="col-md-2 p-1 text-center">
 													<button type="button" id="ext-btn-submit"
 														class="btn btn-success">Search</button>
 												</div>

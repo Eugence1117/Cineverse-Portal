@@ -30,12 +30,17 @@
 	
 	#loading img{
 		display:block;
-		margin:auto;
+		margin:auto;	
 		vertical-align:middle;
 	}
 
 @media only screen and (max-width: 768px) {
 	form .btn{
+		width:100% !important;
+	}
+	
+	#editBtn{
+		float:none !important;
 		width:100% !important;
 	}
 }
@@ -51,7 +56,7 @@
 				  <div class="container-fluid">
 					  	<div class="d-sm-flex align-items-center justify-content-between mb-4">
 			            	<h1 class="h3 mb-0 text-gray-800">View Movie</h1>
-			            	<a href="viewMovie.htm?pages=List" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
+			            	<a href="viewMovie.htm?pages=List" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-exchange-alt fa-sm text-white-50"></i> Change View</a>
 			            </div>
 			            
 				  			<div class="card m-4">
@@ -86,11 +91,11 @@
 												<div class="col-md-1"></div>
 											</div>
 											<div class="form-group row m-0">
-												<div class="col-sm-5"></div>
-												<div class="col-sm-2">
+												<div class="col-md-4"></div>
+												<div class="col-md-4 text-center">
 													<button class="btn-success btn" type="button" id="searchByDate"><span class="fa fa-search"></span> Search</button>
 												</div>
-												<div class="col-sm-5"></div>
+												<div class="col-md-4"></div>
 											</div>
 										</div>
 									
@@ -120,11 +125,11 @@
 												<div class="col-md-3"></div>
 											</div>
 											<div class="form-group row m-0">
-												<div class="col-sm-5"></div>
-												<div class="col-sm-2">
+												<div class="col-md-4"></div>
+												<div class="col-md-4 text-center">
 													<button class="btn-success btn" type="button" id="searchByName"><span class="fa fa-search"></span> Search</button>
 												</div>
-												<div class="col-sm-5"></div>
+												<div class="col-md-4"></div>
 											</div>
 										</div>
 									</form>

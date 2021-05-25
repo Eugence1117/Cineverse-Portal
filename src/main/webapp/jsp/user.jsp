@@ -134,7 +134,6 @@
 										<div class="form-floating">
 											<input type="text" class="form-control" name="username" id="username" placeholder="Write something here..."/>
 											<label for="username">Username</label>
-											<div class="redundant-block d-none invalid-feedback">This username is taken.</div>
 										</div>
 									</div>
 								</div>
