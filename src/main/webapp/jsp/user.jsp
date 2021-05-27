@@ -629,17 +629,19 @@
 			}).done(function(data){
 				bootbox.alert({
 				    title: "Notification",
-				    message: data.msg
+				    message: data.msg,
+				    callback:function(){
+				    	if(data.status == "true"){
+							readyFunction();
+				    		clearInsertField();
+						}
+						else{
+							$("#addUser").modal('show');
+						}
+				    }
 				});
 				
-				if(data.status == "true"){
-					console.log("true");
-					readyFunction();
-		    		clearInsertField();
-				}
-				else{
-					$("#addUser").modal('show');
-				}
+				
 			});
 		}
 		

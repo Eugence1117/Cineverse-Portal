@@ -20,6 +20,8 @@ import org.springframework.stereotype.Repository;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.common.Response;
+
 import com.ms.schedule.ConfigurationModel.MovieAvailablePeriod;
 import com.ms.schedule.Model.AvailableMovie;
 

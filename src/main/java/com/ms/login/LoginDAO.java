@@ -31,7 +31,7 @@ public class LoginDAO{
 		
 		Staff staff = null;
 		try {
-			staff = new Staff(staffInfo.get("seqid"),staffInfo.get("username"),staffInfo.get("password"),usergroup,staffInfo.get("branchid"),UserStatus.valueOf(Integer.parseInt(staffInfo.get("status"))));	
+			staff = new Staff(staffInfo.get("seqid"),staffInfo.get("username"),staffInfo.get("profilepic"),staffInfo.get("password"),usergroup,staffInfo.get("branchid"),UserStatus.valueOf(Integer.parseInt(staffInfo.get("status"))));	
 		}
 		catch(Exception ex) {
 			log.error("Exception " + ex.getMessage());
@@ -44,7 +44,7 @@ public class LoginDAO{
 	public Map<String,String> findUser(String username){
 		Map<String,String> staff = null;
 		try {
-			StringBuffer query = new StringBuffer().append("select seqid, username, password, usergroup, status, branchid FROM masp.STAFF WHERE status = ? AND username = ?");
+			StringBuffer query = new StringBuffer().append("select seqid, username, password, usergroup, status, branchid, profilepic FROM masp.STAFF WHERE status = ? AND username = ?");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString(),Constant.ACTIVE_STATUS_CODE,username);
 			if(result.size() > 0) {
 				staff = new HashMap<String,String>();
@@ -54,12 +54,15 @@ public class LoginDAO{
 					String seqid = (String)row.get("seqid");
 					String name = (String)row.get("username");
 					String password = (String)row.get("password");
+					String profilepic = (String)row.get("profilepic");
+					
 					int status = (int)row.get("status");
 					staff.put("usergroup",String.valueOf(usergroup));
 					staff.put("branchid",branchid);
 					staff.put("seqid",seqid);
 					staff.put("username",name);
 					staff.put("password",password);
+					staff.put("profilepic",profilepic);
 					staff.put("status",String.valueOf(status));
 					log.info(staff.get("username"));
 				}

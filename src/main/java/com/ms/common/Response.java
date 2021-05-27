@@ -1,4 +1,4 @@
-package com.ms.movie;
+package com.ms.common;
 
 import lombok.Getter;
 import lombok.Setter;

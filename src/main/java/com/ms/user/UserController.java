@@ -8,13 +8,20 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.ms.common.Response;
 import com.ms.common.Util;
+import com.ms.login.Staff;
+import com.ms.login.UserGroup;
 
 @Controller
 public class UserController {
@@ -37,11 +44,31 @@ public class UserController {
 		return "user";
 	}
 	
+	@RequestMapping(value = {"/profile.htm"})
+	public String getProfilePage(Model model) {
+		log.info("Entered /profile");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userid = user.getStaffId();
+		UserGroup usergroup = user.getUserGroup();
+		
+		Response response = service.getUserInfo(userid,usergroup);
+		if(response.getErrorMsg() == null) {
+			model.addAttribute("user",response.getResult());
+		}
+		else {
+			model.addAttribute("error",response.getErrorMsg());
+		}
+		return "profile";
+		
+	}
+	
 	@RequestMapping( value= {"/api/admin/retrieveInfo.json"})
 	@ResponseBody
 	public UserModelList getUserDetails(Model model) {
 		log.info("Entered /user/retrieveInfo");
-		String username = (String)httpSession.getAttribute("username");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		String username = user.getUsername();
 		UserModelList result = service.getUsersDetails(username);
 		log.info("Successfully receive response.");
 		return result;
@@ -115,6 +142,26 @@ public class UserController {
 		String msg = service.deleteUser(userid);
 		rst.put("result",msg);
 		return rst;
+	}
+	
+	@RequestMapping( value = {"/api/authorize/changeProfilePic.json"},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response changeProfilePicture(Model model, MultipartFile picture) {
+		log.info("Entered /api/authorize/changeProfilePic.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userid = user.getStaffId();
+		return service.changeProfilePic(picture, userid);
+		
+	}
+	
+	@RequestMapping( value= {"/api/authorize/changePassword.json"}, method= {RequestMethod.POST})
+	@ResponseBody
+	public Response changePassword(Model model, @RequestBody ChangePasswordForm form) {
+		log.info("Entered /api/authorize/changePassword.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userid = user.getStaffId();
+		log.info(form.toString());
+		return service.changePassword(form, userid);
 	}
 	
 }

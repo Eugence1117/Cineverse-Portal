@@ -262,9 +262,9 @@
 					</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" id="ext-btn-addMovie" class="btn btn-success">Submit</button>
 					<button type="button" id="ext-btn-cancel" data-bs-dismiss="modal"
-						class="btn btn-danger">Cancel</button>
+						class="btn btn-secondary">Cancel</button>
+					<button type="button" id="ext-btn-addMovie" class="btn btn-primary">Submit</button>
 				</div>
 			</div>
 		</div>

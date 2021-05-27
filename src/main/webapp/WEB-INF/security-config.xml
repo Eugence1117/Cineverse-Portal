@@ -25,10 +25,11 @@
     	
     	<intercept-url pattern="/home.htm" access="isAuthenticated()"/>
     	<intercept-url pattern="/" access="isAuthenticated()"/>
+    	
     	<intercept-url pattern="/viewMovie.htm" access="isAuthenticated()"/>
     	
     	<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
-    	
+    	<intercept-url pattern="/profile.htm" access="isAuthenticated()" />
 		
     	<intercept-url pattern="/scheduleMovie.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	<intercept-url pattern="/createTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />

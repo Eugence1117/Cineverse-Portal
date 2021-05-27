@@ -14,8 +14,6 @@
 <link rel="stylesheet"
 	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet"
-	href="<spring:url value='/plugins/datatables/datatables.css'/>">
-<link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 </head>
 
@@ -63,10 +61,6 @@
 <%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/js/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datatables/datatables.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"

@@ -25,7 +25,8 @@ public class Staff implements UserDetails {
 
 	private String name;
 	
-
+	private String profilepic;
+	
 	private String password;
 	
 	private UserGroup userGroup;

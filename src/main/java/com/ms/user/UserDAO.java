@@ -13,6 +13,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -219,8 +220,8 @@ public class UserDAO {
 		
 		try {
 			log.info("status:" + form.getStatus() + " branchid:" + form.getBranchid());
-			StringBuffer query = new StringBuffer("INSERT INTO masp.STAFF VALUES(?,?,?,?,?,?,?)");
-			int response = jdbc.update(query.toString(),uuid,form.getUsername(),form.getPassword(),form.getUsergroup(),form.getStatus(),form.getBranchid(),createddate);
+			StringBuffer query = new StringBuffer("INSERT INTO masp.STAFF VALUES(?,?,?,?,?,?,?,?)");
+			int response = jdbc.update(query.toString(),uuid,form.getUsername(),form.getPassword(),form.getUsergroup(),form.getStatus(),form.getBranchid(),createddate,Constant.DEFAULT_USER_PROFILE_PIC);
 			if(response > 0) {
 				return true;
 			}
@@ -232,5 +233,127 @@ public class UserDAO {
 			log.error("Exception ex::" + ex.getMessage());
 			return false;
 		}
+	}
+	
+	public String getCurrentProfilePic(String userid) {
+		String uri = null;
+		try {
+			String query = "SELECT profilepic from masp.staff where seqid = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,userid);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					uri = Util.trimString((String)row.get("profilepic"));
+					return uri;
+				}
+			}
+			else {
+				return null;
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Database connection exception :" + ce.getMessage());
+			return null;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex :" + ex.getMessage());
+			return null;
+		}
+		
+		return null;
+	}
+	
+	public String changeProfilePic(String uri, String userid) {
+		String errorMsg = null;
+		try {
+			String query = "UPDATE masp.staff set profilepic = ? where seqid = ?";
+			int result = jdbc.update(query,uri,userid);
+			if(result > 0) {
+				errorMsg = null;
+			}
+			else {
+				log.error("Change Profile Picture: User Not found");
+				errorMsg = "Unable to update your profile picture in database. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Database connection exception :" + ce.getMessage());
+			errorMsg = "Unable to connect to the database server. Please try again later.";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex :" + ex.getMessage());
+			errorMsg = "Unexpected error occured. Please try again later.";
+		}
+		return errorMsg;
+	}
+	
+	public ProfileInfo getUserInfomation(String userid, int groupId) {
+		ProfileInfo result = null;
+		try {
+			String query = "";
+			if(groupId == Constant.MANAGER_GROUP) {
+				query = "SELECT s.username, s.profilepic, u.groupdesc, b.branchName, s.createddate FROM masp.staff s, masp.branch b, masp.user_group u where s.seqid = ? AND  s.branchid = b.seqid AND s.usergroup = u.groupid";
+			}
+			else {
+				query = "SELECT s.username, s.profilepic, u.groupdesc, s.createddate FROM masp.staff s, masp.user_group u where s.seqid = ? AND s.usergroup = u.groupid";
+			}
+			
+			Map<String,Object> row = jdbc.queryForMap(query,userid);
+			if(row.size() > 0) {
+				String username = (String)row.get("username");
+				String profilePic = (String)row.get("profilepic");
+				String usergroup = (String)row.get("groupdesc");
+				String branchName = groupId == Constant.MANAGER_GROUP ? (String)row.get("branchName") : "-";
+				String joinDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("createddate"));
+				
+				result = new ProfileInfo(username,profilePic,usergroup,branchName,joinDate);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Database connection exception :" + ce.getMessage());
+		}
+		catch(Exception ex) {
+			log.error("Exception ex :" + ex.getMessage());
+		}
+		return result;
+	}
+	
+	public String getCurrentPassword(String userid) {
+		String password = null;
+		try {
+			String query = "SELECT password from masp.staff where seqid = ?";
+			password = jdbc.queryForObject(query, String.class,userid);
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Database connection exception :" + ce.getMessage());
+		}
+		catch(Exception ex) {
+			log.error("Exception ex :" + ex.getMessage());
+		}
+		return password;
+	
+	}
+	
+	public String updatePassword(String userid, String password) {
+		String errorMsg = null;
+		try {
+			String query = "UPDATE masp.staff set password = ? where seqid = ?";
+			int result = jdbc.update(query,password,userid);
+			if(result > 0) {
+				errorMsg = null;
+			}
+			else {
+				log.error("Change Password: User Not found");
+				errorMsg = "Unable to change your password at this moment. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Database connection exception :" + ce.getMessage());
+			errorMsg = "Unable to connect to the database server. Please try again later.";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex :" + ex.getMessage());
+			errorMsg = "Unexpected error occured. Please try again later.";
+		}
+		return errorMsg;
 	}
 }

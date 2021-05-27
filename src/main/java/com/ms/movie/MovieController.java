@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.login.Staff;
+import com.ms.common.Response;
 
 
 @Controller
@@ -50,10 +53,14 @@ public class MovieController {
 	@RequestMapping( value = {"/addMovie.htm"})
 	public String addNewMovie(Model model) {
 		log.info("Entered /addMovie.htm");
-		String usergroupid = httpSession.getAttribute("usergroupid").toString();
-		String username = httpSession.getAttribute("username").toString();
+		
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		int usergroupid = user.getUserGroup().getId();
+		String username = user.getUsername();
+		
 		model.addAttribute("usergroup",usergroupid);
-		if(Integer.parseInt(usergroupid) == 1) {
+		if(usergroupid == Constant.ADMIN_GROUP) {
 			model.addAttribute("movieList", service.getMovieNameList());
 			model.addAttribute("censorship",service.getCensorship());
 			return "addNewMovie";
@@ -67,7 +74,8 @@ public class MovieController {
 	@RequestMapping(value = {"/viewMovie.htm"})
 	public String viewMovie(Model model, @CookieValue(value = "defaultMovieView", defaultValue="") String defaultView, HttpServletResponse response, @RequestParam(required=false) String pages) {
 		log.info("Entered /viewMovie");
-
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
 		if(pages == null) {
 			boolean hasCookie = defaultView.equals("") ? false : true; //Either any view or ignore cookie will return true
 			model.addAttribute("hasCookie",hasCookie);
@@ -93,7 +101,7 @@ public class MovieController {
 					return "viewmovie";
 				}
 				else {
-					String usergroupid = httpSession.getAttribute("usergroupid").toString();
+					int usergroupid = user.getUserGroup().getId();
 					model.addAttribute("usergroup",usergroupid);
 					model.addAttribute("censorship",service.getCensorship());
 					
@@ -122,7 +130,7 @@ public class MovieController {
 				
 				model.addAttribute("censorship",service.getCensorship());
 				
-				String usergroupid = httpSession.getAttribute("usergroupid").toString();
+				int usergroupid = user.getUserGroup().getId();
 				model.addAttribute("usergroup",usergroupid);
 				
 				model.addAttribute("cookieValue",Constant.MOVIE_LIST_VIEW_COOKIE);
@@ -146,8 +154,10 @@ public class MovieController {
 	@ResponseBody
 	public Movie viewMovieDetails(Model model, String movieId) {
 		log.info("Movie ID received: "+ movieId);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
 		Movie result = service.getMovieDetail(movieId);
-		model.addAttribute("usergroup",httpSession.getAttribute("usergroupid").toString());
+		model.addAttribute("usergroup",user.getUserGroup().getId());
 		if(result != null) {
 			return result;
 		}
@@ -167,7 +177,7 @@ public class MovieController {
 			else {
 				Cookie cookie = new Cookie("defaultMovieView",choice);
 				cookie.setMaxAge(30 * 24 * 60 * 60);
-				cookie.setDomain("localhost"); //cineverse.azurewebsites.net
+				cookie.setDomain("localhost"); //
 				cookie.setPath("/masterpisportal");
 				response.addCookie(cookie);
 				log.info("Cookie for movie default view set to " + choice);
@@ -183,9 +193,10 @@ public class MovieController {
 	@RequestMapping(value= {"/api/manager/AddExistMovie.json"})
 	@ResponseBody
 	public ResponseResultJson addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
-		
 		log.info("Movie ID received: "+ form.getMovieId());
-		String username = (String)httpSession.getAttribute("username");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		String username = user.getUsername();
 		
 		return service.insertMovieAvailable(form, username);
 	}

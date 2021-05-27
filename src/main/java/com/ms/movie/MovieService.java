@@ -29,8 +29,10 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.common.Response;
 
 @Service
 public class MovieService {
@@ -378,7 +380,7 @@ public class MovieService {
 	
 	public void deleteFile(String fileName) {
 		try {
-			CloudBlobContainer container = cloudBlobClient.getContainerReference(Constant.IMAGE_CONTAINER_NAME);
+			CloudBlobContainer container = cloudBlobClient.getContainerReference(Constant.MOVIE_IMAGE_CONTAINER_NAME);
 			CloudBlockBlob pendingDelete = container.getBlockBlobReference(fileName);
 			boolean status = pendingDelete.deleteIfExists();
 			if(status) {
