@@ -20,9 +20,13 @@ public class Util {
 	public static String checkActivation(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : Constant.INACTIVE_STATUS;
 	}
+	
+	/*Return null if not found*/
 	public static String getStatusDesc(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : code == Constant.INACTIVE_STATUS_CODE ? Constant.INACTIVE_STATUS : code == Constant.REMOVED_STATUS_CODE ? Constant.REMOVED_STATUS : null;
 	}
+	
+	/*Return invalid code if not found*/
 	public static int getStatusCode(String string) {
 		return string.equals(Constant.ACTIVE_STATUS) ? Constant.ACTIVE_STATUS_CODE : string.equals(Constant.INACTIVE_STATUS) ? Constant.INACTIVE_STATUS_CODE : string.equals(Constant.REMOVED_STATUS) ? Constant.REMOVED_STATUS_CODE : Constant.INVALID_STATUS_CODE;
 	}

@@ -28,7 +28,7 @@ public class UserService {
 		List<UserGroupForm.Result> result = dao.retrieveUserGroupList();
 		Map<Boolean,String> response = new HashMap<Boolean,String>();
 		if(result.size() == 0) {
-			response.put(false,"User group record not found.");
+			response.put(false,"Unable to retrieve necessary data from database.");
 		}
 		else {
 			response.put(true,result.size() + " record(s) retrieved.");
@@ -42,7 +42,7 @@ public class UserService {
 		List<BranchForm.Result> result = dao.retrieveBranchList();
 		Map<Boolean,String> response = new HashMap<Boolean,String>();
 		if(result.size() == 0) {
-			response.put(false,"Branch record not found.");
+			response.put(false,"Unable to retrieve necessary data from database.");
 		}
 		else {
 			response.put(true,result.size() + " record(s) retrieved.");
@@ -95,10 +95,16 @@ public class UserService {
 	}
 	
 	public String updateUserStatus(String userid, String status) {
-		log.info("Updating user status.");
-		boolean result = dao.updateUserStatus(userid, Integer.parseInt(status));
-		log.info("Received response :" + result);
-		return result == true ? "Status update successful." : "Status update failed.";
+		String statusDesc = Util.getStatusDesc(Integer.parseInt(status));
+		if(statusDesc == null) {
+			return "Received invalid data from user's request.";
+		}
+		else {
+			log.info("Updating user status to :" + statusDesc);
+			boolean result = dao.updateUserStatus(userid, Integer.parseInt(status));
+			log.info("Received response :" + result);
+			return result == true ? "Status update successful." : "Status update failed.";
+		}
 	}
 	
 	public Map<String,String> getEditInfo(String userid){

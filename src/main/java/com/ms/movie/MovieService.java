@@ -148,7 +148,7 @@ public class MovieService {
 	public ResponseMovieResult getAllMovieInfo(String movieName) {
 		
 		if(Util.trimString(movieName).isEmpty()) {
-			return new ResponseMovieResult("Empty name found.");
+			return new ResponseMovieResult("Please enter movie name.");
 		}
 		else {
 			List<ResponseMovieResult.Result> result = dao.getMovieByMovieName(movieName);

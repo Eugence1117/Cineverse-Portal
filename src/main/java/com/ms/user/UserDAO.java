@@ -56,8 +56,9 @@ public class UserDAO {
 		List<BranchForm.Result> result = new ArrayList<BranchForm.Result>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
-												   .append("AND d.stateid = s.seqid");
-			List<Map<String,Object>> records = jdbc.queryForList(query.toString());
+												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid) ")
+												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
+			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP);
 			if(records.size() > 0) {
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));

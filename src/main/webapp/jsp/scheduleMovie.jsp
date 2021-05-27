@@ -283,7 +283,7 @@
 				bootbox.alert({
 					message : error,
 					callback : function() {
-						history.back();
+						window.location.href = "home.htm";
 					}
 				})
 			}

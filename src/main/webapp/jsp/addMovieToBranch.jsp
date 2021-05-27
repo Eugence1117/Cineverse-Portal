@@ -49,7 +49,7 @@
 							</div>
 							<div class="card-body">
 								<form id="extMovieForm">
-									<div class="list-group-item">
+									<div class="">
 										<div class="form-group row ">
 											<div class="col-md-1"></div>
 											<div class="col-md-10">
@@ -94,7 +94,7 @@
 								</form>
 							</div>
 						</div>
-						<div class="card my-1">
+						<div class="card my-3">
 							<form id="addMovieForm">
 								<div class="card-header">
 									<span class="card-title">Movie Details</span>
@@ -102,8 +102,7 @@
 								<div class="card-body collapse" id="details-collapse">
 									<input name="movieId" class="extdata" type="hidden"
 										data-json-key="movieId">
-									<div class="list-group-item">
-										<div class="form-group row ">
+									<div class="form-group row ">
 											<label class="font-weight-bold col-form-label col-sm-3">Movie Name</label>
 											<label class="col-form-label colon col-sm-1">:</label>
 											<div class="col-sm-8">
@@ -220,7 +219,6 @@
 												<div class="col-md-5"></div>
 											</div>
 										</div>
-									</div>
 								</div>
 							</form>
 						</div>

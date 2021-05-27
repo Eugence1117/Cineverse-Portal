@@ -48,7 +48,7 @@ public class ScheduleController {
 			model.addAttribute("startDate",dateRange.get(0));
 			model.addAttribute("endDate",dateRange.get(1));
 			if(theatreTypeJson.equals("")) {
-				model.addAttribute("errorMsg","Unable to retrieve the theatre's information. Please your branch have at least one theatre activated. Otherwise, Please try again later or contact with the support team.");
+				model.addAttribute("errorMsg","Unable to retrieve the theatre's information. Please make sure your branch have at least one theatre activated. Otherwise, Please try again later or contact with the support team.");
 			}
 			else {
 				model.addAttribute("theatre",theatreTypeJson);

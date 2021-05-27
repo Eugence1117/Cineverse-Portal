@@ -349,21 +349,23 @@
 			}
 		});
     	
-    	var status1 = "<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
-    	var status2 = "<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
-    	if(status1 != "true" || status2 != "true"){
-    		var error = "";
-    		if(status1 == "false"){
-    			error = error.concat("<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");
-    		}
-    		if(status2 == "false"){
-    			error = error.concat("<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");
-    		}
-    		bootbox.alert(error);
-    	}
     	//console.log("<c:forEach items='${result.result}' var='rlt'><c:out value='${rlt.branchname}'/></c:forEach>");
     	
 		$(document).ready(function(){
+			var status1 = "<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
+		    	var status2 = "<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
+		    	if(status1 != "true" || status2 != "true"){
+		    		var error = "";
+		    		if(status1 == "false"){
+		    			error = error.concat("<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");		    			
+		    		}
+		    		if(status2 == "false"){
+		    			error = error.concat("<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");
+		    		}
+		    		bootbox.alert(error);
+		    		return false;
+		    	}
+		    	
 			readyFunction();
 			//clearInsertField();
 		});

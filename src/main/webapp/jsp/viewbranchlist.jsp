@@ -56,8 +56,8 @@
 											<th>Branch Name</th>
 											<th>Address</th>
 											<th>Postcode</th>
-											<th>District</th>
 											<th>State</th>
+											<th>District</th>
 											<th>Status</th>
 											<th>Action</th>
 										</tr>
@@ -115,14 +115,14 @@
 						<p class="d-inline data col-sm-6" data-json-key="postcode"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>District</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="districtName"></p>
-					</div>
-					<div class="row">
 						<label class="col-sm-4"><b>State</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="stateName"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>District</b></label> <label
+							class="col-sm-1 colon">:</label>
+						<p class="d-inline data col-sm-6" data-json-key="districtName"></p>
 					</div>
 					<div class="row">
 						<label class="col-sm-4"><b>Status</b></label> <label
@@ -292,8 +292,8 @@
 					{ data: 'branchName','width':'23%'},
 					{ data: 'address','width':'12%',render:function(data,type,row){return data.length > 25 ? data.substr(0,10) + '.....' : data}},
 		   			{ data: 'postcode','width':'10%'},
-		   			{ data: 'districtName','width':'10%'},
 		   			{ data: 'stateName','width':'15%'},
+		   			{ data: 'districtName','width':'10%'},
 		   			{ data: 'status','width':'7%'},
 		   			{ data: 'action','width':'13%'}
 				],
