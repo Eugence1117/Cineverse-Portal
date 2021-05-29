@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ms.login.Staff;
 import com.ms.schedule.Model.AvailableMovie;
 import com.ms.theatre.Theatre;
 
@@ -38,10 +40,11 @@ public class ScheduleController {
 	@RequestMapping (value = {"/scheduleMovie.htm"})
 	public String getSchedulePage(Model model) {
 		log.info("Entered /scheduleMovie.htm");
-		String branchid = (String)session.getAttribute("branchid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		log.info("branchid :" + branchid);
 		List<String> dateRange = service.getDefaultDate(branchid);
-		String theatreTypeJson = service.getTheatreType();
+		String theatreTypeJson = service.getTheatreType(branchid);
 		if(dateRange == null || theatreTypeJson == null) {
 			model.addAttribute("errorMsg","Unable to retrieve the information. Please try again later or contact with the support team.");
 		}else {
@@ -62,7 +65,8 @@ public class ScheduleController {
 	@ResponseBody
 	public AvailableMovie getDailyAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retriveDailyAvailableMovie.json");
-		String branchid = (String)session.getAttribute("branchid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		AvailableMovie result = service.getAvailableMovie(branchid, startdate, enddate);
 		return result;
 
@@ -72,7 +76,8 @@ public class ScheduleController {
 	@ResponseBody
 	public AvailableMovie getWeeklyAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retrieveWeeklyAvailableMovie.json");
-		String branchid = (String)session.getAttribute("branchid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		AvailableMovie result = service.getAvailableMovie(branchid, startdate, enddate);
 		return service.groupMovieByWeek(result);
 		
@@ -82,7 +87,8 @@ public class ScheduleController {
 	@ResponseBody
 	public AvailableMovie getOverallAvailableMovie(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retrieveOverallAvailableMovie.json");
-		String branchid = (String)session.getAttribute("branchid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		AvailableMovie result = service.getAvailableMovie(branchid, startdate, enddate);
 		return service.groupMovieByWhole(result);
 		
@@ -92,7 +98,9 @@ public class ScheduleController {
 	@ResponseBody
 	public Map<String,String> getOverallConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByOverall.json");
-		Map<String,String> result = service.generateOverallSchedule(payload);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		Map<String,String> result = service.generateOverallSchedule(payload,branchid);
 		return result;
 	}
 	
@@ -101,7 +109,9 @@ public class ScheduleController {
 	@ResponseBody
 	public Map<String,String> getWeeklyConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByWeekly.json");
-		Map<String,String> result = service.generateWeeklySchedule(payload);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		Map<String,String> result = service.generateWeeklySchedule(payload,branchid);
 		return result;
 	}
 	
@@ -109,7 +119,9 @@ public class ScheduleController {
 	@ResponseBody
 	public Map<String,String> getDailyConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByDaily.json");
-		Map<String,String> result = service.generateDailySchedule(payload);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		Map<String,String> result = service.generateDailySchedule(payload,branchid);
 		return result;
 	}
 }

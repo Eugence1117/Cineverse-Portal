@@ -185,7 +185,7 @@
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">
-											<select name="state" id="state" class="form-control form-select" aria-label="Select an option">
+											<select name="state" id="state" class="form-control" aria-label="Select an option">
 												<option  hidden selected value="">Select an option</option>
 							        			<!-- <c:forEach items="${state.result}" var="state">
 							        				<option value="<c:out value='${state.seqid}'/>"><c:out value="${state.stateName}"/></option>
@@ -197,7 +197,7 @@
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">
-											<select name="district" id="district" class="form-control form-select" disabled aria-label="Select an option">
+											<select name="district" id="district" class="form-control" disabled aria-label="Select an option">
 												<option  hidden selected value="">Select an option</option>
 							        			<!--<c:forEach items="${district.result}" var="district">
 							        				<option value="<c:out value='${district.seqid}'/>"><c:out value="${district.districtname}"/></option>
@@ -441,10 +441,18 @@
 			}
 			
 			$("#addBranch").modal('hide');
-			$.ajax("api/admin/addBranch.json?" + $("#newBranchForm").serialize(),{
-				method : "GET",
+			
+			var formData = $("#newBranchForm").serializeObject();
+			
+			$.ajax("api/admin/addBranch.json",{
+				method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -546,11 +554,11 @@
 			    buttons: {
 			        confirm: {
 			            label: 'Yes',
-			            className: 'btn-success'
+			            className: 'btn-primary'
 			        },
 			        cancel: {
 			            label: 'No',
-			            className: 'btn-danger'
+			            className: 'btn-secondary'
 			        }
 			    },
 			    callback: function (result) {

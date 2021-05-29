@@ -107,8 +107,8 @@
 									</div>
 
 									<div class="text-center d-none" id="editAccessBtn">
-										<button type="button" id="submitEdit" class="m-2 btn btn-primary" onclick=updateBranch()>Apply Changes</button>
 										<button type="button" class="m-2 btn btn-secondary" id="btnReset" onclick=getBranchDetails()>Reset</button>
+										<button type="button" id="submitEdit" class="m-2 btn btn-primary" onclick=updateBranch()>Apply Changes</button>
 									</div>
 								</div>
 							</form>
@@ -330,10 +330,17 @@
 				return false;
 			}
 			
-			$.ajax("api/manager/updateBranch.json?seqid=" + $("#seqid").val() + "&" + $("#editBranchForm").serialize(),{
-				method : "GET",
+			var formData = $("#editBranchForm").serializeObject();
+			
+			$.ajax("api/manager/updateBranch.json",{
+				method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";

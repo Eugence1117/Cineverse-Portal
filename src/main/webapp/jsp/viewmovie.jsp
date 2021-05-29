@@ -222,7 +222,7 @@
 												<div class="row g-2 my-1">
 													<div class="col-md">
 														<div class="form-floating">
-															<select id="censorship" class="form-select form-control floatLabel data" name="censorship" data-json-key="censorship" disabled placeholder="Select an option">
+															<select id="censorship" class="form-control floatLabel data" name="censorship" data-json-key="censorship" disabled placeholder="Select an option">
 																<c:forEach items="${censorship}" var="data">
 																	<option value="${data.id}"><c:out value="${data.id}" /></option>
 																</c:forEach>
@@ -239,8 +239,8 @@
 													</div>
 												</div>
 												<div class="text-center d-none" id="editAccessBtn">
-													<button type="button" id="submitEdit" class="m-2 btn btn-primary">Apply Changes</button>
 													<button type="button" class="m-2 btn btn-secondary" onclick=getNewMovieInfo()>Reset</button>
+													<button type="button" id="submitEdit" class="m-2 btn btn-primary">Apply Changes</button>
 												</div>
 												</form>
 											</div>

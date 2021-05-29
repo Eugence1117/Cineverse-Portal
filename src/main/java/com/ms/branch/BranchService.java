@@ -11,11 +11,17 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ms.common.Constant;
+import com.ms.common.Response;
+import com.ms.login.Staff;
+import com.ms.rules.RuleService;
 
 @Service
+@Transactional
 public class BranchService {
 	
 	public static Logger log = LogManager.getLogger(BranchService.class);
@@ -26,6 +32,9 @@ public class BranchService {
 	@Autowired
 	BranchDAO dao;
 	
+	@Autowired
+	RuleService ruleService;
+	
 	public ResponseBranchInfo getBranchDetails(int usergroup,String username) {
 		ResponseBranchInfo result = null;
 		if(usergroup == Constant.ADMIN_GROUP) {
@@ -34,7 +43,8 @@ public class BranchService {
 		}
 		else if(usergroup == Constant.MANAGER_GROUP){
 			log.info("Retrieving owned branch information.");
-			String branchId = (String)session.getAttribute("branchid");
+			Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String branchId = user.getBranchid();
 			if(branchId == null) {
 				return new ResponseBranchInfo("Unable to retrieve branch information.");
 			}else {
@@ -104,17 +114,32 @@ public class BranchService {
 		return result;
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,String> addNewBranch(NewBranchForm form){
+		Map<String,String> response = new LinkedHashMap<String, String>();
+		
 		log.info("Creating new branch.");
 		String seqid = UUID.randomUUID().toString();
 		log.info("ID: " + seqid);
-		return dao.addBranch(seqid, form);
+		String errorMsg = dao.addBranch(seqid, form);
+		if(errorMsg != null) {
+			throw new RuntimeException(errorMsg);
+		}
+		Response ruleResponse = ruleService.addOperatingHours(seqid);
+		if(ruleResponse.getErrorMsg() != null) {
+			log.error("Creating Rule Error:" + ruleResponse.getErrorMsg());
+			throw new RuntimeException(ruleResponse.getErrorMsg());
+		}
+		response.put("status","true");
+		response.put("msg", "Branch:" + form.getBranchname() + " is added.");
+		return response;
 	}
 	
 	public Map<String,String> updateBranch(String branchid, NewBranchForm form){
 		log.info("Updating branch information.");
 		Map<String,String> response = new HashMap<String, String>();
 		if(form.getBranchname() == null || form.getDistrict() == null || form.getAddress() == null || form.getPostcode() == 0) {
+			log.error("Received empty data.");
 			response.put("msg","Unable to retrieve latest information.");
 			return response;
 		}

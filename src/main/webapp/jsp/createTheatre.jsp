@@ -137,7 +137,7 @@
 				        	<div class="row form-group">
 				        		<div class="col-md">
 				        			<div class="form-floating">
-				        				<select name="theatretype" class="form-control form-select" id="dropdownTheatreTypes" aria-label="Select an option">
+				        				<select name="theatretype" class="form-control" id="dropdownTheatreTypes" aria-label="Select an option">
 						        			<option selected hidden value="">Select an option</option>
 							        			<c:forEach items="${theatreTypes}" var="group">
 							        				<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.seqid}"/> - Maximum capacity: <c:out value="${group.seatSize}"/></option>

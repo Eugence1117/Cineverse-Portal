@@ -1,7 +1,10 @@
 package com.ms.common;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ms.rules.OperatingHours;
 
 public class Util {
 
@@ -29,6 +32,10 @@ public class Util {
 	/*Return invalid code if not found*/
 	public static int getStatusCode(String string) {
 		return string.equals(Constant.ACTIVE_STATUS) ? Constant.ACTIVE_STATUS_CODE : string.equals(Constant.INACTIVE_STATUS) ? Constant.INACTIVE_STATUS_CODE : string.equals(Constant.REMOVED_STATUS) ? Constant.REMOVED_STATUS_CODE : Constant.INVALID_STATUS_CODE;
+	}
+	
+	public static OperatingHours getDefaultRules(String branchid) {
+		return new OperatingHours(branchid,"The operating hours of the business",Constant.DEFAULT_BUSINESS_OPERATING_START_TIME,Constant.DEFAULT_BUSINESS_OPERATING_END_TIME);
 	}
 	
 	public static List<String> generateColorList(){

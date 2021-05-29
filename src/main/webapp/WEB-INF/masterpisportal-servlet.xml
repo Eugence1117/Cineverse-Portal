@@ -43,31 +43,31 @@
 		<property name="password" value="Eugence0679."/>
 	</bean>
 
-	<!-- 
+	<!-- -->
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
 	
-	<tx:annotation-driven transaction-manager="transactionManager" />-->
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
 
-	<!-- JPA Transaction Manager
+	<!-- JPA Transaction Manager -->
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory"/>
-	</bean> -->
+	</bean>
 	
-	<!-- JPA entity manager factory
+	<!-- JPA entity manager factory -->
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan" value="com.ms"/>
-        <property name="jpaProperties">
-        	<props>
+        <!--<property name="jpaProperties">
+        	 <props>
         		<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
-        	</props>
-        </property>
+        	</props> 
+        </property>-->
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
-    </bean> -->
+    </bean>
 	
-	<!-- Configure Spring Data JPA Support
-	<jpa:repositories base-package="com.ms"/> -->
+	<!-- Configure Spring Data JPA Support -->
+	<jpa:repositories base-package="com.ms"/>
 	 
 	
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">

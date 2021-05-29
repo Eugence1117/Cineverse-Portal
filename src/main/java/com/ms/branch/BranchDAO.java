@@ -216,27 +216,21 @@ public class BranchDAO {
 		}
 	}
 
-	public Map<String, String> addBranch(String seqid, NewBranchForm form) {
-		Map<String, String> response = new HashMap<String, String>();
+	public String addBranch(String seqid, NewBranchForm form) {
 		try {
 			StringBuffer query = new StringBuffer()
 					.append("INSERT INTO masp.branch (seqid,branchName,address,postcode,districtid) values(?,?,?,?,?)");
 			int result = jdbc.update(query.toString(), seqid, form.getBranchname(), form.getAddress(),
 					form.getPostcode(), form.getDistrict());
 			if (result > 0) {
-				response.put("msg", "Branch " + form.getBranchname() + " created.");
-				response.put("status", "true");
+				return null;
 			} else {
-				response.put("msg", "Unable to create branch");
-				response.put("status", "false");
+				return "Unable to create branch. Please try again later.";
 			}
 		} catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			response = new HashMap<String, String>();
-			response.put("msg", "Error occurect, unable to create branch");
-			response.put("status", "false");
+			return "Unexpected error occured. Please try again later.";
 		}
-		return response;
 	}
 
 	public String updateBranch(String seqid, NewBranchForm form) {
@@ -248,6 +242,7 @@ public class BranchDAO {
 			if (result > 0) {
 				return "Update successful.";
 			} else {
+				log.error("Unable to locate staff account.");
 				return "Unable to update the details. Please try again later.";
 			}
 		} catch (Exception ex) {

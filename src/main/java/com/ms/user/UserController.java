@@ -83,9 +83,9 @@ public class UserController {
 		return result;
 	}
 	
-	@RequestMapping( value= {"/api/admin/addUser.json"})
+	@RequestMapping( value= {"/api/admin/addUser.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> addNewUser(Model model, @ModelAttribute("form") NewUserForm form) {
+	public Map<String,String> addNewUser(Model model, @RequestBody NewUserForm form) {
 		log.info("Enter /user/addUser");
 		Map<String,String> result = service.addNewUser(form);
 		log.info("Successfully receive response.");
@@ -113,22 +113,23 @@ public class UserController {
 		}
 		else {
 			log.error("Status received are not either 1 or 0");
-			rst.put("result","Invalid parameter.");
+			rst.put("result","Invalid data received from client.");
 			return rst;
 		}
 	}
 	
 	@RequestMapping( value = {"/api/admin/getEditInfo.json"})
 	@ResponseBody
-	public Map<String,String> getEditInfo(Model model, String userid){
+	public Map<String,Object> getEditInfo(Model model, String userid){
 		log.info("Enter /user/getEditInfo");
 		return service.getEditInfo(userid);
 	}
 	
-	@RequestMapping( value= {"/api/admin/editUser.json"})
+	@RequestMapping( value= {"/api/admin/editUser.json"}, method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> editUser(Model model, @ModelAttribute("form") UserEditForm form){
+	public Map<String,String> editUser(Model model, @RequestBody UserEditForm form){
 		log.info("Enter /user/editUser");
+		log.info("Form" + form.toString());
 		Map<String,String> result = service.editUser(form);
 		log.info("Received response from backend.");
 		return result;

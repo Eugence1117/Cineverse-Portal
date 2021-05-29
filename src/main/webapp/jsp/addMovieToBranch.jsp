@@ -70,7 +70,7 @@
 															</select>
 														</c:when>
 														<c:otherwise>
-															<select class="form-control data"
+															<select class="form-select data"
 																name="movieId" id="movieId" disabled="disabled">
 																<option value="-1">No Movie Available</option>
 															</select>

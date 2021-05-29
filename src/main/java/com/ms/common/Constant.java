@@ -2,11 +2,17 @@ package com.ms.common;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 
 public class Constant {
 
 	public static final int PASSWORD_MIN_LENGTH = 6;
 	public static final int PASSWORD_MAX_LENGTH	= 18;
+	
+	public static final int MINIMUM_OPERATING_DURATION = 3;
+	public static final LocalTime DEFAULT_BUSINESS_OPERATING_START_TIME = LocalTime.of(10,0,0);
+	public static final LocalTime DEFAULT_BUSINESS_OPERATING_END_TIME = LocalTime.of(23,59,0);
+	
 	
 	public static final int ADMIN_GROUP = 1;
 	public static final int MANAGER_GROUP = 2;
@@ -33,6 +39,9 @@ public class Constant {
 	public static final int DEFAULT_TIME_GAP = 5;
 	
 	public static final String FILE_PATTERN = ".[a-zA-Z0-9]+";
+	
+	public static final String OPERATING_HOURS_SYNTAX = "_OH";
+	
 
 	//public static final String IMG_STORE_PATH = "B:" + File.separator + "Program Files (x86)" + File.separator + "Tomcat8.5" + File.separator+"webapps"+File.separator+"MovieImg"+File.separator;
 	//public static final String IMG_DB_PATH = File.separator + "MovieImg"+ File.separator;
@@ -42,8 +51,6 @@ public class Constant {
 	public static final String MOVIE_IMAGE_CONTAINER_NAME = "movieimg";
 	public static final String DEFAULT_TIME_ZONE ="Asia/Kuala_Lumpur";
 	public static final String DEFAULT_TIME = " 00:00:00";
-	
-	
 	
 	public static final SimpleDateFormat SQL_DATE_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

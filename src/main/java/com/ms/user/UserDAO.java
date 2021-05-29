@@ -78,6 +78,31 @@ public class UserDAO {
 		return result;
 	}
 	
+	public List<BranchForm.Result> retrieveBranchListWithManagerBranch(String staffId){
+		List<BranchForm.Result> result = new ArrayList<BranchForm.Result>();
+		try { 
+			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
+												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid AND u.seqid != ?) ")
+												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
+			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP,staffId);
+			if(records.size() > 0) {
+				for(Map<String,Object> record : records) {
+					String seqid = Util.trimString((String)record.get("seqid"));
+					String branchname = Util.trimString((String)record.get("branchName"));
+					String district = Util.trimString((String)record.get("districtname"));
+					String state = Util.trimString((String)record.get("stateName"));
+					BranchForm.Result data = new BranchForm.Result(seqid,branchname+"- " + district + ", " + state);
+					result.add(data);
+				}
+			}
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return result;
+		}
+		return result;
+	}
+	
 	public List<UserModelList.Result> retrieveUsersDetails(String myUsername) {
 		List<UserModelList.Result> resultList  = new ArrayList<UserModelList.Result>();
 		try {
@@ -153,8 +178,8 @@ public class UserDAO {
 		}
 	}
 	
-	public Map<String,String> getEditInfo(String userid){
-		Map<String,String> result = new HashMap<String,String>();
+	public Map<String,Object> getEditInfo(String userid){
+		Map<String,Object> result = new HashMap<String,Object>();
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT s.seqid, s.usergroup, s.branchid, s.username FROM masp.staff s WHERE s.seqid = ? ");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),userid);

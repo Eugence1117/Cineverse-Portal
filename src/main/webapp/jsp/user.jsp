@@ -151,7 +151,7 @@
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">
-											<select name="status" class="form-control form-select" aria-label="Select an option">
+											<select name="status" class="form-control" aria-label="Select an option">
 													<option hidden selected value="">Select an option</option>
 												<option value="1">Active</option>
 												<option value="0">Inactive</option>
@@ -164,7 +164,7 @@
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">
-											<select name="usergroup" id="usergroup" class="form-control form-select" aria-label="Select an option">
+											<select name="usergroup" id="usergroup" class="form-control" aria-label="Select an option">
 												<option hidden selected value="">Select an option</option>
 												<c:forEach items="${group.result}" var="group">
 													<option value="<c:out value='${group.seqid}'/>"><c:out
@@ -178,7 +178,7 @@
 								<div class="row form-group">
 								<div class="col-md">
 										<div class="form-floating">
-											<select name="branchid" id="branchname" class="form-control form-select" aria-label="Select an option">
+											<select name="branchid" id="branchname" class="form-control" aria-label="Select an option">
 												<option hidden selected value="">Select an option</option>
 												<c:forEach items="${branch.result}" var="branch">
 													<option value="<c:out value='${branch.seqid}'/>"><c:out
@@ -195,12 +195,12 @@
 				</div>
 				<div class="modal-footer">
 					<div class="mx-auto">
-						<button type="button" class="btn btn-primary m-2"
-							onclick=addUser()>Submit</button>
-						<button type="reset" class="btn btn-danger m-2"
-							onclick=clearInsertField()>Reset</button>
 						<button type="button" class="btn btn-secondary m-2"
 							data-bs-dismiss="modal">Cancel</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=clearInsertField()>Reset</button>
+						<button type="button" class="btn btn-primary m-2"
+							onclick=addUser()>Submit</button>
 					</div>
 				</div>
 			</div>
@@ -288,10 +288,10 @@
 									<div class="col-md">
 										<div class="form-floating">
 											<select name="Editbranchid" id="Editbranchname" class="form-control dropdown">
-												<option hidden selected></option>
+												<!-- <option hidden selected></option>
 												<c:forEach items="${branch.result}" var="branch">
 													<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}" /></option>
-												</c:forEach>
+												</c:forEach> -->
 											</select>
 											<label for="branchname">Branch</label>
 										</div>
@@ -303,12 +303,12 @@
 				</div>
 				<div class="modal-footer">
 					<div class="mx-auto">
-						<button type="button" class="btn btn-primary m-2"
-							onclick=editUser()>Save Changes</button>
-						<button type="reset" class="btn btn-danger m-2"
-							onclick=resetEditBtn()>Reset</button>
 						<button type="button" class="btn btn-secondary m-2"
 							data-bs-dismiss="modal">Cancel</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=resetEditBtn()>Reset</button>
+						<button type="button" class="btn btn-primary m-2"
+							onclick=editUser()>Save Changes</button>
 					</div>
 				</div>
 			</div>
@@ -573,11 +573,6 @@
 							}
 						},
 						dataFilter: function(data){
-							 if(data.hasOwnProperty("SESSION_EXPIRED")){
-				    				if(data["SESSION_EXPIRED"]){
-				    					window.location.href = "expire.htm";
-				    				}
-				    		}
 							var result = JSON.parse(data);
 							return result.status;
 						}
@@ -616,11 +611,18 @@
 				return false;
 			}
 			
+			var formData = $("#newUserForm").serializeObject();
+			
 			$("#addUser").modal('hide');
-			$.ajax("api/admin/addUser.json?" + $("#newUserForm").serialize(),{
-				method : "GET",
+			$.ajax("api/admin/addUser.json",{
+				method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -710,11 +712,11 @@
 			    buttons: {
 			        confirm: {
 			            label: 'Yes',
-			            className: 'btn-success'
+			            className: 'btn-primary'
 			        },
 			        cancel: {
 			            label: 'No',
-			            className: 'btn-danger'
+			            className: 'btn-secondary'
 			        }
 			    },
 			    callback: function (result) {
@@ -779,33 +781,30 @@
 					clearEditField();
 					$("#editUserForm #seqid").val(data.seqid);
 					$("#editUser .modal-title").html("Editing user: " + data.username);
-					$("#editUserForm select[name=Editusergroup] > option").each(function(){
-						if(data.usergroupid == $(this).val()){
-							$(this).attr("selected",true);
-							$("#editUserForm select[name=Editusergroup]").attr("value",$(this).val());
-							$("#editUserForm select[name=Editusergroup]").val($(this).val());
-						}
-						
-					});
+					$("#editUser select[name=Editusergroup]").val(data.usergroupid);
+					
+					var branches = data.branches;
+					var html = "<option hidden selected>Select an option</option>";
+					for(var i = 0 ; i < branches.length ; i++){
+						html += "<option value='" + branches[i].seqid + "'>" + branches[i].branchname + "</option>";  
+					}
+					$("#editUserForm select[name=Editbranchid]").html(html);
 					checkDropdownValue($("#editUserForm select[name=Editusergroup]")[0]);
 					if(data.usergroupid == 2){
-						$("#editUserForm select[name=Editbranchid] > option").each(function(){
-							if(data.branchid == $(this).val()){
-								$(this).attr("selected",true);
-								$("#editUserForm select[name=Editbranchid]").attr("value",$(this).val());
-								$("#editUserForm select[name=Editbranchid]").val($(this).val());
-							}
-							
-						});
+						$("#editUserForm select[name=Editbranchid]").val(data.branchid);
 					}
+					
 					if(!$("#editUser").hasClass("show")){
 						$("#editUser").modal("show");
 					}
-					//$("#editUser").toggle();
 				}
 				
 			});
 		}
+		
+		$("#editUser").on('hidden.bs.modal',function(){
+			$("#editUser select").removeClass("is-valid").removeClass("is-invalid");
+		})
 		
 		$("#editUserForm").validate({
 			ignore : ".ignore",
@@ -833,10 +832,18 @@
 			
 			$("#editUser").modal("hide");
 			
-			$.ajax("api/admin/editUser.json?seqid="+$("#editUserForm #seqid").val() + "&" + $("#editUserForm").serialize(),{
-				method : "GET",
+			var formData = $("#editUserForm").serializeObject();
+			formData["seqid"] = $("#editUserForm #seqid").val();
+			
+			$.ajax("api/admin/editUser.json",{
+				method : "POST",
 				accepts : "application/json",
 				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -867,11 +874,11 @@
 			    buttons: {
 			        confirm: {
 			            label: 'Yes',
-			            className: 'btn-success'
+			            className: 'btn-primary'
 			        },
 			        cancel: {
 			            label: 'No',
-			            className: 'btn-danger'
+			            className: 'btn-secondary'
 			        }
 			    },
 			    callback: function (result) {

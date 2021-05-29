@@ -373,7 +373,7 @@
 											"<div class='input-group'>" + 
 											"<div class='input-group-prepend w-25'>" + 
 											"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
-											"<select name='theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
+											"<select name='theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
 											"</select>" + 
 											"<input type='range' min='0' max='100' value='" + defaultVal + "' class='slider  mt-3' name='percent'/>" +
 											"<input type='hidden' name='movieId' value='" + movie.movieId + "'/>" +
@@ -566,7 +566,7 @@
 													"<div class='input-group'>" + 
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
-													"<select name='"+ groupId +".theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
+													"<select name='"+ groupId +".theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
 													"</select>" + 
 													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='"+ groupId +".percent'/>" +
 													"<input type='hidden' name='"+ groupId +".movieId' value='" + movie.movieId + "'/>" +
@@ -776,7 +776,7 @@
 													"<div class='input-group'>" + 
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
-													"<select name='" + dailyMovie.date + ".theatrePrefer' class='form-select form-control theatreAvailable'>" + retrieveTheatreAsOption() + 
+													"<select name='" + dailyMovie.date + ".theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
 													"</select>" + 
 													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent'/>" +
 													"<input type='hidden' name='" + dailyMovie.date + ".movieId' value='" + movie.movieId + "'/>" +

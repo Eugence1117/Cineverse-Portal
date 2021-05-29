@@ -141,8 +141,7 @@ public class ScheduleService {
 		return newStr;
 	}
 	
-	public String getTheatreType() {
-		String branchid = (String) session.getAttribute("branchid");
+	public String getTheatreType(String branchid) {
 		List<TheatreType> list = theatreDao.groupByTheatreType(branchid);
 		if (list == null) {
 			return null;
@@ -372,11 +371,11 @@ public class ScheduleService {
 		
 	}
 
-	public List<Schedule> createSchedule(List<Configuration> configs, int theatreCount) {
+	public List<Schedule> createSchedule(List<Configuration> configs, int theatreCount, OperatingHours operatingHours) {
 		log.info("Generate Schedule Progress Report: Total Movie = " + configs.size());
 
-		int operatingMinutes = calculateOperatingTimeInMinute();
-		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
+		int operatingMinutes = calculateOperatingTimeInMinute(operatingHours);
+		//OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
 		
 		List<LocalTime> operatingTime = new ArrayList<LocalTime>();
 		operatingTime.add(operatingHours.getStartTime());		
@@ -471,9 +470,8 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, String> generateOverallSchedule(Map<String,Object> payload) {
+	public Map<String, String> generateOverallSchedule(Map<String,Object> payload, String branchid) {
 		Map<String, String> response = null;
-		String branchid = (String) session.getAttribute("branchid");
 		try {
 			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
 			
@@ -492,7 +490,7 @@ public class ScheduleService {
 			Long endDate =(Long)payload.get("endDate");
 			int dateRange = getDateRange(startDate, endDate);
 			if (dateRange != -1) {
-				List<Theatre> theatreList = retrieveTheatreList();
+				List<Theatre> theatreList = retrieveTheatreList(branchid);
 				log.info("Generate Schedule for " + dateRange + " day(s)");
 				if (theatreList != null) {
 					
@@ -540,7 +538,7 @@ public class ScheduleService {
 							}
 							
 							//Get All necessary data
-							List<TimeGrain> timeList = getOperatingTimeGrain();
+							List<TimeGrain> timeList = getOperatingTimeGrain(branchid);
 							if (timeList == null) {
 								response = new LinkedHashMap<String, String>();
 								response.put("error", "Unable to retrieve branch information. Please try again later.");
@@ -560,6 +558,7 @@ public class ScheduleService {
 								}
 							}
 							
+							OperatingHours operatingHours = rulesService.getOperatingHours(branchid);
 							//Ready for generate
 							Map<LocalDate,List<Configuration>> segment = segmentOverallSchedule(configuration,start,end);
 							SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -567,7 +566,7 @@ public class ScheduleService {
 							List<Event> eventList = new ArrayList<Event>();
 							int finalScore = 0;
 							for(Map.Entry<LocalDate, List<Configuration>> entry : segment.entrySet()) {
-								List<Schedule> scheduleList = createSchedule(entry.getValue(), theatreList.size());
+								List<Schedule> scheduleList = createSchedule(entry.getValue(), theatreList.size(),operatingHours);
 								log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
 								
 								List<LocalDate> dateList = getFirstDateInRange(entry.getKey()); // Only configure one day in
@@ -690,19 +689,20 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String,String> generateWeeklySchedule(Map<String,Object> payload){
+	public Map<String,String> generateWeeklySchedule(Map<String,Object> payload,String branchid){
 		Map<String,String> response = null;
-		String branchid = (String) session.getAttribute("branchid");
 		try {
 			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
 			
 			List<String> groupIds = (ArrayList<String>)payload.get("groupId");
+			
+			OperatingHours operatingHours = rulesService.getOperatingHours(branchid);
 			if(groupIds.size() > 0) {
-				List<Theatre> theatreList = retrieveTheatreList(); 
+				List<Theatre> theatreList = retrieveTheatreList(branchid); 
 				List<TheatreType> types =  theatreDao.getTheatreType();
 				Long ScheduleEndDate = (Long)payload.get("endDate");
 				
-				List<TimeGrain> timeList = getOperatingTimeGrain();
+				List<TimeGrain> timeList = getOperatingTimeGrain(branchid);
 				if(timeList == null) {
 					response = new LinkedHashMap<String, String>();
 					response.put("Error", "Unable to retrieve branch information. Please try again later.");
@@ -768,7 +768,7 @@ public class ScheduleService {
 								//Segment 
 								Map<LocalDate,List<Configuration>> segment = segmentOverallSchedule(configuration,startDate,endDate);
 								for(Map.Entry<LocalDate, List<Configuration>> entry : segment.entrySet()) {
-									List<Schedule> scheduleList = createSchedule(entry.getValue(), filteredTheatre.size());
+									List<Schedule> scheduleList = createSchedule(entry.getValue(), filteredTheatre.size(),operatingHours);
 									log.info("Generate Schedule Progress Report: Total Schedule = " + scheduleList.size());
 									
 									List<LocalDate> dateList = getFirstDateInRange(entry.getKey());
@@ -878,18 +878,18 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String,String> generateDailySchedule(Map<String,Object> payload){
+	public Map<String,String> generateDailySchedule(Map<String,Object> payload,String branchid){
 		Map<String,String> response = null;
-		String branchid = (String) session.getAttribute("branchid");
 		try {
 			Map<String,Object> maps = getJsonAsMap(convertToString((String)payload.get("theatres")));
+			OperatingHours operatingHours = rulesService.getOperatingHours(branchid);
 			
 			List<String> groupIds = (ArrayList<String>)payload.get("groupId");
 			if(groupIds.size() > 0) {
-				List<Theatre> theatreList = retrieveTheatreList(); 
+				List<Theatre> theatreList = retrieveTheatreList(branchid); 
 				List<TheatreType> types =  theatreDao.getTheatreType();
 				
-				List<TimeGrain> timeList = getOperatingTimeGrain();
+				List<TimeGrain> timeList = getOperatingTimeGrain(branchid);
 				if(timeList == null) {
 					response = new LinkedHashMap<String, String>();
 					response.put("error", "Unable to retrieve branch information. Please try again later.");
@@ -948,7 +948,7 @@ public class ScheduleService {
 								}
 								
 								//Segment 
-								List<Schedule> scheduleList = createSchedule(configuration, filteredTheatre.size());								
+								List<Schedule> scheduleList = createSchedule(configuration, filteredTheatre.size(),operatingHours);								
 									
 								List<LocalDate> dateList = new ArrayList<LocalDate>();
 								dateList.add(scheduleDate);
@@ -1146,8 +1146,7 @@ public class ScheduleService {
 		return dateList;
 	}
 	
-	public List<Theatre> retrieveTheatreList() {
-		String branchid = (String) session.getAttribute("branchid");
+	public List<Theatre> retrieveTheatreList(String branchid) {
 		List<Theatre> theatre = theatreDao.getActiveTheatreList(branchid);
 		if (theatre == null) {
 			log.error("Unable to retrieve Theatre List from branch: " + branchid);
@@ -1158,8 +1157,8 @@ public class ScheduleService {
 
 	}
 
-	public List<TimeGrain> getOperatingTimeGrain() {
-		List<LocalTime> timeList = rulesService.getOperatingTimeGrain((String) session.getAttribute("branchid"));
+	public List<TimeGrain> getOperatingTimeGrain(String branchid) {
+		List<LocalTime> timeList = rulesService.getOperatingTimeGrain(branchid);
 		List<TimeGrain> timeGrains = new ArrayList<TimeGrain>();
 		for (int i = 0; i < timeList.size(); i++) {
 			timeGrains.add(new TimeGrain(i, timeList.get(i)));
@@ -1167,8 +1166,8 @@ public class ScheduleService {
 		return timeGrains;
 	}
   
-	public int calculateOperatingTimeInMinute() {
-		OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
+	public int calculateOperatingTimeInMinute(OperatingHours operatingHours) {
+		//OperatingHours operatingHours = rulesService.getOperatingHours(branchid);
 		LocalTime startTime = operatingHours.getStartTime();
 		LocalTime endTime = operatingHours.getEndTime();
 		long nextDayNano = 0;

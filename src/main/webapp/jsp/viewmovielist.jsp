@@ -195,7 +195,7 @@
 							<div class="col-md">
 								<div class="form-floating">
 									<select id="censorship"
-										class="form-select form-control floatLabel data"
+										class="form-control floatLabel data"
 										name="censorship" data-json-key="censorship" disabled
 										aria-label="Select an option">
 										<c:forEach items="${censorship}" var="data">

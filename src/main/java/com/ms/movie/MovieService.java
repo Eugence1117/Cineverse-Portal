@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.login.Staff;
 import com.ms.common.Response;
 
 @Service
@@ -305,8 +307,8 @@ public class MovieService {
 	}
 	
 	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {
-		
-		String branchId = (String)session.getAttribute("branchid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchId = user.getBranchid();
 		if(Util.trimString(branchId) == "") {
 			return new ResponseResultJson("Cannot find relavant branch.");
 		}

@@ -1,5 +1,6 @@
 package com.ms.branch;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -7,14 +8,19 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.login.Staff;
 
 @Controller
 public class BranchController {
@@ -31,13 +37,14 @@ public class BranchController {
 	@RequestMapping (value = {"/viewBranch.htm"})
 	public String getBranchPage(Model model) {
 		log.info("Entered /viewbranch");
-		int usergroup = (int)session.getAttribute("usergroupid");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int usergroup = user.getUserGroup().getId();
 		if(usergroup == Constant.ADMIN_GROUP) {
 			return "viewbranchlist";
 		}
 		else 
 		{
-			String username = (String)session.getAttribute("username".toString());
+			String username = user.getUsername();
 			ResponseBranchInfo response = service.getBranchDetails(usergroup, username);
 			model.addAttribute("error",response.getError());
 			model.addAttribute("branch",response.getResult());
@@ -49,8 +56,9 @@ public class BranchController {
 	@ResponseBody
 	public ResponseBranchInfo getBranchesInfo(Model model) {
 		log.info("Entered /branch/retrieveInfo.json");
-		int usergroup = (int)session.getAttribute("usergroupid");
-		String username = (String)session.getAttribute("username".toString());
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int usergroup = user.getUserGroup().getId();
+		String username = user.getUsername();
 		return service.getBranchDetails(usergroup, username);
 	}
 	
@@ -65,8 +73,9 @@ public class BranchController {
 	@ResponseBody
 	public ResponseBranchInfo getOwnBranchInfo(Model model) {
 		log.info("Entered /getBranchInfo.json");
-		int usergroup = (int)session.getAttribute("usergroupid");
-		String username = (String)session.getAttribute("username".toString());
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int usergroup = user.getUserGroup().getId();
+		String username = user.getUsername();
 		return service.getBranchDetails(usergroup, username);
 	}
 	
@@ -105,17 +114,30 @@ public class BranchController {
 		return service.checkRedundantBranchName(Util.trimString(branchname));
 	}
 	
-	@RequestMapping( value= {"/api/admin/addBranch.json"})
+	@RequestMapping( value= {"/api/admin/addBranch.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> addNewBranch(Model model, @ModelAttribute("form") NewBranchForm form){
+	public Map<String,String> addNewBranch(Model model, @RequestBody NewBranchForm form){
 		log.info("Requesting from /branch/addBranch.json");
-		return service.addNewBranch(form);
+		Map<String,String> response = new LinkedHashMap<String, String>();
+		
+		//Because of Transactional
+		try {
+			response = service.addNewBranch(form);
+		}
+		catch(Exception ex) {
+			log.error("Exception " + ex.getMessage());
+			response.put("status","false");
+			response.put("msg",ex.getMessage());
+		}
+		return response;
 	}
 	
-	@RequestMapping( value= {"/api/manager/updateBranch.json"})
+	@RequestMapping( value= {"/api/manager/updateBranch.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> updateBranchDetails(Model model, String seqid, @ModelAttribute("form") NewBranchForm form){
+	public Map<String,String> updateBranchDetails(Model model, @RequestBody NewBranchForm form){
 		log.info("Requesting from /branch/updateBranch.json");
-		return service.updateBranch(seqid, form);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String seqid = user.getBranchid();
+		return service.updateBranch(seqid,form);
 	}
 }

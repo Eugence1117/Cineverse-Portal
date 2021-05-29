@@ -222,10 +222,10 @@
 										<div class="row">
 											<div class="col-md-5"></div>
 											<div class="col-md-1 p-1">
-												<button type="submit" id="new-btn-submit" class="btn btn-primary">Submit</button>
+												<button type="reset" id="btnReset" class="btn btn-danger">Reset</button>
 											</div>
 											<div class="col-md-1 p-1">
-												<button type="reset" id="btnReset" class="btn btn-danger">Reset</button>
+												<button type="submit" id="new-btn-submit" class="btn btn-primary">Submit</button>
 											</div>
 											<div class="col-md-5"></div>
 										</div>
@@ -304,11 +304,11 @@
 					buttons:{
 						confirm: {
 							label: "Yes,I understand.",
-							className: "btn-success"
+							className: "btn-primary"
 						},
 						cancel: {
 							label: "No, is a mistake",
-							className: "btn-danger"
+							className: "btn-secondary"
 						}
 					},
 					callback:function(result){

@@ -30,7 +30,7 @@ public class AjaxRequestHandlingFilter implements Filter {
             String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
             if ("XMLHttpRequest".equals(ajaxHeader)) {
                 String principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-                log.info("Principal: " + principal);
+                //log.info("Principal: " + principal);
                 if("anonymousUser".equals(principal.toString())){
                     resp.setStatus(this.errorCode);
                     resp.sendError(this.errorCode, "Ajax time out");

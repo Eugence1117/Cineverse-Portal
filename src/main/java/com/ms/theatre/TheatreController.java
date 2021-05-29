@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.common.Response;
+import com.ms.login.Staff;
 
 @Controller
 public class TheatreController {
@@ -65,7 +67,8 @@ public class TheatreController {
 	@RequestMapping( value= {"/viewTheatre.htm"})
 	public String loadViewTheatrePage(Model model) {
 		log.info("Entered /viewTheatre.htm");
-		String branchid = session.getAttribute("branchid").toString();
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		Response res = service.retrieveAllTheatre(branchid);
 		if(res.getErrorMsg() != null) {
 			model.addAttribute("errorMsg",res.getErrorMsg());
@@ -80,7 +83,8 @@ public class TheatreController {
 	@ResponseBody
 	public List<Theatre> retrieveTheatreList(Model model){
 		log.info("entered /theatre/getTheatreList");
-		String branchid = session.getAttribute("branchid").toString();
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
 		return service.retrieveAvailableTheatre(branchid);
 	}
 	

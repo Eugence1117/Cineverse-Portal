@@ -1,6 +1,7 @@
 package com.ms.rules;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ms.common.Constant;
+import com.ms.common.Response;
 import com.ms.common.Util;
 
 @Service
@@ -22,9 +24,68 @@ public class RuleService {
 	@Autowired
 	RulesDAO dao;
 	
+	public Response editOperatingHours(String branchid, String startTime, String endTime) {
+		try {
+			String errorMsg = checkOperatingTime(LocalTime.parse(startTime),LocalTime.parse(endTime));
+			if(errorMsg == null) {
+				String timeRange = startTime + "-" + endTime;
+				errorMsg = dao.editOperatingHours(branchid + Constant.OPERATING_HOURS_SYNTAX, timeRange);
+				return errorMsg == null ? new Response((Object)"Operating Hours changed.") : new Response(errorMsg);
+			}
+			else {
+				return new Response(errorMsg);
+			}
+		}
+		catch(DateTimeParseException pe) {
+			log.error("DateTimeParseException:" + pe.getMessage());
+			return new Response("Invalid date found.");
+		}
+		catch(Exception ex) {
+			log.error("Exception:" + ex.getMessage());
+			return new Response("Unexpected error occured. Please try again later.");
+		}
+	}
+	
+	public Response addOperatingHours(String branchid) {
+		try {
+			OperatingHours rule = Util.getDefaultRules(branchid);
+			String errorMsg = checkOperatingTime(rule.getStartTime(),rule.getEndTime());
+			if(errorMsg == null) {
+				errorMsg = dao.generateOperatingHours(rule);
+				return errorMsg == null ? new Response((Object)"Operating Hours added.") : new Response(errorMsg);
+				//return new Response("error");
+			}
+			else {
+				return new Response(errorMsg);
+			}
+		}
+		catch(DateTimeParseException pe) {
+			log.error("DateTimeParseException:" + pe.getMessage());
+			return new Response("Invalid date found.");
+		}
+		catch(Exception ex) {
+			log.error("Exception:" + ex.getMessage());
+			return new Response("Unexpected error occured. Please try again later.");
+		}
+	}
+	
+	public String checkOperatingTime(LocalTime start, LocalTime end) {
+		if(start.compareTo(end) >= 0) {
+			return "Opening time cannot greater than closing time";
+		}
+		else {
+			int difference = end.getHour() - start.getHour();
+			if(difference < Constant.MINIMUM_OPERATING_DURATION) {
+				return "Minimum operating hours must at least " + Constant.MINIMUM_OPERATING_DURATION + " hours.";
+			}
+			
+			return null;
+		}
+	}
+	
 	public OperatingHours getOperatingHours(String branchid) {
 		if(!Util.trimString(branchid).equals("")) {
-			String ruleId = branchid + "_OH"; //Syntax for rules of operating hours
+			String ruleId = branchid + Constant.OPERATING_HOURS_SYNTAX;
 			Map<String,String> rawData = dao.retrieveOperatingHours(ruleId);
 			if(rawData == null) {
 				return null;

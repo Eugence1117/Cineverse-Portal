@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -137,17 +138,27 @@ public class UserService {
 		}
 	}
 	
-	public Map<String,String> getEditInfo(String userid){
+	public Map<String,Object> getEditInfo(String userid){
 		log.info("Retrieving info from database with id :" + userid);
-		Map<String,String> result = dao.getEditInfo(userid);
+		Map<String,Object> result = dao.getEditInfo(userid);
 		log.info("Received response from database.");
 		if(result == null) {
-			result = new HashMap<String,String>();
+			result = new HashMap<String,Object>();
 			result.put("msg","Unable to retrieve record from database.");
 			return result;
 		}
 		else {
-			result.put("msg","");
+			List<BranchForm.Result> branchList = dao.retrieveBranchListWithManagerBranch(userid);
+			if(branchList.size() > 0) {
+				result.put("msg","");
+				result.put("branches",branchList);
+			}
+			else {
+				result = new HashMap<String,Object>();
+				result.put("msg","Unable to retrieve record from database.");
+				return result;
+			}
+			
 			return result;
 		}
 		
