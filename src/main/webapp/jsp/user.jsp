@@ -89,7 +89,6 @@
 											<th>User Group</th>
 											<th>Branch</th>
 											<th>Status</th>
-											<th>Create Date</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -114,7 +113,7 @@
 	</a>
 
 	<!-- Insert Modal -->
-	<div class="modal" tabindex="-1" role="dialog" id="addUser">
+	<div class="modal fade" tabindex="-1" role="dialog" id="addUser">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -166,7 +165,7 @@
 										<div class="form-floating">
 											<select name="usergroup" id="usergroup" class="form-control" aria-label="Select an option">
 												<option hidden selected value="">Select an option</option>
-												<c:forEach items="${group.result}" var="group">
+													<c:forEach items="${group}" var="group">
 													<option value="<c:out value='${group.seqid}'/>"><c:out
 															value="${group.groupname}" /></option>
 												</c:forEach>
@@ -180,7 +179,7 @@
 										<div class="form-floating">
 											<select name="branchid" id="branchname" class="form-control" aria-label="Select an option">
 												<option hidden selected value="">Select an option</option>
-												<c:forEach items="${branch.result}" var="branch">
+												<c:forEach items="${branch}" var="branch">
 													<option value="<c:out value='${branch.seqid}'/>"><c:out
 															value="${branch.branchname}" /></option>
 												</c:forEach>
@@ -255,7 +254,7 @@
 	</div>
 	
 	<!-- Edit Modal -->
-	<div class="modal" tabindex="-1" role="dialog" id="editUser">
+	<div class="modal fade" tabindex="-1" role="dialog" id="editUser">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -276,7 +275,7 @@
 										<div class="form-floating">
 											<select name="Editusergroup" id="Editusergroup" class="form-control dropdown">
 												<option hidden selected></option>
-												<c:forEach items="${group.result}" var="group">
+													<c:forEach items="${group}" var="group">
 													<option value="<c:out value='${group.seqid}'/>"><c:out value="${group.groupname}" /></option>
 												</c:forEach>
 											</select>
@@ -288,10 +287,6 @@
 									<div class="col-md">
 										<div class="form-floating">
 											<select name="Editbranchid" id="Editbranchname" class="form-control dropdown">
-												<!-- <option hidden selected></option>
-												<c:forEach items="${branch.result}" var="branch">
-													<option value="<c:out value='${branch.seqid}'/>"><c:out value="${branch.branchname}" /></option>
-												</c:forEach> -->
 											</select>
 											<label for="branchname">Branch</label>
 										</div>
@@ -326,7 +321,7 @@
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
-    	
+
     	$.validator.setDefaults({
 			errorElement : "div",
 			errorClass : "invalid-feedback",
@@ -349,30 +344,23 @@
 			}
 		});
     	
-    	//console.log("<c:forEach items='${result.result}' var='rlt'><c:out value='${rlt.branchname}'/></c:forEach>");
     	
 		$(document).ready(function(){
-			var status1 = "<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
-		    	var status2 = "<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.key}'/></c:forEach>"
-		    	if(status1 != "true" || status2 != "true"){
-		    		var error = "";
-		    		if(status1 == "false"){
-		    			error = error.concat("<c:forEach items='${branch.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");		    			
-		    		}
-		    		if(status2 == "false"){
-		    			error = error.concat("<c:forEach items='${group.status}' var='rlt'><c:out value='${rlt.value}'/></c:forEach> <br>");
-		    		}
-		    		bootbox.alert(error);
-		    		return false;
-		    	}
+			var status = "${error}";
+			console.log(status)
+			if(status != ""){
+				bootbox.alert(status);
+				return false;
+			}
+			else{
+				readyFunction();
+			}
 		    	
-			readyFunction();
-			//clearInsertField();
 		});
 		
 		//View Function
 		function readyFunction(){
-			$.ajax("api/admin/retrieveInfo.json?",{
+			$.ajax("api/admin/retrieveUserTableInfo.json?",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
@@ -383,13 +371,13 @@
 				}
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					addActionButton(data.result);
 					resultDt.rows.add(data.result).draw();
 					addTooltip();
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}	
 			})
 		}
@@ -421,12 +409,11 @@
 			return $('#userInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'seqid', 'width':'15%',render:function(data,type,row){return data.length > 15 ? data.substr(0,10) + '.....' : data}},
-					{ data: 'username','width':'15%',render:function(data,type,row){return data.length > 15 ? data.substr(0,10) + '.....' : data}},
+					{ data: 'seqid', 'width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
+					{ data: 'username','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
 					{ data: 'usergroup','width':'15%',},
-		   			{ data: 'branchname','width':'15%',render:function(data,type,row){return data.length > 15 ? data.substr(0,10) + '.....' : data}},
+		   			{ data: 'branchname','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
 		   			{ data: 'status','width':'10%'},
-		   			{ data: 'createddate','width':'15%'},
 		   			{ data: 'action','width':'15%'}
 				],
 				order: [], 
@@ -490,6 +477,7 @@
 		
 		function getUserDetails(element){
 			var userid = element.id;
+			
 			$.ajax("api/admin/viewUser.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
@@ -501,7 +489,8 @@
 				}
 			}).done(function(data){
 				clearViewUser();
-				if(data.error == null || data.error == ""){
+				
+				if(data.errorMsg == null){
 					$("#viewUser").find(".modal-title").html("User :  <b>" + data.result.username + "</b>");
 					$("#viewUser .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
@@ -516,7 +505,7 @@
 					//$("#viewUser").toggle();
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
 			});
 		}
@@ -526,6 +515,7 @@
 			$("#viewUser .data").each(function(){
 				$(this).text("");
 			});
+			$("#viewUser").find(".modal-title").html("");
 		}
 		//END View Function
 		
@@ -627,23 +617,27 @@
 					401:function(){
 						window.location.href = "expire.htm";
 					}
-				}
+				},
 			}).done(function(data){
-				bootbox.alert({
-				    title: "Notification",
-				    message: data.msg,
-				    callback:function(){
-				    	if(data.status == "true"){
-							readyFunction();
+				if(data.errorMsg == null){
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.result,
+					    callback:function(){
+					    	readyFunction();
 				    		clearInsertField();
-						}
-						else{
-							$("#addUser").modal('show');
-						}
-				    }
-				});
-				
-				
+					    }
+					});
+				}
+				else{
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.errorMsg,
+					    callback:function(){
+					    	$("#addUser").modal('show');
+					    }
+					});
+				}	
 			});
 		}
 		
@@ -732,13 +726,24 @@
 								}
 							}
 						}).done(function(data){
-							bootbox.alert({
-							    title: "Notification",
-							    message: data.result,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});
+							if(data.errorMsg == null){
+								bootbox.alert({
+								    title: "Notification",
+								    message: data.result,
+								    callback:function(){
+								    	readyFunction();
+								    }
+								});
+							}
+							else{
+								bootbox.alert({
+								    title: "Notification",
+								    message: data.errorMsg,
+								    callback:function(){
+								    	readyFunction();
+								    }
+								});
+							}	
 						});
 			    	}
 			    }
@@ -773,25 +778,27 @@
 					}
 				}
 			}).done(function(data){
-				console.log(data.msg);
-				if(data.msg != ""){
-					bootbox.alert(data.msg);
+				if(data.errorMsg != null){
+					bootbox.alert(data.errorMsg);
 				}
 				else{	
 					clearEditField();
-					$("#editUserForm #seqid").val(data.seqid);
-					$("#editUser .modal-title").html("Editing user: " + data.username);
-					$("#editUser select[name=Editusergroup]").val(data.usergroupid);
 					
-					var branches = data.branches;
+					var user = data.result.user;
+					$("#editUserForm #seqid").val(user.seqid);
+					$("#editUser .modal-title").html("Editing user: " + user.username);
+					$("#editUser select[name=Editusergroup]").val(user.usergroupid);
+					
+					var branches = data.result.branches;
 					var html = "<option hidden selected>Select an option</option>";
 					for(var i = 0 ; i < branches.length ; i++){
 						html += "<option value='" + branches[i].seqid + "'>" + branches[i].branchname + "</option>";  
 					}
 					$("#editUserForm select[name=Editbranchid]").html(html);
 					checkDropdownValue($("#editUserForm select[name=Editusergroup]")[0]);
-					if(data.usergroupid == 2){
-						$("#editUserForm select[name=Editbranchid]").val(data.branchid);
+					
+					if(user.usergroupid == 2){
+						$("#editUserForm select[name=Editbranchid]").val(user.branchid);
 					}
 					
 					if(!$("#editUser").hasClass("show")){
@@ -850,19 +857,25 @@
 					}
 				}
 			}).done(function(data){
-				bootbox.alert({
-				    title: "Notification",
-				    message: data.msg,
-				    callback: function(){
-				    	if(data.status == "true"){
-				    		readyFunction();
-				    		clearEditField();
-				    	}
-				    	else{
-				    		$("#editUser").modal('show');
-				    	}
-					}
-				});
+				if(data.errorMsg != null){
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.errorMsg,
+					    callback: function(){
+					    	$("#editUser").modal('show');
+						}
+					});	
+				}
+				else{
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.result,
+					    callback: function(){
+					    	readyFunction();
+					    	clearEditField();
+						}
+					});	
+				}
 			});
 		}
 		//END Edit function
@@ -894,13 +907,24 @@
 								}
 							}
 						}).done(function(data){
-							bootbox.alert({
-							    title: "Notification",
-							    message: data.result,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});
+							if(data.errorMsg != null){
+								bootbox.alert({
+								    title: "Notification",
+								    message: data.errorMsg,
+								    callback: function(){
+								    	readyFunction();
+									}
+								});	
+							}
+							else{
+								bootbox.alert({
+								    title: "Notification",
+								    message: data.result,
+								    callback: function(){
+								    	readyFunction();
+									}
+								});	
+							}
 						});
 			    	}
 			    }

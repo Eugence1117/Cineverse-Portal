@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +33,10 @@ public class LoginDAO{
 		Staff staff = null;
 		try {
 			staff = new Staff(staffInfo.get("seqid"),staffInfo.get("username"),staffInfo.get("profilepic"),staffInfo.get("password"),usergroup,staffInfo.get("branchid"),UserStatus.valueOf(Integer.parseInt(staffInfo.get("status"))));	
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
 		}
 		catch(Exception ex) {
 			log.error("Exception " + ex.getMessage());
@@ -68,6 +73,10 @@ public class LoginDAO{
 				}
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
+		}
 		catch(Exception ex) {
 			log.info("Exception :" + ex.getMessage());
 			return null;
@@ -90,6 +99,10 @@ public class LoginDAO{
 				}
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
+		}
 		catch(Exception ex) {
 			log.error("Exception :" + ex.getMessage());
 			return null;
@@ -109,6 +122,10 @@ public class LoginDAO{
 					menuList.add(String.valueOf(id));
 				}
 			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
 		}
 		catch(Exception ex) {
 			log.error("Exception :" +ex.getMessage());
@@ -136,6 +153,10 @@ public class LoginDAO{
 					menuList.add(newMenu);
 				}
 			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
 		}
 		catch(Exception ex) {
 			log.error("Exception :" + ex.getMessage());

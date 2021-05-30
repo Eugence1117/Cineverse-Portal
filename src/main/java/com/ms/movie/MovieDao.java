@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,58 +40,79 @@ public class MovieDao {
 	public static Logger log = LogManager.getLogger(MovieDao.class);
 	
 	
-	public List<String> getNameList(){
+	public Map<Boolean,Object> getNameList(){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		
-		List<String> movieName = null;
+		
 		try {
 			 StringBuffer query = new StringBuffer().append("SELECT movieName from masp.movie");
 			 List<Map<String,Object>> rows = jdbc.queryForList(query.toString());
 			 
 			 if(rows.size() > 0) {
-				 movieName = new ArrayList<String>();
+				 List<String> movieName = new ArrayList<String>();
 				 for(Map<String,Object> row : rows) {
 					 String name = Util.trimString((String)row.get("movieName"));
 					 movieName.add(name);
 				 }
+				 log.info("Movie Name List Size::" + movieName.size());
+				 result.put(true, movieName);
+			 }
+			 else {
+				 log.info("No Movie Found.");
+				 result.put(false,Constant.NO_RECORD_FOUND);
 			 }
 			 
 		}
-		catch(Exception e) {
-			log.info("Exception ::" + e.getMessage());
-			return null;
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			result.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return movieName;
+		return result;
 	}
 	
-	public List<Map<String,String>> getCensorshipList(){
-		List<Map<String,String>> result = null;
+	public Map<Boolean,Object> getCensorshipList(){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT seqid, description FROM masp.censorship");
 			List<Map<String,Object>> rows = jdbc.queryForList(query.toString());
 			
 			if(rows.size() > 0) {
-				result = new ArrayList<Map<String,String>>();
+				List<Censorship> dataList = new ArrayList<Censorship>();
 				
 				for(Map<String,Object> row : rows) {
-					Map<String,String> record = new HashMap<String,String>();
 					String id = Util.trimString((String)row.get("seqid"));
 					String desc = Util.trimString((String)row.get("description"));
-					record.put("id", id);
-					record.put("desc", desc);
-					result.add(record);
+					
+					dataList.add(new Censorship(id,desc));
 				}
+				log.info("Censorship:" + dataList.size() + " record(s) retrieved from database");
+				result.put(true,dataList);
 			}
+			else {
+				log.info("Censorship:No record retrieve from database");
+				 result.put(false,Constant.NO_RECORD_FOUND);
+			 }
+			 
+		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.info("Exception ::" + ex.getMessage());
-			return null;
+			log.error("Exception ex: " + ex.getMessage());
+			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
 		return result;
 	
 	}
 	
+	//Backend used
 	public List<String> getExistMovieList(String username){
 		List<String> result = null;
 		try {
@@ -105,6 +127,10 @@ public class MovieDao {
 					result.add(movieId);
 				}
 			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
@@ -143,22 +169,22 @@ public class MovieDao {
 				
 			}
 			else {
-				return new Response("No data to be displayed.");
+				return new Response(Constant.NO_RECORD_FOUND);
 			}
 			
 		}
 		catch(CannotGetJdbcConnectionException gg) {
 			log.error("Connection error: " + gg.getMessage());
-			return new Response("Unable to connect to database server. Please try again later.");
+			return new Response(Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
 		}
 	}
 	
-	public Movie getMovieDetails(String movieId){
-		Movie result = null;
+	public Map<Boolean,Object> getMovieDetails(String movieId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		//TODO Need to select based on the branch manager id
 		try{
 			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
@@ -183,21 +209,33 @@ public class MovieDao {
 					String desc = Util.trimString((String)row.get("censorshipId"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new Movie(id,name,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
+					Movie result = new Movie(id,name,picurl,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,desc,totalTime);
+					
+					log.info("Movie:Movie " + result.getMovieName()+ " retrieved from database");
+					response.put(true,result);
 				}
 			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.info("Exception ::" + ex.getMessage());
-			return null;
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return result;
+		return response;
 		
 	}
 	
-	public ResponseMovieInfo.Result getMovieInfo(String movieId) {
-		ResponseMovieInfo.Result result = null;
+	
+	public Map<Boolean,Object> getMovieInfo(String movieId) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try{
 			StringBuffer query = new StringBuffer().append("SELECT movieName,picURL, totaltime, language, distributor, cast, director, ")
 												   .append("releasedate, synopsis, movietype, censorshipid FROM masp.movie ")
@@ -220,16 +258,25 @@ public class MovieDao {
 					String censorship = Util.trimString((String)row.get("censorshipid"));
 					
 					String releasedate = Constant.SQL_DATE_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(releaseDate));
-					result = new ResponseMovieInfo.Result(name,url,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
+					
+					MovieDetailsForm result = new MovieDetailsForm(name,url,totalTime,language,distributor,cast,director,releasedate,synopsis,movieType,censorship);
+					response.put(true,result);
 				}
 			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.info("Exception ::" + ex.getMessage());
-			return null;
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return result;
+		return response;
 	}
 	
 	public List<Map<String,String>> getMovieNameList(String minDate, String maxDate){
@@ -252,6 +299,10 @@ public class MovieDao {
 				}
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
+		}
 		catch(Exception e) {
 			log.info("Exception ::" + e.getMessage());
 			return null;
@@ -261,36 +312,48 @@ public class MovieDao {
 	}
 	
 	
-	public List<ResponseMovieResult.Result> getMovieByDateRange(String fromdate, String todate) {
+	public Map<Boolean,Object> getMovieByDateRange(String fromdate, String todate) {
 		log.info("Retrieving Movies details...");
-		List<ResponseMovieResult.Result> result = null;
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT seqid,moviename,picurl ")
 												   .append("FROM masp.movie where releasedate between ? and ? order by releasedate desc");
 			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),fromdate,todate);
-			result = new ArrayList<ResponseMovieResult.Result>();
+			List<BriefMovieForm> result = new ArrayList<BriefMovieForm>();
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {
 					String seqid = Util.trimString((String)row.get("seqid"));
 					String moviename = Util.trimString((String)row.get("moviename"));
 					String picUrl = Util.trimString((String)row.get("picurl"));
 					
-					ResponseMovieResult.Result record = new ResponseMovieResult.Result(seqid,moviename,picUrl);
+					BriefMovieForm record = new BriefMovieForm(seqid,moviename,picUrl);
 					result.add(record);
 				}
+				
+				log.info("Record Size : " + result.size());
+				response.put(true, result);
+			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
 		catch(Exception ex) {
-			log.error("Exception :: " + ex.getMessage());
-			return null;
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return result;
+		return response;
 	}
 	
-	public List<ResponseMovieResult.Result> getMovieByMovieName(String movieName) {
+	public Map<Boolean,Object> getMovieByMovieName(String movieName) {
 		log.info("Retrieving Movies details...");
-		List<ResponseMovieResult.Result> result = null;
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		List<Map<String,Object>> rows = new ArrayList<Map<String,Object>>();
 		try {
 			if(!movieName.equals("*")){
@@ -304,24 +367,33 @@ public class MovieDao {
 				rows = jdbc.queryForList(query.toString());
 			}
 			
-			result = new ArrayList<ResponseMovieResult.Result>();
 			if(rows.size() > 0) {
+				List<BriefMovieForm> result = new ArrayList<BriefMovieForm>();
 				for(Map<String,Object> row : rows) {
 					String seqid = Util.trimString((String)row.get("seqid"));
 					String moviename = Util.trimString((String)row.get("moviename"));
 					String picUrl = Util.trimString((String)row.get("picurl"));
 					
-					ResponseMovieResult.Result record = new ResponseMovieResult.Result(seqid,moviename,picUrl);
+					BriefMovieForm record = new BriefMovieForm(seqid,moviename,picUrl);
 					result.add(record);
 				}
+				log.info("Record Size : " + result.size());
+				response.put(true, result);
+			}
+			else {
+				response.put(false, Constant.NO_RECORD_FOUND);
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
 		catch(Exception ex) {
-			log.error("Exception :: " + ex.getMessage());
-			return null;
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return result;
+		return response;
 	}
 	
 	public MovieAvailablePeriod getMovieAvailableTime(String branchid, String movieid){
@@ -378,24 +450,28 @@ public class MovieDao {
 		}
 	}
 	
-	public boolean insertMovieAvailable(ExistMovieForm form, String branchId) {
+	public String insertMovieAvailable(ExistMovieForm form, String branchId) {
 		try {
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movieavailable VALUES(?,?,?,?,?)");
 			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_STATUS_CODE);
 			if(result > 0) {
-				return true;
+				return null;
 			}
 			else {
-				return false;
+				return "Unable to add this movie into your branch. Please try again later.";
 			}
 		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
 		catch(Exception ex) {
-			log.error("Exception ::" + ex.getMessage());
-			return false;
+			log.error("Exception ex: " + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	
-	public boolean insertNewMovie(NewMovieForm form, String picURL) {
+	public String insertNewMovie(NewMovieForm form, String picURL) {
 		int result = 0;
 		
 		try {
@@ -404,20 +480,23 @@ public class MovieDao {
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
 			if(result > 0) {
-				return true;
+				return null;
 			}
 			else {
-				return false;
+				return "Movie is not added. Please try again later.";
 			}
 		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
 		catch(Exception ex) {
-			log.error("Exception ::" + ex.getMessage());
-			return false;
+			log.error("Exception ex: " + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	
-	public Map<Boolean,String> updateMovieInfo(MovieEditForm form) {
-		Map<Boolean,String> response = new HashMap<Boolean,String>();
+	public String updateMovieInfo(MovieEditForm form) {
 		try {
 			String newReleaseDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getReleasedate()+Constant.DEFAULT_TIME));
 			StringBuffer query = new StringBuffer().append("UPDATE masp.movie SET movieName = ?, totaltime = ?, language = ?, distributor = ?, ")
@@ -426,22 +505,23 @@ public class MovieDao {
 			int result = jdbc.update(query.toString(), form.getMovieName(),form.getTotalTime(),form.getLanguage(),form.getDistributor(),
 									 form.getCast(),form.getDirector(),newReleaseDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),form.getMovieId());
 			if(result > 0) {
-				response.put(true,"Update success.");
-				log.info("Update success.");
-				return response;
+				return null;
+				
 			}else {
-				response.put(false,"Movie Not Found. Update Abort.");
-				log.info("No record update.");
-				return response;
+				return "Movie not found. Action abort.";
 			}
 		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
 		catch(Exception ex) {
-			log.error("Exception ex::" +ex.getMessage());
-			response.put(false,ex.getMessage());
-			return response;
+			log.error("Exception ex: " + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	
+	//Backend
 	public String getMoviePublishDate(String movieId) {
 		String date = null;
 		try {

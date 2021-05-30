@@ -234,7 +234,7 @@
 		</div>
 	</div>
 	
-	<div class="modal" tabindex="-1" role="dialog" id="preferences">
+	<div class="modal fade" tabindex="-1" role="dialog" id="preferences">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -272,6 +272,12 @@
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
     	$(document).ready(function(){
+    		var error = "${error}"
+        		if(error != ""){
+        			bootbox.alert(error);
+        			return false;
+        		}
+    		
 			readyFunction();
 			var hasCookie = JSON.parse('${hasCookie}');
     		if(!hasCookie){
@@ -291,13 +297,13 @@
 				},
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
-				if(data.errorMsg == null || data.errorMsg == ""){
+				if(data.errorMsg == null){
 					addActionButton(data.result);
 					resultDt.rows.add(data.result).draw();
 					addTooltip();
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}	
 			})
 		}
@@ -431,11 +437,11 @@
 				}
     		}).done(function(data){
     			$("#loading").hide();
-    			if(data.error == null || data.error == ""){
+    			if(data.errorMsg == null){
 					injectData(data.result,movieId);
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
     		})
 		}
@@ -503,11 +509,11 @@
 				},
     		}).done(function(data){
     			$("#loading").hide();
-    			if(data.error == null || data.error == ""){
+    			if(data.errorMsg == null){
 					injectData(data.result,movieId);
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
     		});
 		});
@@ -535,15 +541,15 @@
 					}
 				},
     		}).done(function(data){
-    			if(typeof data.false == "undefined"){
+    			if(data.errorMsg == null){
     				$("#movieDetails").modal('hide');
-    				bootbox.alert(data.true);
+    				bootbox.alert(data.result);
     				readyFunction();
     			}
     			else{
     				$("#movieDetails").addClass("skip");
     				$("#movieDetails").modal('hide');
-    				bootbox.alert(data.false,function(){
+    				bootbox.alert(data.errorMsg,function(){
     					$("#movieDetails").removeClass("skip");
     					$("#movieDetails").modal('show');
     				});

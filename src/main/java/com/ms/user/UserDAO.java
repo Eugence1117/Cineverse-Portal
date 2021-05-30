@@ -4,6 +4,7 @@ package com.ms.user;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,107 +33,148 @@ public class UserDAO {
 	
 	public static Logger log = LogManager.getLogger(UserDAO.class);
 	
-	public List<UserGroupForm.Result> retrieveUserGroupList(){
-		List<UserGroupForm.Result> result = new ArrayList<UserGroupForm.Result>();
+	public Map<Boolean,Object> retrieveUserGroupList(){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT groupid, groupname FROM masp.user_group WHERE groupid != ?");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.ADMIN_GROUP);
 			if(records.size() > 0) {
+				List<UserGroup> dataList = new ArrayList<UserGroup>();
 				for(Map<String,Object> record : records) {
 					String groupid = String.valueOf((int)record.get("groupid"));
 					String groupname = Util.trimString((String)record.get("groupname"));
-					UserGroupForm.Result data = new UserGroupForm.Result(groupid,Util.capitalize(Util.underscoreRemoval(groupname)));
-					result.add(data);
+					UserGroup data = new UserGroup(groupid,Util.capitalize(Util.underscoreRemoval(groupname)));
+					dataList.add(data);
 				}
+				log.info("Total of " + dataList.size() + " group(s) retrieved.");
+				result.put(true, dataList);
 			}
+			else {
+				result.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return result;
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return result;
 	}
 	
-	public List<BranchForm.Result> retrieveBranchList(){
-		List<BranchForm.Result> result = new ArrayList<BranchForm.Result>();
+	public Map<Boolean,Object> retrieveBranchList(){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
 												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid) ")
 												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP);
 			if(records.size() > 0) {
+				List<Branch> dataList = new ArrayList<Branch>();
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String branchname = Util.trimString((String)record.get("branchName"));
 					String district = Util.trimString((String)record.get("districtname"));
 					String state = Util.trimString((String)record.get("stateName"));
-					BranchForm.Result data = new BranchForm.Result(seqid,branchname+"- " + district + ", " + state);
-					result.add(data);
+					
+					Branch data = new Branch(seqid,branchname+"- " + district + ", " + state);
+					dataList.add(data);
 				}
+				log.info("Total of " + dataList.size() + " branch(s) is retrieved");
+				result.put(true, dataList);
 			}
+			else {
+				result.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return result;
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return result;
 	}
 	
-	public List<BranchForm.Result> retrieveBranchListWithManagerBranch(String staffId){
-		List<BranchForm.Result> result = new ArrayList<BranchForm.Result>();
+	public Map<Boolean,Object> retrieveBranchListWithManagerBranch(String staffId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
 												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid AND u.seqid != ?) ")
 												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP,staffId);
 			if(records.size() > 0) {
+				List<Branch> dataList = new ArrayList<Branch>();
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String branchname = Util.trimString((String)record.get("branchName"));
 					String district = Util.trimString((String)record.get("districtname"));
 					String state = Util.trimString((String)record.get("stateName"));
-					BranchForm.Result data = new BranchForm.Result(seqid,branchname+"- " + district + ", " + state);
-					result.add(data);
+					
+					Branch data = new Branch(seqid,branchname+"- " + district + ", " + state);
+					dataList.add(data);
 				}
+				response.put(true, dataList);
 			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return result;
+			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
-		return result;
+		return response;
 	}
 	
-	public List<UserModelList.Result> retrieveUsersDetails(String myUsername) {
-		List<UserModelList.Result> resultList  = new ArrayList<UserModelList.Result>();
+	public Map<Boolean,Object> retrieveUsersDetails(String myUsername) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT s.seqid, s.username, u.groupname, s.status, b.branchName, s.createddate ")
 												   .append("FROM masp.staff s LEFT JOIN masp.user_group u ON s.usergroup = u.groupid ")
 												   .append("LEFT JOIN masp.branch b ON s.branchid = b.seqid WHERE s.username != ? AND s.usergroup != ?");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),myUsername,Constant.ADMIN_GROUP);
+			log.info("Retrieved "+ records.size() +" record(s) from database.");
 			if(records.size() > 0) {
+				List<User> resultList = new ArrayList<User>();
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String username = Util.trimString((String)record.get("username"));
 					String groupname = Util.trimString((String)record.get("groupname"));
 					int status = (int)record.get("status");
 					String branchname = Util.trimString((String)record.get("branchName"));
-					String createddate = Constant.SQL_DATE_FORMAT.format((Timestamp)record.get("createddate"));
-					UserModelList.Result result = new UserModelList.Result(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status), Constant.STANDARD_PLUGIN_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(createddate)));
+					
+					User result = new User(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status));
 					resultList.add(result);
 				}
+				response.put(true, resultList);
 			}
+			else {
+				response.put(false, Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return null;
+			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return resultList;
+		return response;
 	}
 	
-	public User.Result retrieveUserDetails(String userid) {
-		User.Result result = null;
+	public Map<Boolean,Object> retrieveUserDetails(String userid) {
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT s.seqid, s.username, u.groupname, s.status, b.branchName, s.createddate ")
 												   .append("FROM masp.staff s LEFT JOIN masp.user_group u ON s.usergroup = u.groupid ")
@@ -141,19 +183,29 @@ public class UserDAO {
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),userid);
 			if(records.size() > 0) {
 				for(Map<String,Object> record : records) {
+					
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String username = Util.trimString((String)record.get("username"));
 					String groupname = Util.trimString((String)record.get("groupname"));
 					int status = (int)record.get("status");
 					String branchname = Util.trimString((String)record.get("branchName"));
 					String createddate = Constant.SQL_DATE_FORMAT.format((Timestamp)record.get("createddate"));
-				    result = new User.Result(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status), Constant.STANDARD_PLUGIN_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(createddate)));
+				    User user = new User(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status), Constant.STANDARD_PLUGIN_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(createddate)));
+				    log.info("Retrieved "+ username +" 's record from database.");
+				    result.put(true, user);
 				}
 			}
+			else {
+				result.put(false, Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return null;
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
 		return result;
@@ -172,14 +224,18 @@ public class UserDAO {
 				return true;
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return false;
+		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
 			return false;
 		}
 	}
 	
-	public Map<String,Object> getEditInfo(String userid){
-		Map<String,Object> result = new HashMap<String,Object>();
+	public Map<Boolean,Object> getEditInfo(String userid){
+		Map<Boolean,Object> result = new HashMap<Boolean,Object>();
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT s.seqid, s.usergroup, s.branchid, s.username FROM masp.staff s WHERE s.seqid = ? ");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),userid);
@@ -189,74 +245,112 @@ public class UserDAO {
 					int usergroup = (int)record.get("usergroup");
 					String branchid = (String)record.get("branchid");
 					String username = (String)record.get("username");
-					
-					result.put("seqid",seqid);
-					result.put("usergroupid",String.valueOf(usergroup));
-					result.put("branchid",branchid);
-					result.put("username",username);
-					return result;
+
+					UserEditableForm user = new UserEditableForm(seqid,username,String.valueOf(usergroup),branchid);
+					result.put(true,user);
 				}
 			}
+			else {
+				result.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.error("Exception ex:: " + ex.getMessage());
-			return null;
+			log.error("Exception ex::" + ex.getMessage());
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
 		}
-		return null;
+		
+		return result;
 	}
 	
-	public boolean updateUserStatus(String userid, int status) {
+	public String updateUserStatus(String userid, int status) {
 		try {
 			StringBuffer query = new StringBuffer().append("UPDATE masp.Staff SET status = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(),status,userid);
-			return result > 0 ? true : false;
+			if(result > 0) {
+				log.info("Status updated");
+				return null;
+			}
+			else {
+				log.info("Unable to locate staff record");
+				return "Unable to update the user status. Please try again later.";	
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return false;
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	
-	public boolean updateUser(UserEditForm form) {
+	public String updateUser(UserEditForm form) {
 		try {
 			StringBuffer query = new StringBuffer().append("UPDATE masp.STAFF SET branchid = ?, usergroup = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(),form.getEditbranchid(),form.getEditusergroup(),form.getSeqid());
-			return result > 0 ? true:false;
+			if(result >0) {
+				return null;
+			}
+			else {
+				return "Unable to update the user information. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return false;
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	
-	public boolean deleteUser(String userid) {
+	public String deleteUser(String userid) {
 		
 		try {
 			StringBuffer query = new StringBuffer().append("DELETE FROM masp.STAFF WHERE seqid = ?");
 			int result = jdbc.update(query.toString(),userid);
-			return result > 0 ? true : false;
+			if(result >0) {
+				return null;
+			}
+			else {
+				return "Unable to delete the user. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return false;
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
-	public boolean addNewUser(NewUserForm form, String uuid, String createddate) {
+	public String addNewUser(NewUserForm form, String uuid, String createddate) {
 		
 		try {
 			log.info("status:" + form.getStatus() + " branchid:" + form.getBranchid());
 			StringBuffer query = new StringBuffer("INSERT INTO masp.STAFF VALUES(?,?,?,?,?,?,?,?)");
 			int response = jdbc.update(query.toString(),uuid,form.getUsername(),form.getPassword(),form.getUsergroup(),form.getStatus(),form.getBranchid(),createddate,Constant.DEFAULT_USER_PROFILE_PIC);
 			if(response > 0) {
-				return true;
+				return null;
 			}
 			else {
-				return false;
+				return "Unable to create user. Please try again later.";
 			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return false;
+			return Constant.UNKNOWN_ERROR_OCCURED;
 		}
 	}
 	

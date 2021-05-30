@@ -242,7 +242,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal" tabindex="-1" role="dialog">
+	<div class="modal fade" tabindex="-1" role="dialog">
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -938,11 +938,11 @@
 					}
 				}
 			}).done(function(data){
-				if (data == null){
-					bootbox.alert("Unable to retrieve theatre information, please try again later.");
+				if (data.errorMsg != null){
+					bootbox.alert(errorMsg);
 					return null;
 				}else{
-					theatreList = data;
+					theatreList = data.result;
 				}	
 			});
 			return theatreList;

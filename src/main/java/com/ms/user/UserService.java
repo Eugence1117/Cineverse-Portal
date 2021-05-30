@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,64 +45,47 @@ public class UserService {
 	
 	public static Logger log = LogManager.getLogger(UserService.class);
 	
-	public UserGroupForm getUserGroup() {
-		log.info("Retrieve usergroup list from database.");
-		List<UserGroupForm.Result> result = dao.retrieveUserGroupList();
-		Map<Boolean,String> response = new HashMap<Boolean,String>();
-		if(result.size() == 0) {
-			response.put(false,"Unable to retrieve necessary data from database.");
-		}
-		else {
-			response.put(true,result.size() + " record(s) retrieved.");
-		}
-		log.info(result.size() + " Record(s) retrieved");
-		return new UserGroupForm(result,response);
-	}
-	
-	public BranchForm getBranchList(){
+	public Response getBranchList(){
 		log.info("Retrieve branch list from database.");
-		List<BranchForm.Result> result = dao.retrieveBranchList();
-		Map<Boolean,String> response = new HashMap<Boolean,String>();
-		if(result.size() == 0) {
-			response.put(false,"Unable to retrieve necessary data from database.");
+		Map<Boolean,Object> result = dao.retrieveBranchList();
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
 		}
 		else {
-			response.put(true,result.size() + " record(s) retrieved.");
+			return new Response(result.get(true));
 		}
-		log.info(result.size() + " Record(s) retrieved");
-		return new BranchForm(result,response);
 	}
 	
-	public UserModelList getUsersDetails(String username) {
-		log.info("Retrieve user info from database.");
-		List<UserModelList.Result> result = dao.retrieveUsersDetails(username);
-		if(result == null) 
-		{	
-			log.info("Retrieved null from database.");
-			return new UserModelList("Unable to retrieve record.");
-		}
-		else if(result.size() == 0) {
-			log.info("Retrieved 0 record from database.");
-			return new UserModelList("No Record Found.");
+	public Response getUserGroup() {
+		log.info("Retrieve usergroup list from database.");
+		Map<Boolean,Object> result = dao.retrieveUserGroupList();
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
 		}
 		else {
-			log.info("Retrieved "+ result.size() +" record(s) from database.");
-			return new UserModelList(result);
+			return new Response(result.get(true));
 		}
-		
 	}
 	
-	public User getUserDetails(String userid) {
+	public Response getUsersDetails(String username) {
 		log.info("Retrieve user info from database.");
-		User.Result result = dao.retrieveUserDetails(userid);
-		if(result == null) 
-		{	
-			log.info("Retrieved null from database.");
-			return new User("Unable to retrieve record.");
+		Map<Boolean,Object> result = dao.retrieveUsersDetails(username);
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
 		}
 		else {
-			log.info("Retrieved "+ result.getUsername() +" 's record from database.");
-			return new User(result);
+			return new Response(result.get(true));
+		}
+	}
+	
+	public Response getUserDetails(String userid) {
+		log.info("Retrieve user info from database.");
+		Map<Boolean,Object> result = dao.retrieveUserDetails(userid);
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
+		}
+		else {
+			return new Response(result.get(true));
 		}
 	}
 	
@@ -115,16 +99,20 @@ public class UserService {
 		
 	}
 	
-	public String updateUserStatus(String userid, String status) {
+	public Response updateUserStatus(String userid, String status) {
 		String statusDesc = Util.getStatusDesc(Integer.parseInt(status));
 		if(statusDesc == null) {
-			return "Received invalid data from user's request.";
+			return new Response("Received invalid data from user's request.");
 		}
 		else {
 			log.info("Updating user status to :" + statusDesc);
-			boolean result = dao.updateUserStatus(userid, Integer.parseInt(status));
-			log.info("Received response :" + result);
-			return result == true ? "Status update successful." : "Status update failed.";
+			String errorMsg = dao.updateUserStatus(userid, Integer.parseInt(status));
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				return new Response((Object)("User's status is updated to " + statusDesc));
+			}
 		}
 	}
 	
@@ -138,55 +126,48 @@ public class UserService {
 		}
 	}
 	
-	public Map<String,Object> getEditInfo(String userid){
+	public Response getEditInfo(String userid){
+		Map<String,Object> result = new LinkedHashMap<String, Object>();
 		log.info("Retrieving info from database with id :" + userid);
-		Map<String,Object> result = dao.getEditInfo(userid);
+		Map<Boolean,Object> response = dao.getEditInfo(userid);
 		log.info("Received response from database.");
-		if(result == null) {
-			result = new HashMap<String,Object>();
-			result.put("msg","Unable to retrieve record from database.");
-			return result;
+		if(response.containsKey(false)) {
+			return new Response((String)response.get(false));
 		}
 		else {
-			List<BranchForm.Result> branchList = dao.retrieveBranchListWithManagerBranch(userid);
-			if(branchList.size() > 0) {
-				result.put("msg","");
-				result.put("branches",branchList);
+			result.put("user", response.get(true));
+			Map<Boolean,Object> branchList = dao.retrieveBranchListWithManagerBranch(userid);
+			if(branchList.containsKey(false)) {
+				return new Response((String)branchList.get(false));
 			}
 			else {
-				result = new HashMap<String,Object>();
-				result.put("msg","Unable to retrieve record from database.");
-				return result;
+				result.put("branches", branchList.get(true));
+				return new Response(result);
 			}
-			
-			return result;
 		}
 		
 	}
 	
-	public Map<String,String> editUser(UserEditForm form){
+	public Response editUser(UserEditForm form){
 		log.info("Updating user info");
-		boolean result = dao.updateUser(form);
-		Map<String,String> response = new HashMap<String,String>();
-		if(result) {
-			log.info("Update successful.");
-			response.put("status","true");
-			response.put("msg","Edit successful. Edited on:" + Constant.STANDARD_PLUGIN_FORMAT.format(new Date()));
-			return response;
+		String errorMsg = dao.updateUser(form);
+		if(errorMsg != null) {
+			return new Response(errorMsg);
 		}
 		else {
-			log.info("Update failed.");
-			response.put("status","false");
-			response.put("msg","Edit user failed. Unable to update record.");
-			return response;
+			return new Response((Object)("User details is update."));
 		}
 	}	
 	
-	public String deleteUser(String userid) {
+	public Response deleteUser(String userid) {
 		log.info("Deleting user " + userid);
-		boolean result = dao.deleteUser(userid);
-		log.info("Received response :" + result);
-		return result == true ? "User with ID:" + userid + " deleted." : "User with ID:" + userid + " delete failed."; 
+		String errorMsg = dao.deleteUser(userid);
+		if(errorMsg != null) {
+			return new Response(errorMsg);
+		}
+		else {
+			return new Response((Object)("User with ID:" + userid + " is deleted."));
+		}		
 	}
 	
 	public Response changeProfilePic(MultipartFile mpf, String userid) {
@@ -277,37 +258,29 @@ public class UserService {
 		}
 	}
 	
-	public Map<String,String> addNewUser(NewUserForm form) {
+	public Response addNewUser(NewUserForm form) {
 		
-		Map<String,String> result = new HashMap<String,String>();
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if(Util.getStatusDesc(Integer.parseInt(form.getStatus())) == null) {
 			log.error("Invalid status value.");
-			result.put("status","false");
-			result.put("msg","Received invalid data from client's request.");
-			return result;
+			return new Response("Received invalid data from client's request. Action abort.");
 		}
 		
 		if(Integer.parseInt(form.getUsergroup()) == Constant.MANAGER_GROUP && Util.trimString(form.getBranchid()).isEmpty()) {
 			log.error("Empty branch found.");
-			result.put("status","false");
-			result.put("msg","Branch not found.");
-			return result;
+			return new Response("Received data consist of invalid branch ID. Action abort.");
 		}
 		else{
 			String uuid = UUID.randomUUID().toString();
 			String createddate = Constant.SQL_DATE_FORMAT.format(new Date());
 			form.setPassword(encoder.encode(form.getPassword()));
-			boolean status = dao.addNewUser(form, uuid, createddate);
-			if(status) {
-				result.put("status","true");
-				result.put("msg","User created.<br> User ID generated :" + uuid);
+			String errorMsg = dao.addNewUser(form, uuid, createddate);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
 			}
 			else {
-				result.put("status","false");
-				result.put("msg","Create new User failed. Unable to insert record.");
+				return new Response((Object)("User " + form.getUsername() + " is created."));
 			}
-			return result;
 		}
 	}
 	

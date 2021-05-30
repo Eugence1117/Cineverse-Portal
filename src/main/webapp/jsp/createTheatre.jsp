@@ -116,7 +116,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
+	<div class="modal fade" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">

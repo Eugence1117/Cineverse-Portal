@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ms.common.Constant;
 import com.ms.common.Response;
+import com.ms.common.Util;
 import com.ms.login.Staff;
 import com.ms.rules.RuleService;
 
@@ -35,74 +36,99 @@ public class BranchService {
 	@Autowired
 	RuleService ruleService;
 	
-	public ResponseBranchInfo getBranchDetails(int usergroup,String username) {
-		ResponseBranchInfo result = null;
+	public Response getBranchDetails(int usergroup,String username) {
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		if(usergroup == Constant.ADMIN_GROUP) {
 			log.info("Retrieving branches list.");
 			result = dao.getBranchDetails();
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
+			}
+			else {
+				return new Response(result.get(true));
+			}
 		}
 		else if(usergroup == Constant.MANAGER_GROUP){
 			log.info("Retrieving owned branch information.");
 			Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			String branchId = user.getBranchid();
 			if(branchId == null) {
-				return new ResponseBranchInfo("Unable to retrieve branch information.");
+				return new Response("Unable to retrieve branch information.");
 			}else {
 				result = dao.getBranchDetails(branchId);
+				if(result.containsKey(false)) {
+					return new Response(result.get(false));
+				}
+				else {
+					return new Response(result.get(true));
+				}
 			}
 		}
 		else{
-			return new ResponseBranchInfo("You do not have permission to access this page.");
+			return new Response("You do not have permission to access this page.");
 		}
-		return result;
 	}
 
 	
-	public ResponseBranchInfo getBranchDetails(String branchId) {
-		log.info("Retrieving branch Information.");
-		return dao.getBranchDetails(branchId);
-	}
-	
-	public Map<String,String> deleteBranch(String branchId) {
-		log.info("Deleting branch.");
-		Map<String,String> resultJson = new LinkedHashMap<String, String>();
-		if(branchId.trim().equals("")){
-			resultJson.put("Msg", "Unable to find this branch.");
-		}else {
-			resultJson.put("Msg", dao.deleteBranch(branchId));
-		}
-		return resultJson;
-	}
-	
-	public Map<String,String> updateStatus(int status, String branchId){
-		log.info("Updating status.");
-		Map<String,String> resultJson =new LinkedHashMap<String,String>();
-		if(status < -1 || status > 1) {
-			resultJson.put("msg", "Unknown status recevied. Unable to update.");
+	public Response getBranchDetails(String branchId) {
+		log.info("Retrieving branch Information with ID" + branchId);
+		Map<Boolean,Object> response = dao.getBranchDetails(branchId);
+		if(response.containsKey(false)) {
+			return new Response((String)response.get(false));
 		}
 		else {
-			resultJson.put("msg",dao.updateStatus(status, branchId));
-		}
-		return resultJson;
-	}
-	
-	public States getAllState(){
-		log.info("Retrieving state.");
-		List<States.Result> resultList = dao.retrieveAllState();
-		if(resultList == null) {
-			return new States("Unable to retrieve state.");
-		}else {
-			return new States(resultList);
+			return new Response(response.get(true));
 		}
 	}
 	
-	public Districts getDistricts(String stateId){
-		log.info("Retrieving state.");
-		List<Districts.Result> resultList = dao.retrieveDistricts(stateId);
-		if(resultList == null) {
-			return new Districts("Unable to retrieve state.");
+	public Response deleteBranch(String branchId) {
+		log.info("Deleting branch.");
+		if(branchId.trim().equals("")){
+			return new Response("Required data not found from client's request. Action abort");
 		}else {
-			return new Districts(resultList);
+			String errorMsg = dao.deleteBranch(branchId);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				return new Response((Object)"Selected Branch is deleted.");
+			}
+		}
+	}
+	
+	public Response updateStatus(int status, String branchId){
+		log.info("Updating status.");
+		if(Util.getStatusDesc(status) == null) {
+			return new Response("Received unknown data from client's request. Unable to update.");
+		}
+		else {
+			String errorMsg = dao.updateStatus(status, branchId);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				return new Response((Object)"Branch status updated to " + Util.getStatusDesc(status));
+			}
+		}
+	}
+	
+	public Response getAllState(){
+		log.info("Retrieving state.");
+		List<State> resultList = dao.retrieveAllState();
+		if(resultList == null) {
+			return new Response("Unable to retrieve state.");
+		}else {
+			return new Response(resultList);
+		}
+	}
+	
+	public Response getDistricts(String stateId){
+		log.info("Retrieving state.");
+		List<District> resultList = dao.retrieveDistricts(stateId);
+		if(resultList == null) {
+			return new Response("Unable to retrieve state.");
+		}else {
+			return new Response(resultList);
 		}
 	}
 	
@@ -115,9 +141,7 @@ public class BranchService {
 	}
 	
 	@Transactional(rollbackFor = Exception.class)
-	public Map<String,String> addNewBranch(NewBranchForm form){
-		Map<String,String> response = new LinkedHashMap<String, String>();
-		
+	public Response addNewBranch(NewBranchForm form){
 		log.info("Creating new branch.");
 		String seqid = UUID.randomUUID().toString();
 		log.info("ID: " + seqid);
@@ -130,22 +154,24 @@ public class BranchService {
 			log.error("Creating Rule Error:" + ruleResponse.getErrorMsg());
 			throw new RuntimeException(ruleResponse.getErrorMsg());
 		}
-		response.put("status","true");
-		response.put("msg", "Branch:" + form.getBranchname() + " is added.");
-		return response;
+		return new Response((Object)("Branch:" + form.getBranchname() + " is added."));
 	}
 	
-	public Map<String,String> updateBranch(String branchid, NewBranchForm form){
+	public Response updateBranch(String branchid, NewBranchForm form){
 		log.info("Updating branch information.");
-		Map<String,String> response = new HashMap<String, String>();
 		if(form.getBranchname() == null || form.getDistrict() == null || form.getAddress() == null || form.getPostcode() == 0) {
-			log.error("Received empty data.");
-			response.put("msg","Unable to retrieve latest information.");
-			return response;
+			log.error("Received empty data from client's request.");
+			return new Response("Missing required data from client's request. Action abort.");
 		}
 		else {
-			response.put("msg",dao.updateBranch(branchid, form));
-			return response;
+			String errorMsg = dao.updateBranch(branchid, form);
+			if(errorMsg == null) {
+				log.info("Updating Branch:" + form.getBranchname() + " SUCCESS.");
+				return new Response((Object)"Branch update successfully.");
+			}
+			else {
+				return new Response(errorMsg);
+			}
 		}
 	}
 }

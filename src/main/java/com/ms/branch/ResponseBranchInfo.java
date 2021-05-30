@@ -5,43 +5,28 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
+@AllArgsConstructor
 public class ResponseBranchInfo {
 	
-	private final Result result;
-	private final List<Result> resultList;
-	private final String error;
+	private String seqid;
+	private String branchName;
+	private String address;
+	private int postcode;
+	private String districtName;
+	private String stateName;
+	private String status;
 	
-	public ResponseBranchInfo(Result result) {
-		this.result = result;
-		this.resultList = null;
-		this.error = null;
-	}
-	
-	public ResponseBranchInfo(List<Result> resultList) {
-		this.resultList = resultList;
-		this.result = null;
-		this.error = null;
-	}
-	
-	public ResponseBranchInfo(String error) {
-		this.error = error;
-		this.resultList = null;
-		this.result = null;
+	public ResponseBranchInfo(String seqid, String branchName, String districtName, String stateName, String status) {
+		this.seqid = seqid;
+		this.branchName = branchName;
+		this.districtName = districtName;
+		this.stateName = stateName;
+		this.status = status;
 	}
 	
 	
-	@Getter
-	@AllArgsConstructor
-	@Builder
-	public static class Result{
-		private final String seqid;
-		private final String branchName;
-		private final String address;
-		private final int postcode;
-		private final String districtName;
-		private final String stateName;
-		private final String status;
-	}
 }

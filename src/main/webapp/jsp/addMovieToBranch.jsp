@@ -317,12 +317,12 @@
 					}
 				}
 				}).done(function(data) {
-					if(data != null){
+					if(data.errorMsg == null){
 						$("#details-collapse").toggle(true);
 						insertData(data);
 					}
 					else{
-						bootbox.alert("Unable to retrive the movie details. Please try again later.");
+						bootbox.alert(data.errorMsg);
 					}
 			});
 		});
@@ -368,9 +368,9 @@
 				})
 				.done(function(data){
 					$("#extModal").modal("hide");
-					if(data.result != "" && data.result != 	null){
+					if(data.errorMsg == null){
 						bootbox.alert({
-							message: data.result.message,
+							message: data.result,
 							callback: function(){
 								window.location.href = "addMovieToBranch.htm";
 							}
@@ -378,7 +378,7 @@
 					}
 					else{
 						bootbox.alert({
-							message: data.error,
+							message: data.errorMsg,
 							callback: function(){
 								$("#extModal").modal('show');
 							}

@@ -519,7 +519,15 @@ public class ScheduleService {
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							for (int i = 0; i < movieidList.size(); i++) {
 								String movieId = movieidList.get(i);
-								Movie movie = movieDao.getMovieDetails(movieId);
+								
+								Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+								if(movieResponse.containsKey(false)){
+									response = new LinkedHashMap<String, String>();
+									response.put("error", "Unable to retrieve complete data. Please try again later.");
+									return response;
+								}
+								Movie movie = (Movie)movieResponse.get(true);
+								
 								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
 								int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
@@ -545,8 +553,13 @@ public class ScheduleService {
 								return response;
 							}
 							
-							
-							List<TheatreType> types = theatreDao.getTheatreType();
+							Map<Boolean,Object> res = theatreDao.getTheatreType();
+							if(res.containsKey(false)) {
+								response = new LinkedHashMap<String, String>();
+								response.put("error", (String)res.get(false));
+								return response;
+							}
+							List<TheatreType> types = (List<TheatreType>) res.get(true);
 
 							List<com.ms.optaplanner.Theatre> theatres = new ArrayList<com.ms.optaplanner.Theatre>();
 							for (Theatre theatre : theatreList) {
@@ -699,7 +712,15 @@ public class ScheduleService {
 			OperatingHours operatingHours = rulesService.getOperatingHours(branchid);
 			if(groupIds.size() > 0) {
 				List<Theatre> theatreList = retrieveTheatreList(branchid); 
-				List<TheatreType> types =  theatreDao.getTheatreType();
+				
+				Map<Boolean,Object> res = theatreDao.getTheatreType();
+				if(res.containsKey(false)) {
+					response = new LinkedHashMap<String, String>();
+					response.put("error", (String)res.get(false));
+					return response;
+				}
+				
+				List<TheatreType> types = (List<TheatreType>) res.get(true);
 				Long ScheduleEndDate = (Long)payload.get("endDate");
 				
 				List<TimeGrain> timeList = getOperatingTimeGrain(branchid);
@@ -753,7 +774,13 @@ public class ScheduleService {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
 									
-									Movie movie = movieDao.getMovieDetails(movieId);
+									Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+									if(movieResponse.containsKey(false)){
+										response = new LinkedHashMap<String, String>();
+										response.put("error", "Unable to retrieve complete data. Please try again later.");
+										return response;
+									}
+									Movie movie = (Movie)movieResponse.get(true);
 									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid,movieId);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
@@ -887,7 +914,14 @@ public class ScheduleService {
 			List<String> groupIds = (ArrayList<String>)payload.get("groupId");
 			if(groupIds.size() > 0) {
 				List<Theatre> theatreList = retrieveTheatreList(branchid); 
-				List<TheatreType> types =  theatreDao.getTheatreType();
+				
+				Map<Boolean,Object> res = theatreDao.getTheatreType();
+				if(res.containsKey(false)) {
+					response = new LinkedHashMap<String, String>();
+					response.put("error", (String)res.get(false));
+					return response;
+				}
+				List<TheatreType> types = (List<TheatreType>) res.get(true);
 				
 				List<TimeGrain> timeList = getOperatingTimeGrain(branchid);
 				if(timeList == null) {
@@ -935,7 +969,13 @@ public class ScheduleService {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
 									
-									Movie movie = movieDao.getMovieDetails(movieId);
+									Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+									if(movieResponse.containsKey(false)){
+										response = new LinkedHashMap<String, String>();
+										response.put("error", "Unable to retrieve complete data. Please try again later.");
+										return response;
+									}
+									Movie movie = (Movie)movieResponse.get(true);
 									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
 									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
 									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
@@ -1146,15 +1186,17 @@ public class ScheduleService {
 		return dateList;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Theatre> retrieveTheatreList(String branchid) {
-		List<Theatre> theatre = theatreDao.getActiveTheatreList(branchid);
-		if (theatre == null) {
-			log.error("Unable to retrieve Theatre List from branch: " + branchid);
+		Map<Boolean,Object> response = theatreDao.getActiveTheatreList(branchid);
+		if(response.containsKey(false)) {
+			log.error(response.get(false) + " Branch ID: " + branchid);
 			return null;
-		} else {
+		}
+		else {
+			List<Theatre> theatre = (List<Theatre>)response.get(true);
 			return theatre;
 		}
-
 	}
 
 	public List<TimeGrain> getOperatingTimeGrain(String branchid) {

@@ -8,30 +8,23 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class User {
 	
-	private final Result result;
-	private final String error;
+	private String seqid;
+	private String username;
+	private String usergroup;
+	private String branchname;
+	private String status;
+	private String createddate;
 	
-	public User(Result result) {
-		this.result = result;
-		this.error = null;
+	public User(String seqid, String username, String usergroup, String branchname, String status) {
+		this.seqid = seqid;
+		this.username = username;
+		this.usergroup = usergroup;
+		this.branchname = branchname;
+		this.status = status;
 	}
 	
-	public User(String error) {
-		this.error = error;
-		this.result = null;
-	}
 	
-	@Getter
-	@AllArgsConstructor
-	@Builder
-	public static class Result{
-		private final String seqid;
-		private final String username;
-		private final String usergroup;
-		private final String branchname;
-		private final String status;
-		private final String createddate;
-	}
 }

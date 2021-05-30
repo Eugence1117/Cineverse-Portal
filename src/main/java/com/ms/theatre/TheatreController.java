@@ -39,12 +39,12 @@ public class TheatreController {
 	//@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public String loadCreateTheatrePage(Model model){
 		log.info("Entered /createTheatre.htm");
-		List<TheatreType> typeList = service.retrieveTheatreTypes();
-		if(typeList == null) {
-			model.addAttribute("errorMsg","Unable to retrieve information from server. Please try again later.");
+		Response typeList = service.retrieveTheatreTypes();
+		if(typeList.getErrorMsg() != null) {
+			model.addAttribute("errorMsg",typeList.getErrorMsg());
 		}
 		else {
-			model.addAttribute("theatreTypes",typeList);
+			model.addAttribute("theatreTypes",typeList.getResult());
 		}
 		return "createTheatre";
 		
@@ -53,12 +53,12 @@ public class TheatreController {
 	@RequestMapping(value = {"/editTheatre.htm"})
 	public String loadEditTheatrePage(Model model, String theatreId) {
 		log.info("Entered /editTheatre.htm");
-		List<TheatreType> typeList = service.retrieveTheatreTypes();
-		if(typeList == null) {
-			model.addAttribute("errorMsg","Unable to retrieve information from server. Please try again later.");
+		Response typeList = service.retrieveTheatreTypes();
+		if(typeList.getErrorMsg() != null) {
+			model.addAttribute("errorMsg",typeList.getErrorMsg());
 		}
 		else {
-			model.addAttribute("theatreTypes",typeList);
+			model.addAttribute("theatreTypes",typeList.getResult());
 		}
 		model.addAttribute("theatreid",theatreId);
 		return "editTheatre";
@@ -81,7 +81,7 @@ public class TheatreController {
 	
 	@RequestMapping( value= {"/api/authorize/getTheatreList.json"})
 	@ResponseBody
-	public List<Theatre> retrieveTheatreList(Model model){
+	public Response retrieveTheatreList(Model model){
 		log.info("entered /theatre/getTheatreList");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();

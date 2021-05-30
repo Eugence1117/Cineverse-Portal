@@ -16,23 +16,6 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider_style.css'/>">
     <!-- Compiled and minified JavaScript -->
 <style>
-	#movieInfo{
-		position:relative;
-		min-height:250px;
-	}
-	
-	#loading{
-		position:absolute;
-		display:inline-block;
-		top:50%;
-		right:50%;
-	}
-	
-	#loading img{
-		display:block;
-		margin:auto;	
-		vertical-align:middle;
-	}
 
 @media only screen and (max-width: 768px) {
 	form .btn{
@@ -153,7 +136,7 @@
 												</c:if>
 											</div>
 											<div class="card-body d-none" id="movieInfo">
-												<div class="" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
+												<div class="hide text-center m-4" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
 												<form id="movieEditForm">
 												<div class="row mt-1 mb-4">
 													<div class="col-md">
@@ -264,7 +247,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal" tabindex="-1" role="dialog" id="preferences">
+	<div class="modal fade" tabindex="-1" role="dialog" id="preferences">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -372,6 +355,12 @@
     	
     	var synopsis = null;
     	$(document).ready(function(){
+    		var error = "${error}"
+    		if(error != ""){
+    			bootbox.alert(error);
+    			return false;
+    		}
+    		
     		var hasCookie = JSON.parse('${hasCookie}');
     		if(!hasCookie){
     			$("#preferences").modal("show");
@@ -440,14 +429,14 @@
 						}
 					}
 				}).done(function(data){
-					if(data.error == null || data.error == ""){
+					if(data.errorMsg == null){
 						if(!$("#movieDetails").hasClass("show")){
 							$("#movieDetails").collapse('toggle');
 						}
 						assignValue(data);
 					}
 					else{
-						bootbox.alert(data.error);
+						bootbox.alert(data.errorMsg);
 					}
     			});
     			
@@ -471,14 +460,14 @@
 					}
 				}
 			}).done(function(data){
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					if(!$("#movieDetails").hasClass("show")){
 						$("#movieDetails").collapse('toggle');
 					}
 					assignValue(data);
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}	
     		});
 
@@ -530,12 +519,12 @@
 					}
 				}
     		}).done(function(data){
-    			if(typeof data.false == "undefined"){
-    				bootbox.alert(data.true);
+    			if(data.errorMsg == null){
+    				bootbox.alert(data.result);
     				$("#editBtn").click();
     			}
     			else{
-    				bootbox.alert(data.false);
+    				bootbox.alert(data.errorMsg);
     			}
     		});
     		 
@@ -580,13 +569,13 @@
 					$("#movieInfo .row").show();
 				},
     		}).done(function(data){
-    			if(data.error == null || data.error == ""){
+    			if(data.errorMsg == null){
 					waitInjection(data.result,activeId);
     				//injectData(data.result,activeId);
 					//addAndRemoveReadMore();
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}	
     		});
     	}

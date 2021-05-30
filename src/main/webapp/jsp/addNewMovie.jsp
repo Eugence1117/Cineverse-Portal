@@ -283,6 +283,12 @@
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 
 		$(document).ready(function() {
+			var error = "${error}";
+			if(error != ""){
+				bootbox.alert(error);
+				return false;
+			}
+			
 			var content = readDescription();
 			new jBox('Tooltip', {
 				attach : '.timetooltip',

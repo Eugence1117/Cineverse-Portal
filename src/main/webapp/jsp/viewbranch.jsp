@@ -143,9 +143,18 @@
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	var branchName = "${branch.branchName}";
     	
+    	
     	$(document).ready(function(){
-    		var stateName = "${branch.stateName}";
-    		retrieveState(stateName);	
+    		var error = "${error}"
+    		console.log(error);
+    		if(error != ""){
+    			bootbox.alert(error,function(){window.location.href="home.htm"});
+    		}
+    		else{
+    			var stateName = "${branch.stateName}";
+        		retrieveState(stateName);	
+    		}
+    			
 		});
     	
     	<!--Edit Function -->
@@ -187,11 +196,11 @@
 					}
 				}
 			}).done(function(data){
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					var stateList = $("#state");
 					var optionList = "";
 					var selectedID = "";
-					$.each(data.resultList,function(key,entry){
+					$.each(data.result,function(key,entry){
 						if(selectedState === entry.statename){
 							selectedID = entry.seqid;
 						}
@@ -203,7 +212,7 @@
 					retrieveDistrict(selectedID,true);
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
 			})
 		}
@@ -219,12 +228,12 @@
 					}
 				}
 			}).done(function(data){
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					var districtName = "${branch.districtName}";
 					var districtList = $("#district");
 					var optionList = "";
 					var districtId = "";
-					$.each(data.resultList,function(key,entry){
+					$.each(data.result,function(key,entry){
 						optionList += "<option value='" + entry.seqid + "'>" + entry.districtname + "</option>";
 						if(districtName === entry.districtname){
 							districtId = entry.seqid;
@@ -238,7 +247,7 @@
 					
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
 			})
 		}
@@ -283,11 +292,6 @@
 							}
 						},
 						dataFilter: function(data){
-							if(data.hasOwnProperty("SESSION_EXPIRED")){
-			    				if(data["SESSION_EXPIRED"]){
-			    					window.location.href = "expire.htm";
-			    				}
-			    			}
 							if(branchName != $("input[name=branchname]").val()){
 								var result = JSON.parse(data);
 								return result.status;
@@ -347,9 +351,10 @@
 					}
 				}
 			}).done(function(data){
+				var msg = data.errorMsg == null? data.result : data.errorMsg;
 				bootbox.alert({
 				    title: "Notification",
-				    message: data.msg,
+				    message: msg,
 				    callback: function(){
 				    	$("#editBtn").click();
 				    }
@@ -365,14 +370,14 @@
 				method:"GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
-				if(data.hasOwnProperty("SESSION_EXPIRED")){
-    				if(data["SESSION_EXPIRED"]){
-    					window.location.href = "expire.htm";
-    				}
-    			}
-				if(data.error != null){
-					bootbox.alert(data.error);
+				if(data.errorMsg != null){
+					bootbox.alert(data.errorMsg);
 				}
 				else{
 					var result = data.result;

@@ -7,6 +7,7 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,10 @@ public class TheatreDAO {
 	HttpSession session;
 	
 	//TheatreType is shared by every branch
+	//For Backend used No require Map<Boolean,Object> as return type
 	public List<TheatreType> groupByTheatreType(String branchid){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		List<TheatreType> typeList = null;
 		try {
 			String query = "SELECT b.seqid, b.description, b.seatSize, b.price, b.seatOccupied FROM masp.theatre t, masp.theatretype b WHERE t.branchid = ? AND t.theatretype = b.seqid AND t.status = ? group by b.seqid,b.description,b.seatSize,b.price,b.seatOccupied";
@@ -71,6 +75,10 @@ public class TheatreDAO {
 				return new ArrayList<TheatreType>();//Empty List to indicate Empty record
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
+		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex);
 			return null;
@@ -78,13 +86,14 @@ public class TheatreDAO {
 		return typeList;
 	}
 	
-	public List<TheatreType> getTheatreType(){
-		List<TheatreType> typeList = null;
+	public Map<Boolean,Object> getTheatreType(){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try {
 			String query = "SELECT * FROM masp.theatretype";
 			List<Map<String,Object>> results = jdbc.queryForList(query);
 			if(results.size() > 0) {
-				typeList = new ArrayList<TheatreType>();
+				List<TheatreType> typeList = new ArrayList<TheatreType>();
 				for(Map<String,Object> result : results) {
 					String id = (String)result.get("seqid");
 					String desc = (String)result.get("description");
@@ -95,20 +104,28 @@ public class TheatreDAO {
 					TheatreType type = new TheatreType(id,desc,seatSize,price,seatOccupied);
 					typeList.add(type);
 				}
+				
+				log.info("Total theatre type: " + typeList.size());
+				response.put(true, typeList);
 			}
 			else {
-				return new ArrayList<TheatreType>();//Empty List to indicate Empty record
+				response.put(false, Constant.NO_RECORD_FOUND);
 			}
 		}
-		catch(Exception ex) {
-			log.error("Exception ex::" + ex);
-			return null;
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
-		return typeList;
+		catch(Exception ex) {
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
 	}
 	
-	public TheatreType getTheatreType(String typeId) {
-		TheatreType type = null;
+	public Map<Boolean,Object> getTheatreType(String typeId) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try {
 			String query = "SELECT * FROM masp.theatretype where seqid = ?";
 			List<Map<String,Object>> results = jdbc.queryForList(query,typeId);
@@ -120,21 +137,27 @@ public class TheatreDAO {
 				double price = (double)result.get("price");
 				int seatOccupied = (int)result.get("seatOccupied");
 				
-				type = new TheatreType(id,desc,seatSize,price,seatOccupied);
-				return type;
+				TheatreType type = new TheatreType(id,desc,seatSize,price,seatOccupied);
+				response.put(true,type);
 			}
 			else {
-				return null;
+				response.put(false,Constant.NO_RECORD_FOUND);
 			}
 		}
-		catch(Exception ex) {
-			log.error("Exception ex::" + ex);
-			return null;
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
+		catch(Exception ex) {
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
 	}
 	
-	public ViewTheatreForm getTheatreInfo(String theatreid) {
-		ViewTheatreForm theatre = null;
+	public Map<Boolean,Object> getTheatreInfo(String theatreid) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try {
 			String query = "SELECT seqid, theatrename, seatrow, seatcol, theatretype, createddate,status, totalSeat, theatreLayout FROM masp.theatre where seqid = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,theatreid);
@@ -150,31 +173,34 @@ public class TheatreDAO {
 					int totalSeat = (int)row.get("totalSeat");
 					String theatreLayout = (String)row.get("theatreLayout");
 					
-					theatre = new ViewTheatreForm(seqid,name,theatreType,Util.getStatusDesc(status),Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(createddate))
+					ViewTheatreForm theatre = new ViewTheatreForm(seqid,name,theatreType,Util.getStatusDesc(status),Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(createddate))
 							  ,seatRow,seatCol,totalSeat,theatreLayout);
-					return theatre;
+					
+					response.put(true, theatre);
 				}
+			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
-			log.error("Exception ce::" + ce.getStackTrace().toString());
-			throw new JDBCConnectionException("Connection to database lost.", null);
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.error(ex.getCause().getMessage());
-			log.error("Exception ex::" + ex.getStackTrace().toString());
-			return null;
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
-		return theatre;
+		return response;
 	}
 
-	public List<Theatre> getAllTheatre(String branchid){
-		List<Theatre> theatreList = null;
+	public Map<Boolean,Object> getAllTheatre(String branchid){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT seqid,theatrename,theatretype, status, createddate FROM masp.theatre where branchid = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid);
 			if(rows.size() > 0) {
-				theatreList = new ArrayList<Theatre>();
+				List<Theatre> theatreList = new ArrayList<Theatre>();
 				for(Map<String,Object> row: rows) {
 					
 					Theatre theatre = new Theatre();
@@ -191,28 +217,33 @@ public class TheatreDAO {
 					theatre.setCreateddate(createddate);
 					theatreList.add(theatre);
 				}
+				log.info("Total Theatre: " + theatreList.size());
+				response.put(true, theatreList);
+			}
+			else {
+				response.put(false, Constant.NO_RECORD_FOUND);
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
-			log.error("Exception ex::" + ce.getStackTrace().toString());
-			throw new JDBCConnectionException("Connection to database lost.", null);
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			log.error(ex.getCause().getMessage());
-			log.error("Exception ex::" + ex.getStackTrace().toString());
-			return null;
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return theatreList;
+		return response;
 	}
 	
-	public List<Theatre> getActiveTheatreList(String branchid){
-		List<Theatre> theatreList = null;
+	public Map<Boolean,Object> getActiveTheatreList(String branchid){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
 		try {
 			String query = "SELECT seqid,theatrename, seatrow, seatcol, theatretype, createddate FROM masp.theatre where branchid = ? AND status = ?";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,Constant.ACTIVE_STATUS_CODE);
-			theatreList = new ArrayList<Theatre>();
 			if(rows.size() > 0) {
+				List<Theatre> theatreList =  new ArrayList<Theatre>();
 				for(Map<String,Object> row: rows) {
 					String seqid = Util.trimString((String)row.get("seqid"));
 					char name = ((String)row.get("theatrename")).charAt(0);
@@ -224,15 +255,23 @@ public class TheatreDAO {
 					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid,Constant.ACTIVE_STATUS_CODE);
 					theatreList.add(theatre);
 				}
+				log.info("Theatre count: " + theatreList.size());
+				response.put(true, theatreList);
+			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
 		catch(Exception ex) {
-			log.error(ex.getCause().getMessage());
-			log.error("Exception ex::" + ex.getStackTrace().toString());
-			return null;
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		
-		return theatreList;
+		return response;
 	}
 	
 	public char getTheatreName(String branchid) {
@@ -248,6 +287,10 @@ public class TheatreDAO {
 			name = (char) code;
 			
 			return name;
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return ' ';
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());

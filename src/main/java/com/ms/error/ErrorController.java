@@ -38,6 +38,7 @@ public class ErrorController{
 	public String handleError (HttpServletRequest req, Model model) {
 		Object status = req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 		log.error("Error in HTTP request. ERROR CODE " + req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
+		log.error(req.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE));
 		Integer statusCode = Integer.valueOf(status.toString());
 		model.addAttribute("code",Integer.valueOf(status.toString()));
 		String errorMsg = "";

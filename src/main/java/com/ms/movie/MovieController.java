@@ -61,8 +61,15 @@ public class MovieController {
 		
 		model.addAttribute("usergroup",usergroupid);
 		if(usergroupid == Constant.ADMIN_GROUP) {
-			model.addAttribute("movieList", service.getMovieNameList());
-			model.addAttribute("censorship",service.getCensorship());
+			//model.addAttribute("movieList", service.getMovieNameList());
+			Response censorship = service.getCensorship();
+			if(censorship.getErrorMsg() != null) {
+				model.addAttribute("error",censorship.getErrorMsg());
+			}
+			else {
+				model.addAttribute("censorship",censorship.getResult());
+			}
+			
 			return "addNewMovie";
 		}
 		else {
@@ -86,7 +93,13 @@ public class MovieController {
 				List<String> timeList = service.getDefaultDate();
 				model.addAttribute("startDate",timeList.get(0));
 				model.addAttribute("endDate",timeList.get(1));
-				model.addAttribute("censorship",service.getCensorship());
+				Response censorship = service.getCensorship();
+				if(censorship.getErrorMsg() != null) {
+					model.addAttribute("error",censorship.getErrorMsg());
+				}
+				else {
+					model.addAttribute("censorship",censorship.getResult());
+				}
 				model.addAttribute("cookieValue",Constant.MOVIE_SINGLE_VIEW_COOKIE);
 				
 				return "viewmovie";
@@ -96,14 +109,26 @@ public class MovieController {
 					List<String> timeList = service.getDefaultDate();
 					model.addAttribute("startDate",timeList.get(0));
 					model.addAttribute("endDate",timeList.get(1));
-					model.addAttribute("censorship",service.getCensorship());
+					Response censorship = service.getCensorship();
+					if(censorship.getErrorMsg() != null) {
+						model.addAttribute("error",censorship.getErrorMsg());
+					}
+					else {
+						model.addAttribute("censorship",censorship.getResult());
+					}
 					
 					return "viewmovie";
 				}
 				else {
 					int usergroupid = user.getUserGroup().getId();
 					model.addAttribute("usergroup",usergroupid);
-					model.addAttribute("censorship",service.getCensorship());
+					Response censorship = service.getCensorship();
+					if(censorship.getErrorMsg() != null) {
+						model.addAttribute("error",censorship.getErrorMsg());
+					}
+					else {
+						model.addAttribute("censorship",censorship.getResult());
+					}
 					
 					return "viewmovielist";
 				}
@@ -118,7 +143,13 @@ public class MovieController {
 				List<String> timeList = service.getDefaultDate();
 				model.addAttribute("startDate",timeList.get(0));
 				model.addAttribute("endDate",timeList.get(1));
-				model.addAttribute("censorship",service.getCensorship());
+				Response censorship = service.getCensorship();
+				if(censorship.getErrorMsg() != null) {
+					model.addAttribute("error",censorship.getErrorMsg());
+				}
+				else {
+					model.addAttribute("censorship",censorship.getResult());
+				}
 				model.addAttribute("cookieValue",Constant.MOVIE_SINGLE_VIEW_COOKIE);
 				
 				return "viewmovie";
@@ -128,7 +159,13 @@ public class MovieController {
 				model.addAttribute("hasCookie",hasCookie);
 				model.addAttribute("ignoreValue",Constant.MOVIE_COOKIE_IGNORE);
 				
-				model.addAttribute("censorship",service.getCensorship());
+				Response censorship = service.getCensorship();
+				if(censorship.getErrorMsg() != null) {
+					model.addAttribute("error",censorship.getErrorMsg());
+				}
+				else {
+					model.addAttribute("censorship",censorship.getResult());
+				}
 				
 				int usergroupid = user.getUserGroup().getId();
 				model.addAttribute("usergroup",usergroupid);
@@ -152,18 +189,13 @@ public class MovieController {
 	
 	@RequestMapping(value= {"/api/manager/ViewExistMovie.json"})
 	@ResponseBody
-	public Movie viewMovieDetails(Model model, String movieId) {
+	public Response viewMovieDetails(Model model, String movieId) {
 		log.info("Movie ID received: "+ movieId);
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		Movie result = service.getMovieDetail(movieId);
+		Response result = service.getMovieDetail(movieId);
 		model.addAttribute("usergroup",user.getUserGroup().getId());
-		if(result != null) {
-			return result;
-		}
-		else {
-			return null;
-		}
+		return result;
 	}
 	
 	@RequestMapping(value = {"/api/authorize/addCookie.json"})
@@ -192,7 +224,7 @@ public class MovieController {
 	
 	@RequestMapping(value= {"/api/manager/AddExistMovie.json"})
 	@ResponseBody
-	public ResponseResultJson addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
+	public Response addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
 		log.info("Movie ID received: "+ form.getMovieId());
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
@@ -211,9 +243,9 @@ public class MovieController {
 	
 	@RequestMapping(value = {"/api/authorize/retrieveMovieDetail.json"})
 	@ResponseBody
-	public ResponseMovieResult retrieveMovieList(Model model, String startdate, String enddate) {
+	public Response retrieveMovieList(Model model, String startdate, String enddate) {
 		log.info("Date range received : " + startdate + " - " + enddate);
-		ResponseMovieResult result = service.getAllMovieInfo(startdate, enddate);
+		Response result = service.getAllMovieInfo(startdate, enddate);
 		
 		log.info("Retrieve Response successful.");
 		return result;
@@ -221,19 +253,18 @@ public class MovieController {
 	
 	@RequestMapping( value= {"/api/authorize/retrieveMovieDetailwithName.json"})
 	@ResponseBody
-	public ResponseMovieResult retrieveMovieList(Model model, String movieName) {
+	public Response retrieveMovieList(Model model, String movieName) {
 		log.info("Movie name received :" + movieName);
-		ResponseMovieResult result = service.getAllMovieInfo(movieName);
+		Response result = service.getAllMovieInfo(movieName);
 		log.info("Retrieve Response successful.");
 		return result;
 	}
 	
 	@RequestMapping(value = {"/api/authorize/getMovieInfo.json"})
 	@ResponseBody
-	public ResponseMovieInfo getMovieInfo(Model model, String movieId) {
+	public Response getMovieInfo(Model model, String movieId) {
 		log.info("Movie ID received ::" + movieId);
-		ResponseMovieInfo result = service.getMovieInfo(movieId);
-
+		Response result = service.getMovieInfo(movieId);
 		log.info("Response received.");
 		return result;
 	}
@@ -241,9 +272,9 @@ public class MovieController {
 	
 	 @RequestMapping(value = {"/api/admin/editMovieInfo.json"}, method= {RequestMethod.POST})
 	 @ResponseBody
-	 public Map<Boolean,String> editMovieInfo(Model model, @RequestBody MovieEditForm form){
+	 public Response editMovieInfo(Model model, @RequestBody MovieEditForm form){
 	 log.info("Movie ID received to update::" + form.getMovieId());
-	 Map<Boolean,String> result = service.editMovieInfo(form);
+	 Response result = service.editMovieInfo(form);
 	 log.info("Response received.");
 	 return result; 
 	}

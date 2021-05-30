@@ -71,27 +71,24 @@ public class MovieService {
 		return fromToDate;
 	}
 
-	public List<String> getMovieNameList(){
-		List<String> nameList = dao.getNameList();
-		if(nameList == null) {
-			log.info("No Movie Found.");
+	public Response getMovieNameList(){
+		Map<Boolean,Object> nameList = dao.getNameList();
+		if(nameList.containsKey(false)) {
+			return new Response((String)nameList.get(false));
 		}
 		else {
-			log.info("Movie Name List Size::" + nameList.size());
+			return new Response(nameList.get(true));
 		}
-		return nameList;
 	}
 	
-	public List<Map<String,String>> getCensorship(){
+	public Response getCensorship(){
 		log.info("Censorship:Retrieving Censorship info from database");
-		List<Map<String,String>> result = dao.getCensorshipList();
-		if(result == null || result.size() == 0) {
-			log.info("Censorship:No record retrieve from database");
-			return null;
+		Map<Boolean,Object> result = dao.getCensorshipList();
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
 		}
 		else {
-			log.info("Censorship:" + result.size() + " record(s) retrieved from database");
-			return result;
+			return new Response(result.get(true));
 		}
 	}
 	
@@ -119,7 +116,7 @@ public class MovieService {
 		
 	}
 	
-	public ResponseMovieResult getAllMovieInfo(String fromdate, String todate) {
+	public Response getAllMovieInfo(String fromdate, String todate) {
 		
 		try {
 			Map<Boolean,String> status = validateDateRange(fromdate,todate);
@@ -127,44 +124,36 @@ public class MovieService {
 			if(status.containsKey(true)) {
 				String fromDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(fromdate + Constant.DEFAULT_TIME));
 				String toDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(todate + Constant.DEFAULT_TIME));
-				List<ResponseMovieResult.Result> result = dao.getMovieByDateRange(fromDate, toDate);
-				if(result == null) {
-					return new ResponseMovieResult("Unable retrieve record from database.");
-				}
-				else if(result.size() == 0) {
-					return new ResponseMovieResult("No Record found.");
+				Map<Boolean,Object> result = dao.getMovieByDateRange(fromDate, toDate);
+				if(result.containsKey(false)) {
+					return new Response((String)result.get(false));
 				}
 				else {
-					log.info("Record Size : " + result.size());
-					return new ResponseMovieResult(result);
+					return new Response(result.get(true));
 				}
 			}
 			else {
-				return new ResponseMovieResult(status.get(false));
+				return new Response(status.get(false));
 			}
 		}
-		catch(Exception ex){
-			log.error("Exception ::" + ex.getMessage());
-			return new ResponseMovieResult(ex.getMessage());
+		catch(ParseException ex){
+			log.error("ParseException ::" + ex.getMessage());
+			return new Response("Received date with an invalid date format.");
 		}
 	}
 	
-	public ResponseMovieResult getAllMovieInfo(String movieName) {
+	public Response getAllMovieInfo(String movieName) {
 		
 		if(Util.trimString(movieName).isEmpty()) {
-			return new ResponseMovieResult("Please enter movie name.");
+			return new Response("Please enter movie name.");
 		}
 		else {
-			List<ResponseMovieResult.Result> result = dao.getMovieByMovieName(movieName);
-			if(result == null) {
-				return new ResponseMovieResult("Unable retrieve record from database.");
+			Map<Boolean,Object> result = dao.getMovieByMovieName(movieName);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
 			}
-			else if(result.size() == 0) {
-				return new ResponseMovieResult("No Record found.");
-			}
-			else {
-				log.info("Record Size : " + result.size());
-				return new ResponseMovieResult(result);
+			else{
+				return new Response(result.get(true));
 			}
 		}
 	}
@@ -246,27 +235,27 @@ public class MovieService {
 		}
 	}
 	
-	public Movie getMovieDetail(String movieId){
+	public Response getMovieDetail(String movieId){
 		log.info("Movie:Retrieving Movie info from database");
-		Movie result = dao.getMovieDetails(movieId);
-		if(result == null) {
+		
+		Map<Boolean,Object> result = dao.getMovieDetails(movieId);
+		if(result.containsKey(false)) {
 			log.info("Movie:No record retrieve from database");
-			return null;
+			return new Response((String)result.get(false));
 		}
 		else {
-			log.info("Movie:Movie " + result.getMovieName()+ " retrieved from database");
-			return result;
+			return new Response(result.get(true));
 		}
 	}
 	
-	public ResponseMovieInfo getMovieInfo(String movieId) {
+	public Response getMovieInfo(String movieId) {
 		log.info("Movie:Retrieve Movie " + movieId);
-		ResponseMovieInfo.Result result = dao.getMovieInfo(movieId);
-		if(result == null) {
-			return new ResponseMovieInfo("Error when retrieve information.");
+		Map<Boolean,Object> result = dao.getMovieInfo(movieId);
+		if(result.containsKey(false)) {
+			return new Response((String)result.get(false));
 		}
 		else {
-			return new ResponseMovieInfo(result);
+			return new Response(result.get(true));
 		}
 	}
 	
@@ -287,15 +276,15 @@ public class MovieService {
 				log.info("Uploading image");
 				URL url = uri.toURL();
 				log.info(url.toString());
-				status = dao.insertNewMovie(form,uri.toString());
-				if(status) {
+				String errorMsg = dao.insertNewMovie(form,uri.toString());
+				if(errorMsg == null) {
 					log.info("Movie insert successful.");
-					return new Response((Object)"The movie " + form.getMovieName() + " has been inserted.");
+					return new Response((Object)("The movie " + form.getMovieName() + " has been inserted."));
 				}
 				else {
 					log.error("Insert to database failed.");
 					deleteFile(uuid + format);
-					return new Response("Unable to insert the data into database.");
+					return new Response(errorMsg);
 				}
 			}
 			catch(Exception ex) {
@@ -306,45 +295,54 @@ public class MovieService {
 		
 	}
 	
-	public ResponseResultJson insertMovieAvailable(ExistMovieForm form, String username) {
+	public Response insertMovieAvailable(ExistMovieForm form, String username) {
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchId = user.getBranchid();
 		if(Util.trimString(branchId) == "") {
-			return new ResponseResultJson("Cannot find relavant branch.");
+			return new Response("Cannot find relavant branch.");
 		}
 		else {
 			//Get publish date
 			String publishDate = dao.getMoviePublishDate(form.getMovieId());
+			if(publishDate == null) {
+				return new Response("Unable to get required data from database.");
+			}
+			
 			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
 			if(result.containsKey(false)) {
-				return new ResponseResultJson(result.get(false));
+				return new Response(result.get(false));
 			}
 			else {
 				try {
 					//Change Date Format
 					form.setStartDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getStartDate() + Constant.DEFAULT_TIME)));
 					form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getEndDate() + Constant.DEFAULT_TIME)));
-					boolean status = dao.insertMovieAvailable(form, branchId);
-					if(status) {
-						return new ResponseResultJson(new ResponseResultJson.Result("Insert successful"));
+					String errorMsg = dao.insertMovieAvailable(form, branchId);
+					if(errorMsg == null) {
+						return new Response((Object)"Insert successful.");
 					}
 					else {
-						return new ResponseResultJson("Insert record failed.");
+						return new Response(errorMsg);
 					}
 				}
 				catch(ParseException ex) {
 					log.error("Parse Exception ::" + ex.getMessage());
-					return new ResponseResultJson(ex.getMessage());
+					return new Response("Received date with an invalid date format.");
 				}
 			}
 			
 		}
 	}
 	
-	public Map<Boolean,String> editMovieInfo(MovieEditForm form){
+	public Response editMovieInfo(MovieEditForm form){
 		log.info("Movie to edit: " + form.getMovieId());
-		Map<Boolean,String> response = dao.updateMovieInfo(form);
-		return response;
+		String errorMsg = dao.updateMovieInfo(form);
+		if(errorMsg != null) {
+			return new Response(errorMsg);
+		}
+		else {
+			return new Response((Object)("Movie " + form.getMovieName() + " updated."));
+		}
 	}
 	
 	public String getFileFormat(String filename) {

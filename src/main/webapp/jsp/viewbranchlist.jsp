@@ -54,8 +54,6 @@
 										<tr>
 											<th>Branch ID</th>
 											<th>Branch Name</th>
-											<th>Address</th>
-											<th>Postcode</th>
 											<th>State</th>
 											<th>District</th>
 											<th>Status</th>
@@ -94,6 +92,9 @@
 					</button>
 				</div>
 				<div class="modal-body">
+					<div class="hide text-center m-4" id="loading">
+						<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
+					</div>
 					<div class="row">
 						<label class="col-sm-4"><b>Branch ID</b></label> <label
 							class="col-sm-1 colon">:</label>
@@ -138,7 +139,7 @@
 		</div>
 	</div>
 
-	<div class="modal" tabindex="-1" role="dialog" id="addBranch">
+	<div class="modal fade" tabindex="-1" role="dialog" id="addBranch">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -212,12 +213,12 @@
 				</div>
 				<div class="modal-footer">
 					<div class="mx-auto">
-						<button type="button" class="btn btn-primary m-2"
-							onclick=addBranch()>Submit</button>
-						<button type="reset" class="btn btn-danger m-2"
-							onclick=clearInsertField()>Reset</button>
 						<button type="button" class="btn btn-secondary m-2"
 							data-bs-dismiss="modal">Cancel</button>
+						<button type="reset" class="btn btn-danger m-2"
+							onclick=clearInsertField()>Reset</button>
+						<button type="button" class="btn btn-primary m-2"
+							onclick=addBranch()>Submit</button>
 					</div>
 				</div>
 			</div>
@@ -242,7 +243,7 @@
 		});
     	<!--FOR DISPLAY DATA TABLE-->
     	function readyFunction(){
-			$.ajax("api/am/retrieveInfo.json",{
+			$.ajax("api/am/retrieveBranchesInfo.json",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
@@ -253,13 +254,13 @@
 				}
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
-				if(data.error == null || data.error == ""){
-					addActionButton(data.resultList);
-					resultDt.rows.add(data.resultList).draw();
+				if(data.errorMsg == null){
+					addActionButton(data.result);
+					resultDt.rows.add(data.result).draw();
 					addTooltip();
 				}
 				else{
-					bootbox.alert(data.error);
+					bootbox.alert(data.errorMsg);
 				}
 			})
 		}
@@ -288,12 +289,10 @@
 			return $('#branchInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'seqid', 'width':'10%',render:function(data,type,row){return data.length > 15 ? data.substr(0,10) + '.....' : data}},
-					{ data: 'branchName','width':'23%'},
-					{ data: 'address','width':'12%',render:function(data,type,row){return data.length > 25 ? data.substr(0,10) + '.....' : data}},
-		   			{ data: 'postcode','width':'10%'},
-		   			{ data: 'stateName','width':'15%'},
-		   			{ data: 'districtName','width':'10%'},
+					{ data: 'seqid', 'width':'10%',render:function(data,type,row){return data.length > 10 ? data.substr(0,6) + '.....' : data}},
+					{ data: 'branchName','width':'30%'},
+		   			{ data: 'stateName','width':'20%'},
+		   			{ data: 'districtName','width':'20%'},
 		   			{ data: 'status','width':'7%'},
 		   			{ data: 'action','width':'13%'}
 				],
@@ -459,19 +458,26 @@
 					}
 				}
 			}).done(function(data){
-				bootbox.alert({
-				    title: "Notification",
-				    message: data.msg,
-				    callback: function(){
-				    	if(data.status == "true"){
-				    		readyFunction();
+				if(data.errorMsg != null){
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.errorMsg,
+					    callback: function(){
+					    	$("#addBranch").modal('show');
+						}
+					});	
+				}
+				else{
+					bootbox.alert({
+					    title: "Notification",
+					    message: data.result,
+					    callback: function(){
+					    	readyFunction();
 				    		clearInsertField();
-				    	}
-				    	else{
-				    		$("#addBranch").modal('show');
-				    	}
-					}
-				});	
+						}
+					});	
+				}
+				
 			});
 		}
 		
@@ -496,10 +502,10 @@
 					}
 				}
 			}).done(function(data){				
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					var stateList = $("#state");
 					var optionList = "";
-					$.each(data.resultList,function(key,entry){
+					$.each(data.result,function(key,entry){
 						optionList += "<option value='" + entry.seqid + "'>" + entry.statename + "</option>";
 					})
 					stateList.append(optionList);
@@ -527,10 +533,10 @@
 					}
 				}
 			}).done(function(data){	
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
 					var districtList = $("#district");
 					var optionList = "";
-					$.each(data.resultList,function(key,entry){
+					$.each(data.result,function(key,entry){
 						optionList += "<option value='" + entry.seqid + "'>" + entry.districtname + "</option>";
 					})
 					districtList.append(optionList);
@@ -574,9 +580,10 @@
 								}
 							}
 						}).done(function(data){
+							var msg = data.errorMsg == null ? data.result : data.errorMsg;
 							bootbox.alert({
 							    title: "Notification",
-							    message: data.msg,
+							    message: msg,
 							    callback: function(){
 							    	readyFunction();
 								}
@@ -593,30 +600,38 @@
 		function getBranchDetails(element){
 			var branchId = element.id;
 			
+			clearBranchDetails();
+			if(!$("#viewBranch").hasClass("show")){
+				$("#viewBranch").modal("show");
+			}
+			
+			$("#loading").show();
+			$("#viewBranch .row").hide();
+			
 			$.ajax("api/admin/branchDetails.json?branchID=" + branchId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
 			}).done(function(data){
-				if(data.hasOwnProperty("SESSION_EXPIRED")){
-    				if(data["SESSION_EXPIRED"]){
-    					window.location.href = "expire.htm";
-    				}
-    			}
-				clearBranchDetails();
-				if(data.error == null || data.error == ""){
+				if(data.errorMsg == null){
+					$("#loading").hide();
+					$("#viewBranch .row").show();
+					
 					$("#viewBranch .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
 			            if (key && data.result.hasOwnProperty(key)) {
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
-					if(!$("#viewBranch").hasClass("show")){
-						$("#viewBranch").modal("show");
-					}
 				}
 				else{
-					bootbox.alert(data.error);
+					$("#loading").hide();
+					bootbox.alert(data.errorMsg);
 				}
 			})
 		}
@@ -636,11 +651,11 @@
 			    buttons: {
 			        confirm: {
 			            label: 'Yes',
-			            className: 'btn-success'
+			            className: 'btn-primary'
 			        },
 			        cancel: {
 			            label: 'No',
-			            className: 'btn-danger'
+			            className: 'btn-secondary'
 			        }
 			    },
 			    callback: function (result) {
@@ -656,9 +671,10 @@
 								}
 							}
 						}).done(function(data){
+							var msg = data.errorMsg == null ? data.result : data.errorMsg;
 							bootbox.alert({
 							    title: "Notification",
-							    message: data.Msg,
+							    message: msg,
 							    callback: function(){
 							    	readyFunction();
 								}

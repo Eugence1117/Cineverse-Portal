@@ -113,7 +113,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal" tabindex="-1" role="dialog" id="viewModal" data-backdrop="static" data-keyboard="false">
+	<div class="modal fade" tabindex="-1" role="dialog" id="viewModal" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">
@@ -216,26 +216,25 @@
     				method : "GET",
     				accepts : "application/json",
     				dataType : "json",
-    			}).done(function(data){
-    				if(data.hasOwnProperty("SESSION_EXPIRED")){
-    					if(data["SESSION_EXPIRED"]){
+    				statusCode:{
+    					401:function(){
     						window.location.href = "expire.htm";
     					}
-    				}else{
-    					if(data.errorMsg != null){
-    						bootbox.alert(data.errorMsg);
-    					}
-        				else{
-            				$("#theatreForm .data").each(function(index,element){
-            	    			var key = $(this).data('json-key');
-            		            if (key && data.result.hasOwnProperty(key)) {
-            		                $(this).val(data.result[key]||"");
-            		            }
-            	    		});
-    	        			initializeLayout(data.result);
-            				$("#viewModal").modal('show');
-        				}	
-    				}
+    				},
+    			}).done(function(data){
+    				if(data.errorMsg != null){
+						bootbox.alert(data.errorMsg);
+					}
+    				else{
+        				$("#theatreForm .data").each(function(index,element){
+        	    			var key = $(this).data('json-key');
+        		            if (key && data.result.hasOwnProperty(key)) {
+        		                $(this).val(data.result[key]||"");
+        		            }
+        	    		});
+	        			initializeLayout(data.result);
+        				$("#viewModal").modal('show');
+    				}	
     			});
     		}
     	});

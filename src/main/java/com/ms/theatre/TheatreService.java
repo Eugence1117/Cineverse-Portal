@@ -35,23 +35,24 @@ public class TheatreService {
 	@Autowired
 	TheatreDAO dao;
 	
+	@SuppressWarnings("unchecked")
 	public Response retrieveAllTheatre(String branchid) {
 		log.info("Retrieving theatre list...");
 		if(Util.trimString(branchid).equals("")) {
 			log.info("receive branchid:null from controller.");
-			return new Response("Unable to recognize client's branch.");
+			return new Response("Unable to authenticate your identity. Please try again later.");
 		}
 		else {
 			try {
-				List<Theatre> theatreList = dao.getAllTheatre(branchid);
-				if(theatreList == null) {
-					return new Response("No theatre found.");
+				Map<Boolean,Object> theatreList = dao.getAllTheatre(branchid);
+				if(theatreList.containsKey(false)) {
+					return new Response((String)theatreList.get(false));
 				}
 				else {
-					log.info("Total Theatre: " + theatreList.size());
-					theatreList.sort(Comparator.comparing(Theatre::getTitle));
+					List<Theatre> list = (List<Theatre>)theatreList.get(true);
+					list.sort(Comparator.comparing(Theatre::getTitle));
 					List<BriefTheatreForm> formList = new ArrayList<BriefTheatreForm>();
-					for(Theatre theatre: theatreList) {
+					for(Theatre theatre: list) {
 						Date createDate = Constant.SQL_DATE_FORMAT.parse(theatre.getCreateddate());
 						Date currentDate = new Date();
 						
@@ -71,11 +72,9 @@ public class TheatreService {
 				}
 				
 			}
-			catch(JDBCConnectionException ex) {
-				return new Response("Connection to database lost.");
-			}
 			catch(Exception ex) {
-				return new Response("Unexpected error occured. Please try again later.");
+				log.error("Exception ex:" + ex.getMessage());
+				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
 			}
 		}
 	}
@@ -87,31 +86,32 @@ public class TheatreService {
 			return new Response("Data required are missing from client's request.");
 		}
 		else {
-			try {
-				ViewTheatreForm theatre = dao.getTheatreInfo(theatreid);
-				if(theatre == null) {
-					return new Response("Unable to retrieve information from database");
-				}
-				else {
-					return new Response(theatre);
-				}
+			Map<Boolean,Object> result = dao.getTheatreInfo(theatreid);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
 			}
-			catch(JDBCConnectionException ex) {
-				return new Response("Connection to database lost.");
+			else {
+				//ViewTheatreForm theatre = (ViewTheatreForm)result.get(true);
+				//return new Response(theatre);
+				return new Response(result.get(true));
 			}
 		}
 	}
 	
-	public List<Theatre> retrieveAvailableTheatre(String branchid){
+	public Response retrieveAvailableTheatre(String branchid){
 		log.info("Retrieving theatre list...");
 		if(Util.trimString(branchid).equals("")) {
 			log.info("receive branchid:null from controller.");
-			return null;
+			return new Response("Unable to authenticate your identity. Please try again later.");
 		}
 		else {
-			List<Theatre> theatreList = dao.getActiveTheatreList(branchid);
-			log.info("Theatre count: " + theatreList.size());
-			return theatreList;
+			Map<Boolean,Object> theatreList = dao.getActiveTheatreList(branchid);
+			if(theatreList.containsKey(false)) {
+				return new Response((String)theatreList.get(false));
+			}
+			else {
+				return new Response(theatreList.get(true));
+			}
 		}
 	}
 	
@@ -120,26 +120,28 @@ public class TheatreService {
 			return new Response("No theatre type is selected.");
 		}
 		else {
-			TheatreType type = dao.getTheatreType(typeId);
-			if(type == null) {
-				return new Response("Unable to retrieve the information. If problem exist, please kindly contact support team.");
+		
+			Map<Boolean,Object> result = dao.getTheatreType(typeId);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
 			}
 			else {
-				return new Response(type);
-			}
+				//TheatreType type = (TheatreType)result.get(true);
+				//return new Response(type);
+				return new Response(result.get(true));
+			}			
 		}
 	}
 	
-	public List<TheatreType> retrieveTheatreTypes(){
+	public Response retrieveTheatreTypes(){
 		log.info("Retrieving theatre type list...");
-		List<TheatreType> typeList = dao.getTheatreType();
-		if(typeList == null) {
-			log.error("Unable to retrieve information.");
+		Map<Boolean,Object> typeList = dao.getTheatreType();
+		if(typeList.containsKey(false)) {
+			return new Response((String)typeList.get(false));
 		}
 		else {
-			log.info("Total theatre type: " + typeList.size());
+			return new Response(typeList.get(true));
 		}
-		return typeList;
 	}
 	
 	public Response createTheatre(Map<String,Object> payload, String branchid) {
