@@ -209,8 +209,8 @@ public class MovieController {
 			else {
 				Cookie cookie = new Cookie("defaultMovieView",choice);
 				cookie.setMaxAge(30 * 24 * 60 * 60);
-				cookie.setDomain("localhost"); //
-				cookie.setPath("/masterpisportal");
+				cookie.setDomain("cineverse.azurewebsites.net"); //
+				cookie.setPath("/");
 				response.addCookie(cookie);
 				log.info("Cookie for movie default view set to " + choice);
 				return new Response((Object)"Your preference has been recorded.");

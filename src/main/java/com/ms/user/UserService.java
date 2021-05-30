@@ -173,8 +173,8 @@ public class UserService {
 	public Response changeProfilePic(MultipartFile mpf, String userid) {
 		try {
 			String currentProfilePic  = dao.getCurrentProfilePic(userid);
-			String format = mpf.getOriginalFilename();
-			
+			String format = getFileFormat(mpf.getOriginalFilename());
+			log.info("Format:" + format);
 			if(!currentProfilePic.equals("")) {
 				if(!currentProfilePic.equals(Constant.DEFAULT_USER_PROFILE_PIC)) {
 					deleteFile(userid + format);

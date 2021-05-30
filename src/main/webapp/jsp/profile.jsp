@@ -319,7 +319,7 @@
 				}
     		}).done(function(data){
     			if(data.errorMsg != null){bootbox.alert(data.errorMsg)}
-    			else{bootbox.alert(data.result);}
+    			else{bootbox.alert(data.result);resetImageSource();}
     		});
     	}
     	
