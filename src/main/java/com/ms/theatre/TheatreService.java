@@ -182,7 +182,7 @@ public class TheatreService {
 	
 	public Response updateTheatre(EditTheatreForm form) {
 		try {
-			int statusCode = Util.getStatusCode(form.getStatus());
+			int statusCode = Util.getStatusCodeWithoutRemovedCode(form.getStatus());
 			if(statusCode == Constant.INVALID_STATUS_CODE) {
 				return new Response("Received invalid data from client's request. Action abort.");
 			}else {

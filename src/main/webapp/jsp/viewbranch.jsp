@@ -101,7 +101,18 @@
 										<div class="col-md">
 											<div class="form-floating">
 												<select name="district" id="district" class="form-control inputField" disabled></select>
-												<label for="branchname">District</label>
+												<label for="district">District</label>
+											</div>
+										</div>
+									</div>
+									<div class="row form-group">
+										<div class="col-md">
+											<div class="form-floating">
+												<select name="status" id="status" class="form-control inputField data" disabled>
+													<option>Active</option>
+													<option>Inactive</option>
+												</select>
+												<label for="status">Status</label>
 											</div>
 										</div>
 									</div>
@@ -136,7 +147,6 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
@@ -146,11 +156,12 @@
     	
     	$(document).ready(function(){
     		var error = "${error}"
-    		console.log(error);
     		if(error != ""){
     			bootbox.alert(error,function(){window.location.href="home.htm"});
     		}
     		else{
+    			var branchStatus = "${branch.status}";
+    			$("#status").val(branchStatus);
     			var stateName = "${branch.stateName}";
         		retrieveState(stateName);	
     		}
@@ -311,7 +322,10 @@
 				},
 				district:{
 					required:true
-				}
+				},
+				status:{
+					required:true
+				},
 				
 			},
 			messages:{

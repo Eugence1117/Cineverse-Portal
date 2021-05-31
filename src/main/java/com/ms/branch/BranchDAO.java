@@ -50,7 +50,7 @@ public class BranchDAO {
 					String state = Util.trimString((String) row.get("stateName"));
 					String status = Util.getStatusDesc((int) row.get("status"));
 					
-					ResponseBranchInfo data = new ResponseBranchInfo(id, branchName, address,
+					Branch data = new Branch(id, branchName, address,
 							postcode, district, state, status);
 					result.put(true, data);
 					
@@ -86,7 +86,7 @@ public class BranchDAO {
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
 					String status = Util.getStatusDesc((int) row.get("status"));
-					ResponseBranchInfo data = new ResponseBranchInfo(id, branchName, address,
+					Branch data = new Branch(id, branchName, address,
 							postcode, district, state, status);
 					result.put(true, data);
 				}
@@ -113,14 +113,14 @@ public class BranchDAO {
 
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString());
 			if (rows.size() > 0) {
-				List<ResponseBranchInfo> data = new ArrayList<ResponseBranchInfo>();
+				List<Branch> data = new ArrayList<Branch>();
 				for (Map<String, Object> row : rows) {
 					String seqid = Util.trimString((String) row.get("seqid"));
 					String branchName = Util.trimString((String) row.get("branchName"));
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
 					String status = Util.getStatusDesc((int) row.get("status"));
-					data.add(new ResponseBranchInfo(seqid, branchName, district, state, status));
+					data.add(new Branch(seqid, branchName, district, state, status));
 				}
 				result.put(true, data);
 			}
@@ -204,12 +204,12 @@ public class BranchDAO {
 		}
 	}
 
-	public String updateBranch(String seqid, NewBranchForm form) {
+	public String updateBranch(String seqid,int status,NewBranchForm form) {
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"UPDATE masp.branch SET branchName = ?, address = ?, postcode = ?, districtid = ? WHERE seqid = ?");
+					"UPDATE masp.branch SET branchName = ?, address = ?, postcode = ?, districtid = ?, status = ? WHERE seqid = ?");
 			int result = jdbc.update(query.toString(), form.getBranchname(), form.getAddress(), form.getPostcode(),
-					form.getDistrict(), seqid);
+					form.getDistrict(), status,seqid);
 			if (result > 0) {
 				return null;
 			} else {

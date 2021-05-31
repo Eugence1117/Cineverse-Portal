@@ -13,4 +13,5 @@ public class NewBranchForm {
 	private String address;
 	private int postcode;
 	private String district;
+	private String status;
 }

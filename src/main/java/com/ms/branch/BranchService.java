@@ -173,12 +173,17 @@ public class BranchService {
 	
 	public Response updateBranch(String branchid, NewBranchForm form){
 		log.info("Updating branch information.");
-		if(form.getBranchname() == null || form.getDistrict() == null || form.getAddress() == null || form.getPostcode() == 0) {
+		if(form.getBranchname() == null || form.getDistrict() == null || form.getAddress() == null || form.getPostcode() == 0 || form.getStatus() == null) {
 			log.error("Received empty data from client's request.");
 			return new Response("Missing required data from client's request. Action abort.");
 		}
 		else {
-			String errorMsg = dao.updateBranch(branchid, form);
+			int code = Util.getStatusCodeWithoutRemovedCode(form.getStatus());
+			if(code == Constant.INVALID_STATUS_CODE) {
+				return new Response("Received invalid data from <b>Status</b> field in client's request.");
+			}
+			
+			String errorMsg = dao.updateBranch(branchid,code,form);
 			if(errorMsg == null) {
 				log.info("Updating Branch:" + form.getBranchname() + " SUCCESS.");
 				return new Response((Object)"Branch update successfully.");

@@ -100,7 +100,7 @@ public class UserService {
 	}
 	
 	public Response updateUserStatus(String userid, String status) {
-		String statusDesc = Util.getStatusDesc(Integer.parseInt(status));
+		String statusDesc = Util.getStatusDescWithoutRemovedStatus(Integer.parseInt(status));
 		if(statusDesc == null) {
 			return new Response("Received invalid data from user's request.");
 		}

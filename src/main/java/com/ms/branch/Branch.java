@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ResponseBranchInfo {
+public class Branch {
 	
 	private String seqid;
 	private String branchName;
@@ -20,7 +20,7 @@ public class ResponseBranchInfo {
 	private String stateName;
 	private String status;
 	
-	public ResponseBranchInfo(String seqid, String branchName, String districtName, String stateName, String status) {
+	public Branch(String seqid, String branchName, String districtName, String stateName, String status) {
 		this.seqid = seqid;
 		this.branchName = branchName;
 		this.districtName = districtName;
