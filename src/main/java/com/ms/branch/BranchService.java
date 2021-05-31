@@ -20,6 +20,7 @@ import com.ms.common.Response;
 import com.ms.common.Util;
 import com.ms.login.Staff;
 import com.ms.rules.RuleService;
+import com.ms.user.UserDAO;
 
 @Service
 @Transactional
@@ -32,6 +33,9 @@ public class BranchService {
 	
 	@Autowired
 	BranchDAO dao;
+	
+	@Autowired
+	UserDAO userDao;
 	
 	@Autowired
 	RuleService ruleService;
@@ -81,6 +85,7 @@ public class BranchService {
 		}
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
 	public Response deleteBranch(String branchId) {
 		log.info("Deleting branch.");
 		if(branchId.trim().equals("")){
@@ -91,7 +96,16 @@ public class BranchService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)"Selected Branch is deleted.");
+				String msg = "Selected Branch is deleted.";
+				errorMsg = userDao.updateUserStatusViaBranchid(branchId, Constant.INACTIVE_STATUS_CODE);
+				if(errorMsg == null) {
+					msg += " Manager for the selected branch is now inactive. Please reassigend a branch for him or delete it.";
+					return new Response((Object)msg);
+				}
+				else {
+					log.info(errorMsg);
+					throw new RuntimeException(errorMsg);
+				}
 			}
 		}
 	}

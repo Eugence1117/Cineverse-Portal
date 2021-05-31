@@ -177,7 +177,7 @@ public class UserService {
 			log.info("Format:" + format);
 			if(!currentProfilePic.equals("")) {
 				if(!currentProfilePic.equals(Constant.DEFAULT_USER_PROFILE_PIC)) {
-					deleteFile(userid + format);
+					deleteFile(userid + getFileFormat(currentProfilePic));
 				}
 			}
 			

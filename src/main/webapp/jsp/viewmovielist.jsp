@@ -416,6 +416,10 @@
 		<!--FOR view movie details-->
 		function getMovieDetails(element){
 			var movieId = element.id;
+			$(".adminBtn").each(function(){
+				$(this).hide();
+			});	
+			
 			$("#movieDetails").modal("show");
 			
 			$.ajax("api/authorize/getMovieInfo.json?movieId=" + movieId,{

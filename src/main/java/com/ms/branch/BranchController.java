@@ -84,7 +84,14 @@ public class BranchController {
 	@ResponseBody
 	public Response deleteBranch(Model model, String branchID) {
 		log.info("Entered /branch/deleteBranch.json");
-		return service.deleteBranch(branchID);
+		try {
+			Response res = service.deleteBranch(branchID); 
+			return res;
+		}
+		catch(Exception ex) {
+			log.error("Exception" + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
 	}
 	
 	@RequestMapping( value= {"/api/admin/updateStatus.json"})

@@ -452,7 +452,7 @@ public class MovieDao {
 	
 	public String insertMovieAvailable(ExistMovieForm form, String branchId) {
 		try {
-			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movieavailable VALUES(?,?,?,?,?)");
+			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movieavailable (branchID,movieID,startDate,endDate,status) VALUES(?,?,?,?,?)");
 			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_STATUS_CODE);
 			if(result > 0) {
 				return null;
@@ -477,7 +477,7 @@ public class MovieDao {
 		try {
 			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
 			String sqlDate = Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getReleaseDate() + Constant.DEFAULT_TIME));
-			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movie (seqid,movieName,picURL,totalTime,language,distributor,cast,director,releasedate,synopsis,movietype,censorshipId,createddate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			result = jdbc.update(query.toString(),form.getMovieId(),form.getMovieName(),picURL,form.getTotalTime(),form.getLanguage(),form.getDistributor(),form.getCast(),form.getDirector(),sqlDate,form.getSynopsis(),form.getMovietype(),form.getCensorship(),currentDate);
 			if(result > 0) {
 				return null;

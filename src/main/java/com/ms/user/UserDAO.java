@@ -50,7 +50,7 @@ public class UserDAO {
 				result.put(true, dataList);
 			}
 			else {
-				result.put(false,Constant.NO_RECORD_FOUND);
+				result.put(false,"Unable to retrieve necessary data from database. Please try again later.");
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -68,9 +68,9 @@ public class UserDAO {
 		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
-												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid) ")
+												   .append("AND d.stateid = s.seqid AND b.status != ? AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid) ")
 												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
-			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP);
+			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.REMOVED_STATUS_CODE,Constant.MANAGER_GROUP);
 			if(records.size() > 0) {
 				List<Branch> dataList = new ArrayList<Branch>();
 				for(Map<String,Object> record : records) {
@@ -86,7 +86,9 @@ public class UserDAO {
 				result.put(true, dataList);
 			}
 			else {
-				result.put(false,Constant.NO_RECORD_FOUND);
+				List<Branch> dataList = new ArrayList<Branch>();
+				dataList.add(new Branch(null,"No branch available"));
+				result.put(true,dataList);
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -104,9 +106,9 @@ public class UserDAO {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try { 
 			StringBuffer query = new StringBuffer().append("SELECT b.seqid, b.branchName, d.districtname, s.stateName FROM masp.branch b, masp.district d, masp.state s WHERE b.districtid = d.seqid ")
-												   .append("AND d.stateid = s.seqid AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid AND u.seqid != ?) ")
+												   .append("AND d.stateid = s.seqid AND b.status != ? AND NOT EXISTS (SELECT * FROM masp.staff u where u.usergroup = ? AND u.branchid = b.seqid AND u.seqid != ?) ")
 												   .append("GROUP BY b.seqid, b.branchName, d.districtname, s.stateName");
-			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.MANAGER_GROUP,staffId);
+			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),Constant.REMOVED_STATUS_CODE,Constant.MANAGER_GROUP,staffId);
 			if(records.size() > 0) {
 				List<Branch> dataList = new ArrayList<Branch>();
 				for(Map<String,Object> record : records) {
@@ -121,7 +123,9 @@ public class UserDAO {
 				response.put(true, dataList);
 			}
 			else {
-				response.put(false,Constant.NO_RECORD_FOUND);
+				List<Branch> dataList = new ArrayList<Branch>();
+				dataList.add(new Branch(null,"No branch available"));
+				response.put(true,dataList);
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -266,6 +270,31 @@ public class UserDAO {
 		return result;
 	}
 	
+	//backend used
+	public String updateUserStatusViaBranchid(String branchid, int status) {
+		try {
+			String query = "UPDATE masp.Staff set status = ?, branchid = ? where branchid = ?";
+			int result = jdbc.update(query,status,null,branchid);
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return ("No staff is assigned to this branch.");
+			}
+			
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		
+	}
+	
+	
 	public String updateUserStatus(String userid, int status) {
 		try {
 			StringBuffer query = new StringBuffer().append("UPDATE masp.Staff SET status = ? WHERE seqid = ?");
@@ -335,7 +364,7 @@ public class UserDAO {
 		
 		try {
 			log.info("status:" + form.getStatus() + " branchid:" + form.getBranchid());
-			StringBuffer query = new StringBuffer("INSERT INTO masp.STAFF VALUES(?,?,?,?,?,?,?,?)");
+			StringBuffer query = new StringBuffer("INSERT INTO masp.STAFF (seqid,username,password,usergroup,status,branchid,createddate,profilepic) VALUES(?,?,?,?,?,?,?,?)");
 			int response = jdbc.update(query.toString(),uuid,form.getUsername(),form.getPassword(),form.getUsergroup(),form.getStatus(),form.getBranchid(),createddate,Constant.DEFAULT_USER_PROFILE_PIC);
 			if(response > 0) {
 				return null;

@@ -28,15 +28,18 @@ public class AjaxRequestHandlingFilter implements Filter {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse resp = (HttpServletResponse) response;
             String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
+            
             if ("XMLHttpRequest".equals(ajaxHeader)) {
-                String principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-                //log.info("Principal: " + principal);
-                if("anonymousUser".equals(principal.toString())){
-                    resp.setStatus(this.errorCode);
-                    resp.sendError(this.errorCode, "Ajax time out");
-                    resp.addHeader("SESSION_EXPIRED","true");
-                    SecurityContextHolder.clearContext();
-                    throw new AccessDeniedException("Ajax request time out.");
+            	if(!req.isRequestedSessionIdValid()) {
+            		String principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+                    //log.info("Principal: " + principal);
+                    if("anonymousUser".equals(principal.toString())){
+                        resp.setStatus(this.errorCode);
+                        resp.sendError(this.errorCode, "Ajax time out");
+                        resp.addHeader("SESSION_EXPIRED","true");
+                        SecurityContextHolder.clearContext();
+                        throw new AccessDeniedException("Ajax request time out.");
+                    }
                 }
             }
             filterChain.doFilter(request, response);

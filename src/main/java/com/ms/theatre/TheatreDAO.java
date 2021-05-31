@@ -301,7 +301,7 @@ public class TheatreDAO {
 	public String createNewTheatre(Theatre theatre) {
 		log.info(theatre.toString());
 		try {
-			String query = "INSERT INTO masp.theatre VALUES(?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO masp.theatre (seqid,theatrename,seatrow,seatcol,theatretype,createddate,branchid,status,totalseat,theatrelayout) VALUES(?,?,?,?,?,?,?,?,?,?)";
 			int result = jdbc.update(query,theatre.getId(),Character.toString(theatre.getTitle()),theatre.getSeatrow(),theatre.getSeatcol(),theatre.getTheatretype(),theatre.getCreateddate(),theatre.getBranchid(),Constant.ACTIVE_STATUS_CODE,theatre.getTotalSeat(),theatre.getTheatreLayout());
 			if(result > 0) {
 				return null;

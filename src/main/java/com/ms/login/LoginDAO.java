@@ -2,6 +2,7 @@ package com.ms.login;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,69 @@ public class LoginDAO{
 		return staff;
 	}
 	
+	public boolean getBranchStatus(String branchid) {
+		try {
+			String query = "SELECt status FROM masp.branch where seqid = ?";
+			int status = jdbc.queryForObject(query,Integer.class,branchid);
+			if(status == Constant.ACTIVE_STATUS_CODE || status == Constant.INACTIVE_STATUS_CODE) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return false;
+		}
+		catch(Exception ex) {
+			log.info("Exception :" + ex.getMessage());
+			return false;
+		}
+	}
+	public Map<Boolean,Object> getUser(String username) {
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "select seqid, username, password, usergroup, status, branchid, profilepic FROM masp.STAFF where username = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,username);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					int usergroup = (int)row.get("usergroup");
+					String branchid = (String)row.get("branchid");
+					String seqid = (String)row.get("seqid");
+					String name = (String)row.get("username");
+					String password = (String)row.get("password");
+					String profilepic = (String)row.get("profilepic");
+					
+					int status = (int)row.get("status");
+					
+					Map<String,String> obj = new LinkedHashMap<String, String>();
+					obj.put("usergroup",String.valueOf(usergroup));
+					obj.put("branchid",branchid);
+					obj.put("seqid",seqid);
+					obj.put("username",name);
+					obj.put("password",password);
+					obj.put("profilepic",profilepic);
+					obj.put("status",String.valueOf(status));
+					
+					result.put(true,obj);
+				}				
+			}
+			else {
+				result.put(true, null);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.info("Exception :" + ex.getMessage());
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return result;
+	}
+	
 	public Map<String,String> findUser(String username){
 		Map<String,String> staff = null;
 		try {
@@ -69,7 +133,18 @@ public class LoginDAO{
 					staff.put("password",password);
 					staff.put("profilepic",profilepic);
 					staff.put("status",String.valueOf(status));
-					log.info(staff.get("username"));
+					
+					if(usergroup == Constant.MANAGER_GROUP) {
+						if(branchid == null) {
+							return null;
+						}
+						else {
+							boolean isValidBranch = getBranchStatus(branchid);
+							if(!isValidBranch) {
+								return null;
+							}
+						}
+					}
 				}
 			}
 		}

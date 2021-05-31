@@ -15,6 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.github.javaparser.utils.Log;
+import com.ms.common.Constant;
+import com.ms.common.Response;
+import com.ms.common.Util;
+
 
 @Service("loginService")
 public class LoginService implements UserDetailsService {
@@ -51,6 +56,42 @@ public class LoginService implements UserDetailsService {
 		} catch (EmptyResultDataAccessException e) {
 			logger.info("username [] not found in database", username);
 			throw new UsernameNotFoundException("username not found in database: " + username);
+		}
+	}
+	
+	public Response troubleshootAccount(String username) {
+		try {
+			username = Util.trimString(username);
+			if(username.equals("")) {
+				return new Response((String)"Please enter your username.");
+			}
+			Map<Boolean,Object> result = Repo.getUser(username);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
+			}
+			else {
+				Object object = result.get(true);
+				if(object == null) {
+					return new Response("No issue occured. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
+				}
+				else {
+					Map<String,String> staff = (Map<String,String>)object;
+					if(Integer.parseInt(staff.get("usergroup")) == Constant.MANAGER_GROUP && staff.get("branchid") == null) {
+						return new Response("Your branch has been removed by the admin. Your account is inaccessible until admin assign you to another branch. Please contact with admin for further details.");
+					}
+					else if(Integer.parseInt(staff.get("status")) == Constant.INACTIVE_STATUS_CODE) {
+						return new Response("Your account was deactivated by the admin. Please contact with admin for further details.");
+					}
+					else{
+						return new Response("No issue occured. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
+					}
+						
+				}
+			}
+		}
+		catch(Exception ex) {
+			Log.error("Exception " + ex.getMessage());
+			return new Response("Unexpected error occured during troubleshooting. Please contact with admin.");
 		}
 	}
 	

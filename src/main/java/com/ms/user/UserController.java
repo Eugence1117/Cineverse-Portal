@@ -37,7 +37,7 @@ public class UserController {
 	
 	@RequestMapping(value = {"/user.htm"})
 	public String getUserPage(Model model) {
-		log.info("Entered /user");
+		log.info("Entered /user");		
 		Response branchList = service.getBranchList();
 		if(branchList.getErrorMsg()!= null) {
 			model.addAttribute("error",branchList.getErrorMsg());

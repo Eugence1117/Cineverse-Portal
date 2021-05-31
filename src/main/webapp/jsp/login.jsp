@@ -8,6 +8,14 @@
 <title><fmt:message key="user.login.title" /></title>
 <%@ include file="include/css.jsp"%>
 	<style>
+	#troubleshoot{
+		text-decoration:underline;
+		color:blue;
+	}
+	
+	#troubleshoot:hover{
+		cursor:pointer;
+	}
 	@media only screen and (max-width: 640px) {
 		.card-body .row{
 			margin-left:0px !important;
@@ -29,7 +37,7 @@
 	
 				<c:if test="${param.error ne null}">
 					<div class="alert alert-danger" role="alert">Invalid Username
-						or Password</div>
+						or Password <a class="float-end" id="troubleshoot" data-bs-toggle="modal" data-bs-target="#modal">Troubleshoot</a></div>
 				</c:if>
 				<c:if test="${param.logout ne null}">
 					<div class="alert alert-success" role="alert">Logout
@@ -71,9 +79,61 @@
 			</p>
 		</footer>
 	</div>
-
+	
+	<div class="modal fade bd-example-modal-lg" id="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Troubleshoot</h4>
+					<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form id="problem">
+						<div class="row">
+							<div class="col-md">
+								<div class="form-floating">
+									<input type="text" name="username" class="form-control" id="username" placeholder="Write something here...">
+									<label for="username">Username</label>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="btnCancel" data-bs-dismiss="modal"
+						class="btn btn-secondary">Cancel</button>
+					<button type="button" id="btnCheck" class="btn btn-primary">Troubleshoot</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
 	<%@ include file="include/js.jsp"%>
-		
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script>
+		$("#btnCheck").on('click',function(){
+			$("#modal").modal('hide');
+			
+			var username = $("#username").val();
+			if(username.trim().length == 0){
+				bootbox.alert("Please enter your username.");
+				return false;
+			}
+			$.ajax("api/public/troubleshootAccount.json?username=" + username,{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
+			}).done(function(data){
+				var msg = data.errorMsg == null ? data.result : data.errorMsg;
+				bootbox.alert(msg);
+			})
+		});
 	</script>
 </body>
 </html>

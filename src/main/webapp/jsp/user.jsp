@@ -349,8 +349,7 @@
 			var status = "${error}";
 			console.log(status)
 			if(status != ""){
-				bootbox.alert(status);
-				return false;
+				bootbox.alert(status,function(){window.location.href="home.htm"});
 			}
 			else{
 				readyFunction();
@@ -591,7 +590,7 @@
 				$(this).find(":input.has-error:first").focus();
 			}
 		});
-		
+
 		function addUser(){
 			/* if(!checkEmptyField()){
 				return false;
