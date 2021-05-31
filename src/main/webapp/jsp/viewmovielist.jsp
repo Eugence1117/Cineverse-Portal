@@ -266,6 +266,7 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/date-de.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
@@ -374,7 +375,7 @@
 					{ data: 'movieId', 'width':'30%',render:function(data,type,row){return data.length > 30 ? data.substr(0,25) + '.....' : data}},
 					{ data: 'movieName','width':'25%'},
 					{ data: 'language','width':'10%'},
-		   			{ data: 'releasedate','width':'15%'},
+		   			{ data: 'releasedate','width':'15%',type:'de_date',targets:0},
 		   			{ data: 'totalTime','width':'10%'},
 		   			{ data: 'censorship','width':'5%'},
 		   			{ data: 'action','width':'5%'}
