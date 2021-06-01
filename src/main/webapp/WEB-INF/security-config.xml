@@ -35,6 +35,7 @@
     	<intercept-url pattern="/createTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	<intercept-url pattern="/editTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	<intercept-url pattern="/viewTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
+    	<intercept-url pattern="/previewSchedule.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	
     	<intercept-url pattern="/viewBranch.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
     	<intercept-url pattern="/addMovie.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>

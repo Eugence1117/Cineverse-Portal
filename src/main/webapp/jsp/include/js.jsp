@@ -10,6 +10,7 @@ $('#logOutBtn').on('click', function() {
 	return false;
 });
 
+
 $.fn.serializeObject = function() {
     var o = {};
     var a = this.serializeArray();

@@ -626,7 +626,7 @@ public class ScheduleService {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+											eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 											 
 										} else {
 											counter++;
@@ -840,7 +840,7 @@ public class ScheduleService {
 													nextDate = nextDate.plusDays(1);
 												}
 												Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-												eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+												eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 											} else {
 												UnprocessedProblemCount++;
 											}
@@ -1027,7 +1027,7 @@ public class ScheduleService {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-											eventList.add(new Event(UUID.randomUUID().toString(), "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+											eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
 										} else {
 											UnprocessedProblemCount++;
 										}

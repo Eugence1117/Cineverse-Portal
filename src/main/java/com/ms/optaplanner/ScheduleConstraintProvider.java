@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 
 public class ScheduleConstraintProvider implements ConstraintProvider{
-	
+
 	// overconstrained planning
 	@Override
 	public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {

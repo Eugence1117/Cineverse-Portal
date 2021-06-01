@@ -11,21 +11,25 @@
 <title><fmt:message key="schedule.add.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.css'/>">
 
 <style>
+
+#pageTwo{
+	background-color:blue;
+	
+}
 #scheduleOption .nav-link:hover, .card-header>a, .component-header {
 	cursor: pointer;
 }
 
-#loading{
+#loading,#timeTableLoading{
 	padding:100px;
 	text-align:center;
 }
 
-.media>img {
+.media>img{
 	height: 120px;
 	width: 81px;
 }
@@ -128,104 +132,123 @@
 			<div id="content">
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
-				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Schedule</h1>
-			        </div>
-			        
-			        <div class="card m-2">
-						<div class="card-header bg-light border-1">
-							<a data-toggle="collapse" data-target="#dateOption"><span
-								class="fa fa-search"></span> Configure Date Range</a>
-						</div>
-						<div class="card-body p-0">
-							<form id="dateOption" class="collapse show">
-								<div class="py-3 px-2">
-									<div class="form-group row">
-										<div class="col-md-1"></div>
-										<div class="col-md-5">
-											<div class="row">
-												<div class="col-md">
-													<label class="col-form-label">Start Date :</label>
+				 	<div class="carousel slide" data-bs-ride="carousel" id="carousel" data-bs-interval="false">
+				 		<div class="carousel-inner">
+				 			<div class="carousel-item active">
+				 				<div class="d-sm-flex align-items-center justify-content-between mb-4">
+						        	<h1 class="h3 mb-0 text-gray-800">Schedule</h1>
+						        	<button id="btnNext" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="1">Proceed to next step <i class="fas fa-arrow-circle-right"></i></button>
+						        </div>
+						        
+						        <div class="card m-2">
+									<div class="card-header bg-light border-1">
+										<a data-toggle="collapse" data-target="#dateOption"><span
+											class="fa fa-search"></span> Configure Date Range</a>
+									</div>
+									<div class="card-body p-0">
+										<form id="dateOption" class="collapse show">
+											<div class="py-3 px-2">
+												<div class="form-group row">
+													<div class="col-md-1"></div>
+													<div class="col-md-5">
+														<div class="row">
+															<div class="col-md">
+																<label class="col-form-label">Start Date :</label>
+															</div>
+															<div class="col-md">
+																<input class="form-control date" type="date"
+																	name="startdate" value="${startDate}" disabled id='startDate'>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-5">
+														<div class="row">
+															<div class="col-md">
+																<label class="col-form-label">End Date :</label>
+															</div>
+															<div class="col-md">
+																<input class="form-control date" type="date" name="enddate"
+																	value="${endDate}">
+															</div>
+														</div>
+													</div>
+													<div class="col-md-1"></div>
 												</div>
-												<div class="col-md">
-													<input class="form-control date" type="date"
-														name="startdate" value="${startDate}" disabled id='startDate'>
+												<div class="form-group row m-0">
+													<div class="col-md-4"></div>
+													<div class="col-md-4 text-center">
+														<button class="btn-success btn" type="button" id="searchByDate">
+															<span class="fas fa-wrench"></span> Configure
+														</button>
+													</div>
+													<div class="col-md-4"></div>
+												</div>
+											</div>
+						
+										</form>
+									</div>
+								</div>
+								<div class="card m-2">
+									<div class="card-header">
+										<a data-toggle="collapse" data-target="#scheduleOption"><span
+											class="fa fa-calendar-alt"></span> Configure Schedule</a>
+									</div>
+									<div class="card-body">
+										<div id="scheduleOption" class="collapse show">
+											<ul class="nav nav-pills nav-fill">
+												<li class="nav-item col-sm-4"><a
+													class="nav-link active text-center"
+													onclick="configureByOverall()" id="defaultNav">Overall</a></li>
+												<li class="nav-item col-sm-4"><a class="nav-link text-center"
+													onclick="configureByWeekly()">Weekly</a></li>
+												<li class="nav-item col-sm-4"><a class="nav-link text-center"
+													onclick="configureByDaily()">Daily</a></li>
+											</ul>
+											<div class="row px-3 mt-3">
+												<div class="col-sm-12">
+													<!--  Template for Daily -->
+													<div class="hide" id="dailySchedule">
+														<form>
+														</form>
+													</div>
+													
+													<!-- Template for Weekly -->
+													<div class="hide" id="weeklySchedule">
+														<form>
+														</form>
+													</div>
+						
+													<!--  Template for Overall -->
+													<div class="hide" id="overallSchedule">
+														<form>
+														</form>
+													</div>
+													<!--  End of Overall Template -->
+													<div class="hide" id="loading">
+														<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
+													</div>
 												</div>
 											</div>
 										</div>
-										<div class="col-md-5">
-											<div class="row">
-												<div class="col-md">
-													<label class="col-form-label">End Date :</label>
-												</div>
-												<div class="col-md">
-													<input class="form-control date" type="date" name="enddate"
-														value="${endDate}">
-												</div>
-											</div>
-										</div>
-										<div class="col-md-1"></div>
-									</div>
-									<div class="form-group row m-0">
-										<div class="col-md-4"></div>
-										<div class="col-md-4 text-center">
-											<button class="btn-success btn" type="button" id="searchByDate">
-												<span class="fas fa-wrench"></span> Configure
-											</button>
-										</div>
-										<div class="col-md-4"></div>
 									</div>
 								</div>
-			
-							</form>
-						</div>
-					</div>
-					<div class="card m-2">
-						<div class="card-header">
-							<a data-toggle="collapse" data-target="#scheduleOption"><span
-								class="fa fa-calendar-alt"></span> Configure Schedule</a>
-						</div>
-						<div class="card-body">
-							<div id="scheduleOption" class="collapse show">
-								<ul class="nav nav-pills nav-fill">
-									<li class="nav-item col-sm-4"><a
-										class="nav-link active text-center"
-										onclick="configureByOverall()" id="defaultNav">Overall</a></li>
-									<li class="nav-item col-sm-4"><a class="nav-link text-center"
-										onclick="configureByWeekly()">Weekly</a></li>
-									<li class="nav-item col-sm-4"><a class="nav-link text-center"
-										onclick="configureByDaily()">Daily</a></li>
-								</ul>
-								<div class="row px-3 mt-3">
-									<div class="col-sm-12">
-										<!--  Template for Daily -->
-										<div class="hide" id="dailySchedule">
-											<form>
-											</form>
-										</div>
-										
-										<!-- Template for Weekly -->
-										<div class="hide" id="weeklySchedule">
-											<form>
-											</form>
-										</div>
-			
-										<!--  Template for Overall -->
-										<div class="hide" id="overallSchedule">
-											<form>
-											</form>
-										</div>
-										<!--  End of Overall Template -->
-										<div class="hide" id="loading">
-											<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="calendar" class="calendar m-2"></div>
-			     </div>
+						     </div>
+						     
+						     <div class="carousel-item">
+						     	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+					        		<h1 class="h3 mb-0 text-gray-800">Preview Schedule</h1>
+					        		<button id="btnPrev" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="0"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
+					        	</div>
+					        	
+					        	<div class="card m-2">
+					        		<div id="calendar" class="calendar m-2">
+					        		
+					        		</div>
+					        	</div>
+						     </div>
+				 		</div>
+				 	</div>
+				 </div>
 			</div>
 			<footer class="sticky-footer bg-white">
 		        <div class="container my-auto">
@@ -242,22 +265,17 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal" tabindex="-1" role="dialog" id="timeTableLoading">
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title">Timetable</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      <div class="modal-body">
-	        
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-primary">Save changes</button>
-	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	      </div>
+	     <div class="row justify-content-center">
+	      		<div class="spinner-border m-5 text-primary" role="status">
+			  		<span class="visually-hidden">Loading...</span>
+				</div>
+	      	</div>
+	      	 <div class="row justify-content-center">
+	      		<div>Loading...</div>
+	      	</div>
 	    </div>
 	  </div>
 	</div>
@@ -266,9 +284,6 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript">
@@ -334,6 +349,7 @@
 		function configureByOverall() {
 			hideAllSchedule();
 			$("#loading").show();
+			
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
@@ -386,7 +402,7 @@
 										"<button class='btn-primary btn' type='button' id='submitOverall'>Apply</button>" +
 										"</div>" +
 										"<div class='col-sm-5'></div></div>";
-						$("#overallSchedule > form").append(innerElement);
+						$("#overallSchedule > form").html(innerElement);
 						synchronizeSliderValue(1); //Used to keep the range value at 100
 						$("#overallSchedule").slideDown()
 						setupSlider(); //Setup legend under the range
@@ -413,6 +429,7 @@
 				var formData = form.serializeObject();
 				traverseObject(formData); //Only used if configure 1 movie
 				
+				$("#timeTableLoading").modal("show");
 				
 				formData["startDate"] = form.data("startDate");
 				formData["endDate"] = form.data("endDate");
@@ -433,11 +450,14 @@
 						}
 					}
 					}).done(function(data) {
+						$("#timeTableLoading").modal("hide");
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
 						else{
-							console.log(data.score);
+							$("#btnNext").click();
+							$("#calendarValue").val(data);
+							$("#postForm").submit();
 							var dataResult = JSON.parse(data.result);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
@@ -507,10 +527,23 @@
 							    	  minute: '2-digit',
 							    	  omitZeroMinute: false,
 							    	  meridiem: true
-							    	  }
+							    	  },
+							      eventClick:function(data){
+							    	  console.log(data);
+							      },
+							      eventClassNames:"customEvent"
+
 							    });
 
-							    calendar.render();		
+							    calendar.render();
+							    addPopOver();
+							    if(data.score > 0){
+							    	bootbox.confirm("Unfortunely the scheduling AI not able to provide you the best solution. Do you want to try again ?",function(result){
+							    		if(result){
+							    			$(this).click();
+							    		}
+							    	})
+							    }
 						}
 					});
 				
@@ -578,7 +611,7 @@
 							}
 							
 							innerElement += "</div></div></div>";
-							$("#weeklySchedule > form").append(innerElement);
+							$("#weeklySchedule > form").html(innerElement);
 						
 						}
 						else{
@@ -787,7 +820,7 @@
 								innerElement += "<p class='emptyMovie'>No movie Available</p>";
 							}
 							innerElement += "</div></div></div>";
-							$("#dailySchedule > form").append(innerElement);
+							$("#dailySchedule > form").html(innerElement);
 						}
 						else{
 							console.log("No movie Available");
@@ -1250,21 +1283,29 @@
 			return day + " " + month + " " + year;
 		}
 		
-		$.fn.serializeObject = function() {
-	        var o = {};
-	        var a = this.serializeArray();
-	        $.each(a, function() {
-	            if (o[this.name]) {
-	                if (!o[this.name].push) {
-	                    o[this.name] = [o[this.name]];
-	                }
-	                o[this.name].push(this.value || '');
-	            } else {
-	                o[this.name] = this.value || '';
-	            }
-	        });
-	        return o;
-	    };
+		function addPopOver(){
+			$(".customEvent").each(function(){
+				$(this).attr("data-bs-toggle","popover");
+				$(this).attr("title","Action");
+				$(this).attr("data-bs-content","<b>text</b>");
+				//$(this).attr("data-bs-trigger","focus");
+				$(this).attr("data-bs-html",true);
+				$(this).attr("data-bs-placement","top");
+				
+			})
+			
+			$('.customEvent').on('click', function (e) {
+			    $('.customEvent').not(this).popover('hide');
+			});
+			
+			activatePopover();
+		}
+		function activatePopover(){
+			var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+			var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+			  return new bootstrap.Popover(popoverTriggerEl)
+			})
+		}
 	</script>
 </body>
 

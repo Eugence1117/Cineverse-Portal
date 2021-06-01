@@ -17,10 +17,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.ms.login.Staff;
 import com.ms.schedule.Model.AvailableMovie;
@@ -96,10 +99,11 @@ public class ScheduleController {
 	
 	@RequestMapping( value= {"/api/manager/configureScheduleByOverall.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
-	public Map<String,String> getOverallConfiguration(Model model, @RequestBody Map<String,Object> payload){
+	public 	Map<String,String> getOverallConfiguration(Model model, @RequestBody Map<String,Object> payload){
 		log.info("Entered /schedule/configureScheduleByOverall.json");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();
+		
 		Map<String,String> result = service.generateOverallSchedule(payload,branchid);
 		return result;
 	}

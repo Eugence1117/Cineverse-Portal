@@ -41,6 +41,7 @@
 					  <textarea class="form-control" id="floatingTextarea" disabled></textarea>
 					  <label for="floatingTextarea">Comments</label>
 					</div>
+					<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
 		        </div>
 		        <!--  END CONTENT -->
 			</div>

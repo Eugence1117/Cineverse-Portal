@@ -1,5 +1,8 @@
 package com.ms.schedule;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +16,6 @@ public class Event {
 	private String resourceId;
 	private String start;
 	private String end;
-	private String color;
+	private String color;	
+	
 }
