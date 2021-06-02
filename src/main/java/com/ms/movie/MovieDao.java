@@ -546,4 +546,22 @@ public class MovieDao {
 		}
 		return date;
 	}
+	
+	//Backend
+	public int getMovieDuration(String movieId) {
+		int totalTime = 0;
+		try {
+			String query = "SELECT totalTime FROM masp.movie WHERE seqid = ?";
+			totalTime = jdbc.queryForObject(query, Integer.class,movieId);
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("CannotGetJdbcConnectionException ex::" + ge.getMessage());
+			return totalTime;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return totalTime;
+		}
+		return totalTime;
+	}
 }

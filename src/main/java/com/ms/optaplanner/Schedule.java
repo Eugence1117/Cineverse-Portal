@@ -68,7 +68,14 @@ public class Schedule {
 	public TimeGrain getStartTime() {
 		return startTime;
 	}
-
+	
+	public int getStartGrain() {
+		return startTime.getIndex();
+	}
+	
+	public int getLastGrain() {
+		return startTime.getIndex() + movie.getDurationInGrain();
+	}
 
 	public void setScheduleId(String scheduleId) {
 		this.scheduleId = scheduleId;

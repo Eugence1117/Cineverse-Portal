@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ms.common.Response;
 import com.ms.login.Staff;
 import com.ms.schedule.Model.AvailableMovie;
 import com.ms.theatre.Theatre;
@@ -127,5 +128,12 @@ public class ScheduleController {
 		String branchid = user.getBranchid();
 		Map<String,String> result = service.generateDailySchedule(payload,branchid);
 		return result;
+	}
+	
+	@RequestMapping( value={"/api/manager/showScheduleWithCleaningTime.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response showScheduleWithCleaningTime(Model model, @RequestBody List<Schedule> schedules) {
+		log.info("Entered /schedule/configureScheduleByDaily.json");
+		return service.generatingScheduleWithCleaningTime(schedules);
 	}
 }

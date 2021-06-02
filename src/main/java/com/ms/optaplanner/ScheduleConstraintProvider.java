@@ -33,6 +33,7 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				TheatrePrefer(constraintFactory),
 				AvoidDuplicateMovieAtDifferentTheatre(constraintFactory),
 				AvoidSameTime(constraintFactory),
+				ScheduleGap(constraintFactory)
 				//VariatyOfMovie(constraintFactory),
 		};
 	}
@@ -101,5 +102,14 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				.penalize("TheatrePrefer", HardSoftScore.ONE_SOFT);
 	}
 	
+	public Constraint ScheduleGap(ConstraintFactory constraintFactory) {
+		return constraintFactory.from(Schedule.class)
+			  .join(Schedule.class,
+			   Joiners.equal(Schedule::getTheatre), 
+			   Joiners.equal(Schedule::getStartGrain,(rightSchedule) -> rightSchedule.getLastGrain()))
+			.penalize("ScheduleGap",HardSoftScore.ofSoft(5));
+			   
+	}
+
 
 }

@@ -136,7 +136,12 @@
 												</c:if>
 											</div>
 											<div class="card-body d-none" id="movieInfo">
-												<div class="hide text-center m-4" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
+												<div class="hide m-2 text-center" id="loading">
+													<div class="spinner-border text-primary" role="status">
+														<span class="visually-hidden">Loading...</span>
+													</div>
+													<p class="text-center">Loading...</p>
+												</div> 
 												<form id="movieEditForm">
 												<div class="row mt-1 mb-4">
 													<div class="col-md">

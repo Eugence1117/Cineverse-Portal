@@ -18,12 +18,8 @@ public class MovieConfig {
 	
 	private int totalTime;
 	
-	
 	private String theatrePrefer;
 	
-	//private int defaultTime;
-	
-	//private String color;
 	private int originalTime;
 	
 	public int getDurationInGrain() {

@@ -16,10 +16,45 @@
 
 <style>
 
-#pageTwo{
-	background-color:blue;
-	
+.cleaningEvent{
+	background-color:#77DD77;
+	border-color: #77DD77 !important;
 }
+
+#overlayloading {
+  display:none;
+  background: #ffffff;
+  color: #666666;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 5000;
+  top: 0;
+  left: 0;
+  float: left;
+  text-align: center;
+  padding-top: 15%;
+  opacity: .80;
+}
+
+.clickable:hover{
+	cursor:pointer;
+}
+
+#draggable{
+	min-height:50px;
+}
+.draggable > .item:hover{
+	background-color: #007bff;
+    border-color: #007bff;
+    transition:0.5s;
+    cursor:move;
+}
+
+.activeEvent{
+	opacity:0.8
+}
+
 #scheduleOption .nav-link:hover, .card-header>a, .component-header {
 	cursor: pointer;
 }
@@ -195,6 +230,9 @@
 									</div>
 									<div class="card-body">
 										<div id="scheduleOption" class="collapse show">
+											<div class="alert alert-info" role="alert">
+												Please aware that <b>weekly</b> will take longer time than <b>overall</b> while the <b>daily</b> take longest.
+											</div>
 											<ul class="nav nav-pills nav-fill">
 												<li class="nav-item col-sm-4"><a
 													class="nav-link active text-center"
@@ -224,8 +262,11 @@
 														</form>
 													</div>
 													<!--  End of Overall Template -->
-													<div class="hide" id="loading">
-														<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
+													<div class="hide m-2" id="loading">
+														<div class="spinner-border text-primary" role="status">
+													  		<span class="visually-hidden">Loading...</span>
+														</div>
+														<p class="text-center">Loading...</p>
 													</div>
 												</div>
 											</div>
@@ -237,14 +278,51 @@
 						     <div class="carousel-item">
 						     	<div class="d-sm-flex align-items-center justify-content-between mb-4">
 					        		<h1 class="h3 mb-0 text-gray-800">Preview Schedule</h1>
-					        		<button id="btnPrev" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="0"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
+					        		<div>
+					        			<button id="btnPrev" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="0"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
+					        			<button id="btnLast" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="2">View with Cleaning Schedule <i class="fas fa-arrow-circle-right"></i></button>
+					        		</div>
 					        	</div>
 					        	
-					        	<div class="card m-2">
-					        		<div id="calendar" class="calendar m-2">
+					        	<div class="alert alert-info" role="alert">
+									You may click on the movie timeline to view the details info or remove it from the schedule.
+								</div>
+					        	<div class="card m-2 p-2">
+					        		<div id="calendar" class="calendar">
 					        		
 					        		</div>
 					        	</div>
+					        	
+					        	<div class="m-2 p-2">
+					        		<h4>Unassigned Schedule</h4>
+					        		<div id="draggable">
+					        			<ul class="draggable list-group">
+					        			</ul>
+					        		</div>
+					        		<div class="text-center">
+					        			<button id="btnSubmit" class="btn btn-primary">Complete</button>
+					        		</div>
+					        	</div>
+						     </div>
+						     
+						     <div class="carousel-item">
+						     	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+					        		<h1 class="h3 mb-0 text-gray-800">Schedule with cleaning time</h1>
+					        		<button class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="1"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
+					        	</div>
+					        	
+					        	<div class="card m-2 p-2">
+					        		<div class="text-center text-primary m-2" id="loading3">
+									  <div class="spinner-border" role="status">
+									    <span class="visually-hidden">Loading...</span>
+									  </div>
+									  <p class="text-center">Loading...</p>
+									</div>
+					        		<div id="ReadOnlyCalendar" class="calendar">
+					        		
+					        		</div>
+					        	</div>
+					        	
 						     </div>
 				 		</div>
 				 	</div>
@@ -265,19 +343,45 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal" tabindex="-1" role="dialog" id="timeTableLoading">
-	  <div class="modal-dialog modal-lg" role="document">
-	    <div class="modal-content">
-	     <div class="row justify-content-center">
-	      		<div class="spinner-border m-5 text-primary" role="status">
-			  		<span class="visually-hidden">Loading...</span>
+	<div class="modal fade" id="eventView" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Event Details</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
-	      	</div>
-	      	 <div class="row justify-content-center">
-	      		<div>Loading...</div>
-	      	</div>
-	    </div>
-	  </div>
+				<div class="modal-body">
+					<div class="row">
+						<label class="col-sm-4"><b>Title :</b></label>
+						<p class="d-inline data col-sm-6" id="title"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Start Time :</b></label>
+						<p class="d-inline data col-sm-6" id="start"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>End Time :</b></label>
+						<p class="d-inline data col-sm-6" id="end"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-danger" id="removeEvent"> Remove</button>
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
 	</div>
 	<!-- /.container -->
 
@@ -286,10 +390,18 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 	<script type="text/javascript">
+	
+		
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
-
+		
+		
+		var selectedEvent = null;
+		var calendar = null;
+		var calendarData = null;
+		
 		//Check Error on load
 		$(document).ready(function() {
 			var error = "${errorMsg}";
@@ -337,7 +449,29 @@
 			}
 			return elementTag;
 		}
-		
+
+		$("#btnLast").on('click',function(){
+			$("#loading3").show();
+			if(calendarData == null){
+				bootbox.alert("Please finish the configuration on the 1st page first.");
+				$("#loading3").hide();
+				return false;
+			}
+			else{
+				var data = convertCalendarToJSON();
+				if(data == false){
+					$("#loading3").hide();
+					return false;
+				}
+				else{
+					$("#ReadOnlyCalendar").html("");
+					requestAnotherCalendar(data);	
+				}
+					
+			}
+			
+		});
+	
 		$("#searchByDate").on('click', function() {
 			checkDefaultActiveNav();
 
@@ -369,7 +503,7 @@
 				$("#loading").hide();
 				if (data.error == null) {
 					//hideAllSchedule();
-					
+					clearFormHTML()
 					
 					//Read data
 					var movieList = data.singleResult;
@@ -402,7 +536,7 @@
 										"<button class='btn-primary btn' type='button' id='submitOverall'>Apply</button>" +
 										"</div>" +
 										"<div class='col-sm-5'></div></div>";
-						$("#overallSchedule > form").html(innerElement);
+						$("#overallSchedule > form").append(innerElement);
 						synchronizeSliderValue(1); //Used to keep the range value at 100
 						$("#overallSchedule").slideDown()
 						setupSlider(); //Setup legend under the range
@@ -421,6 +555,7 @@
 		
 		function addListenerToOverallButton(){
 			$("#overallSchedule #submitOverall").on('click',function(){
+				$("#overlayloading").show();
 				var form = $("#overallSchedule > form");
 				var theatreSelected = retrieveTheatreSelection(1);
 				if(!theatreSelected){
@@ -450,100 +585,24 @@
 						}
 					}
 					}).done(function(data) {
-						$("#timeTableLoading").modal("hide");
+						$("#overlayloading").hide();
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
 						else{
 							$("#btnNext").click();
-							$("#calendarValue").val(data);
-							$("#postForm").submit();
+							
 							var dataResult = JSON.parse(data.result);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
-							 var calendar = new FullCalendar.Calendar(calendarEl, {
-								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-							      now: new Date(form.data("startDate")),
-							      editable: true,
-							      slotLabelFormat:{
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-	  
-							      },
-							      slotDuration:'00:15:00',
-							      slotLabelInterval:'00:15:00',
-							      snapDuration:'00:05:00',
-							      aspectRatio: 3,
-							      themeSystem: 'bootstrap',
-							      scrollTime: '09:00:00',
-							      eventOverlap: false,
-							      eventDurationEditable: false,
-							      contentHeight: 'auto',
-							      headerToolbar: {
-							        left: 'today prev,next',
-							        center: 'title',
-							        right: 'resourceTimelineByDay,resourceTimeGridByDay'
-							      },
-							      initialView: 'resourceTimelineByDay',
-							      views:{
-							    	  resourceTimeGridByDay:{
-							    		  type: 'resourceTimeGrid',
-							    		  duration:{days:1},
-							    		  buttonText: 'Vertical' 
-							    	  },
-							      	resourceTimelineByDay:{
-							      		 type: 'resourceTimeline',
-								         duration:{days:1},
-								     	 buttonText: 'Horizontal' 
-							      	}
-							      },
-							      resourceAreaWidth: '15%',
-							      resourceAreaColumns: [
-							        {
-							          headerContent: 'Theatre',
-							          field: 'title'
-							        },
-							        {
-							        	headerContent: 'Type',
-							        	field: 'theatretype'
-							        }
-							      ],
-							      slotMinTime: '10:00',
-							      slotMaxTime: '23:59',
-							      resources: dataLocation,
-							      resourceOrder: 'title',
-							      businessHours: {
-							    	  // days of week. an array of zero-based day of week integers (0=Sunday)
-							    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
-
-							    	  startTime: '10:00', // a start time (10am in this example)
-							    	  endTime: '23:59', // an end time (6pm in this example)
-							    	},
-							      events: dataResult,
-							      eventTimeFormat: { // like '14:30:00'
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-							    	  },
-							      eventClick:function(data){
-							    	  console.log(data);
-							      },
-							      eventClassNames:"customEvent"
-
-							    });
-
-							    calendar.render();
-							    addPopOver();
-							    if(data.score > 0){
-							    	bootbox.confirm("Unfortunely the scheduling AI not able to provide you the best solution. Do you want to try again ?",function(result){
-							    		if(result){
-							    			$(this).click();
-							    		}
-							    	})
-							    }
+							
+							var obj = new Object();
+							obj["start"] = form.data("startDate");
+							obj["operatingStartTime"] = "10:00";
+							obj["operatingEndTime"] = "23:59";
+							obj["resource"] = dataLocation;
+							
+							initializeCalendar(calendarEl,dataResult,obj);
 						}
 					});
 				
@@ -572,6 +631,7 @@
 				}).done(function(data) {
 				$("#loading").hide();
 				if (data.error == null) {
+					clearFormHTML();
 					//hideAllSchedule();
 					
 					//Read the date from list.
@@ -611,7 +671,7 @@
 							}
 							
 							innerElement += "</div></div></div>";
-							$("#weeklySchedule > form").html(innerElement);
+							$("#weeklySchedule > form").append(innerElement);
 						
 						}
 						else{
@@ -654,6 +714,7 @@
 		
 		function addListenerToWeeklyButton(){
 			$("#weeklySchedule #submitWeekly").on('click',function(){
+				$("#overlayloading").show();
 				var form = $("#weeklySchedule > form");
 				var theatreSelected = retrieveTheatreSelection(2);
 				if(!theatreSelected){
@@ -686,77 +747,20 @@
 							bootbox.alert(data.error);
 						}
 						else{
+							$("#overlayloading").hide();
+							$("#btnNext").click();
+							
 							var dataResult = JSON.parse(data.result);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
-							 var calendar = new FullCalendar.Calendar(calendarEl, {
-								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-							      now: new Date(form.data("startDate")),
-							      editable: true,
-							      slotLabelFormat:{
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-	  
-							      },
-							      slotDuration:'00:05:00',
-							      slotLabelInterval:'00:05:00',
-							      snapDuration:'00:05:00',
-							      aspectRatio: 3,
-							      themeSystem: 'bootstrap',
-							      scrollTime: '09:00:00',
-							      eventOverlap: false,
-							      eventDurationEditable: false,
-							      contentHeight: 'auto',
-							      headerToolbar: {
-							        left: 'today prev,next',
-							        center: 'title',
-							        right: 'resourceTimelineByDay,resourceTimeGridByDay'
-							      },
-							      initialView: 'resourceTimelineByDay',
-							      views:{
-							    	  resourceTimeGridByDay:{
-							    		  type: 'resourceTimeGrid',
-							    		  duration:{days:1},
-							    		  buttonText: 'Vertical' 
-							    	  },
-							      	resourceTimelineByDay:{
-							      		 type: 'resourceTimeline',
-								         duration:{days:1},
-								     	 buttonText: 'Horizontal' 
-							      	}
-							      },
-							      resourceAreaWidth: '15%',
-							      resourceAreaColumns: [
-							        {
-							          headerContent: 'Theatre',
-							          field: 'title'
-							        },
-							        {
-							        	headerContent: 'Type',
-							        	field: 'theatretype'
-							        }
-							      ],
-							      resources: dataLocation,
-							      resourceOrder: 'title',
-							      businessHours: {
-							    	  // days of week. an array of zero-based day of week integers (0=Sunday)
-							    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
-
-							    	  startTime: '10:00', // a start time (10am in this example)
-							    	  endTime: '23:59', // an end time (6pm in this example)
-							    	},
-							      events: dataResult,
-							      eventTimeFormat: { // like '14:30:00'
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-							    	  }
-							    });
-
-							    calendar.render();		
+							
+							var obj = new Object();
+							obj["start"] = form.data("startDate");
+							obj["operatingStartTime"] = "10:00";
+							obj["operatingEndTime"] = "23:59";
+							obj["resource"] = dataLocation;
+							
+							initializeCalendar(calendarEl,dataResult,obj);
 						}
 					});
 				
@@ -785,6 +789,7 @@
 				}).done(function(data) {
 				$("#loading").hide();
 				if (data.error == null) {
+					clearFormHTML()
 					//clearAllSchedule();
 					$("#dailySchedule > form").data("startDate",data.range.startDate);
 					//Read the data from list.
@@ -820,7 +825,7 @@
 								innerElement += "<p class='emptyMovie'>No movie Available</p>";
 							}
 							innerElement += "</div></div></div>";
-							$("#dailySchedule > form").html(innerElement);
+							$("#dailySchedule > form").append(innerElement);
 						}
 						else{
 							console.log("No movie Available");
@@ -851,6 +856,7 @@
 		
 		function addListenerToDailyButton(){
 			$("#dailySchedule #submiDaily").on('click',function(){
+				$("#overlayloading").show();
 				var form = $("#dailySchedule > form");
 				var theatreSelected = retrieveTheatreSelection(3);
 				if(!theatreSelected){
@@ -879,77 +885,20 @@
 							bootbox.alert(data.error);
 						}
 						else{
+							$("#overlayloading").hide();
+							$("#btnNext").click();
+							
 							var dataResult = JSON.parse(data.result);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
-							 var calendar = new FullCalendar.Calendar(calendarEl, {
-								 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-							      now: new Date(form.data("startDate")),
-							      editable: true,
-							      slotLabelFormat:{
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-	  
-							      },
-							      slotDuration:'00:15:00',
-							      slotLabelInterval:'00:15:00',
-							      snapDuration:'00:05:00',
-							      aspectRatio: 3,
-							      themeSystem: 'bootstrap',
-							      scrollTime: '09:00:00',
-							      eventOverlap: false,
-							      eventDurationEditable: false,
-							      contentHeight: 'auto',
-							      headerToolbar: {
-							        left: 'today prev,next',
-							        center: 'title',
-							        right: 'resourceTimelineByDay,resourceTimeGridByDay'
-							      },
-							      initialView: 'resourceTimelineByDay',
-							      views:{
-							    	  resourceTimeGridByDay:{
-							    		  type: 'resourceTimeGrid',
-							    		  duration:{days:1},
-							    		  buttonText: 'Vertical' 
-							    	  },
-							      	resourceTimelineByDay:{
-							      		 type: 'resourceTimeline',
-								         duration:{days:1},
-								     	 buttonText: 'Horizontal' 
-							      	}
-							      },
-							      resourceAreaWidth: '15%',
-							      resourceAreaColumns: [
-							        {
-							          headerContent: 'Theatre',
-							          field: 'title'
-							        },
-							        {
-							        	headerContent: 'Type',
-							        	field: 'theatretype'
-							        }
-							      ],
-							      resources: dataLocation,
-							      resourceOrder: 'title',
-							      businessHours: {
-							    	  // days of week. an array of zero-based day of week integers (0=Sunday)
-							    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
-
-							    	  startTime: '10:00', // a start time (10am in this example)
-							    	  endTime: '23:59', // an end time (6pm in this example)
-							    	},
-							      events: dataResult,
-							      eventTimeFormat: { // like '14:30:00'
-							    	  hour: 'numeric',
-							    	  minute: '2-digit',
-							    	  omitZeroMinute: false,
-							    	  meridiem: true
-							    	  }
-							    });
-
-							    calendar.render();		
+							
+							var obj = new Object();
+							obj["start"] = form.data("startDate");
+							obj["operatingStartTime"] = "10:00";
+							obj["operatingEndTime"] = "23:59";
+							obj["resource"] = dataLocation;
+							
+							initializeCalendar(calendarEl,dataResult,obj);
 						}
 					});
 				
@@ -1253,6 +1202,10 @@
 
 		}
 		
+		function clearFormHTML(){ //Clear html after change view
+			$("#scheduleOption form").html("");
+		}
+		
 		//Allow the Component header able to open the 
 		function activateClickListener(){
 			$(".component-header").on('click',function() {
@@ -1283,28 +1236,274 @@
 			return day + " " + month + " " + year;
 		}
 		
-		function addPopOver(){
-			$(".customEvent").each(function(){
-				$(this).attr("data-bs-toggle","popover");
-				$(this).attr("title","Action");
-				$(this).attr("data-bs-content","<b>text</b>");
-				//$(this).attr("data-bs-trigger","focus");
-				$(this).attr("data-bs-html",true);
-				$(this).attr("data-bs-placement","top");
+		$("#removeEvent").on('click',function(){
+			if(selectedEvent != null){
+				$("#eventView").modal("hide");
 				
-			})
+				selectedEvent.remove();
+				var startTime = new Date(selectedEvent.start);
+				var endTime = new Date(selectedEvent.end);
+				var title = selectedEvent.title;
+				var difference = calculateDuration(endTime.getTime() - startTime.getTime());
+				
+				var timeAry = difference.split(':');
+				var hrs = parseInt(timeAry[0])
+				var minutes = parseInt(timeAry[1]);
+				
+				var dataObj = new Object();
+				dataObj["duration"] = difference;
+				dataObj["title"] = title;
+				dataObj["id"] = selectedEvent.id; 
+				
+				var $element = $("<li class='item list-group-item'>" + title + " - " + hrs + " hour(s) " + minutes + " minute(s)" + "</li>");
+				$(".draggable").append($element);
+				
+				new FullCalendar.Draggable($element[0],{
+					 eventData: dataObj
+				})
+				
+				selectedEvent = null;
+			}
+			else{
+				bootbox.alert("Error in showing the event details. Please contact the developer.");
+			}
+		});
+		
+		function calculateDuration(millisec) {
+	        var seconds = (millisec / 1000).toFixed(0);
+	        var minutes = Math.floor(seconds / 60);
+	        var hours = "";
+	        if (minutes > 59) {
+	            hours = Math.floor(minutes / 60);
+	            hours = (hours >= 10) ? hours : "0" + hours;
+	            minutes = minutes - (hours * 60);
+	            minutes = (minutes >= 10) ? minutes : "0" + minutes;
+	            
+	            if(hours == ""){
+					return "00:" + minutes;
+				}
+		        return hours + ":" + minutes;
+	        }
+	        else{
+	        	minutes = (minutes >= 10) ? minutes : "0" + minutes;
+	        	return "00:" + minutes
+	        }
+	    }
+		
+		function convertCalendarToJSON(){
+			if(calendar != null){
+				var array = calendar.getEvents();
+				
+				var jsonArray = [];
+				for(var  i = 0 ; i < array.length;i++){
+					var data = array[i];
+					var obj = new Object();
+					
+					obj["scheduleId"] = data.id;
+					obj["theatreId"] = data.getResources().map(function(resource) { return resource.id })[0];
+					obj["movieName"] = data.title;
+					obj["movieId"] = data.extendedProps.movieId;
+					obj["start"] = data.start;
+					obj["end"] = data.end;
+					
+					jsonArray.push(obj);
+				}
+				
+				return JSON.stringify(jsonArray);
+			}
+			else{
+				bootbox.alert("Please complete the previous configuration first.");
+				return false;
+			}
 			
-			$('.customEvent').on('click', function (e) {
-			    $('.customEvent').not(this).popover('hide');
-			});
-			
-			activatePopover();
 		}
-		function activatePopover(){
-			var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-			var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-			  return new bootstrap.Popover(popoverTriggerEl)
-			})
+		
+		function requestAnotherCalendar(data){
+			$.ajax("api/manager/showScheduleWithCleaningTime.json",{
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: data,
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					}
+				}
+			}).done(function(data){
+				if(data.errorMsg ==null){
+					console.log(calendarData);
+					var calendar = new FullCalendar.Calendar($("#ReadOnlyCalendar")[0],{
+						schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+						now: new Date(calendarData.start),
+					      editable: false,
+					      droppable:false,
+					      slotLabelFormat:{
+					    	  hour: 'numeric',
+					    	  minute: '2-digit',
+					    	  omitZeroMinute: false,
+					    	  meridiem: true
+					      },
+					      slotDuration:'00:15:00',
+					      slotLabelInterval:'00:15:00',
+					      snapDuration:'00:05:00',
+					      aspectRatio: 3,
+					      themeSystem: 'bootstrap',
+					      scrollTime: '09:00:00',
+					      eventOverlap: false,
+					      eventDurationEditable: false,
+					      contentHeight: 'auto',
+					      headerToolbar: {
+					        left: 'today prev,next',
+					        center: 'title',
+					        right: 'resourceTimelineByDay,resourceTimeGridByDay'
+					      },
+					      initialView: 'resourceTimelineByDay',
+					      views:{
+					    	  resourceTimeGridByDay:{
+					    		  type: 'resourceTimeGrid',
+					    		  duration:{days:1},
+					    		  buttonText: 'Vertical' 
+					    	  },
+					      	resourceTimelineByDay:{
+					      		 type: 'resourceTimeline',
+						         duration:{days:1},
+						     	 buttonText: 'Horizontal' 
+					      	}
+					      },
+					      resourceAreaWidth: '15%',
+					      resourceAreaColumns: [
+					        {
+					          headerContent: 'Theatre',
+					          field: 'title'
+					        },
+					        {
+					        	headerContent: 'Type',
+					        	field: 'theatretype'
+					        }
+					      ],
+					      slotMinTime: calendarData.operatingStartTime,
+					      slotMaxTime: calendarData.operatingEndTime, 
+					      resources: calendarData.resource,
+					      resourceOrder: 'title',
+					      businessHours: {
+					    	  // days of week. an array of zero-based day of week integers (0=Sunday)
+					    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
+
+					    	  startTime: calendarData.operatingStartTime,
+					    	  endTime: calendarData.operatingEndTime, 
+					    	},
+					      eventConstraint:"businessHours",
+					      events: data.result,
+					      eventTimeFormat: { // like '14:30:00'
+					    	  hour: 'numeric',
+					    	  minute: '2-digit',
+					    	  omitZeroMinute: false,
+					    	  meridiem: true
+					    	  }
+					});
+					$("#loading3").hide();
+					calendar.render();
+				}
+				else{
+					bootbox.alert(data.errorMsg);
+				}
+				
+			});
+		}
+		function initializeCalendar(element,event,data){
+			calendarData = data;
+			
+			calendar = new FullCalendar.Calendar(element, {
+				 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+			      now: new Date(data.start),
+			      editable: true,
+			      slotLabelFormat:{
+			    	  hour: 'numeric',
+			    	  minute: '2-digit',
+			    	  omitZeroMinute: false,
+			    	  meridiem: true
+			      },
+			      slotDuration:'00:15:00',
+			      slotLabelInterval:'00:15:00',
+			      snapDuration:'00:05:00',
+			      aspectRatio: 3,
+			      themeSystem: 'bootstrap',
+			      scrollTime: '09:00:00',
+			      eventOverlap: false,
+			      eventDurationEditable: false,
+			      contentHeight: 'auto',
+			      headerToolbar: {
+			        left: 'today prev,next',
+			        center: 'title',
+			        right: 'resourceTimelineByDay,resourceTimeGridByDay'
+			      },
+			      initialView: 'resourceTimelineByDay',
+			      views:{
+			    	  resourceTimeGridByDay:{
+			    		  type: 'resourceTimeGrid',
+			    		  duration:{days:1},
+			    		  buttonText: 'Vertical' 
+			    	  },
+			      	resourceTimelineByDay:{
+			      		 type: 'resourceTimeline',
+				         duration:{days:1},
+				     	 buttonText: 'Horizontal' 
+			      	}
+			      },
+			      resourceAreaWidth: '15%',
+			      resourceAreaColumns: [
+			        {
+			          headerContent: 'Theatre',
+			          field: 'title'
+			        },
+			        {
+			        	headerContent: 'Type',
+			        	field: 'theatretype'
+			        }
+			      ],
+			      slotMinTime: data.operatingStartTime,
+			      slotMaxTime: data.operatingEndTime, 
+			      resources: data.resource,
+			      resourceOrder: 'title',
+			      businessHours: {
+			    	  // days of week. an array of zero-based day of week integers (0=Sunday)
+			    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
+
+			    	  startTime: data.operatingStartTime,
+			    	  endTime: data.operatingEndTime, 
+			    	},
+			      eventConstraint:"businessHours",
+			      events: event,
+			      eventTimeFormat: { // like '14:30:00'
+			    	  hour: 'numeric',
+			    	  minute: '2-digit',
+			    	  omitZeroMinute: false,
+			    	  meridiem: true
+			    	  },
+			      eventClick:function(data){
+			    	  selectedEvent = data.event;
+			    	  $("#eventView #title").text(selectedEvent.title);
+					  $("#eventView #start").text(moment(selectedEvent.start).format("HH:mm:ss DD-MM-YYYY"));
+					  $("#eventView #end").text(moment(selectedEvent.end).format("HH:mm:ss DD-MM-YYYY"));
+					  $("#eventView").modal("show");
+			      },
+			      drop: function(arg) {
+			    	  arg.draggedEl.parentNode.removeChild(arg.draggedEl);
+			        }
+			    });	
+			 	
+			 if(data.score > 0){
+			    	bootbox.confirm("Unfortunely the scheduling AI not able to provide you the best solution. Do you want to try again ?",function(result){
+			    		if(result){
+			    			$(this).click();
+			    		}
+			    	})
+			  }
+			  calendar.render();
 		}
 	</script>
 </body>

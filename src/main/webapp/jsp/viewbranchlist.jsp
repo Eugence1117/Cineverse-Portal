@@ -92,8 +92,11 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="hide text-center m-4" id="loading">
-						<img src="<spring:url value='/images/ajax-loader.gif'/>"/>
+					<div class="hide m-2 text-center" id="loading">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						<p class="text-center">Loading...</p>
 					</div>
 					<div class="row">
 						<label class="col-sm-4"><b>Branch ID</b></label> <label

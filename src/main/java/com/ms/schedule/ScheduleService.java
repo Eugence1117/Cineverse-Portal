@@ -32,11 +32,15 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.drools.core.rule.Forall;
@@ -65,6 +69,7 @@ import com.ms.optaplanner.Theatre_Schedule;
 import com.ms.optaplanner.TimeGrain;
 import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
+import com.ms.common.Response;
 import com.ms.rules.OperatingHours;
 import com.ms.rules.RuleService;
 import com.ms.schedule.ConfigurationModel.Configuration;
@@ -599,8 +604,6 @@ public class ScheduleService {
 								int score = (int)results.get("score");
 								finalScore += score;
 								int UnprocessedProblemCount = 0;
-
-								int counter = 0;
 								
 								LocalDate segmentEndDate = calculateEndDate(segment, entry.getKey(), end);
 								List<LocalDate> scheduleDateList = getScheduledDate(entry.getKey(),segmentEndDate);
@@ -608,32 +611,23 @@ public class ScheduleService {
 								for (Schedule s : solution) {
 									for (LocalDate date : scheduleDateList) {
 										if (s.getStartTime() != null) {
-											Date startTime = Constant.SQL_DATE_FORMAT
-													.parse(date + " " + s.getStartTime().getTime() + ":00");
+											Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 											
 											LocalDate nextDate = date;
-											if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+											if(s.getEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 												nextDate = nextDate.plusDays(1);
 											}
-											Date endTime = Constant.SQL_DATE_FORMAT
-													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
+											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
 											
-											nextDate = date;
-											if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-												nextDate = nextDate.plusDays(1);
-											}
-											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-											eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
-											 
+				
 										} else {
-											counter++;
+											UnprocessedProblemCount++;
 										}
 									}
 								}
-								log.info("Remaining problem:" + counter);
+								log.info("Remaining problem:" + UnprocessedProblemCount);
 
 							}
 							
@@ -823,24 +817,15 @@ public class ScheduleService {
 									for (Schedule s : solution) {
 										for (LocalDate date : scheduleDateList) {
 											if (s.getStartTime() != null) {
-												Date startTime = Constant.SQL_DATE_FORMAT
-														.parse(date + " " + s.getStartTime().getTime() + ":00");
-												LocalDate nextDate = date;
-												if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-													nextDate = nextDate.plusDays(1);
-												}
-												Date endTime = Constant.SQL_DATE_FORMAT
-														.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
-												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+												Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 												
-												nextDate = date;
-												if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-														&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+												LocalDate nextDate = date;
+												if(s.getEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 													nextDate = nextDate.plusDays(1);
 												}
-												Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-												eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+												Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
+												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
 											} else {
 												UnprocessedProblemCount++;
 											}
@@ -1010,24 +995,15 @@ public class ScheduleService {
 								for (Schedule s : solution) {
 									for (LocalDate date : scheduleDateList) {
 										if (s.getStartTime() != null) {
-											Date startTime = Constant.SQL_DATE_FORMAT
-													.parse(date + " " + s.getStartTime().getTime() + ":00");
-											LocalDate nextDate = date;
-											if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-												nextDate = nextDate.plusDays(1);
-											}
-											Date endTime = Constant.SQL_DATE_FORMAT
-													.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
-											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7"));
+											Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 											
-											nextDate = date;
-											if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-													&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+											LocalDate nextDate = date;
+											if(s.getEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
 												nextDate = nextDate.plusDays(1);
 											}
-											Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-											eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745"));
+											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
+											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
 										} else {
 											UnprocessedProblemCount++;
 										}
@@ -1238,7 +1214,7 @@ public class ScheduleService {
 			toCal.setTime(toDate);
 
 			if (fromCal.compareTo(toCal) > 0) {
-				result.put(false, "From date cannot greater than To date.");
+				result.put(false, "Start date cannot greater than End date.");
 				return result;
 			}
 			fromCal.add(Calendar.DATE, 30);
@@ -1255,4 +1231,67 @@ public class ScheduleService {
 			return result;
 		}
 	}
+	
+	public Response generatingScheduleWithCleaningTime(List<com.ms.schedule.Schedule> schedules) {
+		if(schedules != null) {
+			try {
+				List<Event> eventList =new ArrayList<Event>();
+				
+				SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				
+				Map<String,List<com.ms.schedule.Schedule>> groupedByID = schedules.stream().collect(Collectors.groupingBy(com.ms.schedule.Schedule::getMovieId));
+				for(String movieId:groupedByID.keySet()) {
+					int movieTime = movieDao.getMovieDuration(movieId);
+				
+					for(com.ms.schedule.Schedule s : groupedByID.get(movieId)) {
+						long totalTime = TimeUnit.MILLISECONDS.toMinutes(s.getEnd().getTime() - s.getStart().getTime());
+						
+						Date movieEndDate = DateUtils.addMinutes(s.getStart(),movieTime);
+						eventList.add(new Event(s.getScheduleId(),s.getMovieName(),s.getTheatreId(),f.format(s.getStart()),f.format(movieEndDate),"movieEvent",s.getMovieId()));
+						
+						eventList.add(new Event(s.getScheduleId() + "_C","C",s.getTheatreId(),f.format(movieEndDate),f.format(s.getEnd()),"cleaningEvent",s.getMovieId()));
+						
+					}
+				}
+				
+				log.info("Total Event: " + eventList.size());
+				return new Response(eventList);
+			}
+			catch(Exception ex) {
+				log.error("Exception ex" + ex.getMessage());
+				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+			}
+			
+		}
+		else {
+			return new Response("Data that required cannot found from client's requests.");
+		}
+	}
 }
+/*
+for (Schedule s : solution) {
+	for (LocalDate date : scheduleDateList) {
+		if (s.getStartTime() != null) {
+			Date startTime = Constant.SQL_DATE_FORMAT
+					.parse(date + " " + s.getStartTime().getTime() + ":00");
+			LocalDate nextDate = date;
+			if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+				nextDate = nextDate.plusDays(1);
+			}
+			Date endTime = Constant.SQL_DATE_FORMAT
+					.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
+			eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+					s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7","movieEvent"));
+			
+			nextDate = date;
+			if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
+					&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
+				nextDate = nextDate.plusDays(1);
+			}
+			Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
+			eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745","cleaningEvent"));
+		} else {
+			UnprocessedProblemCount++;
+		}
+	}
+}*/

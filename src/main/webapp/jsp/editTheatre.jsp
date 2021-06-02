@@ -92,7 +92,12 @@
 								<div id="screen" class="row m-0 p-0 w-100 mb-4 screen">
 									<p class="text-center w-100 p-1 bg-light screen">Screen</p>
 								</div>
-								<div class="" id="loading"><img src="<spring:url value='/images/ajax-loader.gif'/>"/></div> 
+								<div class="hide m-2" id="loading">
+									<div class="spinner-border text-primary" role="status">
+										<span class="visually-hidden">Loading...</span>
+									</div>
+									<p class="text-center">Loading...</p>
+								</div>
 							</div>
 						</div>
 					</div>
