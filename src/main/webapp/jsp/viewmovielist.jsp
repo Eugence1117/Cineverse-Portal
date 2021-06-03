@@ -299,6 +299,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				},
 			}).done(function(data){
@@ -334,6 +340,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				},
     		})
@@ -443,8 +455,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
     		}).done(function(data){
     			$("#loading").hide();
     			if(data.errorMsg == null){
@@ -507,6 +525,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				},
 				beforeSend:function(){
@@ -548,6 +572,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				},
     		}).done(function(data){
@@ -634,21 +664,6 @@
 			}
 		});
 		
-		$.fn.serializeObject = function() {
-	        var o = {};
-	        var a = this.serializeArray();
-	        $.each(a, function() {
-	            if (o[this.name]) {
-	                if (!o[this.name].push) {
-	                    o[this.name] = [o[this.name]];
-	                }
-	                o[this.name].push(this.value || '');
-	            } else {
-	                o[this.name] = this.value || '';
-	            }
-	        });
-	        return o;
-	    };
 	</script>
 </body>
 

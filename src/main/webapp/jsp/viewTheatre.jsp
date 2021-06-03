@@ -219,6 +219,12 @@
     				statusCode:{
     					401:function(){
     						window.location.href = "expire.htm";
+    					},
+    					403:function(){
+    						window.location.href = "expire.htm";
+    					},
+    					404:function(){
+    						window.location.href = "404.htm";
     					}
     				},
     			}).done(function(data){

@@ -22,6 +22,8 @@ public class MovieConfig {
 	
 	private int originalTime;
 	
+	private int preferTime;
+	
 	public int getDurationInGrain() {
 		return totalTime / Constant.DEFAULT_TIME_GRAIN;
 	}

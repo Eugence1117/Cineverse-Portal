@@ -366,8 +366,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
 			}).done(function(data){
 				var resultDt = getResultDataTable().clear();
 				if(data.errorMsg == null){
@@ -484,8 +490,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
 			}).done(function(data){
 				clearViewUser();
 				
@@ -529,6 +541,12 @@
 				 statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					},
 				 fail:function(){
@@ -559,6 +577,12 @@
 						statusCode:{
 							401:function(){
 								window.location.href = "expire.htm";
+							},
+							403:function(){
+								window.location.href = "expire.htm";
+							},
+							404:function(){
+								window.location.href = "404.htm";
 							}
 						},
 						dataFilter: function(data){
@@ -615,6 +639,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				},
 			}).done(function(data){
@@ -722,8 +752,14 @@
 							statusCode:{
 								401:function(){
 									window.location.href = "expire.htm";
+								},
+								403:function(){
+									window.location.href = "expire.htm";
+								},
+								404:function(){
+									window.location.href = "404.htm";
 								}
-							}
+							},
 						}).done(function(data){
 							if(data.errorMsg == null){
 								bootbox.alert({
@@ -774,8 +810,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
 			}).done(function(data){
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg);
@@ -853,8 +895,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
 			}).done(function(data){
 				if(data.errorMsg != null){
 					bootbox.alert({
@@ -903,8 +951,14 @@
 							statusCode:{
 								401:function(){
 									window.location.href = "expire.htm";
+								},
+								403:function(){
+									window.location.href = "expire.htm";
+								},
+								404:function(){
+									window.location.href = "404.htm";
 								}
-							}
+							},
 						}).done(function(data){
 							if(data.errorMsg != null){
 								bootbox.alert({

@@ -127,8 +127,14 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
-				}
+				},
 			}).done(function(data){
 				var msg = data.errorMsg == null ? data.result : data.errorMsg;
 				bootbox.alert(msg);

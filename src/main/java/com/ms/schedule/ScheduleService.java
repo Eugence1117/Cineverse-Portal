@@ -403,7 +403,7 @@ public class ScheduleService {
 					minuteUsed += model.getTotalTime() * movieAvailable;
 					//minuteUsed += Constant.DEFAULT_TIME_GAP * movieAvailable;
 					MovieConfig movie = new MovieConfig(model.getMovieId(), model.getMovieName(), model.getTotalTime(),
-							config.getTheatrePrefer(),model.getOriginalTime());
+							config.getTheatrePrefer(),model.getOriginalTime(),config.getTimePrefer());
 					for (int i = 0; i < movieAvailable; i++) {
 						scheduleList.add(new Schedule(UUID.randomUUID().toString(), movie,operatingTime));
 					}
@@ -428,7 +428,7 @@ public class ScheduleService {
 							Movie movie = config.getMovie();
 							scheduleList.add(new Schedule(UUID.randomUUID().toString(),
 									new MovieConfig(movie.getMovieId(), movie.getMovieName(), movie.getTotalTime(),
-											config.getTheatrePrefer(), movie.getOriginalTime()),operatingTime));
+											config.getTheatrePrefer(), movie.getOriginalTime(),config.getTimePrefer()),operatingTime));
 							minuteUsed += movie.getTotalTime();
 
 						}
@@ -436,7 +436,7 @@ public class ScheduleService {
 				}
 			} while (newConfig.length > 0);
 			
-			log.info("Time used: " + minuteUsed);
+			//log.info("Time used: " + minuteUsed);
 			
 			//Random remove on some theatre
 			//When schedule too tight
@@ -483,6 +483,7 @@ public class ScheduleService {
 			List<String> theatreSelected = (ArrayList<String>)maps.get("theatreSelection");
 			List<String> movieidList = (ArrayList<String>)payload.get("movieId");
 			
+			List<String> timePrefer = (ArrayList<String>)payload.get("timePrefer");
 			double[] percentList = ((ArrayList<String>)payload.get("percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
 			String strm = "Stream ";
 			for(double value : percentList) {
@@ -516,7 +517,7 @@ public class ScheduleService {
 					theatreList.removeAll(removableItem);					
 					if (theatreList.size() > 0) {
 						if (movieidList.size() == percentList.length
-								&& movieidList.size() == typeList.size()) {
+								&& movieidList.size() == typeList.size() && movieidList.size() == timePrefer.size()) {
 							LocalDate start = new Timestamp(startDate).toLocalDateTime().toLocalDate();
 							LocalDate end = new Timestamp(endDate).toLocalDateTime().toLocalDate();
 							int largestMovieTime = 0;
@@ -546,7 +547,7 @@ public class ScheduleService {
 									return response;
 								}
 								Configuration config = new Configuration(movieId,
-										percentList[i], typeList.get(i), movie,moviePeriod);
+										percentList[i], typeList.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
 								configuration.add(config);
 							}
 							
@@ -582,6 +583,8 @@ public class ScheduleService {
 							SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 							
 							List<Event> eventList = new ArrayList<Event>();
+							List<EmptyEvent> pendingEvent = new ArrayList<EmptyEvent>();
+							
 							int finalScore = 0;
 							for(Map.Entry<LocalDate, List<Configuration>> entry : segment.entrySet()) {
 								List<Schedule> scheduleList = createSchedule(entry.getValue(), theatreList.size(),operatingHours);
@@ -623,6 +626,7 @@ public class ScheduleService {
 											
 				
 										} else {
+											pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 											UnprocessedProblemCount++;
 										}
 									}
@@ -638,10 +642,12 @@ public class ScheduleService {
 							mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 							try {
 								String jsonData = mapper.writeValueAsString(eventList);
+								String jsonUnassignedData = mapper.writeValueAsString(pendingEvent);
 								String locationJsonData = mapper.writeValueAsString(theatreList);
 								response.put("result", jsonData);
 								response.put("location", locationJsonData);
 								response.put("score",String.format("%d",finalScore));
+								response.put("pending", jsonUnassignedData);
 							} catch (JsonProcessingException e) {
 								e.printStackTrace();
 							}
@@ -736,6 +742,8 @@ public class ScheduleService {
 				if(theatreList != null) {
 					if(theatreList.size() > 0) {
 						List<Event> eventList = new ArrayList<Event>();
+						List<EmptyEvent> pendingEvent = new ArrayList<EmptyEvent>();
+						
 						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 						LocalDate scheduleEnd = new Timestamp(ScheduleEndDate).toLocalDateTime().toLocalDate();
 						int finalScore = 0;
@@ -744,7 +752,9 @@ public class ScheduleService {
 							
 							List<String> movieIds = (ArrayList<String>)payload.get(groupId + ".movieId");
 							List<String> theatrePrefer = (ArrayList<String>)payload.get(groupId + ".theatrePrefer");
+							List<String> timePrefer = (ArrayList<String>)payload.get(groupId + ".timePrefer");
 							double[] percentList = ((ArrayList<String>)payload.get(groupId + ".percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
+							
 							
 							LocalDate startDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
 							int rangeToEndOfWeek = 7 - startDate.getDayOfWeek().getValue();
@@ -764,7 +774,7 @@ public class ScheduleService {
 
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							if (movieIds.size() == percentList.length
-									&& percentList.length == theatrePrefer.size()) {
+									&& percentList.length == theatrePrefer.size() && theatrePrefer.size() == timePrefer.size()) {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
 									
@@ -782,7 +792,7 @@ public class ScheduleService {
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 																							// number
 									Configuration config = new Configuration(movieId,
-											percentList[i], theatrePrefer.get(i), movie,moviePeriod);
+											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
 									configuration.add(config);
 								}
 								
@@ -826,7 +836,10 @@ public class ScheduleService {
 												Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
 												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
 														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
+												
+					
 											} else {
+												pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 												UnprocessedProblemCount++;
 											}
 										}
@@ -847,10 +860,12 @@ public class ScheduleService {
 						mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 						try {
 							String jsonData = mapper.writeValueAsString(eventList);
+							String jsonUnassignedData = mapper.writeValueAsString(pendingEvent);
 							String locationJsonData = mapper.writeValueAsString(theatreList);
 							response.put("result", jsonData);
 							response.put("location", locationJsonData);
 							response.put("score",String.format("%d",finalScore));
+							response.put("pending", jsonUnassignedData);
 						} catch (JsonProcessingException e) {
 							e.printStackTrace();
 						}
@@ -927,11 +942,14 @@ public class ScheduleService {
 				if(theatreList != null) {
 					if(theatreList.size() > 0) {
 						List<Event> eventList = new ArrayList<Event>();
+						List<EmptyEvent> pendingEvent = new ArrayList<EmptyEvent>();
+						
 						SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 						int finalScore = 0;
 						for(String groupId : groupIds) {
 							List<String> movieIds = (ArrayList<String>)payload.get(groupId + ".movieId");
 							List<String> theatrePrefer = (ArrayList<String>)payload.get(groupId + ".theatrePrefer");
+							List<String> timePrefer = (ArrayList<String>)payload.get(groupId + ".timePrefer");
 							double[] percentList = ((ArrayList<String>)payload.get(groupId + ".percent")).stream().mapToDouble(str -> Double.parseDouble((String) str)).toArray();
 									
 							LocalDate scheduleDate = new Timestamp(Long.parseLong(groupId)).toLocalDateTime().toLocalDate();
@@ -950,7 +968,7 @@ public class ScheduleService {
 							
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							if (movieIds.size() == percentList.length
-									&& percentList.length == theatrePrefer.size()) {
+									&& percentList.length == theatrePrefer.size() && theatrePrefer.size() == timePrefer.size()) {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
 									
@@ -968,7 +986,7 @@ public class ScheduleService {
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;										
 
 									Configuration config = new Configuration(movieId,
-											percentList[i], theatrePrefer.get(i), movie,moviePeriod);
+											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
 									configuration.add(config);
 								}
 								
@@ -1005,6 +1023,7 @@ public class ScheduleService {
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
 													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
 										} else {
+											pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 											UnprocessedProblemCount++;
 										}
 									}
@@ -1024,10 +1043,12 @@ public class ScheduleService {
 						mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 						try {
 							String jsonData = mapper.writeValueAsString(eventList);
+							String jsonUnassignedData = mapper.writeValueAsString(pendingEvent);
 							String locationJsonData = mapper.writeValueAsString(theatreList);
 							response.put("result", jsonData);
 							response.put("location", locationJsonData);
 							response.put("score",String.format("%d",finalScore));
+							response.put("pending", jsonUnassignedData);
 						} catch (JsonProcessingException e) {
 							e.printStackTrace();
 						}
@@ -1100,7 +1121,7 @@ public class ScheduleService {
 			for (ConstraintMatch<HardSoftScore> constraintMatch : constraintMatchTotal.getConstraintMatchSet()) {
 				List<Object> justificationList = constraintMatch.getJustificationList();
 				HardSoftScore score = constraintMatch.getScore();
-				log.info(justificationList + "Score: " + totalScore);
+				//log.info(justificationList + "Score: " + totalScore);
 			}
 		}
 		log.info(scoreManager.explainScore(solution));
@@ -1181,6 +1202,8 @@ public class ScheduleService {
 		for (int i = 0; i < timeList.size(); i++) {
 			timeGrains.add(new TimeGrain(i, timeList.get(i)));
 		}
+		log.info("First Time Grain " + timeGrains.get(0).getTime());
+		log.info("Last Time Grain " + timeGrains.get(timeGrains.size()-1).getTime());
 		return timeGrains;
 	}
   

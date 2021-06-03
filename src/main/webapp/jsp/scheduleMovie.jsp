@@ -19,6 +19,7 @@
 .cleaningEvent{
 	background-color:#77DD77;
 	border-color: #77DD77 !important;
+	text-align:center;
 }
 
 #overlayloading {
@@ -497,6 +498,12 @@
 						statusCode:{
 							401:function(){
 								window.location.href = "expire.htm";
+							},
+							403:function(){
+								window.location.href = "expire.htm";
+							},
+							404:function(){
+								window.location.href = "404.htm";
 							}
 						}
 					}).done(function(data) {
@@ -520,14 +527,18 @@
 											"<div class='media-body' style='align-items: stretch'>" +
 											"<h5 class='mt-0'>" + movie.movieName + "</h5>" +
 											"<div class='slidecontainer'>" + 
-											"<div class='input-group'>" + 
+											"<div class='input-group my-1'>" + 
 											"<div class='input-group-prepend w-25'>" + 
 											"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
 											"<select name='theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
-											"</select>" + 
+											"</select></div>" + 
+											"<div class='input-group my-1'>" + 
+											"<div class='input-group-prepend w-25'>" + 
+											"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
+											"<select name='timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
 											"<input type='range' min='0' max='100' value='" + defaultVal + "' class='slider  mt-3' name='percent'/>" +
 											"<input type='hidden' name='movieId' value='" + movie.movieId + "'/>" +
-											"</div></div></div></div><div class='my-2'></div>";
+											"</div></div></div><div class='my-2'></div>";
 						}
 						innerElement += "</div>" + 
 										"<div class='form-group row m-0'>" +
@@ -582,6 +593,12 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					}
 					}).done(function(data) {
@@ -593,6 +610,7 @@
 							$("#btnNext").click();
 							
 							var dataResult = JSON.parse(data.result);
+							var unassignedData = JSON.parse(data.pending);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
 							
@@ -602,7 +620,7 @@
 							obj["operatingEndTime"] = "23:59";
 							obj["resource"] = dataLocation;
 							
-							initializeCalendar(calendarEl,dataResult,obj);
+							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
 						}
 					});
 				
@@ -626,6 +644,12 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					}
 				}).done(function(data) {
@@ -660,10 +684,14 @@
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
 													"<select name='"+ groupId +".theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
-													"</select>" + 
+													"</select></div>" + 
+													"<div class='input-group my-1'>" + 
+													"<div class='input-group-prepend w-25'>" + 
+													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
+													"<select name='"+ groupId +".timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
 													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='"+ groupId +".percent'/>" +
 													"<input type='hidden' name='"+ groupId +".movieId' value='" + movie.movieId + "'/>" +
-													"</div></div></div></div><div class='my-2'></div>";
+													"</div></div></div><div class='my-2'></div>";
 								}
 							}
 							else{
@@ -740,6 +768,12 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					}
 					}).done(function(data) {
@@ -751,6 +785,7 @@
 							$("#btnNext").click();
 							
 							var dataResult = JSON.parse(data.result);
+							var unassignedData = JSON.parse(data.pending);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
 							
@@ -760,7 +795,7 @@
 							obj["operatingEndTime"] = "23:59";
 							obj["resource"] = dataLocation;
 							
-							initializeCalendar(calendarEl,dataResult,obj);
+							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
 						}
 					});
 				
@@ -784,6 +819,12 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					}
 				}).done(function(data) {
@@ -815,10 +856,14 @@
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='theatrePrefer' class='input-group-text w-100'>Select preferable theatre:</label></div>" +
 													"<select name='" + dailyMovie.date + ".theatrePrefer' class='form-select theatreAvailable'>" + retrieveTheatreAsOption() + 
-													"</select>" + 
+													"</select></div>" + 
+													"<div class='input-group my-1'>" + 
+													"<div class='input-group-prepend w-25'>" + 
+													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
+													"<select name='"+ dailyMovie.date +".timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
 													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent'/>" +
 													"<input type='hidden' name='" + dailyMovie.date + ".movieId' value='" + movie.movieId + "'/>" +
-													"</div></div></div></div><div class='my-2'></div>";
+													"</div></div></div><div class='my-2'></div>";
 								}
 							}
 							else{
@@ -878,6 +923,12 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
 					}
 					}).done(function(data) {
@@ -889,6 +940,7 @@
 							$("#btnNext").click();
 							
 							var dataResult = JSON.parse(data.result);
+							var unassignedData = JSON.parse(data.pending);
 							var dataLocation = JSON.parse(data.location);
 							var calendarEl = document.getElementById('calendar');
 							
@@ -898,7 +950,7 @@
 							obj["operatingEndTime"] = "23:59";
 							obj["resource"] = dataLocation;
 							
-							initializeCalendar(calendarEl,dataResult,obj);
+							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
 						}
 					});
 				
@@ -917,6 +969,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				}
 			}).done(function(data){
@@ -1331,6 +1389,12 @@
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
 					}
 				}
 			}).done(function(data){
@@ -1414,8 +1478,11 @@
 				
 			});
 		}
-		function initializeCalendar(element,event,data){
+		function initializeCalendar(element,event,unassignedEvent,data){
 			calendarData = data;
+			
+			//clear the unassigned list
+			$("#draggable .draggable").html("");
 			
 			calendar = new FullCalendar.Calendar(element, {
 				 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
@@ -1495,7 +1562,19 @@
 			    	  arg.draggedEl.parentNode.removeChild(arg.draggedEl);
 			        }
 			    });	
-			 	
+			 
+			 if(unassignedEvent.length > 0){
+				 for(var i = 0 ; i < unassignedEvent.length;i++){
+					 var event = unassignedEvent[i];
+					 var $element = $("<li class='item list-group-item'>" + event.subtitle + "</li>");
+						$(".draggable").append($element);
+						
+						new FullCalendar.Draggable($element[0],{
+							 eventData: event
+						})
+						
+				 }
+			 }
 			 if(data.score > 0){
 			    	bootbox.confirm("Unfortunely the scheduling AI not able to provide you the best solution. Do you want to try again ?",function(result){
 			    		if(result){

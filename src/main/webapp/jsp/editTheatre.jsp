@@ -243,10 +243,16 @@
     				accepts : "application/json",
     				dataType : "json",
     				statusCode:{
-						401:function(){
-							window.location.href = "expire.htm";
-						}
-					}
+    					401:function(){
+    						window.location.href = "expire.htm";
+    					},
+    					403:function(){
+    						window.location.href = "expire.htm";
+    					},
+    					404:function(){
+    						window.location.href = "404.htm";
+    					}
+    				},
     			}).done(function(data){
     				$("#theatreForm .data").each(function(index,element){
     	    			var key = $(this).data('json-key');
@@ -278,8 +284,14 @@
 					statusCode:{
 						401:function(){
 							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "expire.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
 						}
-					}
+					},
 				}).done(function(data){
 					if(data.errorMsg != null){
 						bootbox.alert(data.errorMsg);
@@ -645,8 +657,14 @@
 							statusCode:{
 								401:function(){
 									window.location.href = "expire.htm";
+								},
+								403:function(){
+									window.location.href = "expire.htm";
+								},
+								404:function(){
+									window.location.href = "404.htm";
 								}
-							}
+							},
 						}).done(function(data){
 							if(data.errorMsg != null){
 								bootbox.alert(data.errorMsg);
@@ -762,23 +780,6 @@
 				}
 			}
 		});
-		
-		$.fn.serializeObject = function() {
-	        var o = {};
-	        var a = this.serializeArray();
-	        $.each(a, function() {
-	            if (o[this.name]) {
-	                if (!o[this.name].push) {
-	                    o[this.name] = [o[this.name]];
-	                }
-	                o[this.name].push(this.value || '');
-	            } else {
-	                o[this.name] = this.value || '';
-	            }
-	        });
-	        return o;
-	    };
-		
 	</script>
 </body>
 

@@ -9,6 +9,11 @@ public class Constant {
 	public static final int PASSWORD_MIN_LENGTH = 6;
 	public static final int PASSWORD_MAX_LENGTH	= 18;
 	
+	public static final int DAY_TIME_CODE = 1;
+	public static final int NIGHT_TIME_CODE = 2;
+	public static final LocalTime NIGHT_TIME = LocalTime.of(18,0,0);
+	public static final LocalTime DAY_TIME = LocalTime.of(10,0,0);
+	
 	public static final int MINIMUM_OPERATING_DURATION = 3;
 	public static final LocalTime DEFAULT_BUSINESS_OPERATING_START_TIME = LocalTime.of(10,0,0);
 	public static final LocalTime DEFAULT_BUSINESS_OPERATING_END_TIME = LocalTime.of(23,59,0);

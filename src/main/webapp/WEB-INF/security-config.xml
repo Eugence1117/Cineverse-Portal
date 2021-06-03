@@ -22,6 +22,7 @@
     	<intercept-url pattern="/login.htm" access="permitAll()" />
     	<intercept-url pattern="/expire.htm" access="permitAll()" />
     	<intercept-url pattern="/error.htm" access="permitAll()" />
+    	<intercept-url pattern="/404.htm" access="permitAll()" />
     	
     	<intercept-url pattern="/home.htm" access="isAuthenticated()"/>
     	<intercept-url pattern="/" access="isAuthenticated()"/>

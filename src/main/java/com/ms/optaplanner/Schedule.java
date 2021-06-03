@@ -64,17 +64,17 @@ public class Schedule {
 		return date;
 	}
 
-	@PlanningVariable( valueRangeProviderRefs = "timeList")
+	@PlanningVariable( valueRangeProviderRefs = "timeList",nullable = true)
 	public TimeGrain getStartTime() {
 		return startTime;
 	}
 	
 	public int getStartGrain() {
-		return startTime.getIndex();
+		return startTime == null ? -1 : startTime.getIndex();
 	}
 	
 	public int getLastGrain() {
-		return startTime.getIndex() + movie.getDurationInGrain();
+		return startTime == null ? -1 : startTime.getIndex() + movie.getDurationInGrain();
 	}
 
 	public void setScheduleId(String scheduleId) {

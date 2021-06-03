@@ -26,12 +26,12 @@ public class ErrorController{
 	
 	@RequestMapping("/expire.htm")
 	public String handleSessionExpired(HttpServletRequest req, Model model, HttpServletResponse response) {
-		Map<String,Boolean> map = new LinkedHashMap<String, Boolean>();
-		model.addAttribute("code","Opps");
-		model.addAttribute("errorMsg","It looks like you idle for too long...");
-		model.addAttribute("title","Session expired");
-		
 		return "sessionExpire";
+	}
+	
+	@RequestMapping("/404.htm")
+	public String handle404Event(HttpServletRequest req, Model model) {
+		return "404";
 	}
 	
 	@RequestMapping("/error.htm")
@@ -74,5 +74,4 @@ public class ErrorController{
 		map.put("SESSION_EXPIRED",true);
 		return map;
 	}
-	
 }

@@ -17,6 +17,9 @@ public class Util {
 	public static String underscoreRemoval(String string) {
 		return string.replace("_"," ");
 	}
+	public static LocalTime getTimePreferable(int code) {
+		return code == 1 ? Constant.DAY_TIME : Constant.NIGHT_TIME;
+	}
 	public static String capitalize(String string) {
 		return (string.substring(0,1).toUpperCase() + string.substring(1).toLowerCase());
 	}

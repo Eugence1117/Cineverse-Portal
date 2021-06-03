@@ -10,9 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Configuration {
+	
 	private String movieId;
 	private double percent;
 	private String theatrePrefer;
+	private int timePrefer;
 	private Movie movie;
 	private MovieAvailablePeriod period;
 	
