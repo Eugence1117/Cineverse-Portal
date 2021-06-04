@@ -126,6 +126,10 @@
 	form .btn{
 		width:100% !important;
 	}
+	
+	#overlayloading {
+		padding-top:50% !important;
+	}
 }
 
 
@@ -281,7 +285,7 @@
 					        		<h1 class="h3 mb-0 text-gray-800">Preview Schedule</h1>
 					        		<div>
 					        			<button id="btnPrev" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="0"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
-					        			<button id="btnLast" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="2">View with Cleaning Schedule <i class="fas fa-arrow-circle-right"></i></button>
+					        			<button id="btnLast" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="2">View Details <i class="fas fa-arrow-circle-right"></i></button>
 					        		</div>
 					        	</div>
 					        	
@@ -308,7 +312,7 @@
 						     
 						     <div class="carousel-item">
 						     	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-					        		<h1 class="h3 mb-0 text-gray-800">Schedule with cleaning time</h1>
+					        		<h1 class="h3 mb-0 text-gray-800">Schedule Details</h1>
 					        		<button class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="1"><i class="fas fa-arrow-circle-left"></i> Back to previous</button>
 					        	</div>
 					        	
@@ -319,7 +323,12 @@
 									  </div>
 									  <p class="text-center">Loading...</p>
 									</div>
-					        		<div id="ReadOnlyCalendar" class="calendar">
+									<h5 class="text-center" id="chartTitle"></h5>
+									<div class='chart-pie mt-2 mb-4'>
+										<canvas id="pieChart"></canvas>
+									</div>
+									
+					        		<div id="ReadOnlyCalendar" class="calendar mt-2">
 					        		
 					        		</div>
 					        	</div>
@@ -392,6 +401,8 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/chart/Chart.bundle.min.js'/>"></script>
+	<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
 	<script type="text/javascript">
 	
 		
@@ -401,6 +412,7 @@
 		
 		var selectedEvent = null;
 		var calendar = null;
+		var chart = null;
 		var calendarData = null;
 		
 		//Check Error on load
@@ -466,6 +478,9 @@
 				}
 				else{
 					$("#ReadOnlyCalendar").html("");
+					if(chart != null){
+						chart.destroy();
+					}
 					requestAnotherCalendar(data);	
 				}
 					
@@ -483,13 +498,14 @@
 		<!-- Retrieve Movie that grouped by Overall-->
 		function configureByOverall() {
 			hideAllSchedule();
-			$("#loading").show();
 			
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
 				return false;
 			}
+			$("#loading").show();
+			
 			var theatreElement = addTheatreElement(theatreList,"");
 			$.ajax("api/manager/retrieveOverallAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 						method : "GET",
@@ -536,7 +552,7 @@
 											"<div class='input-group-prepend w-25'>" + 
 											"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
 											"<select name='timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
-											"<input type='range' min='0' max='100' value='" + defaultVal + "' class='slider  mt-3' name='percent'/>" +
+											"<input type='range' min='0' max='100' value='" + defaultVal + "' class='slider mt-3' name='percent' data-bs-toggle='tooltip' data-bs-placement='top' title='Adjust the availability of this movie against others.'/>" +
 											"<input type='hidden' name='movieId' value='" + movie.movieId + "'/>" +
 											"</div></div></div><div class='my-2'></div>";
 						}
@@ -551,6 +567,7 @@
 						synchronizeSliderValue(1); //Used to keep the range value at 100
 						$("#overallSchedule").slideDown()
 						setupSlider(); //Setup legend under the range
+						activeTooltip();
 						addListenerToOverallButton();
 						theatreSelectionListener(1);
 					}
@@ -566,12 +583,13 @@
 		
 		function addListenerToOverallButton(){
 			$("#overallSchedule #submitOverall").on('click',function(){
-				$("#overlayloading").show();
 				var form = $("#overallSchedule > form");
 				var theatreSelected = retrieveTheatreSelection(1);
 				if(!theatreSelected){
 					return false;
 				}
+				$("#overlayloading").show();
+				
 				var formData = form.serializeObject();
 				traverseObject(formData); //Only used if configure 1 movie
 				
@@ -630,12 +648,12 @@
 		<!-- Retrieve Movie that grouped by Week-->
 		function configureByWeekly() {
 			hideAllSchedule();
-			$("#loading").show();
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
 				return false;
 			}
+			$("#loading").show();
 			
 			$.ajax("api/manager/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
 					method : "GET",
@@ -689,7 +707,8 @@
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
 													"<select name='"+ groupId +".timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
-													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='"+ groupId +".percent'/>" +
+													"<div class='input-group my-1'>" + 
+													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider mt-3' name='"+ groupId +".percent' data-bs-toggle='tooltip' data-bs-placement='top' title='Adjust the availability of this movie against others.'/></div>" +
 													"<input type='hidden' name='"+ groupId +".movieId' value='" + movie.movieId + "'/>" +
 													"</div></div></div><div class='my-2'></div>";
 								}
@@ -721,6 +740,7 @@
 					synchronizeSliderValue(0);
 					$("#weeklySchedule").slideDown();
 					setupSlider();
+					activeTooltip();
 					addListenerToWeeklyButton();
 					theatreSelectionListener(2);
 				} else {
@@ -742,13 +762,13 @@
 		
 		function addListenerToWeeklyButton(){
 			$("#weeklySchedule #submitWeekly").on('click',function(){
-				$("#overlayloading").show();
 				var form = $("#weeklySchedule > form");
 				var theatreSelected = retrieveTheatreSelection(2);
 				if(!theatreSelected){
 					return false;
 				}
 				
+				$("#overlayloading").show();
 				var formData = form.serializeObject();
 				traverseObject(formData);
 				
@@ -805,12 +825,12 @@
 		<!-- Retrieve Movie that grouped by Daily-->
 		function configureByDaily() {
 			hideAllSchedule();
-			$("#loading").show();
 			var startDate = $("#startDate").val();
 			var theatreList = getTheatreList()
 			if(theatreList == null){
 				return false;
 			}
+			$("#loading").show();
 			
 			$.ajax("api/manager/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 					method : "GET",
@@ -861,7 +881,7 @@
 													"<div class='input-group-prepend w-25'>" + 
 													"<label for='timePrefer' class='input-group-text w-100'>Select preferable time:</label></div>" +
 													"<select name='"+ dailyMovie.date +".timePrefer' class='form-select'><option selected value='0'>None</option><option value='1'>Day</option><option value='2'>Night</option></select></div>" +
-													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent'/>" +
+													"<input type='range' min='1' max='100' value='" + defaultVal + "' class='slider  mt-3' name='" + dailyMovie.date + ".percent' data-bs-toggle='tooltip' data-bs-placement='top' title='Adjust the availability of this movie against others.'/>" +
 													"<input type='hidden' name='" + dailyMovie.date + ".movieId' value='" + movie.movieId + "'/>" +
 													"</div></div></div><div class='my-2'></div>";
 								}
@@ -891,6 +911,7 @@
 					synchronizeSliderValue(0); //sync the range value maintain at 100
 					$("#dailySchedule").slideDown();
 					setupSlider(); //setup legend
+					activeTooltip();
 					addListenerToDailyButton();
 					theatreSelectionListener(3)
 				} else {
@@ -901,12 +922,13 @@
 		
 		function addListenerToDailyButton(){
 			$("#dailySchedule #submiDaily").on('click',function(){
-				$("#overlayloading").show();
 				var form = $("#dailySchedule > form");
 				var theatreSelected = retrieveTheatreSelection(3);
 				if(!theatreSelected){
 					return false;
 				}
+				$("#overlayloading").show();
+				
 				var formData = form.serializeObject();
 				traverseObject(formData); //Only used if configure 1 movie
 				formData["theatres"] = theatreSelected;
@@ -1377,6 +1399,7 @@
 		}
 		
 		function requestAnotherCalendar(data){
+			
 			$.ajax("api/manager/showScheduleWithCleaningTime.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -1399,7 +1422,48 @@
 				}
 			}).done(function(data){
 				if(data.errorMsg ==null){
-					console.log(calendarData);
+					
+					var chartData = data.result.chartData;
+					//$("#chartTitle").text(chartData.title);
+					chart = new Chart($("#pieChart"),{
+						type:'doughnut',
+						 data: {
+							    labels: chartData.labels,
+							    datasets: [{
+							      data:chartData.data,
+								  backgroundColor:poolColors(chartData.labels)
+							    }],
+						},
+						options: {
+						    maintainAspectRatio: false,
+						    tooltips: {
+						      backgroundColor: "rgb(255,255,255)",
+						      bodyFontColor: "#858796",
+						      borderColor: '#dddfeb',
+						      borderWidth: 1,
+						      xPadding: 15,
+						      yPadding: 15,
+						      displayColors: false,
+						      caretPadding: 10,
+						    },
+						    legend: {
+						      display: false
+						    },
+						    cutoutPercentage: 68,
+					    	title: {
+				                display: true,
+				                text: chartData.title
+				            },
+						    plugins: {
+					            labels: {
+					                render: 'percentage',
+					                fontColor: 'Black',
+					                precision: 2
+					            }
+						    }
+						},
+					});
+					
 					var calendar = new FullCalendar.Calendar($("#ReadOnlyCalendar")[0],{
 						schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 						now: new Date(calendarData.start),
@@ -1461,7 +1525,7 @@
 					    	  endTime: calendarData.operatingEndTime, 
 					    	},
 					      eventConstraint:"businessHours",
-					      events: data.result,
+					      events: data.result.event,
 					      eventTimeFormat: { // like '14:30:00'
 					    	  hour: 'numeric',
 					    	  minute: '2-digit',
@@ -1478,6 +1542,38 @@
 				
 			});
 		}
+		
+		function hashCode(str) { // java String#hashCode
+    	    var hash = 0;
+    	    for (var i = 0; i < str.length; i++) {
+    	       hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    	    }
+    	    return hash;
+    	} 
+
+    	function intToRGB(i){
+    	    var c = (i & 0x00FFFFFF)
+    	        .toString(16)
+    	        .toUpperCase();
+
+    	    return "#" + "00000".substring(0, 6 - c.length) + c;
+    	}
+    	
+		function dynamicColors() {
+		    var r = Math.floor(Math.random() * 255);
+		    var g = Math.floor(Math.random() * 255);
+		    var b = Math.floor(Math.random() * 255);
+		    return "rgba(" + r + "," + g + "," + b + ", 0.5)";
+		}
+		
+		function poolColors(a) {
+		    var pool = [];
+		    for(i = 0; i < a.length; i++) {
+		    	pool.push(intToRGB(hashCode(a[i])));
+		    }
+		    return pool;
+		}
+		
 		function initializeCalendar(element,event,unassignedEvent,data){
 			calendarData = data;
 			
@@ -1583,6 +1679,16 @@
 			    	})
 			  }
 			  calendar.render();
+		}
+		
+		function activeTooltip(){
+			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+			var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+			  return new bootstrap.Tooltip(tooltipTriggerEl,{
+				  trigger:"hover"
+			  })
+			})
+			
 		}
 	</script>
 </body>

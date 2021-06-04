@@ -134,6 +134,7 @@ public class ScheduleController {
 	@ResponseBody
 	public Response showScheduleWithCleaningTime(Model model, @RequestBody List<Schedule> schedules) {
 		log.info("Entered /schedule/configureScheduleByDaily.json");
-		return service.generatingScheduleWithCleaningTime(schedules);
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return service.getScheduleDetailStatistic(schedules,user.getBranchid());
 	}
 }

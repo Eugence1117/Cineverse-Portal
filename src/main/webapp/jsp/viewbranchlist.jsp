@@ -21,7 +21,13 @@
 }
 
 @media only screen and (max-width: 768px) {
-
+	.colon{
+		display:none;
+	}
+	
+	.row label:after{
+		content: " :"
+	}
 }
 
 </style>
@@ -99,39 +105,39 @@
 						<p class="text-center">Loading...</p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Branch ID</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
+						<label class="col-md-4"><b>Branch ID</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="seqid"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Branch Name</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="branchName"></p>
+						<label class="col-md-4"><b>Branch Name</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="branchName"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Address</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="address"></p>
+						<label class="col-md-4"><b>Address</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="address"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Postcode</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="postcode"></p>
+						<label class="col-md-4"><b>Postcode</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="postcode"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>State</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="stateName"></p>
+						<label class="col-md-4"><b>State</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="stateName"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>District</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="districtName"></p>
+						<label class="col-md-4"><b>District</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="districtName"></p>
 					</div>
 					<div class="row">
-						<label class="col-sm-4"><b>Status</b></label> <label
-							class="col-sm-1 colon">:</label>
-						<p class="d-inline data col-sm-6" data-json-key="status"></p>
+						<label class="col-md-4"><b>Status</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="status"></p>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -158,7 +164,7 @@
 					</h3>
 					<div class="">
 						<form class="p-0 mt-5" id="newBranchForm">
-							<div class="col-sm-10 mx-auto">
+							<div class="col-md-10 mx-auto">
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">

@@ -1,12 +1,14 @@
 package com.ms.movie;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ExistMovieForm {
+@AllArgsConstructor
+public class MovieAvailable {
 	
 	private String movieId;
 	private String startDate;

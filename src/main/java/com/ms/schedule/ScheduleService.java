@@ -126,6 +126,33 @@ public class ScheduleService {
 
 	}
 	
+	public boolean validateStartDate(long startDate,String branchId) {
+		try {
+			log.info("Validating startDate received...");
+			String defaultStartDate = dao.getLatestSchedule(branchId);
+			
+			Date dateReceived = new Date(startDate);
+			Date defaultDate = Constant.SQL_DATE_WITHOUT_TIME.parse(defaultStartDate);
+			log.info("Default Date: " + defaultDate.getTime());
+			log.info("Date Received: " + dateReceived.getTime());
+			if(defaultDate.equals(dateReceived)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch(ParseException pe) {
+			log.error("ParseException :" + pe.getMessage());
+			throw new RuntimeException("Unable to continue the date validation process.");
+		}
+		catch(Exception ex) {
+			log.error("Exception :" + ex.getMessage());
+			throw new RuntimeException("Unable to continue the date validation process.");
+		}
+		
+	}
+	
 	public Object[] convertToObject(String base64) {
 		Decoder decoder = Base64.getDecoder();
 		byte[] bytes = decoder.decode(base64);
@@ -493,6 +520,11 @@ public class ScheduleService {
 			List<String> typeList = (ArrayList<String>)payload.get("theatrePrefer");
 	
 			Long startDate = (Long)payload.get("startDate");
+			if(!validateStartDate(startDate,branchid)) {
+				response = new LinkedHashMap<String, String>();
+				response.put("error", "The <b>startDate</b> received is invalid. Action abort.");
+				return response;
+			}
 			Long endDate =(Long)payload.get("endDate");
 			int dateRange = getDateRange(startDate, endDate);
 			if (dateRange != -1) {
@@ -1255,19 +1287,49 @@ public class ScheduleService {
 		}
 	}
 	
-	public Response generatingScheduleWithCleaningTime(List<com.ms.schedule.Schedule> schedules) {
+	public Response getScheduleDetailStatistic(List<com.ms.schedule.Schedule> schedules, String branchid) {
 		if(schedules != null) {
 			try {
+				Map<String,Object> response = new LinkedHashMap<String, Object>();
+				
 				List<Event> eventList =new ArrayList<Event>();
+				Set<String> theatreId = new LinkedHashSet<String>();
+				schedules.stream().forEach(schedule -> theatreId.add(schedule.getTheatreId()));
+				Set<Date> date = new LinkedHashSet<Date>();
+				schedules.stream().forEach(schedule -> {
+					try {
+						date.add(Constant.SQL_DATE_WITHOUT_TIME.parse(Constant.SQL_DATE_WITHOUT_TIME.format(schedule.getStart())));
+					} catch (ParseException e) {
+						throw new RuntimeException("Unable to parse date to required format.");
+					}
+				});
+				List<Date> dateList = new ArrayList<Date>(date);
+				Comparator<Date> dateComparator = (Date d1, Date d2) -> d1.compareTo(d2);
+				Collections.sort(dateList,dateComparator);
+				
+				log.info("Total theatre count: " + theatreId.size());
+				log.info("Schedule time span :" + dateList.size() + " day(s)");
 				
 				SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				OperatingHours time = rulesService.getOperatingHours(branchid);
+				ChartData data = new ChartData();
+				
+				int totalOperatingHours = calculateOperatingTimeInMinute(time) * theatreId.size() * dateList.size();
+				int totalMovieTime = 0;
+				int totalCleaningTime = 0;
 				
 				Map<String,List<com.ms.schedule.Schedule>> groupedByID = schedules.stream().collect(Collectors.groupingBy(com.ms.schedule.Schedule::getMovieId));
 				for(String movieId:groupedByID.keySet()) {
+					
 					int movieTime = movieDao.getMovieDuration(movieId);
-				
+					totalMovieTime += movieTime * groupedByID.get(movieId).size();
+					String movieName = "";
+					
 					for(com.ms.schedule.Schedule s : groupedByID.get(movieId)) {
 						long totalTime = TimeUnit.MILLISECONDS.toMinutes(s.getEnd().getTime() - s.getStart().getTime());
+						movieName = s.getMovieName(); //Same Movie return same name
+						
+						totalCleaningTime += totalTime - movieTime;
 						
 						Date movieEndDate = DateUtils.addMinutes(s.getStart(),movieTime);
 						eventList.add(new Event(s.getScheduleId(),s.getMovieName(),s.getTheatreId(),f.format(s.getStart()),f.format(movieEndDate),"movieEvent",s.getMovieId()));
@@ -1275,10 +1337,21 @@ public class ScheduleService {
 						eventList.add(new Event(s.getScheduleId() + "_C","C",s.getTheatreId(),f.format(movieEndDate),f.format(s.getEnd()),"cleaningEvent",s.getMovieId()));
 						
 					}
+					data.addData(movieName,movieTime * groupedByID.get(movieId).size());
+				}
+				data.addData("Cleaning Time",totalCleaningTime);
+				data.addData("Unallocated Time", totalOperatingHours - totalMovieTime - totalCleaningTime);
+				if(dateList.size() == 1) {
+					data.setTitle("Time allocation  on " + Constant.UI_DATE_FORMAT.format(dateList.get(0)));
+				}
+				else {
+					data.setTitle("Time allocation from " + Constant.UI_DATE_FORMAT.format(dateList.get(0)) + " to " + Constant.UI_DATE_FORMAT.format(dateList.get(dateList.size()-1)));
 				}
 				
 				log.info("Total Event: " + eventList.size());
-				return new Response(eventList);
+				response.put("event",eventList);
+				response.put("chartData",data);
+				return new Response(response);
 			}
 			catch(Exception ex) {
 				log.error("Exception ex" + ex.getMessage());
@@ -1291,30 +1364,3 @@ public class ScheduleService {
 		}
 	}
 }
-/*
-for (Schedule s : solution) {
-	for (LocalDate date : scheduleDateList) {
-		if (s.getStartTime() != null) {
-			Date startTime = Constant.SQL_DATE_FORMAT
-					.parse(date + " " + s.getStartTime().getTime() + ":00");
-			LocalDate nextDate = date;
-			if(s.calcMovieEndTime().compareTo(LocalTime.of(0,0,0)) >= 0 && s.calcMovieEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-				nextDate = nextDate.plusDays(1);
-			}
-			Date endTime = Constant.SQL_DATE_FORMAT
-					.parse(nextDate + " " + s.calcMovieEndTime() + ":00");
-			eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-					s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"#1569C7","movieEvent"));
-			
-			nextDate = date;
-			if (s.getEndTime().compareTo(LocalTime.of(0, 0, 0)) >= 0
-					&& s.getEndTime().compareTo(timeList.get(0).getTime()) < 0) {
-				nextDate = nextDate.plusDays(1);
-			}
-			Date cleaningEndTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");;
-			eventList.add(new Event(s.getScheduleId() + "_C", "C",s.getTheatre().getTheatreId(),f.format(endTime),f.format(cleaningEndTime),"#28a745","cleaningEvent"));
-		} else {
-			UnprocessedProblemCount++;
-		}
-	}
-}*/

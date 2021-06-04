@@ -412,8 +412,13 @@ public class MovieDao {
 			else {
 				return null;
 			}
-			
-		}catch(Exception ex) {
+		
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			return null;
+		}
+		catch(Exception ex) {
 			log.error("Exception :: " + ex.getMessage());
 			return null;
 		}
@@ -444,13 +449,134 @@ public class MovieDao {
 				return new AvailableMovie.resultList(null,Constant.SQL_DATE_WITHOUT_TIME.parse(date));
 			}
 		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			return new AvailableMovie.resultList(Constant.DATABASE_CONNECTION_LOST);
+		}
 		catch(Exception ex) {
 			log.error("Exception :: " + ex.getMessage());
 			return new AvailableMovie.resultList("Unexpected error occured, please try again later.");
 		}
 	}
 	
-	public String insertMovieAvailable(ExistMovieForm form, String branchId) {
+	public Map<Boolean,Object> getMovieAvailableInBranch(String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		List<MovieAvailable> movieList = new ArrayList<MovieAvailable>();
+		try {
+			String query = "SELECT movieID, startDate,endDate from masp.movieavailable where branchID = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,branchId);
+			if(rows.size() > 0) {
+				for(Map<String,Object> row : rows) {
+					String movieId = Util.trimString((String)row.get("movieID"));
+					String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
+					String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+					
+					movieList.add(new MovieAvailable(movieId,startDate,endDate));
+				}
+				log.info("Total movie available: " + movieList.size());
+				response.put(true,movieList);
+			}
+			else {
+				response.put(false,"No movie is added into your branch. Please add some movie first.");
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
+	public Map<Boolean,Object> getSingleMovieAvailableInBranch(String movieId, String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT movieId, startDate,endDate from masp.movieavailable where branchId = ? and movieId = ?";
+			Map<String,Object> row = jdbc.queryForMap(query,branchId,movieId);
+			if(row != null) {
+				String id = Util.trimString((String)row.get("movieID"));
+				String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
+				String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+				
+				response.put(true,new MovieAvailable(id,startDate,endDate));
+			}
+			else {
+				response.put(false, "Unable to find the movie specified. Please try again later.");
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
+	public String changeMovieAvailableStatusInBranch(String branchID, String movieID,int status) {
+		try {
+			String query = "UPDATE masp.movieavailable SET status = ? where movieID = ? AND branchID = ?";
+			int result = jdbc.update(query,status,movieID,branchID);
+			if(result > 0) {
+				return null;
+			}
+			else{
+				return "Unable to locate the data in database. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
+		}
+	}
+	
+	//Backend code
+	public Date getMovieAvailableStartDate(String movieId, String branchId) {
+		Date startDate = null;
+		try {
+			String query = "SELECT startDate from masp.movieavailable where branchID = ? AND movieID = ?";
+			startDate = jdbc.queryForObject(query, Date.class,branchId,movieId);
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+		}
+		return startDate;
+	}
+	
+	public String updateMovieAvailableInBranch(MovieAvailable form,String branchId) {
+		try {
+			String query = "UPDATE masp.movieavailable SET startDate = ?, endDate = ? where movieID = ? AND branchID = ?";
+			int result = jdbc.update(query,form.getStartDate(),form.getEndDate(),form.getMovieId(),branchId);
+			if(result > 0) {
+				return null;
+			}
+			else{
+				return "Unable to locate the data in database. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("Connection error: " + ce.getMessage());
+			return Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			return Constant.UNKNOWN_ERROR_OCCURED;
+		}
+	}
+	
+	public String insertMovieAvailable(MovieAvailable form, String branchId) {
 		try {
 			StringBuffer query = new StringBuffer().append("INSERT INTO masp.movieavailable (branchID,movieID,startDate,endDate,status) VALUES(?,?,?,?,?)");
 			int result = jdbc.update(query.toString(),branchId,form.getMovieId(),form.getStartDate(),form.getEndDate(),Constant.ACTIVE_STATUS_CODE);

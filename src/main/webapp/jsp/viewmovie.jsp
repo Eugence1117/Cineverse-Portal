@@ -11,7 +11,6 @@
 <title><fmt:message key="movie.view.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider_style.css'/>">
     <!-- Compiled and minified JavaScript -->
@@ -281,9 +280,7 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/slick_slider/slick_slider.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/readmore/readmore.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootstrap/js/bootstrap-maxlength.min.js'/>"></script>
 	<script type="text/javascript">

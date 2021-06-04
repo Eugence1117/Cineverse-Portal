@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="home.title" /></title>
+<title><fmt:message key="template" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"
@@ -24,24 +24,10 @@
 			<div id="content">
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
-		        	<p>
-					  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-					    Link with href
-					  </a>
-					  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-					    Button with data-bs-target
-					  </button>
-					</p>
-					<div class="collapse" id="collapseExample">
-					  <div class="card card-body">
-					    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-					  </div>
-					</div>
-					<div class="form-floating">
-					  <textarea class="form-control" id="floatingTextarea" disabled></textarea>
-					  <label for="floatingTextarea">Comments</label>
-					</div>
-					<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			        	<h1 class="h3 mb-0 text-gray-800">Template</h1>
+			        </div>
+
 		        </div>
 		        <!--  END CONTENT -->
 			</div>
@@ -68,12 +54,6 @@
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
-    	
-    	$(document).ready(function(){
-    		
-    	});
-    	
-    	
 	</script>
 </body>
 

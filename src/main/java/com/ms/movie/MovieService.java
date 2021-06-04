@@ -295,11 +295,9 @@ public class MovieService {
 		
 	}
 	
-	public Response insertMovieAvailable(ExistMovieForm form, String username) {
-		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String branchId = user.getBranchid();
+	public Response insertMovieAvailable(MovieAvailable form, String branchId) {
 		if(Util.trimString(branchId) == "") {
-			return new Response("Cannot find relavant branch.");
+			return new Response("Cannot identify your identity. Please try again later.");
 		}
 		else {
 			//Get publish date
@@ -331,6 +329,105 @@ public class MovieService {
 				}
 			}
 			
+		}
+	}
+	
+	public Response retrieveSingleMovieAvailable(String branchId, String movieId) {
+		if(Util.trimString(branchId) == "") {
+			return new Response("Cannot identify your identity. Please try again later.");
+		}
+		
+		if(Util.trimString(movieId) == "") {
+			return new Response("Unable to identify the movie you request. Please try again later.");
+		}
+		
+		Map<Boolean,Object> data = dao.getSingleMovieAvailableInBranch(movieId, branchId);
+		if(data.containsKey(false)) {
+			return new Response((String)data.get(false));
+		}
+		else {
+			return new Response(data.get(true));
+		}
+	}
+	public Response retrieveMovieAvailableByBranch(String branchId) {
+		if(Util.trimString(branchId) == "") {
+			return new Response("Cannot identify your identity. Please try again later.");
+		}
+		else {
+			Map<Boolean,Object> data = dao.getMovieAvailableInBranch(branchId);
+			if(data.containsKey(false)) {
+				return new Response((String)data.get(false));
+			}
+			else {
+				return new Response(data.get(true));
+			}
+		}
+	}
+	
+	public Response updateMovieAvailableDate(MovieAvailable form, String branchId) {
+		if(Util.trimString(branchId) == "") {
+			return new Response("Cannot identify your identity. Please try again later.");
+		}
+		else {
+			Date currentStartDate = dao.getMovieAvailableStartDate(form.getMovieId(), branchId);
+			if(currentStartDate == null) {
+				return new Response("Unable to get required data from database.");
+			}
+			
+			if(currentStartDate.compareTo(new Date()) >= 0) {
+				return new Response("Start date no longer editable since the movie already on screen.");
+			}
+			else {
+				String publishDate = dao.getMoviePublishDate(form.getMovieId());
+				if(publishDate == null) {
+					return new Response("Unable to get required data from database.");
+				}
+				
+				Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
+				if(result.containsKey(false)) {
+					return new Response(result.get(false));
+				}
+				
+				try {
+					form.setStartDate(Constant.SQL_DATE_FORMAT.format(Constant.UI_DATE_FORMAT.parse(form.getStartDate())));
+					form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.UI_DATE_FORMAT.parse(form.getEndDate())));
+					
+					String errorMsg = dao.updateMovieAvailableInBranch(form, branchId);
+					if(errorMsg == null) {
+						return new Response((Object)"Information updated.");
+					}
+					else {
+						return new Response(errorMsg);
+					}
+				}
+				catch(ParseException pe) {
+					log.error("Parse Exception: " + pe.getMessage());
+					return new Response("Received invalid format of data from client. Action abort.");
+				}
+				catch(Exception ex) {
+					log.error("Exception :" + ex.getMessage());
+					return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+				}
+			}			
+		}
+	}
+	
+	public Response updateMovieAvailableStatus(int status, String branchId, String movieId) {
+		if(Util.trimString(branchId) == "") {
+			return new Response("Cannot identify your identity. Please try again later.");
+		}
+		
+		if(Util.getStatusDescWithoutRemovedStatus(status) == null) {
+			return new Response("The server unable to process the request due to the invalid data received from client.");
+		}
+		else {
+			String errorMsg = dao.changeMovieAvailableStatusInBranch(branchId, movieId, status);
+			if(errorMsg == null) {
+				return new Response((Object)"Status updated.");
+			}
+			else {
+				return new Response(errorMsg);
+			}
 		}
 	}
 	

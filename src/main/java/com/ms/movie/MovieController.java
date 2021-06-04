@@ -179,6 +179,15 @@ public class MovieController {
 		}
 	}
 	
+	@RequestMapping( value= {"/movieOwned.htm"})
+	public String getMovieOwnedPage(Model model) {
+		log.info("Entered movieOwned.htm");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		
+		return "movieOwned";
+	}
+
 	@RequestMapping( value = {"/api/admin/uploadnewmovie.json"}, method = {RequestMethod.POST})
 	@ResponseBody
 	public Response addNewMovie(Model model, @ModelAttribute NewMovieForm form) {
@@ -224,13 +233,13 @@ public class MovieController {
 	
 	@RequestMapping(value= {"/api/manager/AddExistMovie.json"})
 	@ResponseBody
-	public Response addMovieToBranch(Model model, @ModelAttribute("form") ExistMovieForm form) {
+	public Response addMovieToBranch(Model model, @ModelAttribute("form") MovieAvailable form) {
 		log.info("Movie ID received: "+ form.getMovieId());
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		String username = user.getUsername();
+		String branchId = user.getBranchid();
 		
-		return service.insertMovieAvailable(form, username);
+		return service.insertMovieAvailable(form, branchId);
 	}
 	
 	@RequestMapping(value = {"/api/authorize/getMovieList.json"})
@@ -278,4 +287,47 @@ public class MovieController {
 	 log.info("Response received.");
 	 return result; 
 	}
+	 
+	 @RequestMapping( value= {"/api/manager/getOwnedMovie.json"})
+	 @ResponseBody
+	 public Response getOwnBranchMovie(Model model) {
+		 log.info("Entered /getOwnedMovie.json");
+		 Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 String branchid = user.getBranchid();
+		 return service.retrieveMovieAvailableByBranch(branchid);
+	 }
+	 
+	 @RequestMapping( value= {"/api/manager/updateMovieAvailableStatus.json"})
+	 @ResponseBody
+	 public Response updateMovieAvailableStatus(Model model,String movieId, int status) {
+		 log.info("Entered /updateMovieAvailableStatus.json");
+		 Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 String branchid = user.getBranchid();
+		 
+		 return service.updateMovieAvailableStatus(status, branchid, movieId);
+	 }
+	 
+	 @RequestMapping( value= {"/api/manager/updateMovieAvailableDate.json"},method = {RequestMethod.POST})
+	 @ResponseBody
+	 public Response updateMovieAvailableDate(Model model, @RequestBody MovieAvailable form) {
+		 log.info("Entered /updateMovieAvailableDate.json");
+		 Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 String branchid = user.getBranchid();
+		 
+		 return service.updateMovieAvailableDate(form, branchid);
+	 }
+	 
+	 @RequestMapping( value= {"/api/manager/getMovieAvailableDate.json"})
+	 @ResponseBody
+	 public Response getMovieAvailableDate(Model model, String movieId) {
+		 log.info("Entered /getMovieAvailableDate.json");
+		 Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 String branchid = user.getBranchid();
+		 
+		 return service.retrieveSingleMovieAvailable(branchid, movieId);
+	 }
+	 
+	 
+	 
+	 
 }

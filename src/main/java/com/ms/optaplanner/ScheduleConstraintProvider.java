@@ -111,7 +111,7 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 	public Constraint PreventExceedOperatingTime(ConstraintFactory constraintFactory) {
 		return constraintFactory.from(Schedule.class)
 				.filter(schedule -> schedule.getStartTime() != null)
-				.filter(schedule -> !(schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(0)) > 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) < 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) > 0))
+				.filter(schedule -> !(schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(0)) >= 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) < 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) > 0))
 				//.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) > 0 || schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 || schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) >= 0)
 				.penalize("PreventExceedOperatingTime", HardSoftScore.ONE_HARD);
 	}
@@ -129,8 +129,12 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 	public Constraint AvoidSameTime(ConstraintFactory constraintFactory) {
 		return constraintFactory.from(Schedule.class)
 			   .filter(schedule -> schedule.getStartTime() != null)
-			   .groupBy(Schedule::getStartTime,ConstraintCollectors.count())
-			   .penalize("SameStartTime", HardSoftScore.ofSoft(1),(time,count) -> count);
+			   .join(Schedule.class,
+					   Joiners.equal(Schedule::getDate),
+					   Joiners.equal(Schedule::getStartGrain,(right) -> right.getStartGrain()),
+					   Joiners.filtering((left,right) -> right.getStartTime() != null),
+					   Joiners.filtering((left,right) -> !left.getTheatre().getTheatreId().equals(right.getTheatre().getTheatreId())))
+			   .penalize("AvoidSameTime", HardSoftScore.ONE_SOFT);
 	}
 	
 	public Constraint TheatreBalance(ConstraintFactory constraintFactory) {
