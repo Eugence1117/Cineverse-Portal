@@ -461,17 +461,26 @@ public class MovieDao {
 	
 	public Map<Boolean,Object> getMovieAvailableInBranch(String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
-		List<MovieAvailable> movieList = new ArrayList<MovieAvailable>();
+		List<Map<String,String>> movieList = new ArrayList<Map<String,String>>();
 		try {
-			String query = "SELECT movieID, startDate,endDate from masp.movieavailable where branchID = ?";
+			String query = "SELECT a.movieID, a.startDate, a.endDate, a.status, m.movieName from masp.movieavailable a, masp.movie m where a.branchID = ? AND a.movieId = m.seqid";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchId);
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {
 					String movieId = Util.trimString((String)row.get("movieID"));
+					String movieName = Util.trimString((String)row.get("movieName"));
 					String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
 					String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+					String status = Util.getStatusDescWithoutRemovedStatus((int)row.get("status"));
 					
-					movieList.add(new MovieAvailable(movieId,startDate,endDate));
+					Map<String,String> result = new LinkedHashMap<String, String>();
+					result.put("movieId", movieId);
+					result.put("movieName", movieName);
+					result.put("startDate", startDate);
+					result.put("endDate", endDate);
+					result.put("status",status);
+					
+					movieList.add(result);
 				}
 				log.info("Total movie available: " + movieList.size());
 				response.put(true,movieList);
@@ -494,14 +503,25 @@ public class MovieDao {
 	public Map<Boolean,Object> getSingleMovieAvailableInBranch(String movieId, String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT movieId, startDate,endDate from masp.movieavailable where branchId = ? and movieId = ?";
+			String query = "SELECT a.movieID, a.startDate, a.endDate, a.status , m.movieName, m.releaseDate from masp.movieavailable a, masp.movie m where a.branchID = ? AND a.movieId = ? AND a.movieId = m.seqid";
 			Map<String,Object> row = jdbc.queryForMap(query,branchId,movieId);
 			if(row != null) {
 				String id = Util.trimString((String)row.get("movieID"));
+				String movieName = Util.trimString((String)row.get("movieName"));
+				String releaseDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("releaseDate"));
 				String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
 				String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+				String status = Util.getStatusDescWithoutRemovedStatus((int)row.get("status"));
 				
-				response.put(true,new MovieAvailable(id,startDate,endDate));
+				Map<String,String> result = new LinkedHashMap<String, String>();
+				result.put("movieId", id);
+				result.put("movieName", movieName);
+				result.put("releaseDate",releaseDate);
+				result.put("startDate",startDate);
+				result.put("endDate",endDate);
+				result.put("status",status);
+				
+				response.put(true,result);
 			}
 			else {
 				response.put(false, "Unable to find the movie specified. Please try again later.");

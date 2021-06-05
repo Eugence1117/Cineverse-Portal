@@ -15,6 +15,9 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/slick_slider/slick_slider_style.css'/>">
     <!-- Compiled and minified JavaScript -->
 <style>
+.collapseKey:hover{
+	cursor:pointer;
+}
 
 @media only screen and (max-width: 768px) {
 	form .btn{
@@ -43,7 +46,7 @@
 			            
 				  			<div class="card m-2">
 								<div class="card-header bg-light border-1">
-									<a  data-bs-toggle="collapse" data-bs-target="#dateOption"><span class="fa fa-search"></span> Search By Date Range</a>
+									<a  data-bs-toggle="collapse" data-bs-target="#dateOption" class='collapseKey'><span class="fa fa-search"></span> Search By Date Range</a>
 								</div>
 								<div class="card-body p-0">
 									<form id="dateOption" class="collapse show">
@@ -87,7 +90,7 @@
 							
 							<div class="card m-2">
 								<div class="card-header bg-light border-1">
-									<a  data-bs-toggle="collapse" data-bs-target="#nameOption"><span class="fa fa-search"></span> Search By Name</a>
+									<a  data-bs-toggle="collapse" data-bs-target="#nameOption" class='collapseKey'><span class="fa fa-search"></span> Search By Name</a>
 								</div>
 								<div class="card-body p-0">
 									<form id="nameOption" class="collapse">
@@ -120,7 +123,7 @@
 							
 							<div class="card m-2">
 								<div class="card-header bg-light" >
-									<a data-bs-toggle="collapse" data-bs-target="#movieDetails"><span class="fa fa-info"></span> Movie</a>
+									<a data-bs-toggle="collapse" data-bs-target="#movieDetails" class='collapseKey'><span class="fa fa-info"></span> Movie</a>
 								</div>
 								<div class="collapse" id="movieDetails">
 									<div class="card-body">
@@ -384,6 +387,17 @@
     		$("input").bind('keypress keydown keyup', function(e){
     		       if(e.keyCode == 13) { e.preventDefault(); }
     		    });
+    		
+    		let searchParams = new URLSearchParams(window.location.search);
+    		if(searchParams.has('movieName')){
+    			var param = searchParams.get('movieName');
+    			$("#nameOption input[name=movieName]").val(param);
+    			if($("#nameOption").hasClass("hide")){
+    				$("#nameOption").collapse('toggle');
+    			}
+    			$("#searchByName").click();
+    		}
+    		
     	});
     	
     	$("#btnSetCookie").on('click',function(){

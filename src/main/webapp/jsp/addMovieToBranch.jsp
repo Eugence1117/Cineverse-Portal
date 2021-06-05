@@ -11,7 +11,6 @@
 <title><fmt:message key="movie.add.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
 @media only screen and (max-width: 768px) {
@@ -249,15 +248,20 @@
 				<div class="modal-body">
 					<form id="dateForm">
 						<div class="form-group row">
-							<label class="font-weight-bold col-form-label col-sm-5">Movie
-								Start Date</label> <label class="col-form-label colon col-sm-1">:</label>
-							<input type="date" name="startDate" class="form-control col-sm-5"
-								required>
+							<div class="col-md">
+								<div class="form-floating">
+									<input type="date" name="startDate" class="form-control data " placeholder="Select a date" data-json-key="startDate"/>
+									<label class="font-weight-bold" for="startDate">Start Showing Date</label>
+								</div>
+							</div>
 						</div>
 						<div class="form-group row">
-							<label class="font-weight-bold col-form-label col-sm-5">Movie
-								End Date</label> <label class="col-form-label colon col-sm-1">:</label> <input
-								type="date" name="endDate" class="form-control col-sm-5" required>
+							<div class="col-md">
+								<div class="form-floating">
+									<input type="date" class="form-control data" name="endDate" placeholder="Select a date" data-json-key="endDate"/>
+									<label class="font-weight-bold" for="endDate">Last Showing Date</label>
+								</div>
+							</div>
 						</div>
 					</form>
 				</div>
@@ -292,18 +296,25 @@
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
-		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
-	<script type="text/javascript"
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
-
+		
+		$(document).ready(function(){
+			var status = "${error}";
+			if(status != ""){
+				bootbox.alert(status,function(){window.location.href="home.htm"});
+				return false;
+			}
+			
+		})
+		
 		$("#ext-btn-submit").on("click",function() {
 			if ($("#movieId").val() == 0) {
-				bootbox.alert("Please select a movie.");
+				bootbox.alert("Please select a movie from the list.");
 				return false;
 			}
 
@@ -325,7 +336,7 @@
 				}).done(function(data) {
 					if(data.errorMsg == null){
 						$("#details-collapse").toggle(true);
-						insertData(data);
+						insertData(data.result);
 					}
 					else{
 						bootbox.alert(data.errorMsg);
@@ -336,7 +347,6 @@
 		
 		function insertData(data){
 			$("#details-collapse .extdata").each(function(index,element){
-				
 				var key = $(this).data('json-key');
 	            if (key && data.hasOwnProperty(key)) {
 	                $(this).val(data[key] || "-");
@@ -356,35 +366,43 @@
 			});
 		}
 		
-		$("#ext-btn-add").on("click",function(){
-			var movieName = $("#extmovieName").val();
-			$("#extModal-title").html(movieName);
-			$("#extModal").modal('show');
 
-			$("#ext-btn-addMovie").on("click",function(){
-			$.ajax("api/manager/AddExistMovie.json?" + $("#addMovieForm").serialize() + "&" +$("#dateForm").serialize(),{
-						method : "GET",
-						accepts : "application/json",
-						dataType : "json",
-						statusCode:{
-							401:function(){
-								window.location.href = "expire.htm";
-							},
-							403:function(){
-								window.location.href = "expire.htm";
-							},
-							404:function(){
-								window.location.href = "404.htm";
-							}
-						},
-				})
-				.done(function(data){
+		$("#ext-btn-addMovie").on("click",function(){
+			var validator = $("#dateForm").validate();
+			if(!validator.form()){
+				return false;
+			}
+			
+			var formData = $("#dateForm").serializeObject();
+			formData["movieId"] = $("#addMovieForm input[name=movieId]").val()
+			
+			$.ajax("api/manager/AddExistMovie.json?",{
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "expire.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				},
+				}).done(function(data){
 					$("#extModal").modal("hide");
 					if(data.errorMsg == null){
 						bootbox.alert({
 							message: data.result,
 							callback: function(){
-								window.location.href = "addMovieToBranch.htm";
+								window.location.href = "addMovie.htm";
 							}
 						});
 					}
@@ -398,8 +416,47 @@
 						
 					}
 				});
-			});
+		});
+		
+		$("#ext-btn-add").on("click",function(){
+			var movieName = $("#extmovieName").val();
+			$("#extModal-title").html(movieName);
+			$("#extModal").modal('show');
 			
+		});
+		
+		$.validator.setDefaults({
+			errorElement : "div",
+			errorClass : "invalid-feedback",
+			highlight : function(element, errorClass, validClass) {
+				// Only validation controls
+				if (!$(element).hasClass('novalidation')) {
+					$(element).closest('.form-control').removeClass(
+							'is-valid').addClass('is-invalid');
+				}
+			},
+			unhighlight : function(element, errorClass, validClass) {
+				// Only validation controls
+				if (!$(element).hasClass('novalidation')) {
+					$(element).closest('.form-control')
+							.removeClass('is-invalid').addClass('is-valid');
+				}
+			},
+			errorPlacement : function(error, element) {
+				error.insertAfter(element);
+			}
+		});
+		
+		$("#dateForm").validate({
+			ignore : ".ignore",
+			rules : {
+				startDate:{
+					required:true,
+				},
+				endDate:{
+					required:true,
+				},
+			}
 		});
 		
 	</script>

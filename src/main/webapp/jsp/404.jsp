@@ -15,13 +15,12 @@
 
 <body id="page-top">
 	<div id="wrapper">
-		<%@ include file="include/sidebar.jsp" %>
 		<div id="content-wrapper" class="d-flex flex-column">
 			<div id="content">
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 		        	<div class="text-center">
-			            <div class="error mx-auto" data-text="403">404</div>
+			            <div class="error mx-auto" data-text="404">404</div>
 			            <p class="lead text-gray-800 mb-5">Page Not Found</p>
 			            <p class="text-gray-500 mb-0">It looks like the page is missing...</p>
 			            <a href="home.htm">&larr; Back to Dashboard</a>

@@ -30,7 +30,7 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-
+import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 import com.ms.login.Staff;
@@ -52,6 +52,24 @@ public class MovieService {
 	
 	@Autowired
 	MovieDao dao;
+	
+	@Autowired
+	BranchDAO branchDao;
+	
+	public Response getBranchName(String branchid) {
+		if(Util.trimString(branchid) == "") {
+			return new Response("Unable to identify your identity. Please try again later or login again.");
+		}
+		else {
+			String name = branchDao.getBranchName(branchid);
+			if(name == null) {
+				return new Response("Unable to get data from database. Please try again later.");
+			}
+			else {
+				return new Response((Object)name);
+			}
+		}
+	}
 	
 	public List<String> getDefaultDate(){
 		List<String> fromToDate = new ArrayList<String>();
@@ -306,7 +324,7 @@ public class MovieService {
 				return new Response("Unable to get required data from database.");
 			}
 			
-			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
+			Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate,true);
 			if(result.containsKey(false)) {
 				return new Response(result.get(false));
 			}
@@ -349,6 +367,7 @@ public class MovieService {
 			return new Response(data.get(true));
 		}
 	}
+	
 	public Response retrieveMovieAvailableByBranch(String branchId) {
 		if(Util.trimString(branchId) == "") {
 			return new Response("Cannot identify your identity. Please try again later.");
@@ -369,46 +388,54 @@ public class MovieService {
 			return new Response("Cannot identify your identity. Please try again later.");
 		}
 		else {
-			Date currentStartDate = dao.getMovieAvailableStartDate(form.getMovieId(), branchId);
-			if(currentStartDate == null) {
-				return new Response("Unable to get required data from database.");
-			}
-			
-			if(currentStartDate.compareTo(new Date()) >= 0) {
-				return new Response("Start date no longer editable since the movie already on screen.");
-			}
-			else {
-				String publishDate = dao.getMoviePublishDate(form.getMovieId());
-				if(publishDate == null) {
+			try {
+				
+				if(Util.trimString(form.getStartDate()).equals("") || Util.trimString(form.getEndDate()).equals("")) {
+					return new Response("Unable to get the required data from client's request.");
+				}
+				
+				Date currentStartDate = dao.getMovieAvailableStartDate(form.getMovieId(), branchId);
+				if(currentStartDate == null) {
 					return new Response("Unable to get required data from database.");
 				}
+
+				Date startDate = Constant.SQL_DATE_WITHOUT_TIME.parse(form.getStartDate());
+				boolean isEqual = currentStartDate.compareTo(startDate) == 0 ? true:false;
 				
-				Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate);
-				if(result.containsKey(false)) {
-					return new Response(result.get(false));
+				if(currentStartDate.compareTo(new Date()) <= 0 && !isEqual) {
+					return new Response("Start Showing Date no longer editable since the movie already on screen.");
 				}
-				
-				try {
-					form.setStartDate(Constant.SQL_DATE_FORMAT.format(Constant.UI_DATE_FORMAT.parse(form.getStartDate())));
-					form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.UI_DATE_FORMAT.parse(form.getEndDate())));
+				else {
+					String publishDate = dao.getMoviePublishDate(form.getMovieId());
+					if(publishDate == null) {
+						return new Response("Unable to get required data from database.");
+					}
 					
-					String errorMsg = dao.updateMovieAvailableInBranch(form, branchId);
-					if(errorMsg == null) {
-						return new Response((Object)"Information updated.");
+					Map<Boolean,String> result = validateDate(form.getStartDate(),form.getEndDate(),publishDate,!isEqual);
+					if(result.containsKey(false)) {
+						return new Response(result.get(false));
 					}
-					else {
-						return new Response(errorMsg);
-					}
-				}
-				catch(ParseException pe) {
-					log.error("Parse Exception: " + pe.getMessage());
-					return new Response("Received invalid format of data from client. Action abort.");
-				}
-				catch(Exception ex) {
-					log.error("Exception :" + ex.getMessage());
-					return new Response(Constant.UNKNOWN_ERROR_OCCURED);
-				}
-			}			
+					
+						form.setStartDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getStartDate() + Constant.DEFAULT_TIME)));
+						form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_WITHOUT_TIME.parse(form.getEndDate() + Constant.DEFAULT_TIME)));
+						
+						String errorMsg = dao.updateMovieAvailableInBranch(form, branchId);
+						if(errorMsg == null) {
+							return new Response((Object)"Information updated.");
+						}
+						else {
+							return new Response(errorMsg);
+						}
+				}			
+			}
+			catch(ParseException pe) {
+				log.error("Parse Exception: " + pe.getMessage());
+				return new Response("Received invalid format of data from client. Action abort.");
+			}
+			catch(Exception ex) {
+				log.error("Exception :" + ex.getMessage());
+				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+			}
 		}
 	}
 	
@@ -495,8 +522,7 @@ public class MovieService {
 		}
 	}
 
-	public Map<Boolean,String> validateDate(String startDate, String endDate, String minDate) {
-		
+	public Map<Boolean,String> validateDate(String startDate, String endDate, String minDate, boolean checkCurrentDate) {
 		Map<Boolean,String> result = new HashMap<Boolean,String>();
 		try {
 			if(Util.trimString(startDate).equals("") || Util.trimString(endDate).equals("")) {
@@ -509,7 +535,7 @@ public class MovieService {
 			
 			Date start = displayFormat.parse(startDate + Constant.DEFAULT_TIME);
 			Date end = displayFormat.parse(endDate + Constant.DEFAULT_TIME);
-			Date min = Constant.STANDARD_DATE_FORMAT.parse(minDate + Constant.DEFAULT_TIME);
+			Date min = displayFormat.parse(minDate + Constant.DEFAULT_TIME);
 			
 			Calendar publishCal = Calendar.getInstance();
 			publishCal.setTime(min);
@@ -526,18 +552,20 @@ public class MovieService {
 			currentCal.setTime(new Date());
 			
 			log.info("Start:" + startCal.getTime() + " End:" + endCal.getTime());
-			if(startCal.compareTo(currentCal) == -1) {
-				result.put(false,"Start Date need to same or greater than current date");
-				return result;
+			if(checkCurrentDate) {
+				if(startCal.compareTo(currentCal) <= 0) {
+					result.put(false,"Start Showing Date need to be after " + Constant.UI_DATE_FORMAT.format(new Date()));
+					return result;
+				}
 			}
 			
 			if(startCal.compareTo(publishCal) < 0) {
-				result.put(false,"Start Date cannot less than official publish date");
+				result.put(false,"Start Showing Date cannot set before the Official Publish Date which is " + Constant.UI_DATE_FORMAT.format(min));
 				return result;
 			}
 			
-			if(startCal.compareTo(endCal) >= 0) {
-				result.put(false,"Start Date cannot greater than or same as the End Date");
+			if(startCal.compareTo(endCal) > 0) {
+				result.put(false,"Start Showing Date cannot greater than the Last Showing Date");
 				return result;
 			}
 			else {

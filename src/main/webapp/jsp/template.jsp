@@ -11,10 +11,7 @@
 <title><fmt:message key="template" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet"
-	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 </head>
 
 <body id="page-top">
@@ -59,10 +56,8 @@
 	<!-- /.container -->
 
 <%@ include file="include/js.jsp"%>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");

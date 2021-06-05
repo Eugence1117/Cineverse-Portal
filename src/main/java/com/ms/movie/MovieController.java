@@ -1,5 +1,6 @@
 package com.ms.movie;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +74,13 @@ public class MovieController {
 			return "addNewMovie";
 		}
 		else {
-			model.addAttribute("exMovieList", service.getMovieName(username));
+			List<Map<String,String>> movieList = new ArrayList<Map<String,String>>();
+			if(movieList == null || movieList.size() == 0) {
+				model.addAttribute("error","No movie is available at this moment.");
+			}
+			else {
+				model.addAttribute("exMovieList", service.getMovieName(username));
+			}
 			return "addMovieToBranch";
 		}
 	}
@@ -184,7 +191,14 @@ public class MovieController {
 		log.info("Entered movieOwned.htm");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		
+		String branchid = user.getBranchid();
+		Response res = service.getBranchName(branchid);
+		if(res.getErrorMsg() != null) {
+			model.addAttribute("error",res.getErrorMsg());
+		}
+		else {
+			model.addAttribute("branchname",res.getResult());
+		}
 		return "movieOwned";
 	}
 
@@ -231,9 +245,9 @@ public class MovieController {
 		}
 	}
 	
-	@RequestMapping(value= {"/api/manager/AddExistMovie.json"})
+	@RequestMapping(value= {"/api/manager/AddExistMovie.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Response addMovieToBranch(Model model, @ModelAttribute("form") MovieAvailable form) {
+	public Response addMovieToBranch(Model model, @RequestBody MovieAvailable form) {
 		log.info("Movie ID received: "+ form.getMovieId());
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
@@ -317,17 +331,15 @@ public class MovieController {
 		 return service.updateMovieAvailableDate(form, branchid);
 	 }
 	 
-	 @RequestMapping( value= {"/api/manager/getMovieAvailableDate.json"})
+	 @RequestMapping( value= {"/api/manager/getMovieAvailableDetails.json"})
 	 @ResponseBody
-	 public Response getMovieAvailableDate(Model model, String movieId) {
-		 log.info("Entered /getMovieAvailableDate.json");
+	 public Response getMovieAvailableDetails(Model model, String movieId) {
+		 log.info("Entered /getMovieAvailableDetails.json");
 		 Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		 String branchid = user.getBranchid();
 		 
 		 return service.retrieveSingleMovieAvailable(branchid, movieId);
 	 }
-	 
-	 
-	 
+	  
 	 
 }

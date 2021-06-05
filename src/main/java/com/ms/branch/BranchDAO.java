@@ -292,4 +292,21 @@ public class BranchDAO {
 			return false;
 		}
 	}
+	
+	//backend
+	public String getBranchName(String branchid) {
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT branchname from masp.branch where seqid = ?");
+			String name = jdbc.queryForObject(query.toString(),String.class,branchid);
+			if(Util.trimString(name) != "") {
+				return name;
+			}
+			else {
+				return null;
+			}
+		} catch (Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			return null;
+		}
+	}
 }
