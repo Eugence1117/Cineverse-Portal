@@ -1333,7 +1333,11 @@
 				var dataObj = new Object();
 				dataObj["duration"] = difference;
 				dataObj["title"] = title;
-				dataObj["id"] = selectedEvent.id; 
+				dataObj["id"] = selectedEvent.id;
+				
+				var prop = new Object();
+				prop["movieId"] = selectedEvent.extendedProps.movieId;
+				dataObj["extendedProps"] = prop;
 				
 				var $element = $("<li class='item list-group-item'>" + title + " - " + hrs + " hour(s) " + minutes + " minute(s)" + "</li>");
 				$(".draggable").append($element);
@@ -1612,6 +1616,7 @@
 				 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 			      now: new Date(data.start),
 			      editable: true,
+			      droppable:true,
 			      slotLabelFormat:{
 			    	  hour: 'numeric',
 			    	  minute: '2-digit',
