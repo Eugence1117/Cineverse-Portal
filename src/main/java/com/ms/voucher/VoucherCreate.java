@@ -16,6 +16,7 @@ public class VoucherCreate {
 	private MultipartFile picURl;
 	
 	//For Voucher Table
+	private String seqid;
 	private double min;
 	private double reward;
 	private int quantity;

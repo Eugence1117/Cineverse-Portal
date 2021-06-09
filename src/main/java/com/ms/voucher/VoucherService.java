@@ -198,7 +198,7 @@ public class VoucherService {
 			throw new RuntimeException("Invalid data received. Please contact with admin or developer regarding this issue.");
 		}
 		
-		return new Voucher(UUID.randomUUID().toString(),v.getMin(),v.getReward(),v.getQuantity(),v.getCalculateUnit(),Constant.ACTIVE_STATUS_CODE);
+		return new Voucher(v.getSeqid(),v.getMin(),v.getReward(),v.getQuantity(),v.getCalculateUnit(),Constant.ACTIVE_STATUS_CODE);
 	}
 	
 	public List<VoucherView> convertToViews(List<Voucher> vouchers) {
