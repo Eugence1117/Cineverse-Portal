@@ -1,6 +1,7 @@
 package com.ms.voucher;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -34,12 +36,25 @@ public class VoucherDAO {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT * FROM masp.voucher";
-			List<Voucher> vouchers = jdbc.queryForList(query,Voucher.class);
+			List<Map<String,Object>> vouchers = jdbc.queryForList(query);
+			
 			if(vouchers.size() > 0) {
-				response.put(true, vouchers);
+				List<Voucher> list = new LinkedList<Voucher>();
+				for(Map<String,Object> v : vouchers) {
+					String id = (String)v.get("seqid");
+					double min = (Double)v.get("min");
+					double reward = (Double)v.get("reward");
+					int quantity = (int)v.get("quantity");
+					int type = (int)v.get("calculateUnit");
+					int status = (int)v.get("status");
+					
+					Voucher voucher = new Voucher(id,min,reward,quantity,type,status);
+					list.add(voucher);
+				}
+				response.put(true, list);
 			}
 			else {
-				response.put(false,"No voucher added. You may create some new voucher before visit this page.");
+				response.put(false,"No voucher added. You may create some new voucher first.");
 			}
 			
 		}
@@ -55,14 +70,58 @@ public class VoucherDAO {
 		return response;
 	}
 	
+	public Map<Boolean,Object> getSingleVoucher(String voucherId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT * FROM masp.voucher where seqid = ? AND status != ?";
+			Map<String,Object> obj = jdbc.queryForMap(query,voucherId,Constant.REMOVED_STATUS_CODE);			
+			
+			if(obj != null) {
+				String id = (String)obj.get("seqid");
+				double min = (Double)obj.get("min");
+				double reward = (Double)obj.get("reward");
+				int quantity = (int)obj.get("quantity");
+				int type = (int)obj.get("calculateUnit");
+				int status = (int)obj.get("status");
+				
+				Voucher voucher = new Voucher(id,min,reward,quantity,type,status);
+				response.put(true, voucher);
+			}
+			else {
+				response.put(false,"Unable to identified the voucher you specified. Please try again later.");
+			}
+			
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		
+		return response;
+	}
 	//Manager
 	public Map<Boolean,Object> getVoucherAvailableByBranch(String branchid){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT * FROM masp.voucher v where NOT EXISTS(select b.voucherid FROM masp.branch_voucher b where b.voucherid = v.seqid AND b.branchid = ? AND v.status = ?)";
-			List<Voucher> vouchers = jdbc.queryForList(query,Voucher.class,branchid,Constant.ACTIVE_STATUS_CODE);
+			List<Map<String,Object>> vouchers = jdbc.queryForList(query,branchid,Constant.ACTIVE_STATUS_CODE);
 			if(vouchers.size() > 0) {
-				response.put(true, vouchers);
+				List<Voucher> list = new LinkedList<Voucher>();
+				for(Map<String,Object> v : vouchers) {
+					String id = (String)v.get("seqid");
+					double min = (Double)v.get("min");
+					double reward = (Double)v.get("reward");
+					int quantity = (int)v.get("quantity");
+					int type = (int)v.get("calculateUnit");
+					int status = (int)v.get("status");
+					Voucher voucher = new Voucher(id,min,reward,quantity,type,status);
+					list.add(voucher);
+				}
+				response.put(true, list);
 			}
 			else {
 				response.put(false,"No voucher available at this moment. Please wait until the admin release more voucher.");
@@ -85,9 +144,21 @@ public class VoucherDAO {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT v.seqid,v.min,v.reward,v.quantity,v.calculateUnit,b.status FROM masp.voucher v, masp.branch_voucher b where v.seqid = b.branchid AND b.branchid = ?";
-			List<Voucher> vouchers = jdbc.queryForList(query,Voucher.class,branchid);
+			List<Map<String,Object>> vouchers = jdbc.queryForList(query,branchid);
 			if(vouchers.size() > 0) {
-				response.put(true, vouchers);
+				List<Voucher> list = new LinkedList<Voucher>();
+				for(Map<String,Object> v : vouchers) {
+					String id = (String)v.get("seqid");
+					double min = Double.parseDouble((String)v.get("min"));
+					double reward = Double.parseDouble((String)v.get("reward"));
+					int quantity = Integer.parseInt((String)v.get("quantity"));
+					int type = Integer.parseInt((String)v.get("calculateUnit"));
+					int status = Integer.parseInt((String)v.get("status"));
+					
+					Voucher voucher = new Voucher(id,min,reward,quantity,type,status);
+					list.add(voucher);
+				}
+				response.put(true, list);
 			}
 			else {
 				response.put(false,"No voucher available at this moment. You may add some voucher first.");
@@ -110,7 +181,7 @@ public class VoucherDAO {
 		String errorMsg = "";
 		try {
 			String query = "INSERT INTO masp.voucher (seqid,min,reward,quantity,calculateUnit) VALUES(?,?,?,?,?)";
-			int result = jdbc.update(query,v.getSeqid(),v.getMin(),v.getReward(),v.getCalculateUnit());
+			int result = jdbc.update(query,v.getSeqid(),v.getMin(),v.getReward(),v.getQuantity(),v.getCalculateUnit());
 			if(result > 0) {
 				errorMsg = null;
 			}
@@ -155,6 +226,27 @@ public class VoucherDAO {
 		return errorMsg;
 	}
 	
+	public boolean checkVoucherExistance(String voucherId) {
+		boolean isValid = false;
+		try {
+			String query = "SELECT status FROM masp.voucher where seqid = ?";
+			List<Map<String,Object>> status = jdbc.queryForList(query,voucherId);
+			if(status.size() == 0) {
+				isValid = true;
+			}
+			else
+				isValid = false;
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			isValid = false;
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			isValid = false;
+		}
+		return isValid;
+	}
 	//Manager
 	public String addAvailableVoucher(VoucherAvailable v) {
 		String errorMsg = "";

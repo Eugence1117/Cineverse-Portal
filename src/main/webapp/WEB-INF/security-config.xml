@@ -29,6 +29,8 @@
     	
     	<intercept-url pattern="/viewMovie.htm" access="isAuthenticated()"/>
     	
+    	<intercept-url pattern="/viewVoucher.htm" access="isAuthenticated()"/>
+    	
     	<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
     	<intercept-url pattern="/profile.htm" access="isAuthenticated()" />
 		

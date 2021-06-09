@@ -41,9 +41,10 @@ public class AnnouncementService {
 					Announcement annoucement = new Announcement(id, url.toString(), Constant.ACTIVE_STATUS_CODE);
 					String errorMsg = dao.addNewAnnoucement(annoucement);
 					if(errorMsg == null) {
-						return new Response((Object)"Profile picture changed. Please login again to view the latest changes.");
+						return new Response((Object)"Annoucement Added.");
 					}
 					else {
+						azure.deleteFile(id + fileFormat, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
 						return new Response(errorMsg);
 					}
 					

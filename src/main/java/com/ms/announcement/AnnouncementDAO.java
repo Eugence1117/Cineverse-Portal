@@ -26,7 +26,7 @@ public class AnnouncementDAO {
 	public String addNewAnnoucement(Announcement ann) {
 		String errorMsg = "";
 		try {
-			String query = "INSERT INTO masp.announcement (seqid,picULR) VALUES(?,?)";
+			String query = "INSERT INTO masp.announcement (seqid,picURL) VALUES(?,?)";
 			int result = jdbc.update(query,ann.getSeqid(),ann.getPicURL());
 			if(result > 0) {
 				errorMsg = null;

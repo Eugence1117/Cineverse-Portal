@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.drools.modelcompiler.util.lambdareplace.ExecModelLambdaPostProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.announcement.AnnouncementService;
+import com.ms.common.Constant;
 import com.ms.common.Response;
+import com.ms.common.Util;
 import com.ms.login.Staff;
 
 @Controller
@@ -29,6 +32,19 @@ public class VoucherController {
 	@Autowired
 	AnnouncementService annService;
 	
+	@RequestMapping( value= {"/viewVoucher.htm"})
+	public String getVoucherPage(Model model) {
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if(user.getUserGroup().getId() == Constant.MANAGER_GROUP) {
+			return "viewVoucherManager";
+
+		}
+		else {
+			model.addAttribute("usergroup",user.getUserGroup().getId());
+			return "viewVoucher";
+		}
+	}
+	
 	@RequestMapping( value= {"/api/admin/voucher/updateStatus.json"},method= {RequestMethod.POST})
 	@ResponseBody
 	public Response updateVoucherStatusByAdmin(Model model, @RequestBody Map<String,Object> payload) {
@@ -37,7 +53,7 @@ public class VoucherController {
 		try {
 			
 			String voucherId = (String)payload.get("voucherId");
-			int status = Integer.parseInt((String) payload.get("status"));
+			int status = (int) payload.get("status");
 			
 			return service.modifyVoucherStatusWithAdmin(voucherId, status);
 		}
@@ -55,6 +71,14 @@ public class VoucherController {
 		return service.getAllVoucherWithAdmin();
 	}
 	
+	@RequestMapping (value= {"/api/admin/voucher/retrieveSingleVoucher.json"})
+	@ResponseBody
+	public Response getVoucherByAdmin(Model model, String voucherId) {
+		log.info("Entered /api/admin/voucher/retrieveSingleVoucher");
+		return service.getSingleVoucherWithAdmin(voucherId);
+		
+	}
+	
 	@RequestMapping( value= {"/api/admin/voucher/addNewVoucher.json"},method= {RequestMethod.POST})
 	@ResponseBody
 	public Response addNewVoucherWithAdmin(Model model, @ModelAttribute VoucherCreate data) {
@@ -67,6 +91,17 @@ public class VoucherController {
 			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
 		}
 		
+	}
+	
+	@RequestMapping( value= {"/api/admin/voucher/checkVoucherID.json"},method= {RequestMethod.GET})
+	@ResponseBody
+	public boolean checkVoucherID(Model model, String voucherId) {
+		if(Util.trimString(voucherId) == "") {
+			return false;
+		}
+		else {
+			return service.checkVoucherName(voucherId);
+		}
 	}
 	
 	@RequestMapping( value= {"/api/manager/voucher/retrieveVoucher.json"},method= {RequestMethod.GET})

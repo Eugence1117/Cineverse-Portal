@@ -24,7 +24,6 @@
             </Policies>
         </RollingFile>
         
-         <ApplicationInsightsAppender name="aiAppender" instrumentationKey="[APPLICATION_INSIGHTS_KEY]" />
     </Appenders>
     
     <Loggers>

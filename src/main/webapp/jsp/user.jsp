@@ -6,18 +6,6 @@
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 <style>
-	.form-group.input-material{
-		margin-top:50px !important;
-		margin-bottom:25px !important;	
-	}
-	
-	.help-block,.redundant-block{
-		margin:0px !important;
-	}
-	#newUserForm .form-group.input-material:first-of-type{
-		margin-top:15px !important;
-	}
-	
 	.fontBtn:hover,#showInsert:hover{
 		cursor:pointer;
 	}

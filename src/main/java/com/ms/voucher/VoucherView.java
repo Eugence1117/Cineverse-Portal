@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class VoucherView {
 	
-	private String vouncherId;
+	private String voucherId;
 	private String min;
 	private String reward;
 	private int quantity;
