@@ -26,7 +26,9 @@ public class Util {
 	public static String checkActivation(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : Constant.INACTIVE_STATUS;
 	}
-	
+	public static String getVouncherType(int code) {
+		return code == Constant.VOUCHER_PRICE_UNIT ? Constant.VOUCHER_PRICE_LABEL : code == Constant.VOUCHER_TICKET_UNIT ? Constant.VOUCHER_TICKET_LABEL : null;
+	}
 	public static String getStatusDescWithoutRemovedStatus(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : code == Constant.INACTIVE_STATUS_CODE ? Constant.INACTIVE_STATUS : null;
 	}

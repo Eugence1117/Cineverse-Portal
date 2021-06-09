@@ -200,7 +200,7 @@ public class UserService {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:" + ex.getMessage());
-			return new Response("Unexpected error occured. Please try again later");
+			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
 		}
 	}
 	

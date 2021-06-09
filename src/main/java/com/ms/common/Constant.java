@@ -18,6 +18,10 @@ public class Constant {
 	public static final LocalTime DEFAULT_BUSINESS_OPERATING_START_TIME = LocalTime.of(10,0,0);
 	public static final LocalTime DEFAULT_BUSINESS_OPERATING_END_TIME = LocalTime.of(23,59,0);
 	
+	public static final int VOUCHER_TICKET_UNIT = 1;
+	public static final int VOUCHER_PRICE_UNIT = 2;
+	public static final String VOUCHER_TICKET_LABEL = "Ticket purchased";
+	public static final String VOUCHER_PRICE_LABEL = "Money Spent";
 	
 	public static final int ADMIN_GROUP = 1;
 	public static final int MANAGER_GROUP = 2;
@@ -54,6 +58,8 @@ public class Constant {
 	public static final String DEFAULT_USER_PROFILE_PIC = "https://cineversefiles.blob.core.windows.net/profilepic/default-user.png";
 	public static final String PROFILE_IMAGE_CONTAINER_NAME = "profilepic";
 	public static final String MOVIE_IMAGE_CONTAINER_NAME = "movieimg";
+	public static final String ANNOUCEMENT_IMAGE_CONTAINER_NAME = "annoucement";
+	
 	public static final String DEFAULT_TIME_ZONE ="Asia/Kuala_Lumpur";
 	public static final String DEFAULT_TIME = " 00:00:00";
 	
