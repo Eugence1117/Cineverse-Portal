@@ -1,5 +1,6 @@
 package com.ms.voucher;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class VoucherService {
 		}
 		else {
 			if(v.isShowOffer()) {
-				Response s = anService.createAnnoucementFromVoucher(v.getPicURL());
+				Response s = anService.createAnnoucement(v.getPicURL());
 				if(s.getErrorMsg() != null) {
 					return s;
 				}
@@ -105,9 +106,10 @@ public class VoucherService {
 		}
 	}
 	
+	@Transactional (rollbackFor = Exception.class)
 	public Response modifyVoucherStatusWithAdmin(String voucherId, int status) {
 		if(Util.trimString(voucherId) == "") {
-			return new Response("Unable to identify the voucher. Please try again later. Please feel free to contact with admin if problem still exist.");
+			return new Response("The voucher received by the server is empty. Please try again later. Please feel free to contact with admin if problem still exist.");
 		}
 		else {
 			String desc = Util.getStatusDesc(status);
@@ -117,6 +119,8 @@ public class VoucherService {
 			else {
 				log.info("Updating voucher to status: " + desc.toUpperCase());
 				String errorMsg = dao.updateVoucherStatus(voucherId, status);
+				//String optionalMsg = dao.updateBranchVoucherStatus(voucherId, status);
+				//log.info("Applying same voucher status to branch: Server Status: " + optionalMsg == null ? "Complete" : optionalMsg);
 				if(errorMsg != null) {
 					return new Response(errorMsg);
 				}
@@ -131,6 +135,28 @@ public class VoucherService {
 		return dao.checkVoucherExistance(voucherId);
 	}
 	
+	public Response editVoucherDetails(VoucherEdit form) {
+		//Validation
+		if(Util.trimString(form.getSeqid()) == "") {
+			return new Response("The voucher received by the server is empty. Please try again later. Please feel free to contact with admin if problem still exist.");
+		}
+		
+		if(Util.getVouncherType(form.getCalculateUnit()) == null){
+			return new Response("Received invalid voucher type from client's request. Please try again later. Please feel free to contact with admin if problem still exist.");
+		}
+		
+		form.setSeqid(form.getSeqid().toUpperCase());
+		String errorMsg = dao.updateVoucherDetail(form);
+		if(errorMsg != null) {
+			return new Response(errorMsg);
+		}
+		else {
+			return new Response((Object)"The voucher data has been updated.");
+		}
+		
+	}
+	
+	/*
 	public Response getAllVoucherWithBranch(String branchid) {
 		if(Util.trimString(branchid) == "") {
 			return new Response("Unable to identify your identity. Please try again later. Please feel free to contact with admin if problem still exist.");
@@ -204,6 +230,29 @@ public class VoucherService {
 		}
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
+	public Response addAvailableVoucherByBranch(List<String> v, String branchid) {
+		log.info("Adding multiple voucher...");
+		if(v == null) {
+			log.error("Received null data from request");
+			return new Response("Unable to retrieve the data from client's request");
+		}
+		else {
+			List<VoucherAvailable> list = new ArrayList<VoucherAvailable>();
+			v.forEach(item -> {
+				list.add(new VoucherAvailable(item,branchid,Constant.ACTIVE_STATUS_CODE));
+			});
+			
+			String error = dao.addAvailableVoucher(list);
+			if(error != null) {
+				throw new RuntimeException(error);
+			}
+			else {
+				return new Response((Object)"Voucher added successfully.");
+			}
+		}
+	}
+	
 	public Response modifyVoucherAvailableByBranch(VoucherAvailable v) {
 		if(Util.trimString(v.getVoucherId()) == "") {
 			return new Response("Unable to identify the voucher. Please try again later. Please feel free to contact with admin if problem still exist.");
@@ -225,6 +274,7 @@ public class VoucherService {
 			}
 		}
 	}
+	*/
 	
 	public Voucher convertFromCreateVoucher(VoucherCreate v) {
 		String desc = Util.getVouncherType(v.getCalculateUnit());
@@ -253,6 +303,8 @@ public class VoucherService {
 		return list;
 	}
 	
+	
+	//Only used when edit
 	public VoucherView convertToView(Voucher v) {
 		String status = Util.getStatusDesc(v.getStatus());
 		String voucherType = Util.getVouncherType(v.getCalculateUnit());

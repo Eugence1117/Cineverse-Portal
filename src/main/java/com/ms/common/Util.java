@@ -2,7 +2,10 @@ package com.ms.common;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.ms.rules.OperatingHours;
 
@@ -49,6 +52,61 @@ public class Util {
 	public static OperatingHours getDefaultRules(String branchid) {
 		return new OperatingHours(branchid,"The operating hours of the business",Constant.DEFAULT_BUSINESS_OPERATING_START_TIME,Constant.DEFAULT_BUSINESS_OPERATING_END_TIME);
 	}
+	
+	public static List<Map<String,Object>> createVoucherTypeDropDown(){
+		List<Map<String,Object>> result = new LinkedList<Map<String,Object>>();
+		
+		Map<String,Object> data = new LinkedHashMap<String, Object>();
+		data.put("type", Constant.VOUCHER_TICKET_UNIT);
+		data.put("desc", Constant.VOUCHER_TICKET_LABEL);
+		result.add(data);
+		
+		data = new LinkedHashMap<String, Object>();
+		data.put("type", Constant.VOUCHER_PRICE_UNIT);
+		data.put("desc", Constant.VOUCHER_PRICE_LABEL);
+		result.add(data);
+		
+		return result;
+		
+	}
+	
+	public static List<Map<String,Object>> createStatusWithoutRemovedDropDown(){
+		List<Map<String,Object>> result = new LinkedList<Map<String,Object>>();
+		
+		Map<String,Object> data = new LinkedHashMap<String, Object>();
+		data.put("code", Constant.ACTIVE_STATUS_CODE);
+		data.put("desc", Constant.ACTIVE_STATUS);
+		result.add(data);
+		
+		data = new LinkedHashMap<String, Object>();
+		data.put("code", Constant.INACTIVE_STATUS_CODE);
+		data.put("desc", Constant.INACTIVE_STATUS);
+		result.add(data);
+		
+		return result;
+	}
+	
+	public static List<Map<String,Object>> createStatusWithRemovedDropDown(){
+		List<Map<String,Object>> result = new LinkedList<Map<String,Object>>();
+		
+		Map<String,Object> data = new LinkedHashMap<String, Object>();
+		data.put("code", Constant.ACTIVE_STATUS_CODE);
+		data.put("desc", Constant.ACTIVE_STATUS);
+		result.add(data);
+		
+		data = new LinkedHashMap<String, Object>();
+		data.put("code", Constant.INACTIVE_STATUS_CODE);
+		data.put("desc", Constant.INACTIVE_STATUS);
+		result.add(data);
+		
+		data = new LinkedHashMap<String, Object>();
+		data.put("code", Constant.REMOVED_STATUS_CODE);
+		data.put("desc", Constant.REMOVED_STATUS);
+		result.add(data);
+		
+		return result;
+	}
+	
 	
 	public static List<String> generateColorList(){
 		List<String> colors = new ArrayList<String>();

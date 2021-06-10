@@ -1,5 +1,6 @@
 package com.ms.voucher;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,6 +104,7 @@ public class VoucherDAO {
 		
 		return response;
 	}
+	/*
 	//Manager
 	public Map<Boolean,Object> getVoucherAvailableByBranch(String branchid){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
@@ -139,21 +141,23 @@ public class VoucherDAO {
 		return response;
 	}
 	
+	
 	//Manager
 	public Map<Boolean,Object> getVoucherByBranch(String branchid){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT v.seqid,v.min,v.reward,v.quantity,v.calculateUnit,b.status FROM masp.voucher v, masp.branch_voucher b where v.seqid = b.branchid AND b.branchid = ?";
+			String query = "SELECT v.seqid,v.min,v.reward,v.quantity,v.calculateUnit,b.status FROM masp.voucher v, masp.branch_voucher b where v.seqid = b.voucherid AND b.branchid = ?";
 			List<Map<String,Object>> vouchers = jdbc.queryForList(query,branchid);
 			if(vouchers.size() > 0) {
 				List<Voucher> list = new LinkedList<Voucher>();
 				for(Map<String,Object> v : vouchers) {
+					
 					String id = (String)v.get("seqid");
-					double min = Double.parseDouble((String)v.get("min"));
-					double reward = Double.parseDouble((String)v.get("reward"));
-					int quantity = Integer.parseInt((String)v.get("quantity"));
-					int type = Integer.parseInt((String)v.get("calculateUnit"));
-					int status = Integer.parseInt((String)v.get("status"));
+					double min = (Double)v.get("min");
+					double reward = (Double)v.get("reward");
+					int quantity = (int)v.get("quantity");
+					int type = (int)v.get("calculateUnit");
+					int status = (int)v.get("status");
 					
 					Voucher voucher = new Voucher(id,min,reward,quantity,type,status);
 					list.add(voucher);
@@ -175,6 +179,7 @@ public class VoucherDAO {
 		
 		return response;
 	}
+	*/
 	
 	//Admin
 	public String addNewVoucher(Voucher v) {
@@ -226,6 +231,57 @@ public class VoucherDAO {
 		return errorMsg;
 	}
 	
+	//Admin 
+	public String updateVoucherDetail(VoucherEdit voucher) {
+		String errorMsg = "";
+		try {
+			String query = "UPDATE masp.voucher set calculateUnit = ?, min = ?, reward = ?, quantity = ? where seqid = ? AND status != ?";
+			int result = jdbc.update(query,voucher.getCalculateUnit(),voucher.getMin(),voucher.getReward(),voucher.getQuantity(),voucher.getSeqid(),Constant.REMOVED_STATUS_CODE);
+			if(result > 0) {
+				errorMsg = null;
+			}
+			else {
+				errorMsg = "Unable to modify the voucher's details at this moment. This might occured due to the voucher is already removed. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		return errorMsg;
+	}
+	
+	/*
+	//Admin //Backend
+	public String updateBranchVoucherStatus(String voucherId, int status) {
+		String errorMsg = "";
+		try {
+			String query = "UPDATE masp.branch_voucher set status = ? where voucherId = ? AND status != ?";
+			int result = jdbc.update(query,status,voucherId,Constant.REMOVED_STATUS_CODE);
+			if(result >= 0) {
+				errorMsg = null;
+			}
+			else {
+				errorMsg = "Unable to execute query.";
+			}
+				
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		return errorMsg;
+	}
+	*/
+	
 	public boolean checkVoucherExistance(String voucherId) {
 		boolean isValid = false;
 		try {
@@ -247,6 +303,7 @@ public class VoucherDAO {
 		}
 		return isValid;
 	}
+	/*
 	//Manager
 	public String addAvailableVoucher(VoucherAvailable v) {
 		String errorMsg = "";
@@ -272,6 +329,35 @@ public class VoucherDAO {
 		return errorMsg;
 	}
 	
+	public String addAvailableVoucher(List<VoucherAvailable>v) {
+		String errorMsg = "";
+		try {
+			String query = "INSERT INTO masp.branch_voucher (voucherId,branchid) VALUES(?,?)";
+			List<Object[]> parameters = new ArrayList<Object[]>();
+			for(VoucherAvailable obj : v) {
+				parameters.add(new Object[] {obj.getVoucherId(),obj.getBranchid()});
+			}
+			int[] result = jdbc.batchUpdate(query,parameters);
+			if(result.length == v.size()) {
+				errorMsg = null;
+			}
+			else {
+				errorMsg = "Unable to add the vouchers into your branch at this moment. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.info("Exception ::" + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		
+		return errorMsg;
+	}
+	
+	
 	//Manager
 	public String updateVoucherStatus(VoucherAvailable v) {
 		String errorMsg = "";
@@ -296,4 +382,5 @@ public class VoucherDAO {
 		
 		return errorMsg;
 	}
+	*/
 }

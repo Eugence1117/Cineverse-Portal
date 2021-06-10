@@ -178,12 +178,12 @@ public class BranchService {
 			return new Response("Missing required data from client's request. Action abort.");
 		}
 		else {
-			int code = Util.getStatusCodeWithoutRemovedCode(form.getStatus());
-			if(code == Constant.INVALID_STATUS_CODE) {
+			String desc = Util.getStatusDescWithoutRemovedStatus(Integer.parseInt(form.getStatus()));
+			if(desc == null) {
 				return new Response("Received invalid data from <b>Status</b> field in client's request.");
 			}
 			
-			String errorMsg = dao.updateBranch(branchid,code,form);
+			String errorMsg = dao.updateBranch(branchid,form);
 			if(errorMsg == null) {
 				log.info("Updating Branch:" + form.getBranchname() + " SUCCESS.");
 				return new Response((Object)"Branch update successfully.");

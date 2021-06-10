@@ -47,6 +47,7 @@ public class BranchController {
 		{
 			String username = user.getUsername();
 			Response response = service.getBranchDetails(usergroup, username);
+			model.addAttribute("status",Util.createStatusWithoutRemovedDropDown());
 			model.addAttribute("error",response.getErrorMsg());
 			model.addAttribute("branch",response.getResult());
 			return "viewbranch";

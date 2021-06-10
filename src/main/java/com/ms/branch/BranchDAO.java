@@ -85,7 +85,7 @@ public class BranchDAO {
 					int postcode = (int) row.get("postcode");
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
-					String status = Util.getStatusDesc((int) row.get("status"));
+					String status = String.valueOf((int) row.get("status"));
 					Branch data = new Branch(id, branchName, address,
 							postcode, district, state, status);
 					result.put(true, data);
@@ -204,16 +204,16 @@ public class BranchDAO {
 		}
 	}
 
-	public String updateBranch(String seqid,int status,NewBranchForm form) {
+	public String updateBranch(String seqid,NewBranchForm form) {
 		try {
 			StringBuffer query = new StringBuffer().append(
-					"UPDATE masp.branch SET branchName = ?, address = ?, postcode = ?, districtid = ?, status = ? WHERE seqid = ?");
+					"UPDATE masp.branch SET branchName = ?, address = ?, postcode = ?, districtid = ?, status = ? WHERE seqid = ? AND status != ?");
 			int result = jdbc.update(query.toString(), form.getBranchname(), form.getAddress(), form.getPostcode(),
-					form.getDistrict(), status,seqid);
+					form.getDistrict(), form.getStatus(),seqid,Constant.REMOVED_STATUS_CODE);
 			if (result > 0) {
 				return null;
 			} else {
-				log.error("Unable to locate staff account.");
+				log.error("Unable to locate branch in database.");
 				return "Unable to update the details. Please try again later.";
 			}
 		}

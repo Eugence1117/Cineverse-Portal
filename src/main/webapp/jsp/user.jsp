@@ -139,9 +139,10 @@
 									<div class="col-md">
 										<div class="form-floating">
 											<select name="status" class="form-control" aria-label="Select an option">
-													<option hidden selected value="">Select an option</option>
-												<option value="1">Active</option>
-												<option value="0">Inactive</option>
+												<option hidden selected value="">Select an option</option>
+												<c:forEach items="${status}" var="status">
+							        				<option value="<c:out value='${status.code}'/>"><c:out value="${status.desc}"/></option>
+							        			</c:forEach>
 											</select>									
 											<label for="status">Status</label>
 										</div>
@@ -304,7 +305,6 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
@@ -335,9 +335,12 @@
     	
 		$(document).ready(function(){
 			var status = "${error}";
-			console.log(status)
+			var data = "${status}"
 			if(status != ""){
 				bootbox.alert(status,function(){window.location.href="home.htm"});
+			}
+			else if(data == ""){
+				bootbox.alert("Unable to retrieve data from the server. Please contact with admin or develop to troubleshoot the problem",function(){window.location.href="home.htm"});
 			}
 			else{
 				readyFunction();
@@ -356,7 +359,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -480,7 +483,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -531,7 +534,7 @@
 							window.location.href = "expire.htm";
 						},
 						403:function(){
-							window.location.href = "expire.htm";
+							window.location.href = "403.htm";
 						},
 						404:function(){
 							window.location.href = "404.htm";
@@ -567,7 +570,7 @@
 								window.location.href = "expire.htm";
 							},
 							403:function(){
-								window.location.href = "expire.htm";
+								window.location.href = "403.htm";
 							},
 							404:function(){
 								window.location.href = "404.htm";
@@ -629,7 +632,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -742,7 +745,7 @@
 									window.location.href = "expire.htm";
 								},
 								403:function(){
-									window.location.href = "expire.htm";
+									window.location.href = "403.htm";
 								},
 								404:function(){
 									window.location.href = "404.htm";
@@ -800,7 +803,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -885,7 +888,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -941,7 +944,7 @@
 									window.location.href = "expire.htm";
 								},
 								403:function(){
-									window.location.href = "expire.htm";
+									window.location.href = "403.htm";
 								},
 								404:function(){
 									window.location.href = "404.htm";

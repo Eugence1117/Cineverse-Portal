@@ -11,7 +11,6 @@
 <title><fmt:message key="branch.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 
@@ -109,8 +108,9 @@
 										<div class="col-md">
 											<div class="form-floating">
 												<select name="status" id="status" class="form-control inputField data" disabled>
-													<option>Active</option>
-													<option>Inactive</option>
+													<c:forEach items="${status}" var="status">
+							        					<option value="<c:out value='${status.code}'/>"><c:out value="${status.desc}"/></option>
+							        				</c:forEach>
 												</select>
 												<label for="status">Status</label>
 											</div>
@@ -156,8 +156,12 @@
     	
     	$(document).ready(function(){
     		var error = "${error}"
+    		var data = "${status}"
     		if(error != ""){
     			bootbox.alert(error,function(){window.location.href="home.htm"});
+    		}
+    		else if(data == ""){
+    			bootbox.alert("Unable to retrieve data from the server. Please contact with admin or develop to troubleshoot the problem",function(){window.location.href="home.htm"});
     		}
     		else{
     			var branchStatus = "${branch.status}";
@@ -206,7 +210,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -244,7 +248,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -314,7 +318,7 @@
 								window.location.href = "expire.htm";
 							},
 							403:function(){
-								window.location.href = "expire.htm";
+								window.location.href = "403.htm";
 							},
 							404:function(){
 								window.location.href = "404.htm";
@@ -382,7 +386,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -413,7 +417,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";

@@ -39,6 +39,7 @@ public class UserController {
 	public String getUserPage(Model model) {
 		log.info("Entered /user");		
 		Response branchList = service.getBranchList();
+		model.addAttribute("status",Util.createStatusWithoutRemovedDropDown());
 		if(branchList.getErrorMsg()!= null) {
 			model.addAttribute("error",branchList.getErrorMsg());
 		}

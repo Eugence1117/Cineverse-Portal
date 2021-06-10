@@ -10,7 +10,7 @@
 </style>
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="voucher.title" /></title>
+<title><fmt:message key="voucher.view.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
@@ -20,9 +20,6 @@
 
 .fontBtn:hover{
 	cursor:pointer;
-}
-#seqid{
-	text-transform: uppercase;
 }
 
 #overlayloading {
@@ -58,9 +55,8 @@
 							<span class="fas fa-ticket-alt"></span> <span>Vouchers</span>
 							<div class="fa-pull-right d-inline-block">		
 								<c:if test="${usergroup == 1}">						
-								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
-									id="showInsert" data-bs-toggle="modal" data-bs-target="#newVoucher"><span class="fa fa-user-plus"
-									aria-hidden="true"></span> <span>Create Voucher</span>
+								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" href="addVoucher.htm">
+								<span class="fa fa-plus" aria-hidden="true"></span> <span>Create Voucher</span>
 								</a>
 								</c:if>
 							</div>
@@ -105,7 +101,7 @@
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Create New Voucher</h5>
+					<h5 class="modal-title">Editing Voucher</h5>
 					<button type="button" class="close" data-bs-dismiss="modal"
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -122,8 +118,9 @@
 									<div class="col-md">
 										<div class="form-floating">
 											<select name="calculateUnit" class="form-control data" aria-label="Select an option" data-json-key="calculateUnit">
-													<option value="1">Ticket Purchased</option>
-													<option value="2">Money Spent</option>
+												<c:forEach items="${voucherType}" var="voucher">
+							        				<option value="<c:out value='${voucher.type}'/>"><c:out value="${voucher.desc}"/></option>
+							        			</c:forEach>
 											</select>									
 											<label for="calculateUnit">Voucher Type</label>
 										</div>
@@ -190,7 +187,6 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
@@ -199,13 +195,16 @@
     	const usergroup = JSON.parse("${usergroup}");
     	
 		$(document).ready(function(){
-			//usergroup = JSON.parse("${usergroup}");
+			if("${voucherType}" == ""){
+				bootbox.alert("Unable to retrieve data from the server. Please contact with admin or develop to troubleshoot the problem");
+				return false;
+			}
 			readyFunction();
 		});
 		
 		//View Function
 		function readyFunction(){
-			$.ajax("api/admin/voucher/retrieveVoucher.json?",{
+			$.ajax("api/authorize/retrieveVoucher.json?",{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
@@ -214,7 +213,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -368,7 +367,16 @@
 				return false;
 			}
 			else{
-				editVoucherStatus(id,status);
+				var desc = status == 1 ? "Active" : "Inactive"
+				bootbox.confirm({
+					message:"Are you sure you want to change the status to <b>" + desc + "</b> ?",
+					callback:function(result){
+						if(result){
+							editVoucherStatus(id,status);		
+						}
+					}
+					
+				})
 			}
 		}
 		
@@ -393,7 +401,7 @@
 			formData["voucherId"] = voucherId;
 			formData["status"] = status;
 			
-			$.ajax("api/admin/voucher/updateStatus.json",{
+			$.ajax("api/admin/updateStatus.json",{
 				method : "POST",
 				accepts : "application/json",
 				dataType : "json",
@@ -407,7 +415,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -442,7 +450,7 @@
 			
 			$("#overlayloading").show();
 			
-			$.ajax("api/admin/voucher/retrieveSingleVoucher.json",{
+			$.ajax("api/admin/retrieveSingleVoucher.json",{
 				method : "GET",
 				accepts : "application/json",
 				data:{
@@ -454,7 +462,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -531,6 +539,41 @@
 			if(!validator.form()){
 				return false;
 			}
+			
+			var formData = $("#editVoucherForm").serializeObject();
+			$.ajax("api/admin/editVoucher.json",{
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: JSON.stringify(formData),
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				},
+			}).done(function(data){
+				if(data.errorMsg != null){
+					$("#editVoucher").addClass("skip");
+					$("#editVoucher").modal("hide");
+					bootbox.alert(data.errorMsg,function(){$("#editVoucher").removeClass("skip");$("#editVoucher").modal("show")});
+				}
+				else{
+					$("#editVoucher").modal("hide");
+					bootbox.alert(data.result,function(){readyFunction()});
+					
+				}
+			})
+			
 		}
 	</script>
 </body>

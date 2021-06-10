@@ -8,10 +8,19 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title><fmt:message key="template" /></title>
+<title><fmt:message key="voucher.add.title" /></title>
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<style>
+	.label:after{
+		content:":"
+	}
+	
+	#seqid{
+	text-transform: uppercase;
+	}
+</style>
 </head>
 
 <body id="page-top">
@@ -22,21 +31,93 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Template</h1>
+			        	<h1 class="h3 mb-0 text-gray-800">Create Voucher</h1>
 			        </div>
-		        	<p>
-					  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-					    Link with href
-					  </a>
-					  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-					    Button with data-bs-target
-					  </button>
-					</p>
-					<div class="collapse" id="collapseExample">
-					  <div class="card card-body">
-					    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-					  </div>
-					</div>
+			        
+		        	<div class="card m-2">
+						<div class="card-body">
+							<form id="newVoucherForm">
+								<div class="col-md-11">
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label class="col-form-label">Voucher Code</label>
+										</div>
+										<div class="col-md-8">
+											<input type="text" class="form-control" name="seqid" id="seqid"/>
+										</div>
+									</div>
+									
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label class="col-form-label">Voucher Type</label>
+										</div>
+										<div class="col-md-8">
+											<select name="calculateUnit" class="form-control" aria-label="Select an option">
+													<option hidden selected value="">Select an option</option>
+													<c:forEach items="${voucherType}" var="voucher">
+							        					<option value="<c:out value='${voucher.type}'/>"><c:out value="${voucher.desc}"/></option>
+							        				</c:forEach>
+											</select>									
+										</div>
+									</div>
+									
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label class="col-form-label">Voucher Quantity</label>
+										</div>
+										<div class="col-md-8">
+											<input type="text" class="form-control" name="quantity" id="quantity"/>
+										</div>
+									</div>
+									
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label for="min" id="minLabel" class="col-form-label">Minimum Purchased/Spent</label>
+										</div>
+										<div class="col-md-8">
+											<input type="text" class="form-control" name="min" id="min" placeholder="Please select the Voucher Type first." disabled/>
+										</div>
+									</div>
+									
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label for="reward" id="rewardLabel" class="col-form-label">Discount/Free Ticket</label>
+										</div>
+										<div class="col-md-8">
+											<input type="text" class="form-control" name="reward" id="reward" placeholder="Please select the Voucher Type first." disabled/>
+										</div>
+									</div>
+									
+									<div class="row form-group">
+										<div class="col-md">
+											<div class="form-check">
+												<input class="form-check-input" type="checkbox" id="showOffer">
+										 		<label class="form-check-label" for="showOffer">
+										  		Show this offer in announcement
+										 		</label>
+											</div>
+										</div>
+									</div>
+									
+									<hr class="divider"/>
+									
+									<div class="row form-group">
+										<div class="col-md-4 label">
+											<label class="col-form-label">Poster</label>
+										</div>
+										<div class="col-md-8">
+											<input class="form-control" type="file" id="picURL" name="picURL" disabled/>
+										</div>
+									</div>
+								</div>
+							</form>
+							<hr class="divider">
+							<div class="mx-auto btnList text-center">
+								<button class="btn btn-secondary" type="reset">Clear</button>
+								<button class="btn btn-primary" onclick=addVoucher()>Create</button>
+							</div>
+						</div>
+		        	</div>
 		        </div>
 		        <!--  END CONTENT -->
 			</div>
@@ -53,116 +134,16 @@
 	<a class="scroll-to-top rounded" href="#page-top"> <i
 		class="fas fa-angle-up"></i>
 	</a>
-	<!-- /.container -->
-	<div class="modal fade" tabindex="-1" role="dialog" id="newVoucher">
-		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Create New Voucher</h5>
-					<button type="button" class="close" data-bs-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<h3 class="text-center">New Voucher Form</h3>
-					<hr class="divider mx-3"/>
-					<div class="">
-						<form class="p-0 mt-5" id="newVoucherForm">
-							<div class="col-sm-11 mx-auto">								
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="">
-										  <label for="picURL" class="form-label">Poster</label>
-										  <input class="form-control" type="file" id="picURL" name="picURL" disabled>
-										</div>
-									</div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-check">
-										  <input class="form-check-input" type="checkbox" id="showOffer">
-										  <label class="form-check-label" for="showOffer">
-										  	Show this offer in announcement
-										  </label>
-										</div>
-									</div>
-								</div>
-								
-								<hr class="divider"/>
-								
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-floating">
-											<input type="text" class="form-control" name="seqid" id="seqid" placeholder="Write something here..."/>
-											<label for="seqid">Voucher Code</label>
-										</div>
-									</div>
-								</div>
-								
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-floating">
-											<select name="calculateUnit" class="form-control" aria-label="Select an option">
-													<option hidden selected value="">Select an option</option>
-													<option value="1">Ticket Purchased</option>
-													<option value="2">Money Spent</option>
-											</select>									
-											<label for="calculateUnit">Voucher Type</label>
-										</div>
-									</div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-floating">
-											<input type="text" class="form-control" name="quantity" id="quantity" placeholder="Write something here..."/>
-											<label for="quantity">Voucher Quantity</label>
-										</div>
-									</div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-floating">
-											<input type="text" class="form-control" name="min" id="min" placeholder="Write something here..." disabled/>
-											<label for="min" id="minLabel">Minimum Purchased/Spent</label>
-										</div>
-									</div>
-									
-								</div>
-								
-								<div class="row form-group">
-									<div class="col-md">
-										<div class="form-floating">
-											<input type="text" class="form-control" name="reward" id="reward" placeholder="Write something here..." disabled/>
-											<label for="reward" id="rewardLabel">Discount/Free Ticket</label>
-										</div>
-									</div>
-									
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<div class="mx-auto">
-						<button type="button" class="btn btn-secondary m-2"
-							data-bs-dismiss="modal">Cancel</button>
-						<button type="reset" class="btn btn-danger m-2"
-							onclick=clearInsertField()>Reset</button>
-						<button type="button" class="btn btn-primary m-2"
-							onclick=addVoucher()>Submit</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 <%@ include file="include/js.jsp"%>
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
+    	
+    	const placeholder = "Please select the Voucher Type first.";
     	
     	$.validator.setDefaults({
 			errorElement : "div",
@@ -193,7 +174,7 @@
 				seqid:{
 					required:true,
 					remote:{
-						url:"api/admin/voucher/checkVoucherID.json",
+						url:"api/admin/checkVoucherID.json",
 						type:"get",
 						data:{
 							voucherId:function(){return $("input[name=seqid]").val();}
@@ -203,7 +184,7 @@
 								window.location.href = "expire.htm";
 							},
 							403:function(){
-								window.location.href = "expire.htm";
+								window.location.href = "403.htm";
 							},
 							404:function(){
 								window.location.href = "404.htm";
@@ -244,6 +225,13 @@
 			}
 		});
     	
+    	$(document).ready(function(){
+    		if("${voucherType}" == ""){
+				bootbox.alert("Unable to retrieve data from the server. Please contact with admin or develop to troubleshoot the problem");
+				return false;
+			}
+    	});
+    	
     	$("select[name=calculateUnit]").on('change',function(){
 			var selectedMethod = $(this).val();
 			changeLabelName(selectedMethod);
@@ -261,11 +249,17 @@
 		function disableInputField(){
 			$("#min").attr("disabled",true)	;
 			$("#reward").attr("disabled",true);
+			
+			$("#min").attr("placeholder",placeholder);
+			$("#reward").attr("placeholder",placeholder);
 		}
 		
 		function enableInputField(){
 			$("#min").attr("disabled",false)	;
 			$("#reward").attr("disabled",false);
+			
+			$("#min").attr("placeholder","");
+			$("#reward").attr("placeholder","");
 		}
 		
 		function changeOfferInput(isChecked){
@@ -285,29 +279,25 @@
 				min.text("Minimum Ticket(s) Purchased");
 				reward.text("Free Ticket(s)");
 				enableInputField();
+				
 			}
 			else if(method == "2"){
 				min.text("Minimum Money Spent (RM)");
 				reward.text("Discount (RM)");
 				enableInputField();
+				
 			}
 			else{
 				min.text("Minimum Purchased/Spent");
 				reward.text("Discount/Free Ticket");
 				disableInputField();
+				
 			}
 		}
 		
-		$("#newVoucher").on('hidden.bs.modal',function(){
-			if(!$(this).hasClass("skip")){
-				clearInsertField();
-				clearValidator();
-			}	
-		})
-		
 		function clearValidator(){
-			$("#newVoucher input").removeClass("is-valid").removeClass("is-invalid");
-			$("#newVoucher select").removeClass("is-valid").removeClass("is-invalid");
+			$("#newVoucherForm input").removeClass("is-valid").removeClass("is-invalid");
+			$("#newVoucherForm select").removeClass("is-valid").removeClass("is-invalid");
 		}
 		
 		function addVoucher(){
@@ -321,7 +311,7 @@
 			var data = new FormData(form);
 			data.set("showOffer", $("#showOffer").prop("checked") ? true : false);
 			
-			$.ajax("api/admin/voucher/addNewVoucher.json",{
+			$.ajax("api/admin/addNewVoucher.json",{
 				method : "POST",
 				processData: false,
 			    contentType: false,
@@ -336,7 +326,7 @@
 						window.location.href = "expire.htm";
 					},
 					403:function(){
-						window.location.href = "expire.htm";
+						window.location.href = "403.htm";
 					},
 					404:function(){
 						window.location.href = "404.htm";
@@ -345,16 +335,14 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					$("#newVoucher").addClass("skip");
-					$("#newVoucher").modal("hide");
 					bootbox.alert(data.errorMsg);
-					$("#newVoucher").modal("show");
-					$("#newVoucher").removeClass("skisp");
 				}
 				else{
-					$("#newVoucher").modal("hide");
+					clearValidator();
+					clearInsertField();
+					
 					bootbox.alert(data.result);
-					readyFunction();
+					
 				}
 			});
 		}
