@@ -10,9 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ScheduleView {
+	
 	private String scheduleId;
-	private Date startTime;
-	private Date endTime;	
+	private String startTime;
+	private String endTime;	
 	private String movieName;
 	private String theatreId;
 	private String theatreName;

@@ -182,7 +182,7 @@
 						        
 						        <div class="card m-2">
 									<div class="card-header bg-light border-1">
-										<a data-toggle="collapse" data-target="#dateOption"><span
+										<a data-bs-toggle="collapse" data-bs-target="#dateOption"><span
 											class="fa fa-search"></span> Configure Date Range</a>
 									</div>
 									<div class="card-body p-0">
@@ -230,7 +230,7 @@
 								</div>
 								<div class="card m-2">
 									<div class="card-header">
-										<a data-toggle="collapse" data-target="#scheduleOption"><span
+										<a data-bs-toggle="collapse" data-bs-target="#scheduleOption"><span
 											class="fa fa-calendar-alt"></span> Configure Schedule</a>
 									</div>
 									<div class="card-body">
@@ -305,7 +305,7 @@
 					        			</ul>
 					        		</div>
 					        		<div class="text-center">
-					        			<button id="btnSubmit" class="btn btn-primary">Complete</button>
+					        			<button id="btnSubmit" class="btn btn-primary" disabled>Complete</button>
 					        		</div>
 					        	</div>
 						     </div>
@@ -402,7 +402,7 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/chart/Chart.bundle.min.js'/>"></script>
-	<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/chart/chartjs-plugin-labels.js'/>"></script>
 	<script type="text/javascript">
 	
 		
@@ -1402,6 +1402,44 @@
 			
 		}
 		
+		$("#btnSubmit").on('click',function(){
+			if(calendar == null){
+				bootbox.alert("Please finish the configuration first.");
+			}
+			else{
+				var data = convertCalendarToJSON();
+				
+				$.ajax("api/manager/addSchedule.json",{
+					method : "POST",
+					accepts : "application/json",
+					dataType : "json",
+					contentType:"application/json; charset=utf-8",
+					data: data,
+					headers:{
+						"X-CSRF-Token": CSRF_TOKEN
+					},
+					statusCode:{
+						401:function(){
+							window.location.href = "expire.htm";
+						},
+						403:function(){
+							window.location.href = "403.htm";
+						},
+						404:function(){
+							window.location.href = "404.htm";
+						}
+					}
+				}).done(function(data){
+					if(data.errorMsg != null){
+						bootbox.alert(data.errorMsg);
+					}
+					else{
+						bootbox.alert(data.result,function(){window.location.reload(false)})
+					}
+				});
+			}
+		})
+		
 		function requestAnotherCalendar(data){
 			
 			$.ajax("api/manager/showScheduleWithCleaningTime.json",{
@@ -1712,6 +1750,7 @@
 			    	})
 			  }
 			  calendar.render();
+			  $("#btnSubmit").attr("disabled",false);
 		}
 		
 		function activeTooltip(){

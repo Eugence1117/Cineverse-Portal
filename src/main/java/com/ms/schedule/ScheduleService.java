@@ -133,11 +133,13 @@ public class ScheduleService {
 			if(Util.trimString(branchid) == "") {
 				return new Response("Unable to identify your identity. Please contact with admin or developer for more information");
 			}
-			 Map<Boolean,String> validation = validateDateRange(start, end);
+			 Map<Boolean,String> validation = validateDateRangeWithoutLimit(start, end);
 			 if(validation.containsKey(false)) {
 				 return new Response((String)validation.get(false));
 			 }
 			 else {
+				 start += Constant.END_OF_DAY;
+				 end += Constant.END_OF_DAY;
 				 Map<Boolean,Object> result = dao.getScheduleByDate(start, end, branchid);
 				 if(result.containsKey(false)) {
 					 return new Response((String)result.get(false));
@@ -162,7 +164,7 @@ public class ScheduleService {
 				 return new Response((String)result.get(false));
 			 }
 			else {
-				return new Response((int)result.get(true));
+				return new Response((Object)("Please note that " + (int)result.get(true) + " ticket(s) will be refund if this schedule is being removed. Are you sure you want to remove this schedule ?"));
 			}
 		}
 	}
@@ -180,9 +182,9 @@ public class ScheduleService {
 			else {
 				//UPDATE ALL THE TICKET WITH SAME SCHEDULE ID
 				//iF PROBLEM OCCURED THROW NEW RUNTIMEEXCEPTION
+				return new Response((Object)"The schedule is being removed. A refund will be initialize to the ticket that is under this schedule.");
 			}
 		}
-		return null;
 	}
 	
 	public Map<Boolean,String> validateDateRangeWithoutLimit(String fromdate, String todate) {
@@ -1372,6 +1374,34 @@ public class ScheduleService {
 			log.error("Exception ::" + ex.getMessage());
 			result.put(false, "Invalid date detected.");
 			return result;
+		}
+	}
+	
+	@Transactional (rollbackFor = Exception.class)
+	public Response addSchedule(List<com.ms.schedule.Schedule> schedules) {
+		if(schedules != null) {
+			if(schedules.size() <= 0) {
+				log.error("Data received size: " + schedules.size());
+				return new Response("The data recevied from client's requests is empty.");
+			}
+			else {
+				Map<Boolean,Object> response = dao.insertMultipleSchedules(schedules);
+				if(response.containsKey(false)) {
+					return new Response((String)response.get(false));
+				}
+				else {
+					int size = (int)response.get(true);
+					if(size != schedules.size()) {
+						throw new RuntimeException(size + " out of " + schedules.size() + " schedule(s) is added. The action will revert since not every schedule is added. Please kindly contact with developer if the problem still exist");
+					}
+					else {
+						return new Response((Object)("Total of " + size + " schedule(s) is added to your branch."));
+					}
+				}
+			}
+		}
+		else {
+			return new Response("Data that required cannot found from client's requests.");
 		}
 	}
 	

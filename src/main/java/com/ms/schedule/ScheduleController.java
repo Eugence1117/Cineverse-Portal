@@ -64,12 +64,21 @@ public class ScheduleController {
 		return "scheduleMovie";
 	}
 	
+	@RequestMapping (value= {"/viewSchedule.htm"})
+	public String getScheduleViewPage(Model model) {
+		log.info("Entered /viewSchedule.htm");
+		
+		return "viewSchedule";
+	}
+	
 	@RequestMapping( value= {"/api/manager/getScheduleWithDate.json"})
 	@ResponseBody
 	public Response retrieveScheduleWithDate(Model model, String startdate, String enddate) {
 		log.info("Entered /schedule/retriveDailyAvailableMovie.json");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();
+		log.info("Start" + startdate);
+		log.info("End" + enddate);
 		return service.getScheduleWithRange(startdate, enddate, branchid);
 
 	}
@@ -145,5 +154,52 @@ public class ScheduleController {
 		log.info("Entered /schedule/configureScheduleByDaily.json");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return service.getScheduleDetailStatistic(schedules,user.getBranchid());
+	}
+	
+	@RequestMapping( value={"/api/manager/addSchedule.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response addSchedule(Model model, @RequestBody List<Schedule> schedules) {
+		log.info("Entered /schedule/addSchedule.json");
+		try {
+			Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return service.addSchedule(schedules);
+		}
+		catch(RuntimeException ex) {
+			log.error("RuntimeException: " + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
+		
+	}
+	
+	@RequestMapping( value={"/api/manager/getImpactTicket.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response retrieveTicketImpacted(Model model, @RequestBody String scheduleId) {
+		log.info("Entered /schedule/addSchedule.json");
+		log.info("ID" + scheduleId);
+		try {
+			Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return service.getInfluenceTicket(scheduleId);
+		}
+		catch(RuntimeException ex) {
+			log.error("RuntimeException: " + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
+		
+	}
+	
+	@RequestMapping( value={"/api/manager/removeSchedule.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
+	@ResponseBody
+	public Response removeSchedule(Model model, @RequestBody String scheduleId) {
+		log.info("Entered /schedule/addSchedule.json");
+		log.info("ID" + scheduleId);
+		try {
+			Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return service.cancelSchedule(scheduleId);
+		}
+		catch(RuntimeException ex) {
+			log.error("RuntimeException: " + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
+		
 	}
 }

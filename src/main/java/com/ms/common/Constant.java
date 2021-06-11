@@ -36,9 +36,11 @@ public class Constant {
 	public static final int INACTIVE_STATUS_CODE = 0;
 	public static final int REMOVED_STATUS_CODE = -1;
 	
+	public static final int SCHEDULE_END_CODE = -1;
 	public static final int SCHEDULE_AVAILABLE_CODE = 1;
 	public static final int SCHEDULE_CANCELLED_CODE = 0;
 	
+	public static final String SCHEDULE_END = "End";
 	public static final String SCHEDULE_AVAILABLE = "Available";
 	public static final String SCHEDULE_CANCELLED = "Cancellled";
 	
@@ -68,6 +70,7 @@ public class Constant {
 	
 	public static final String DEFAULT_TIME_ZONE ="Asia/Kuala_Lumpur";
 	public static final String DEFAULT_TIME = " 00:00:00";
+	public static final String END_OF_DAY = " 23:59:59";
 	
 	public static final SimpleDateFormat SQL_DATE_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

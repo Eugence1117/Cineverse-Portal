@@ -49,7 +49,7 @@ public class Util {
 		return string.equals(Constant.ACTIVE_STATUS) ? Constant.ACTIVE_STATUS_CODE : string.equals(Constant.INACTIVE_STATUS) ? Constant.INACTIVE_STATUS_CODE : string.equals(Constant.REMOVED_STATUS) ? Constant.REMOVED_STATUS_CODE : Constant.INVALID_STATUS_CODE;
 	}
 	public static String getScheduleStatus(int code) {
-		return code == Constant.SCHEDULE_AVAILABLE_CODE ? Constant.SCHEDULE_AVAILABLE : code == Constant.SCHEDULE_CANCELLED_CODE ? Constant.SCHEDULE_CANCELLED : null;
+		return code == Constant.SCHEDULE_AVAILABLE_CODE ? Constant.SCHEDULE_AVAILABLE : code == Constant.SCHEDULE_CANCELLED_CODE ? Constant.SCHEDULE_CANCELLED : code == Constant.SCHEDULE_END_CODE ? Constant.SCHEDULE_END : null;
 	}
 	public static OperatingHours getDefaultRules(String branchid) {
 		return new OperatingHours(branchid,"The operating hours of the business",Constant.DEFAULT_BUSINESS_OPERATING_START_TIME,Constant.DEFAULT_BUSINESS_OPERATING_END_TIME);

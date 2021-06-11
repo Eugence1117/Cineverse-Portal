@@ -33,9 +33,6 @@
         <Logger name="org.hibernate.SQL" level="all" additivity="false">
         	<AppenderRef ref="file-log"/>
         </Logger>
-        <logger level="trace" name="com.ms">
-        	<AppenderRef ref="aiAppender"/>
-        </logger>
         <Logger name="org.optaplanner" level="warn">
         	<AppenderRef ref="OP-log"/>
         </Logger>

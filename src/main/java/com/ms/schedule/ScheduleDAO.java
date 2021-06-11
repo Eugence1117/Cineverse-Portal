@@ -4,6 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,7 +36,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.ms.optaplanner.Schedule;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
@@ -84,34 +85,40 @@ public class ScheduleDAO {
 		}
 		return latestDate;
 	}
-	
-	public String insertMultipleSchedules(List<Schedule> scheduleList) {
+
+	public Map<Boolean,Object> insertMultipleSchedules(List<Schedule> scheduleList) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "INSERT INTO masp.SCHEDULE VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO masp.SCHEDULE (seqid,starttime,endtime,movieId,theatreId) VALUES(?,?,?,?,?)";
+			List<Object[]> parameters = new ArrayList<Object[]>();
+			for(Schedule schedule : scheduleList) {
+				parameters.add(new Object[] {
+						schedule.getScheduleId(),
+						Constant.SQL_DATE_FORMAT.format(schedule.getStart()),
+						Constant.SQL_DATE_FORMAT.format(schedule.getEnd()),
+						schedule.getMovieId(),
+						schedule.getTheatreId()
+				});
+			}
 			
-//				int result = jdbc.batchUpdate(query,new BatchPreparedStatementSetter() {
-//				});
-//				@Override
-//				public void setValues(PreparedStatement ps, int i) throws SQLException {
-//					Schedule sch = scheduleList.get(i);
-//					ps.setString(1,sch.getScheduleId());
-//					ps.setString(2,sch.getDate().toString() + sch.getStartTime().toString());
-//					ps.setString( 0);
-//					
-//				}
-//
-//				@Override
-//				public int getBatchSize() {
-//					// TODO Auto-generated method stub
-//					return 0;
-//				}
-//				
-//			});
+			int[] result = jdbc.batchUpdate(query,parameters);
+			if(result.length == scheduleList.size()) {
+				response.put(true, result.length);
+			}
+			else {
+				log.error("Total of " + result.length + " out of " + scheduleList.size() + "schedule(s) is added to database.");
+				response.put(true, result.length);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
-			
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
-		return null;
+		return response;
 	}
 
 	public Map<Boolean,Object> getTicketByScheduleId(String scheduleId){
@@ -140,8 +147,8 @@ public class ScheduleDAO {
 	public String updateScheduleStatus(String scheduleId) {
 		String errorMsg = "";
 		try {
-			String query = "UPDATE masp.schedule set status = ? where seqid = ?";
-			int result = jdbc.update(query,Constant.SCHEDULE_CANCELLED_CODE,scheduleId);
+			String query = "UPDATE masp.schedule set status = ? where seqid = ? AND status != ? AND status != ?";
+			int result = jdbc.update(query,Constant.SCHEDULE_CANCELLED_CODE,scheduleId,Constant.REMOVED_STATUS_CODE,Constant.SCHEDULE_END_CODE);
 			if(result > 0) {
 				return null;
 			}
@@ -164,10 +171,11 @@ public class ScheduleDAO {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT s.seqid, s.starttime, s.endtime, m.movieName, t.seqid AS theatreId, t.theatrename, s.status " +
-					       "FROM masp.schedule s, masp.movie m, masp.theatre t" + 
+					       "FROM masp.schedule s, masp.movie m, masp.theatre t " + 
 					       "WHERE t.branchid = ? AND t.seqid = s.theatreId " + 
 					       "AND s.movieId = m.seqid " + 
-					       "AND s.starttime <= ? AND s.starttime >= ?";
+					       "AND s.starttime <= ? AND s.starttime >= ? " +
+						   "Order By s.starttime";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,endDate,startDate);
 			if(rows.size() > 0) {
 				List<ScheduleView> scheduleList = new ArrayList<ScheduleView>();
@@ -181,14 +189,14 @@ public class ScheduleDAO {
 					String theatreName = (String)row.get("theatrename");
 					int status = (int)row.get("status");
 					
-					ScheduleView view = new ScheduleView(scheduleId,startTime,endTime,movieName,theatreId,theatreName,Util.getScheduleStatus(status));
+					ScheduleView view = new ScheduleView(scheduleId,Constant.STANDARD_DATE_FORMAT.format(startTime),Constant.STANDARD_DATE_FORMAT.format(endTime),movieName,theatreId,"Hall " + theatreName,Util.getScheduleStatus(status));
 					scheduleList.add(view);
 				}
 				log.info("Total Schedule retrieve: " + scheduleList.size());
 				response.put(true, scheduleList);
 			}
 			else {
-				response.put(false,"No Schedule is available from " + startDate + " to " + endDate);
+				response.put(false,"No Schedule is available at the date specified");
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -197,6 +205,11 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ex.printStackTrace(printWriter);
+			printWriter.flush();
+			log.error(writer.toString());
 			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return response;
