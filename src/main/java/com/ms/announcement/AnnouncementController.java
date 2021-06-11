@@ -2,6 +2,7 @@ package com.ms.announcement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +31,7 @@ public class AnnouncementController {
 	public String getAnnouncementPage(Model model) {
 		log.info("Entered announcement page");
 		model.addAttribute("status",Util.createStatusWithoutRemovedDropDown());
-		Response response = service.getAllAnnouncement();
+		Response response = service.getAnnouncementWithStatus(Constant.ACTIVE_STATUS_CODE);
 		if(response.getErrorMsg() == null) {
 			model.addAttribute("announcement",response.getResult());
 		}
@@ -44,7 +45,7 @@ public class AnnouncementController {
 	@ResponseBody
 	public Response getAllAnnouncement(Model model) {
 		log.info("Entered /api/admin/retrieveAllAnnouncement.json");
-		return service.getAllAnnouncement();
+		return service.getAllAnnouncementDividedWithStatus();
 	}
 	
 	@RequestMapping(value= {"/api/admin/retrieveActiveAnnouncement.json"},method= {RequestMethod.GET})
@@ -70,9 +71,15 @@ public class AnnouncementController {
 	
 	@RequestMapping(value= {"/api/admin/uploadAnnouncement.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Response createAnnouncement(Model model, @RequestBody MultipartFile data) {
+	public Response createAnnouncement(Model model, @RequestBody MultipartFile picURL) {
 		log.info("Entered /api/admin/uploadAnnouncement.json");
-		return service.createAnnoucement(data);
+		try {
+			return service.createAnnoucement(picURL);
+		}
+		catch(RuntimeException ex) {
+			log.error("RuntimeException" + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
 	}
 	
 	@RequestMapping(value= {"/api/admin/editAnnouncement.json"},method= {RequestMethod.POST})
@@ -84,9 +91,12 @@ public class AnnouncementController {
 	
 	@RequestMapping(value= {"/api/admin/deleteAnnouncement.json"},method= {RequestMethod.POST})
 	@ResponseBody
-	public Response deleteAnnouncement(Model model, @RequestBody String id) {
+	public Response deleteAnnouncement(Model model, @RequestBody Map<String,String> data) {
 		log.info("Entered /api/admin/editAnnouncement.json");
-		return service.removeAnnouncement(id);
+		if(data ==null) {
+			return new Response("Unable to retrieve the data required from client's request. Please report this issue with developer.");
+		}
+		return service.removeAnnouncement(data.get("seqid"));
 	}
 	
 }

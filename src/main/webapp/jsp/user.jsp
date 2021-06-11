@@ -55,7 +55,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Users</h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><span class="fas fa-user"></span> Users</h1>
 			        </div>
 					<div class="card m-2">
 						<div class="card-header">
@@ -462,12 +462,19 @@
 				value.action = "<p class='my-auto actionColumn'>";
 				if(value.status == "Inactive"){
 					value.action += "<span class='p-1 mx-1 fontBtn approveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,1)>" + approveBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
+					value.action +="</p>"
+				}
+				else if(value.status = "Active"){
+					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,0)>" + deactivateBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
+					value.action +="</p>"
 				}
 				else{
-					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,0)>" + deactivateBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>";
+					value.action +="</p>"
 				}
-				value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
-				value.action +="</p>"
+				
 			});
 		}
 		

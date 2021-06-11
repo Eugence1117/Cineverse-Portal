@@ -36,6 +36,12 @@ public class Constant {
 	public static final int INACTIVE_STATUS_CODE = 0;
 	public static final int REMOVED_STATUS_CODE = -1;
 	
+	public static final int SCHEDULE_AVAILABLE_CODE = 1;
+	public static final int SCHEDULE_CANCELLED_CODE = 0;
+	
+	public static final String SCHEDULE_AVAILABLE = "Available";
+	public static final String SCHEDULE_CANCELLED = "Cancellled";
+	
 	public static final String SCHEDULE_TYPE_MOVIE = "Movie";
 	public static final String SCHEDULE_TYPE_CLEANING = "Cleaning";
 	

@@ -37,7 +37,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Add Movie to Branch</h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><span class="fas fa-film"></span> Add Movie to Branch</h1>
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">

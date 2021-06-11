@@ -32,7 +32,7 @@ public class AnnouncementDAO {
 	public Map<Boolean,Object> retrieveAnnouncementWithStatus(int status){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT * FROM masp.announcement where status = ? order by createddate";
+			String query = "SELECT * FROM masp.announcement where status = ? order by createddate desc";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,status);
 			if(rows.size() > 0) {
 				List<Announcement> announcementList = new ArrayList<Announcement>();
@@ -180,7 +180,13 @@ public class AnnouncementDAO {
 		String url = "";
 		try {
 			String query = "SELECT picURL FROM masp.announcement where seqid = ?";
-			url = jdbc.queryForObject(query, String.class,announcementId);
+			Map<String,Object> row = jdbc.queryForMap(query,announcementId);
+			if(row != null) {
+				url = (String)row.get("picURL");
+			}
+			else {
+				url =null;
+			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
 			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());

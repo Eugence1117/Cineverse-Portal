@@ -63,7 +63,13 @@ public class AnnouncementService {
 				List<AnnouncementView> data = convertToAnnouncement(rows);
 				
 				Map<String,	List<AnnouncementView>> divider = 	data.stream().collect(Collectors.groupingBy(view -> view.getStatus()));
+				if(!divider.containsKey(Constant.ACTIVE_STATUS)) {
+					divider.put(Constant.ACTIVE_STATUS, new ArrayList<AnnouncementView>());
+				}
 				
+				if(!divider.containsKey(Constant.INACTIVE_STATUS)) {
+					divider.put(Constant.INACTIVE_STATUS, new ArrayList<AnnouncementView>());
+				}
 			
 				return new Response(divider);
 			}
@@ -140,7 +146,7 @@ public class AnnouncementService {
 					Announcement annoucement = new Announcement(id, url.toString(), Constant.ACTIVE_STATUS_CODE);
 					String errorMsg = dao.addNewAnnouncement(annoucement);
 					if(errorMsg == null) {
-						return new Response((Object)"Annoucement Added.");
+						return new Response((Object)"Annoucement Added. Please refresh the slide to view the latest information.");
 					}
 					else {
 						azure.deleteFile(id + fileFormat, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
@@ -171,8 +177,8 @@ public class AnnouncementService {
 			
 			String errorMsg = dao.deleteAnnouncement(announcementID);
 			if(errorMsg==null) {
-				azure.deleteFile(announcementID + currentPath, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
-				return new Response((Object)"Announcement specified has been removed.");
+				azure.deleteFile(announcementID + fileFormat, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
+				return new Response((Object)"Announcement specified has been removed. Please refresh the slide to view the latest information.");
 			}
 			else {
 				return new Response(errorMsg);
@@ -198,7 +204,7 @@ public class AnnouncementService {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)"The status is updated to <b>" + Util.getStatusDescWithoutRemovedStatus(data.getStatus()) + "</b>");
+			return new Response((Object)("The status is updated to <b>" + Util.getStatusDescWithoutRemovedStatus(data.getStatus()) + "</b>. Please refresh the slide to view the latest information."));
 		}
 	}
 }

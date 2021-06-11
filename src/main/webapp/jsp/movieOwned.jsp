@@ -49,7 +49,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Movie Available in <c:out value='${branchname}'/></h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><span class="fas fa-film"></span> Movie Available in <c:out value='${branchname}'/></h1>
 			        </div>
 					
 					<div class="card m-2">

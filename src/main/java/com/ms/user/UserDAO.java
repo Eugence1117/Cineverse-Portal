@@ -156,7 +156,7 @@ public class UserDAO {
 					int status = (int)record.get("status");
 					String branchname = Util.trimString((String)record.get("branchName"));
 					
-					User result = new User(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status));
+					User result = new User(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.getStatusDesc(status));
 					resultList.add(result);
 				}
 				response.put(true, resultList);
@@ -320,13 +320,13 @@ public class UserDAO {
 	
 	public String updateUser(UserEditForm form) {
 		try {
-			StringBuffer query = new StringBuffer().append("UPDATE masp.STAFF SET branchid = ?, usergroup = ? WHERE seqid = ?");
-			int result = jdbc.update(query.toString(),form.getEditbranchid(),form.getEditusergroup(),form.getSeqid());
+			StringBuffer query = new StringBuffer().append("UPDATE masp.STAFF SET branchid = ?, usergroup = ? WHERE seqid = ? AND status != ?");
+			int result = jdbc.update(query.toString(),form.getEditbranchid(),form.getEditusergroup(),form.getSeqid(),Constant.REMOVED_STATUS_CODE);
 			if(result >0) {
 				return null;
 			}
 			else {
-				return "Unable to update the user information. Please try again later.";
+				return "Unable to update the user information. Please note that the <b>Removed</b> user is no longer editable. If the problem still exist, please contact with the developer.";
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -342,8 +342,8 @@ public class UserDAO {
 	public String deleteUser(String userid) {
 		
 		try {
-			StringBuffer query = new StringBuffer().append("DELETE FROM masp.STAFF WHERE seqid = ?");
-			int result = jdbc.update(query.toString(),userid);
+			StringBuffer query = new StringBuffer().append("UPDATE masp.staff set status = ? WHERE seqid = ?");
+			int result = jdbc.update(query.toString(),Constant.REMOVED_STATUS_CODE,userid);
 			if(result >0) {
 				return null;
 			}

@@ -499,11 +499,29 @@
 				},
 				min:{
 					required:true,
-					number:true
+					number:{
+						depends:function(){
+							return $("select[name=calculateUnit]").val() == "2"
+						}
+					},
+					digits:{
+						depends:function(){
+							return $("select[name=calculateUnit]").val() == "1"
+						}
+					}
 				},
 				reward:{
 					required:true,
-					number:true
+					number:{
+						depends:function(){
+							return $("select[name=calculateUnit]").val() == "2"
+						}
+					},
+					digits:{
+						depends:function(){
+							return $("select[name=calculateUnit]").val() == "1"
+						}
+					}
 				},
 			},
 			invalidHandler: function() {				
@@ -513,6 +531,14 @@
 		
 		$("select[name=calculateUnit]").on('change',function(){
 			var selectedMethod = $(this).val();
+			
+			if($("input[name=min]").val() != ""){
+				$("#editVoucherForm").validate().element("input[name=min");
+			}
+			if($("input[name=reward]").val() != ""){
+				$("#editVoucherForm").validate().element("input[name=reward");
+			}
+			
 			changeLabelName(selectedMethod);
 		});
 		

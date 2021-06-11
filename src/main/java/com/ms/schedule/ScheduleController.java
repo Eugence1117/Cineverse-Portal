@@ -64,6 +64,15 @@ public class ScheduleController {
 		return "scheduleMovie";
 	}
 	
+	@RequestMapping( value= {"/api/manager/getScheduleWithDate.json"})
+	@ResponseBody
+	public Response retrieveScheduleWithDate(Model model, String startdate, String enddate) {
+		log.info("Entered /schedule/retriveDailyAvailableMovie.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		return service.getScheduleWithRange(startdate, enddate, branchid);
+
+	}
 	
 	@RequestMapping( value= {"/api/manager/retriveDailyAvailableMovie.json"})
 	@ResponseBody

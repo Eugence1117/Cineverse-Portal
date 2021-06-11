@@ -41,7 +41,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">My Cinema</h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><i class="fas fa-store-alt"></i> My Cinema</h1>
 			        </div>
 
 					<div class="card m-2">

@@ -56,6 +56,7 @@ import org.optaplanner.core.api.solver.SolverManager;
 import org.optaplanner.core.config.solver.SolverManagerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,6 +71,7 @@ import com.ms.optaplanner.TimeGrain;
 import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
 import com.ms.common.Response;
+import com.ms.common.Util;
 import com.ms.rules.OperatingHours;
 import com.ms.rules.RuleService;
 import com.ms.schedule.ConfigurationModel.Configuration;
@@ -124,6 +126,92 @@ public class ScheduleService {
 			return null;
 		}
 
+	}
+	
+	public Response getScheduleWithRange(String start, String end, String branchid) {
+		if(Util.trimString(start) != "" && Util.trimString(end) != "") {
+			if(Util.trimString(branchid) == "") {
+				return new Response("Unable to identify your identity. Please contact with admin or developer for more information");
+			}
+			 Map<Boolean,String> validation = validateDateRange(start, end);
+			 if(validation.containsKey(false)) {
+				 return new Response((String)validation.get(false));
+			 }
+			 else {
+				 Map<Boolean,Object> result = dao.getScheduleByDate(start, end, branchid);
+				 if(result.containsKey(false)) {
+					 return new Response((String)result.get(false));
+				 }
+				 else {
+					 return new Response(result.get(true));
+				 }
+			 }
+		}
+		else {
+			return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
+		}
+	}
+	
+	public Response getInfluenceTicket(String scheduleId) {
+		if(Util.trimString(scheduleId) == "") {
+			return new Response("Unable to locate the schedule you specified. This may occured due the the data submitted to server is empty. Please contact with developer for asistance.");
+		}
+		else {
+			Map<Boolean,Object> result = dao.getTicketByScheduleId(scheduleId);
+			if(result.containsKey(false)) {
+				 return new Response((String)result.get(false));
+			 }
+			else {
+				return new Response((int)result.get(true));
+			}
+		}
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Response cancelSchedule(String scheduleId) {
+		if(Util.trimString(scheduleId) == "") {
+			return new Response("Unable to locate the schedule you specified. This may occured due the the data submitted to server is empty. Please contact with developer for asistance.");
+		}
+		else {
+			String res = dao.updateScheduleStatus(scheduleId);
+			if(res != null){
+				return new Response(res);
+			}
+			else {
+				//UPDATE ALL THE TICKET WITH SAME SCHEDULE ID
+				//iF PROBLEM OCCURED THROW NEW RUNTIMEEXCEPTION
+			}
+		}
+		return null;
+	}
+	
+	public Map<Boolean,String> validateDateRangeWithoutLimit(String fromdate, String todate) {
+		Map<Boolean,String> result = new HashMap<Boolean,String>();
+		try {
+			SimpleDateFormat format = Constant.SQL_DATE_WITHOUT_TIME;
+			format.setLenient(false);
+			Date fromDate = format.parse(fromdate);
+			Date toDate = format.parse(todate);
+			
+			Calendar fromCal = Calendar.getInstance();
+			fromCal.setTime(fromDate);
+			
+			Calendar toCal = Calendar.getInstance();
+			toCal.setTime(toDate);
+		
+			if(fromCal.compareTo(toCal) > 0) {
+				result.put(false,"From date cannot greater than To date.");
+				return result;
+			}
+			
+			result.put(true,"");
+			return result;
+		}
+		catch(Exception ex) {
+			log.error("Exception ::" + ex.getMessage());
+			result.put(false,"The date received is invalid.");
+			return result;
+		}
 	}
 	
 	public boolean validateStartDate(long startDate,String branchId) {

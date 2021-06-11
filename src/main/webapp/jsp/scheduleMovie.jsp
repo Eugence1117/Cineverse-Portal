@@ -176,7 +176,7 @@
 				 		<div class="carousel-inner">
 				 			<div class="carousel-item active">
 				 				<div class="d-sm-flex align-items-center justify-content-between mb-4">
-						        	<h1 class="h3 mb-0 text-gray-800">Schedule</h1>
+						        	<h1 class="h3 mb-0 text-gray-800"><i class="fas fa-calendar-week"></i> Schedule</h1>
 						        	<button id="btnNext" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide-to="1">Proceed to next step <i class="fas fa-arrow-circle-right"></i></button>
 						        </div>
 						        

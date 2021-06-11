@@ -66,7 +66,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Create New Theatre</h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><i class="fas fa-couch"></i> Create New Theatre</h1>
 			        </div>
 			        
 			        <h2 class='text-center m-2'>Theatre layout</h2>

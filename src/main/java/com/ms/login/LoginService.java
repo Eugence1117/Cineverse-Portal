@@ -82,6 +82,9 @@ public class LoginService implements UserDetailsService {
 					else if(Integer.parseInt(staff.get("status")) == Constant.INACTIVE_STATUS_CODE) {
 						return new Response("Your account was deactivated by the admin. Please contact with admin for further details.");
 					}
+					else if(Integer.parseInt(staff.get("status")) == Constant.REMOVED_STATUS_CODE) {
+						return new Response("Your account was removed by the admin. Please contact with admin for further details.");
+					}
 					else{
 						return new Response("No issue occured. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
 					}

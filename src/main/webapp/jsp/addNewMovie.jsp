@@ -52,7 +52,7 @@
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
 				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Add New Movie</h1>
+			        	<h1 class="h3 mb-0 text-gray-800"><span class="fas fa-film"></span> Add New Movie</h1>
 			        </div>
 					<input type="hidden" id="movieList" value="${movieList}">
 					<input type="hidden" id="usergroupid" value="${usergroup}">
@@ -270,6 +270,7 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/additional.method.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
@@ -488,7 +489,8 @@
 				},
 				posterImage : {
 					required : true,
-					filesize : 1000000
+					filesize : 5,
+					extension: "jpg,jpeg,png",
 				},
 				releaseDate : {
 					required : true,
@@ -497,7 +499,12 @@
 					required : true,
 					SelectFormat : true
 				}
-			}
+			},
+			messages:{
+				posterImage:{
+					extension: "Please only upload file with format .jpg .jpeg or .png"
+				}
+			},
 		});
 		
 	</script>
