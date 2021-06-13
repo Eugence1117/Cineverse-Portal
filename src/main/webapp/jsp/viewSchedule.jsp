@@ -13,8 +13,41 @@
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<link rel="stylesheet" href="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.css'/>">
 
 <style>
+.movieEvent,.movieRedirect{
+	cursor:pointer;
+}
+
+#expandSearch:hover{
+	cursor:pointer;
+	background-color:#f8f9fa
+}
+
+.hidden-event{
+	display:none;
+}
+
+.endEvent{
+	background-color:#6c757d !important;
+	border-color: #6c757d !important;
+	opacity:0.8;
+}
+
+.cancelledEvent{
+	background-color:#dc3545 !important;
+	border-color:#dc3545 !important;
+	color:black;
+	opacity:0.8;
+}
+
+
+.cleaningEvent{
+	background-color:#77DD77;
+	border-color: #77DD77;
+	text-align:center;
+}
 .fontBtn:hover,.collapsible{
 	cursor:pointer;
 }
@@ -52,16 +85,22 @@
 			<div id="content">
 				 <%@ include file="include/topbar.jsp" %>
 				 <div class="container-fluid">
-				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800"><i class="fas fa-calendar-alt"></i> Schedule</h1>
-			        </div>
-			        
-			        <div class="card m-2">
-			        	<div class="card-header">
-			        		<a data-bs-toggle="collapse" data-bs-target="#searchForm" class="collapsible"><i class="fas fa-search"></i> Search</a>
-			        	</div>
-			        	<div class="card-body">
-			        		<form id="searchForm" class="collapse show">
+					<div class="d-sm-flex align-items-center justify-content-between mb-4">
+						<h1 class="h3 mb-0 text-gray-800">
+							<i class="fas fa-calendar-alt"></i> Schedule
+						</h1>
+						<button id="btnNext" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-bs-target="#carousel" data-bs-slide="next">
+							<i class='fas fa-calendar-alt'></i> Calendar Mode
+						</button>
+					</div>
+
+					<div class="card m-2">
+						<div class="card-header">
+							<a data-bs-toggle="collapse" data-bs-target="#searchForm"
+								class="collapsible"><i class="fas fa-search"></i> Search</a>
+						</div>
+						<div class="card-body">
+							<form id="searchForm" class="collapse show">
 								<div class="py-3 px-2">
 									<div class="form-group row">
 										<div class="col-md-1"></div>
@@ -71,7 +110,8 @@
 													<label class="col-form-label">Start Date :</label>
 												</div>
 												<div class="col-md">
-													<input class="form-control date" type="date" name="startdate">
+													<input class="form-control date" type="date"
+														name="startdate">
 												</div>
 											</div>
 										</div>
@@ -87,48 +127,108 @@
 										</div>
 										<div class="col-md-1"></div>
 									</div>
-									<div class="form-group row m-0">
+									<div class="form-group row text-center my-2">
+										<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
+										<div class="collapse my-2" id="advancedOption">
+											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
+											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
+											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
+											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+										</div>
+									</div>
+									<div class="form-group row m-2 mt-3">
 										<div class="col-md-4"></div>
 										<div class="col-md-4 text-center">
 											<button class="btn-success btn" type="button" id="btnSearch">
-												<span class="fas fa-wrench"></span> Search
+												<i class="fas fa-search"></i> Search
 											</button>
 										</div>
 										<div class="col-md-4"></div>
 									</div>
 								</div>
 							</form>
-			        	</div>
-			        </div>
-			        
-			        <div class="card m-2">
-						<div class="card-header">
-							<span class="fa fa-calendar-alt"></span> Schedule
-							<div class="fa-pull-right d-inline-block">
-								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" href="scheduleMovie.htm">
-									<span class="fas fa-plus-circle" aria-hidden="true"></span>
-									<span>Schedule Movie</span>
-								</a>
-			  				</div>
-						</div>
-						<div class="card-body">
-							<div class="table-responsive">
-								<table id="scheduleInfo" class="table table-bordered" style="width:100% !important">
-									<thead>
-										<tr>
-											<th>Movie Name</th>
-											<th>Start Time</th>
-											<th>End Time</th>
-											<th>Theatre</th>
-											<th>Status</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-								</table>
-							</div>
 						</div>
 					</div>
-				 </div>
+
+					<div class="carousel slide" data-bs-ride="carousel" id="carousel" data-bs-interval="false">
+				 		<div class="carousel-inner">
+				 			<div class="carousel-item active" id="tableView">
+				 				<div class="card m-2">
+									<div class="card-header">
+										<span class="fa fa-calendar-alt"></span> Schedule
+										<div class="fa-pull-right d-inline-block">
+											<a
+												class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
+												href="scheduleMovie.htm"> <span class="fas fa-plus-circle"
+												aria-hidden="true"></span> <span>Schedule Movie</span>
+											</a>
+										</div>
+									</div>
+									<div class="card-body">
+										<div class="table-responsive">
+											<table id="scheduleInfo" class="table table-bordered table-hover"
+												style="width: 100% !important">
+												<thead>
+													<tr>
+														<th>Movie Name</th>
+														<th>Start Time</th>
+														<th>End Time</th>
+														<th>Theatre</th>
+														<th>Status</th>
+														<th>Action</th>
+													</tr>
+												</thead>
+											</table>
+										</div>
+									</div>
+								</div>
+				 			</div>
+				 			
+				 			<div class="carousel-item" id="calendarView">
+				 				<div class="card m-2">
+									<div class="card-header">
+										<span class="fa fa-calendar-alt"></span> Schedule
+										<div class="fa-pull-right d-inline-block">
+											<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" href="scheduleMovie.htm"> <span class="fas fa-plus-circle" aria-hidden="true"></span> <span>Schedule Movie</span></a>
+										</div>
+									</div>
+									<div class="card-body">
+										<div class="text-left">
+											<div class="dropdown mx-0 my-2 d-none">
+												<button class="btn btn-secondary dropdown-toggle" type="button" id="filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+											    	Filter <i class="fas fa-filter"></i>
+											  	</button>
+											  	<ul class="dropdown-menu p-3" aria-labelledby="filterBtn">
+											  		<li>
+												  		<div class="form-check">
+												  			<input class="form-check-input filter" type="checkbox" data-element="availableEvent">
+												  			<label class="form-check-label">Hide Available Schedule</label>
+												  		</div>
+											  		</li>
+											  		<li>
+											  			<div class="form-check">
+											  				<input class="form-check-input filter" type="checkbox" data-element="endEvent"> 
+											  				<label class="form-check-label">Hide End Schedule</label>
+											  			</div>
+											  		</li>
+											  		<li>
+											  			<div class="form-check">
+											  				<input class="form-check-input filter" type="checkbox" data-element="cancelledEvent">
+											  				<label class="form-check-label">Hide Cancelled Schedule</label>
+											  			</div>
+											  		</li>
+											  	</ul>
+											</div>
+										</div>
+										<div class="calendar" id="scheduleCalendar">
+											
+										</div>
+									</div>
+								</div>
+				 			</div>
+				 		</div>
+				 	</div>
+				</div>
 			</div>
 			<footer class="sticky-footer bg-white">
 		        <div class="container my-auto">
@@ -151,11 +251,50 @@
 		<p class="text-center">Loading...</p>
 		
 	</div>
+	
+	<div class="modal fade" id="eventView" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Event Details</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<label class="col-sm-4"><b>Title :</b></label>
+						<p class="d-inline data col-sm-6" id="title"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Start Time :</b></label>
+						<p class="d-inline data col-sm-6" id="start"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>End Time :</b></label>
+						<p class="d-inline data col-sm-6" id="end"></p>
+					</div>
+					<div class="row">
+						<label class="col-sm-4"><b>Status :</b></label>
+						<p class="d-inline data col-sm-6" id="status"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="hidden" id="scheduleId"/>
+					<button class="btn btn-danger" id="removeEvent"> Remove</button>
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
@@ -164,6 +303,8 @@
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
+    	var timeRange = null;
+    	
     	
     	$(document).ready(function(){
     		var resultDt = getResultDataTable().clear();
@@ -233,22 +374,112 @@
     		console.log("add");
     	}
     	
+    	$(".quickFill").on('click',function(e){
+    		e.preventDefault();
+    		var data = parseInt($(this).data("duration"));
+    		
+    		var validator = $("#searchForm").validate();
+    		if(!validator.element("input[name=startdate]")){
+    			return false;
+    		}
+    		
+    		var endDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
+    		$("input[name=enddate]").val(endDate);
+    		
+    		$("#btnSearch").click();
+    		
+    	})
     	$("#btnSearch").on('click',function(){
     		
     		var validator = $("#searchForm").validate();
     		if(!validator.form()){
     			return false;
     		}
-    		//addLoading();
-    		getTableData();
-    		//removeLoading();
+    		
+    		if(carouselSlide == 0){
+    			getTableData(null);	
+    		}
+    		else{
+    			console.log("Get Calendar Data");
+    			getCalendarData(null);
+    		}
     	});
     	
-    	<!--FOR DISPLAY DATA TABLE-->
-    	function getTableData(){
+    	var carouselSlide = 0; //Default Table View
+    	$("#carousel").on('slid.bs.carousel',function(event){
+    		var destination = event.to;
+    		if(destination == 1){
+    			const html = "<i class='fas fa-table'></i> Table Mode"
+    				$("#btnNext").html(html);
+    		}
+    		else{
+    			const html = "<i class='fas fa-calendar-alt'></i> Calendar Mode";
+    			$("#btnNext").html(html);
+    		}
+    		carouselSlide = destination;
+    	});
+    	
+    	$("#advancedOption").on("hide.bs.collapse",function(){
+    		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
+    	});
+    	
+		$("#advancedOption").on("show.bs.collapse",function(){
+			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
+    	});
+    	
+    	function getCalendarData(existingData){
     		addLoading();
-    		var formData = $("#searchForm").serializeObject();
     		
+    		var formData = new Object();
+    		if(existingData != null){
+    			formData = existingData;
+    		}
+    		else{
+    			formData = $("#searchForm").serializeObject();
+    		}
+    		
+    			
+    		$.ajax("api/manager/getCalendarWithDate.json",{
+    			method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+				data:formData,
+				async:false,
+				statusCode:{
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				},
+    		}).done(function(data){
+    			removeLoading();
+				if(data.errorMsg == null){
+					timeRange = formData;
+					var startDate = formData.startdate;
+					$(".dropdown").removeClass("d-none");
+					renderCalendar(data.result,startDate);
+				}
+				else{
+					bootbox.alert(data.errorMsg);
+				}
+    		})	
+    	}
+    	<!--FOR DISPLAY DATA TABLE-->
+    	function getTableData(existingData){
+    		addLoading();
+    		
+    		var formData = new Object();
+    		if(existingData != null){
+    			formData = existingData;
+    		}
+    		else{
+    			 formData = $("#searchForm").serializeObject();
+    		}
     		
     		$.ajax("api/manager/getScheduleWithDate.json",{
     			method : "GET",
@@ -271,9 +502,11 @@
     			removeLoading();
     			var resultDt = getResultDataTable().clear();
 				if(data.errorMsg == null){
+					timeRange = formData;
 					addActionButton(data.result);
 					resultDt.rows.add(data.result).draw();
 					addTooltip();
+					addRedirectListener();
 					//$("#tableCollapse").collapse("show");
 				}
 				else{
@@ -294,7 +527,7 @@
 			return $('#scheduleInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'movieName', 'width':'30%'},
+					{ data: 'movieName', 'width':'30%',render:function(data,type,row){return data = '<a class="movieRedirect" href="#" id="' + encodeURIComponent(data) + '">' + data + '</a>'}},
 					{ data: 'startTime','width':'20%'},
 		   			{ data: 'endTime','width':'20%'},
 		   			{ data: 'theatreName','width':'5%'},
@@ -309,6 +542,14 @@
 			});
 		}
 		
+		function addRedirectListener(){
+			$(".movieRedirect").on('click',function(){
+				var movieName = $(this).attr('id');
+				window.open("viewMovie.htm?pages=Single&movieName=" + movieName);
+			});
+				
+		}
+		
 		function addActionButton(data){
  			var deleteBtn =	'<svg class="bi bi-trash" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"> '
 					 		+ '<path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/> '
@@ -318,14 +559,144 @@
 			$.each(data, function(index, value) {
 				value.action = "<p class='my-auto actionColumn'>";
 				if(value.status == "Available"){
-					value.action += "<span class='p-1 mx-1 fontBtn removeBtn' id='" + value.scheduleId +"' onclick=checkTicket(this)>" + deleteBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn removeBtn' id='" + value.scheduleId +"' onclick='checkTicket(this.id)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
 				}
 			});
 		}
 		
-		function checkTicket(element){
-			var id = element.id;
+		
+		var calendar = null;
+		function renderCalendar(data,start){
+			
+			var time = data.time;
+			var event = data.event;
+			var resource = data.resource;
+			
+			calendar = new FullCalendar.Calendar($("#scheduleCalendar")[0], {
+				 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+			      now: new Date(start),
+			      editable: false,
+			      droppable:false,
+			      slotLabelFormat:{
+			    	  hour: 'numeric',
+			    	  minute: '2-digit',
+			    	  omitZeroMinute: false,
+			    	  meridiem: true
+			      },
+			      slotDuration:'00:15:00',
+			      slotLabelInterval:'00:15:00',
+			      snapDuration:'00:05:00',
+			      aspectRatio: 3,
+			      themeSystem: 'bootstrap',
+			      scrollTime: '09:00:00',
+			      eventOverlap: false,
+			      eventDurationEditable: false,
+			      contentHeight: 'auto',
+			      headerToolbar: {
+			        left: 'today prev,next',
+			        center: 'title',
+			        right: 'resourceTimelineByDay,resourceTimeGridByDay'
+			      },
+			      initialView: 'resourceTimelineByDay',
+			      views:{
+			    	  resourceTimeGridByDay:{
+			    		  type: 'resourceTimeGrid',
+			    		  duration:{days:1},
+			    		  buttonText: 'Vertical' 
+			    	  },
+			      	resourceTimelineByDay:{
+			      		 type: 'resourceTimeline',
+				         duration:{days:1},
+				     	 buttonText: 'Horizontal' 
+			      	}
+			      },
+			      resourceAreaWidth: '15%',
+			      resourceAreaColumns: [
+			        {
+			          headerContent: 'Theatre',
+			          field: 'title'
+			        },
+			      ],
+			      slotMinTime: time.start,
+			      slotMaxTime: time.end, 
+			      resources: resource,
+			      resourceOrder: 'title',
+			      businessHours: {
+			    	  // days of week. an array of zero-based day of week integers (0=Sunday)
+			    	  daysOfWeek: [ 0,1, 2, 3, 4,5,6 ],
+
+			    	  startTime: time.start,
+			    	  endTime: time.end, 
+			    	},
+			      eventConstraint:"businessHours",
+			      events: event,
+			      eventTimeFormat: { // like '14:30:00'
+			    	  hour: 'numeric',
+			    	  minute: '2-digit',
+			    	  omitZeroMinute: false,
+			    	  meridiem: true
+			    	  },
+			      eventClick:function(data){
+			    	  if(!data.event.id.includes("_C")){
+			    		  var selectedEvent = data.event;
+				    	  $("#eventView #title").text(selectedEvent.title);
+				    	  $("#eventView #scheduleId").val(selectedEvent.id);
+						  $("#eventView #start").text(moment(selectedEvent.start).format("HH:mm:ss DD-MM-YYYY"));
+						  $("#eventView #end").text(moment(selectedEvent.end).format("HH:mm:ss DD-MM-YYYY"));
+						  
+						  var status = selectedEvent.extendedProps.status;
+						  $("#eventView #status").text(status);
+						  if(status != "Available"){
+							  $("#removeEvent").attr("disabled",true);
+						  }
+						  else{
+							  $("#removeEvent").attr("disabled",false);
+						  }
+						  $("#eventView").modal("show");  
+			    	  }
+			      },
+			    });	
+			 
+			  calendar.render();
+		}
+		
+		$("#eventView").on('hidden.bs.modal',function(){
+			 $("#eventView #title").text("");
+	    	  $("#eventView #scheduleId").val("");
+			  $("#eventView #start").text("");
+			  $("#eventView #end").text("");
+			  $("#eventView #status").text("");
+			  $("#removeEvent").attr("disabled",true);
+		});
+		
+		$("#removeEvent").on('click',function(){
+			var id =  $("#eventView #scheduleId").val();
+			if(id == ""){
+				bootbox.alert("Unable to identify the schedule you clicked. Please try again later.");
+			}
+			else{
+				checkTicket(id);
+			}
+		})
+		
+		$(".filter").on('change',function(){
+			if(calendar == null){
+				$(this).attr("checked",false);
+				bootbox.alert("Please search the schedule first.");
+			}
+			else{
+				var className = $(this).data("element");
+				if($(this).is(":checked")){
+					$("." + className).addClass("d-none");	
+				}
+				else{
+					$("." + className).removeClass("d-none");
+				}
+			}
+		})
+		
+		function checkTicket(id){
 			$("#overlayloading").show();
 			$.ajax("api/manager/getImpactTicket.json", {
 				method : "POST",
@@ -353,6 +724,7 @@
 						bootbox.alert(data.errorMsg)
 					}
 					else{
+						$("#eventView").modal("hide");
 						bootbox.confirm({
 							message:data.result,
 							callback:function(result){
@@ -393,7 +765,14 @@
 						bootbox.alert(data.errorMsg)
 					}
 					else{
-						bootbox.alert(data.result,function(){getTableData()});
+						bootbox.alert(data.result,function(){
+							if(carouselSlide == 0){
+								getTableData(timeRange);	
+							}
+							else{
+								getCalendarData(timeRange);
+							}
+						});
 					}
 				})
 		}

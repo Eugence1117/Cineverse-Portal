@@ -14,6 +14,7 @@ public class ScheduleView {
 	private String scheduleId;
 	private String startTime;
 	private String endTime;	
+	private String movieId;
 	private String movieName;
 	private String theatreId;
 	private String theatreName;

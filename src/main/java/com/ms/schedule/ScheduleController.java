@@ -83,6 +83,18 @@ public class ScheduleController {
 
 	}
 	
+	@RequestMapping( value= {"/api/manager/getCalendarWithDate.json"})
+	@ResponseBody
+	public Response retrieveCalendarWithDate(Model model, String startdate, String enddate) {
+		log.info("Entered /schedule/retriveDailyAvailableMovie.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		log.info("Start" + startdate);
+		log.info("End" + enddate);
+		return service.retrieveScheduleByDateAsCalendar(startdate, enddate, branchid);
+
+	}
+	
 	@RequestMapping( value= {"/api/manager/retriveDailyAvailableMovie.json"})
 	@ResponseBody
 	public AvailableMovie getDailyAvailableMovie(Model model, String startdate, String enddate) {

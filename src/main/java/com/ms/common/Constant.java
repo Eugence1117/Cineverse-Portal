@@ -42,7 +42,7 @@ public class Constant {
 	
 	public static final String SCHEDULE_END = "End";
 	public static final String SCHEDULE_AVAILABLE = "Available";
-	public static final String SCHEDULE_CANCELLED = "Cancellled";
+	public static final String SCHEDULE_CANCELLED = "Cancelled";
 	
 	public static final String SCHEDULE_TYPE_MOVIE = "Movie";
 	public static final String SCHEDULE_TYPE_CLEANING = "Cleaning";

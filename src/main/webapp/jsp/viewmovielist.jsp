@@ -54,7 +54,7 @@
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
-								<table id="movieList" class="table table-bordered" style="width:100% !important">
+								<table id="movieList" class="table table-bordered table-hover" style="width:100% !important">
 									<thead>
 										<tr>
 											<th>Movie ID</th>

@@ -63,7 +63,7 @@
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
-								<table id="voucherInfo" class="table table-bordered" style="width: 100% !important">
+								<table id="voucherInfo" class="table table-bordered table-hover" style="width: 100% !important">
 									<thead>
 										<tr>
 											<th>Voucher Code</th>

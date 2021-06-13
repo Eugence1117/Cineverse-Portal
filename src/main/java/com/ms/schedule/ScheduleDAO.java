@@ -170,7 +170,7 @@ public class ScheduleDAO {
 	public Map<Boolean,Object> getScheduleByDate(String startDate, String endDate,String branchid){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT s.seqid, s.starttime, s.endtime, m.movieName, t.seqid AS theatreId, t.theatrename, s.status " +
+			String query = "SELECT s.seqid, s.starttime, s.endtime, s.movieId , m.movieName, t.seqid AS theatreId, t.theatrename, s.status " +
 					       "FROM masp.schedule s, masp.movie m, masp.theatre t " + 
 					       "WHERE t.branchid = ? AND t.seqid = s.theatreId " + 
 					       "AND s.movieId = m.seqid " + 
@@ -184,12 +184,13 @@ public class ScheduleDAO {
 					String scheduleId = (String)row.get("seqid");
 					Date startTime = (Timestamp)row.get("starttime");
 					Date endTime = (Timestamp)row.get("endtime");
+					String movieId = (String)row.get("movieId");
 					String movieName = (String)row.get("movieName");
 					String theatreId = (String)row.get("theatreId");
 					String theatreName = (String)row.get("theatrename");
 					int status = (int)row.get("status");
 					
-					ScheduleView view = new ScheduleView(scheduleId,Constant.STANDARD_DATE_FORMAT.format(startTime),Constant.STANDARD_DATE_FORMAT.format(endTime),movieName,theatreId,"Hall " + theatreName,Util.getScheduleStatus(status));
+					ScheduleView view = new ScheduleView(scheduleId,Constant.STANDARD_DATE_FORMAT.format(startTime),Constant.STANDARD_DATE_FORMAT.format(endTime),movieId,movieName,theatreId,"Hall " + theatreName,Util.getScheduleStatus(status));
 					scheduleList.add(view);
 				}
 				log.info("Total Schedule retrieve: " + scheduleList.size());
@@ -205,11 +206,6 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
-			ex.printStackTrace(printWriter);
-			printWriter.flush();
-			log.error(writer.toString());
 			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return response;

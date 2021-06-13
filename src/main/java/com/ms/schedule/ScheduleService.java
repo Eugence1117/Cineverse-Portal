@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,7 +139,7 @@ public class ScheduleService {
 				 return new Response((String)validation.get(false));
 			 }
 			 else {
-				 start += Constant.END_OF_DAY;
+				 start += Constant.DEFAULT_TIME;
 				 end += Constant.END_OF_DAY;
 				 Map<Boolean,Object> result = dao.getScheduleByDate(start, end, branchid);
 				 if(result.containsKey(false)) {
@@ -202,7 +203,7 @@ public class ScheduleService {
 			toCal.setTime(toDate);
 		
 			if(fromCal.compareTo(toCal) > 0) {
-				result.put(false,"From date cannot greater than To date.");
+				result.put(false,"[End Date] cannot greater than the [Start Date].");
 				return result;
 			}
 			
@@ -744,7 +745,7 @@ public class ScheduleService {
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 											
 				
 										} else {
@@ -957,7 +958,7 @@ public class ScheduleService {
 												}
 												Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
 												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
+														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 												
 					
 											} else {
@@ -1143,7 +1144,7 @@ public class ScheduleService {
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
 											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
-													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),"movieEvent",s.getMovie().getMovieId()));
+													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 										} else {
 											pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 											UnprocessedProblemCount++;
@@ -1405,6 +1406,117 @@ public class ScheduleService {
 		}
 	}
 	
+	public Response retrieveScheduleByDateAsCalendar(String start, String end, String branchid) {
+		if(Util.trimString(start) != "" && Util.trimString(end) != "") {
+			if(Util.trimString(branchid) == "") {
+				return new Response("Unable to identify your identity. Please contact with admin or developer for more information");
+			}
+			 Map<Boolean,String> validation = validateDateRangeWithoutLimit(start, end);
+			 if(validation.containsKey(false)) {
+				 return new Response((String)validation.get(false));
+			 }
+			 else {
+				 start += Constant.DEFAULT_TIME;
+				 end += Constant.END_OF_DAY;
+				 Map<Boolean,Object> result = dao.getScheduleByDate(start, end, branchid);
+				 if(result.containsKey(false)) {
+					 return new Response((String)result.get(false));
+				 }
+				 else {
+					 List<ScheduleView> views = (List<ScheduleView>) result.get(true); 
+					 return convertScheduleViewToStatistic(views, branchid, start, end);
+				 }
+			 }
+		}
+		else {
+			return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
+		}
+	}
+	
+	public Response convertScheduleViewToStatistic(List<ScheduleView> schedules, String branchid, String firstDate, String lastDate) {
+		Map<String,Object> response = new LinkedHashMap<String,Object>();
+		
+		try {
+			//Get Resource (Theatre)
+			Set<Map<String,String>> theatreList = new LinkedHashSet<Map<String,String>>();
+			Map<String,List<ScheduleView>> theatreSchedule = schedules.stream().collect(Collectors.groupingBy(ScheduleView::getTheatreId));
+			for(String key : theatreSchedule.keySet()) {
+				List<ScheduleView> schedule = theatreSchedule.get(key);
+				int default_index = 0;
+				Map<String,String> map = new HashMap<String, String>();
+				map.put("id",schedule.get(default_index).getTheatreId());
+				map.put("title",schedule.get(default_index).getTheatreName());
+				theatreList.add(map);
+			}
+			
+			//Generate Event
+			List<Event> eventList = new LinkedList<Event>();
+			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			Map<String,List<ScheduleView>> movieSchedule = schedules.stream().collect(Collectors.groupingBy(ScheduleView::getMovieId));
+			
+			for(String movieId : movieSchedule.keySet()) {
+				List<ScheduleView> views = movieSchedule.get(movieId);				
+				int movieTime = movieDao.getMovieDuration(movieId);
+				for(ScheduleView s : views) {
+					Date startDate = Constant.STANDARD_DATE_FORMAT.parse(s.getStartTime());
+					Date endDate = Constant.STANDARD_DATE_FORMAT.parse(s.getEndTime());
+					Date movieEndTime = DateUtils.addMinutes(startDate, movieTime);
+					
+					String[] scheduleEventClassNames = new String[2];
+					String[] cleaningEventClassNames = new String[2];
+					
+					scheduleEventClassNames[0] = "movieEvent";
+					cleaningEventClassNames[0] = "cleaningEvent";
+					if(s.getStatus().equals(Constant.SCHEDULE_END)) {
+						scheduleEventClassNames[1] = "endEvent";
+						cleaningEventClassNames[1] = "endEvent";
+					}
+					else if(s.getStatus().equals(Constant.SCHEDULE_CANCELLED)){
+						scheduleEventClassNames[1] = "cancelledEvent";
+						cleaningEventClassNames[1] = "cancelledEvent";
+					}
+					else {
+						scheduleEventClassNames[1] = "availableEvent";
+						cleaningEventClassNames[1] = "availableEvent";
+					}
+					
+					Event movieEvent = new Event(s.getScheduleId(),s.getMovieName(),s.getTheatreId(),f.format(startDate),f.format(movieEndTime),scheduleEventClassNames);
+					movieEvent.addProp("status",s.getStatus());
+					
+					Event cleaningEvent = new Event(s.getScheduleId() + "_C","C",s.getTheatreId(),f.format(movieEndTime),f.format(endDate),cleaningEventClassNames);
+					cleaningEvent.addProp("status",s.getStatus());
+					
+					eventList.add(movieEvent);
+					eventList.add(cleaningEvent);
+					
+				}
+			}
+			
+			//Get Operating Time
+			OperatingHours time = rulesService.getOperatingHours(branchid);
+			Map<String,String> operatingTimes = new HashMap<String, String>();
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+			operatingTimes.put("start",time.getStartTime().format(dtf));
+			operatingTimes.put("end",time.getEndTime().format(dtf));
+			
+			response.put("event",eventList);
+			response.put("time",operatingTimes);
+			response.put("resource", theatreList);
+			return new Response(response);
+			
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			ex.printStackTrace(printWriter);
+			printWriter.flush();
+			log.error(writer.toString());
+			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+		}
+	}
+	
 	public Response getScheduleDetailStatistic(List<com.ms.schedule.Schedule> schedules, String branchid) {
 		if(schedules != null) {
 			try {
@@ -1450,9 +1562,9 @@ public class ScheduleService {
 						totalCleaningTime += totalTime - movieTime;
 						
 						Date movieEndDate = DateUtils.addMinutes(s.getStart(),movieTime);
-						eventList.add(new Event(s.getScheduleId(),s.getMovieName(),s.getTheatreId(),f.format(s.getStart()),f.format(movieEndDate),"movieEvent",s.getMovieId()));
+						eventList.add(new Event(s.getScheduleId(),s.getMovieName(),s.getTheatreId(),f.format(s.getStart()),f.format(movieEndDate),new String[]{"movieEvent"},s.getMovieId()));
 						
-						eventList.add(new Event(s.getScheduleId() + "_C","C",s.getTheatreId(),f.format(movieEndDate),f.format(s.getEnd()),"cleaningEvent",s.getMovieId()));
+						eventList.add(new Event(s.getScheduleId() + "_C","C",s.getTheatreId(),f.format(movieEndDate),f.format(s.getEnd()),new String[]{"cleaningEvent"},s.getMovieId()));
 						
 					}
 					data.addData(movieName,movieTime * groupedByID.get(movieId).size());
