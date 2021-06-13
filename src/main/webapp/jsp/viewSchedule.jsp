@@ -73,7 +73,23 @@
 }
 
 @media only screen and (max-width: 768px) {
-
+	form .btn{
+		width:100% !important;
+	}
+	
+	#overlayloading {
+		padding-top:50% !important;
+	}
+	
+	.card-body{
+		padding-left:0px !important;
+		padding-right:0px !important;
+	}
+	
+	#advancedOption .btn{
+		margin:5px 0px 5px 0px !important;
+		
+	}
 }
 
 </style>
@@ -127,13 +143,15 @@
 										</div>
 										<div class="col-md-1"></div>
 									</div>
-									<div class="form-group row text-center my-2">
+									<div class="form-group row text-center my-2 justify-content-center">
 										<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
-										<div class="collapse my-2" id="advancedOption">
-											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
-											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
-											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
-											<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+										<div class="collapse my-2 row" id="advancedOption">
+											<div class="col-md">
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+											</div>
 										</div>
 									</div>
 									<div class="form-group row m-2 mt-3">
@@ -310,6 +328,7 @@
     		var resultDt = getResultDataTable().clear();
     		var currentDate = moment(new Date()).format("YYYY-MM-DD");
     		$("#searchForm input[type=date]").val(currentDate);
+    		
 		});
     	
     	$.validator.setDefaults({
@@ -365,13 +384,14 @@
     	
     	function removeLoading(){
     		$("#btnSearch").empty();
-    		$("#btnSearch").append("<span class='fas fa-wrench'></span> Search");
+    		$("#btnSearch").append("<span class='fas fa-fa-search'></span> Search");
+    		$("#btnSearch").attr("disabled",false);
     	
     	}
     	function addLoading(){
     		$("#btnSearch").empty();
     		$("#btnSearch").append("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...");
-    		console.log("add");
+    		$("#btnSearch").attr("disabled",true);
     	}
     	
     	$(".quickFill").on('click',function(e){
@@ -444,7 +464,6 @@
 				accepts : "application/json",
 				dataType : "json",
 				data:formData,
-				async:false,
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -486,7 +505,6 @@
 				accepts : "application/json",
 				dataType : "json",
 				data:formData,
-				async:false,
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -660,7 +678,7 @@
 			 
 			  calendar.render();
 		}
-		
+
 		$("#eventView").on('hidden.bs.modal',function(){
 			 $("#eventView #title").text("");
 	    	  $("#eventView #scheduleId").val("");
