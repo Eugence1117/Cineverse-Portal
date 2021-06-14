@@ -11,7 +11,6 @@
 <title><fmt:message key="movie.view.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 

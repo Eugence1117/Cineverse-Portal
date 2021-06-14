@@ -12,8 +12,6 @@
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet"
-	href="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.css'/>">
-<link rel="stylesheet"
 	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 
 <style>
@@ -189,8 +187,6 @@
 		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript"
-		src="<spring:url value='/plugins/datetimepicker/jquery.datetimepicker.full.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript"
