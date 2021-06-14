@@ -374,7 +374,7 @@
     	<div class="spinner-border text-primary" role="status">
 		  <span class="visually-hidden">Loading...</span>
 		</div>
-		<p class="text-center">Loading...</p>
+		<p class="text-center" id="loadingTip">Please wait...</p>
 		
 	</div>
 	<!-- /.container -->

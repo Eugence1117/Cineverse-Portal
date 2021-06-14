@@ -19,6 +19,10 @@
 	cursor:pointer;
 }
 
+.actionColumn:hover{
+	background-color:inherit
+}
+
 #loading{
 	padding:100px;
 	text-align:center;

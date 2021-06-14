@@ -27,6 +27,7 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import com.ms.branch.BranchDAO;
 import com.ms.common.Azure;
 import com.ms.common.Constant;
 import com.ms.common.Response;
@@ -41,6 +42,9 @@ public class UserService {
 	
 	@Autowired
 	Azure azure;
+	
+	@Autowired
+	BranchDAO branchDao;
 	
 	@Autowired
 	CloudBlobClient cloudBlobClient;
@@ -151,14 +155,57 @@ public class UserService {
 		
 	}
 	
+	@Transactional (rollbackFor = Exception.class)
 	public Response editUser(UserEditForm form){
 		log.info("Updating user info");
+		if(Util.trimString(form.getSeqid()) == "") {
+			return new Response("Unable to retrieve the user specified. This may occured due to the data received by the server is empty. Please contact with the developer if the problem still exist.");
+		}
+		//Check user is branch manager
+		Map<Boolean,Object> response = dao.getUserBranch(form.getSeqid());
+		if(response.containsKey(false)) {
+			return new Response((String)response.get(false));
+		}
+		
+		
 		String errorMsg = dao.updateUser(form);
 		if(errorMsg != null) {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)("User details is update."));
+			if(response.get(true) != null) {
+				Map<String,String> branchInfo = (Map<String, String>) response.get(true);
+				if(form.getEditbranchid() == null) {
+					//Branch removed from the manager, set the branch to inactive
+					String error = branchDao.updateStatus(Constant.INACTIVE_STATUS_CODE, branchInfo.get("id"));
+					if(error != null){
+						throw new RuntimeException(error);
+					}
+					else {
+						return new Response((Object)("User details is update. The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
+					}
+				}
+				else {
+					if(form.getEditbranchid().equals((String)branchInfo.get("id"))) {
+						//if same no need bother
+						return new Response((Object)("User details is update."));
+					}
+					else {
+						//Deactivate previous branch too
+						String error = branchDao.updateStatus(Constant.INACTIVE_STATUS_CODE, branchInfo.get("id"));
+						if(error != null){
+							throw new RuntimeException(error);
+						}
+						else {
+							return new Response((Object)("User details is update. The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
+						}
+					}
+				}
+			}
+			else {
+				//Not necassary to activate branch if a user promoted as manager
+				return new Response((Object)("User details is update."));
+			}
 		}
 	}	
 	

@@ -10,10 +10,6 @@
 		cursor:pointer;
 	}
 	
-	.actionColumn{
-		background-color:white;
-	}
-	
 	select[name="branchid"]:disabled{
 		cursor:not-allowed;
 	}
@@ -207,6 +203,14 @@
 					</button>
 				</div>
 				<div class="modal-body">
+					<div id="viewLoading" class="hide">
+						<div class="hide m-2 text-center" id="loading">
+							<div class="spinner-border text-primary" role="status">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+							<p class="text-center">Loading...</p>
+						</div>
+					</div>
 					<div class="row">
 						<label class="col-sm-4"><b>User ID</b></label> <label
 							class="col-sm-1 colon">:</label>
@@ -255,7 +259,16 @@
 				</div>
 				<div class="modal-body">
 					<h3 class="text-center">Edit User</h3>
-					<div class="">
+					<hr class="divider">
+					<div class="m-1">
+						<div id="editLoading" class="hide">
+							<div class="hide m-2 text-center" id="loading">
+								<div class="spinner-border text-primary" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+								<p class="text-center">Loading...</p>
+							</div>
+						</div>
 						<form class="p-0 mt-5" id="editUserForm">
 							<div class="col-sm-10 mx-auto">
 								<input type="hidden" id="seqid" />
@@ -489,6 +502,12 @@
 		function getUserDetails(element){
 			var userid = element.id;
 			
+			if(!$("#viewUser").hasClass("show")){
+				$("#viewUser").modal("show");
+			}
+			
+			$("#viewUser .row").hide();
+			$("#viewUser #viewLoading").show();
 			$.ajax("api/admin/viewUser.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
@@ -506,6 +525,8 @@
 				},
 			}).done(function(data){
 				clearViewUser();
+				$("#viewUser #viewLoading").hide();
+				$("#viewUser .row").show();
 				
 				if(data.errorMsg == null){
 					$("#viewUser").find(".modal-title").html("User :  <b>" + data.result.username + "</b>");
@@ -515,13 +536,10 @@
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
-					
-					if(!$("#viewUser").hasClass("show")){
-						$("#viewUser").modal("show");
-					}
 					//$("#viewUser").toggle();
 				}
 				else{
+					$("#viewUser").modal("hide");
 					bootbox.alert(data.errorMsg);
 				}
 			});
@@ -786,9 +804,18 @@
 			$("#editUserForm select > option").each(function(){
 				$(this).attr("selected",false);
 			});
+			$("#editUser .modal-title").html("");
 		}
 		
 		function getEditInfo(userid){
+			clearEditField();
+			if(!$("#editUser").hasClass("show")){
+				$("#editUser").modal("show");
+			}
+			
+			$("#editUserForm").hide();
+			$("#editLoading").show();
+			
 			$.ajax("api/admin/getEditInfo.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
@@ -805,12 +832,14 @@
 					}
 				},
 			}).done(function(data){
+				$("#editLoading").hide();
+				$("#editUserForm").show();
+				
 				if(data.errorMsg != null){
+					$("#editUser").modal("hide");
 					bootbox.alert(data.errorMsg);
 				}
 				else{	
-					clearEditField();
-					
 					var user = data.result.user;
 					$("#editUserForm #seqid").val(user.seqid);
 					$("#editUser .modal-title").html("Editing user: " + user.username);
@@ -826,10 +855,6 @@
 					
 					if(user.usergroupid == 2){
 						$("#editUserForm select[name=Editbranchid]").val(user.branchid);
-					}
-					
-					if(!$("#editUser").hasClass("show")){
-						$("#editUser").modal("show");
 					}
 				}
 				
@@ -894,13 +919,6 @@
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg,function(){$("#editUser").modal("show");})
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.errorMsg,
-					    callback: function(){
-					    	$("#editUser").modal('show');
-						}
-					});	
 				}
 				else{
 					bootbox.alert(data.result,function(){readyFunction();clearEditField();})

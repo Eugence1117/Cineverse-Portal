@@ -134,9 +134,16 @@ public class UserController {
 	public Response editUser(Model model, @RequestBody UserEditForm form){
 		log.info("Enter /user/editUser");
 		log.info("Form" + form.toString());
-		Response result = service.editUser(form);
-		log.info("Received response from backend.");
-		return result;
+		try {
+			Response result = service.editUser(form);
+			log.info("Received response from backend.");
+			return result;
+		}
+		catch(RuntimeException ex) {
+			log.error("RuntimeException " + ex.getMessage());
+			return new Response(ex.getMessage());
+		}
+		
 	}
 	
 	@RequestMapping( value= {"/api/admin/deleteUser.json"})

@@ -95,7 +95,15 @@
 				<div class="modal-body">
 					<h3 class="text-center">Voucher: <span id="voucherTitle"></span></h3>
 					<hr class="divider mx-3"/>
-					<div class="">
+					<div class="m-1">
+						<div id="editLoading" class="hide">
+							<div class="hide m-2 text-center" id="loading">
+								<div class="spinner-border text-primary" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+								<p class="text-center">Loading...</p>
+							</div>
+						</div>
 						<form class="p-0 mt-5" id="editVoucherForm">
 							<div class="col-sm-11 mx-auto">								
 								<input type="hidden" data-json-key="voucherId" name="seqid" id="seqid" class="data"/>
@@ -434,7 +442,10 @@
 		}
 		
 		function getCurrentVoucherDetails(voucherid){
-
+			$("#editVoucher").modal("show");
+			$("#editVoucherForm").hide();
+			$("#editLoading").show();
+			
 			$.ajax("api/admin/retrieveSingleVoucher.json",{
 				method : "GET",
 				accepts : "application/json",
@@ -454,8 +465,9 @@
 					}
 				},
 			}).done(function(data){
-	
+				$("#editLoading").hide();
 				if(data.errorMsg != null){
+					$("#editVoucher").modal("hide");
 					bootbox.alert(data.errorMsg);
 				}
 				else{
@@ -466,7 +478,7 @@
 			            }
 					});
 					$("#voucherTitle").text(data.result.voucherId);
-					$("#editVoucher").modal("show");
+					$("#editVoucherForm").show();
 				}
 			});
 		}

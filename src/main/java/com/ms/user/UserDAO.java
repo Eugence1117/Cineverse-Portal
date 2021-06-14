@@ -384,6 +384,39 @@ public class UserDAO {
 		}
 	}
 	
+	//Backend
+	public Map<Boolean,Object> getUserBranch(String userid) {
+		Map<Boolean,Object> response = new HashMap<Boolean, Object>();
+		try {
+			String query = "SELECT b.branchName, s.branchid FROM masp.staff s, masp.branch b where s.seqid = ? AND s.branchid = b.seqid";
+			List<Map<String,Object>> result = jdbc.queryForList(query,userid);
+			if(result.size() > 0) {
+				Map<String,String> branch = new HashMap<String, String>();
+				for(Map<String,Object> row : result) {
+					String id = (String)row.get("branchid");
+					String name = (String)row.get("branchName");
+					
+					branch.put("id", id);
+					branch.put("name", name);
+					
+					response.put(true, branch);
+				}
+			}
+			else {
+				response.put(true, null);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
 	public String getCurrentProfilePic(String userid) {
 		String uri = null;
 		try {

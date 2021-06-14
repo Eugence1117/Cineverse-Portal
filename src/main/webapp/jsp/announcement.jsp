@@ -93,6 +93,14 @@
 									<button class="fa-pull-right btn btn-primary" onclick=refreshSlide()><i class="fas fa-sync-alt"></i> Refresh</button>
 								</div>
 							</div>
+							<div id="loading" class="hide">
+								<div class="hide m-2 text-center">
+									<div class="spinner-border text-primary" role="status">
+										<span class="visually-hidden">Loading...</span>
+									</div>
+									<p class="text-center">Loading...</p>
+								</div>
+							</div>
 							<div id="activeCarousel" class="carousel slide carousel-dark text-center m-2" data-bs-ride="carousel">
 							  <div class="carousel-indicators">
 							  	<c:forEach var="slide" items="${announcement}" varStatus="loop">
@@ -259,6 +267,8 @@
 		});
     	
     	function refreshSlide(){
+    		$("#activeCarousel").hide();
+    		$("#loading").show();
     		$.ajax("api/admin/retrieveActiveAnnouncement.json",{
     			method : "GET",
 				accepts : "application/json",
@@ -275,13 +285,14 @@
 					}
 				},
     		}).done(function(data){
-    			$("#activeCarousel").hide();
     			if(data.errorMsg != null){
+    				$("#loading").hide();
     				bootbox.alert(data.errorMsg);
     			}
     			else{
     				updateIndicator(data.result.length);
-    				rebuildSlide(data.result)
+    				rebuildSlide(data.result);
+    				$("#loading").hide();
     				$("#activeCarousel").show();
     			}
     		});
