@@ -189,6 +189,14 @@
 		    </div>
 		  </div>
 		</div>
+	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
+	</div>
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
@@ -480,7 +488,7 @@
 								var status = await constructLayout();
 								console.log(status);
 								if(!status){
-									$("#createTheatre").modal("show");
+									$("#editTheatre").modal("show");
 								}
 							}
 							else{
@@ -644,6 +652,7 @@
 						formData["layout"] = data;
 						formData["totalSeat"] = counter;
 						
+						$("#overlayloading").show();
 						$.ajax("api/manager/updateTheatre.json", {
 							method : "POST",
 							accepts : "application/json",
@@ -666,6 +675,7 @@
 								}
 							},
 						}).done(function(data){
+							$("#overlayloading").hide();
 							if(data.errorMsg != null){
 								bootbox.alert(data.errorMsg);
 							}

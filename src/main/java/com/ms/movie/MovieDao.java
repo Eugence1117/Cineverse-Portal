@@ -381,7 +381,7 @@ public class MovieDao {
 				response.put(true, result);
 			}
 			else {
-				response.put(false, Constant.NO_RECORD_FOUND);
+				response.put(false, "No relevant data found in the database server.");
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {

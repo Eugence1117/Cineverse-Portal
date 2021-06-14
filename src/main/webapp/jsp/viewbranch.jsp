@@ -142,6 +142,13 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+	</div>
+	
 <%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
@@ -394,13 +401,7 @@
 				},
 			}).done(function(data){
 				var msg = data.errorMsg == null? data.result : data.errorMsg;
-				bootbox.alert({
-				    title: "Notification",
-				    message: msg,
-				    callback: function(){
-				    	$("#editBtn").click();
-				    }
-				});
+				bootbox.alert(msg,function(){$("#editBtn").click()});
 			});
 		}
 			

@@ -22,21 +22,6 @@
 	cursor:pointer;
 }
 
-#overlayloading {
-  display:none;
-  background: #ffffff;
-  color: #666666;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  z-index: 5000;
-  top: 0;
-  left: 0;
-  float: left;
-  text-align: center;
-  padding-top: 15%;
-  opacity: .80;
-}
 </style>
 </head>
 
@@ -401,6 +386,7 @@
 			formData["voucherId"] = voucherId;
 			formData["status"] = status;
 			
+			$("#overlayloading").show();
 			$.ajax("api/admin/updateStatus.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -422,6 +408,7 @@
 					}
 				},
 			}).done(function(data){
+				$("#overlayloading").hide();
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg);
 				}
@@ -447,9 +434,7 @@
 		}
 		
 		function getCurrentVoucherDetails(voucherid){
-			
-			$("#overlayloading").show();
-			
+
 			$.ajax("api/admin/retrieveSingleVoucher.json",{
 				method : "GET",
 				accepts : "application/json",
@@ -469,7 +454,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+	
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg);
 				}
@@ -565,7 +550,7 @@
 			if(!validator.form()){
 				return false;
 			}
-			
+			$("#overlayloading").show();
 			var formData = $("#editVoucherForm").serializeObject();
 			$.ajax("api/admin/editVoucher.json",{
 				method : "POST",
@@ -588,6 +573,7 @@
 					}
 				},
 			}).done(function(data){
+				$("#overlayloading").hide();
 				if(data.errorMsg != null){
 					$("#editVoucher").addClass("skip");
 					$("#editVoucher").modal("hide");

@@ -271,27 +271,28 @@ public class UserDAO {
 	}
 	
 	//backend used
-	public String updateUserStatusViaBranchid(String branchid, int status) {
+	public Map<Boolean,String> updateUserStatusViaBranchid(String branchid, int status) {
+		Map<Boolean,String> response = new HashMap<Boolean, String>();
 		try {
 			String query = "UPDATE masp.Staff set status = ?, branchid = ? where branchid = ?";
 			int result = jdbc.update(query,status,null,branchid);
 			if(result > 0) {
-				return null;
+				response.put(true,null);
 			}
 			else {
-				return ("No staff is assigned to this branch.");
+				response.put(true, "No staff is assigned to this branch.");
 			}
 			
 		}
 		catch(CannotGetJdbcConnectionException ce) {
 			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
-			return Constant.DATABASE_CONNECTION_LOST;
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
-		
+		return response;
 	}
 	
 	

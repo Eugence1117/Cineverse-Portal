@@ -99,7 +99,7 @@
 	<a class="scroll-to-top rounded" href="#page-top"> <i
 		class="fas fa-angle-up"></i>
 	</a>
-
+	
 	<!-- Insert Modal -->
 	<div class="modal fade" tabindex="-1" role="dialog" id="addUser">
 		<div class="modal-dialog modal-lg" role="document">
@@ -299,7 +299,15 @@
 		</div>
 	</div>
 	<!-- /.container -->
-
+	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
+	</div>
+	
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
@@ -625,6 +633,8 @@
 			var formData = $("#newUserForm").serializeObject();
 			
 			$("#addUser").modal('hide');
+			$("#overlayloading").show();
+			
 			$.ajax("api/admin/addUser.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -646,24 +656,12 @@
 					}
 				},
 			}).done(function(data){
+				$("#overlayloading").hide();
 				if(data.errorMsg == null){
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.result,
-					    callback:function(){
-					    	readyFunction();
-				    		clearInsertField();
-					    }
-					});
+					bootbox.alert(data.result,function(){readyFunction();clearInsertField();})
 				}
 				else{
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.errorMsg,
-					    callback:function(){
-					    	$("#addUser").modal('show');
-					    }
-					});
+					bootbox.alert(data.errorMsg,function(){$("#addUser").modal('show')})
 				}	
 			});
 		}
@@ -743,6 +741,7 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
+				    	$("#overlayloading").show();
 						$.ajax("api/admin/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
 							method : "GET",
 							accepts : "application/json",
@@ -759,23 +758,12 @@
 								}
 							},
 						}).done(function(data){
+							$("#overlayloading").hide();
 							if(data.errorMsg == null){
-								bootbox.alert({
-								    title: "Notification",
-								    message: data.result,
-								    callback:function(){
-								    	readyFunction();
-								    }
-								});
+								bootbox.alert(data.result,function(){readyFunction();})
 							}
 							else{
-								bootbox.alert({
-								    title: "Notification",
-								    message: data.errorMsg,
-								    callback:function(){
-								    	readyFunction();
-								    }
-								});
+								bootbox.alert(data.errorMsg);
 							}	
 						});
 			    	}
@@ -877,10 +865,11 @@
 			}
 			
 			$("#editUser").modal("hide");
-			
+		
 			var formData = $("#editUserForm").serializeObject();
 			formData["seqid"] = $("#editUserForm #seqid").val();
 			
+			$("#overlayloading").show();
 			$.ajax("api/admin/editUser.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -902,7 +891,9 @@
 					}
 				},
 			}).done(function(data){
+				$("#overlayloading").hide();
 				if(data.errorMsg != null){
+					bootbox.alert(data.errorMsg,function(){$("#editUser").modal("show");})
 					bootbox.alert({
 					    title: "Notification",
 					    message: data.errorMsg,
@@ -912,14 +903,7 @@
 					});	
 				}
 				else{
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.result,
-					    callback: function(){
-					    	readyFunction();
-					    	clearEditField();
-						}
-					});	
+					bootbox.alert(data.result,function(){readyFunction();clearEditField();})
 				}
 			});
 		}
@@ -942,6 +926,7 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
+				    	$("#overlayloading").show();
 						$.ajax("api/admin/deleteUser.json?userid=" + userid,{
 							method : "GET",
 							accepts : "application/json",
@@ -958,23 +943,13 @@
 								}
 							},
 						}).done(function(data){
-							if(data.errorMsg != null){
-								bootbox.alert({
-								    title: "Notification",
-								    message: data.errorMsg,
-								    callback: function(){
-								    	readyFunction();
-									}
-								});	
+							$("#overlayloading").hide();
+							
+							if(data.errorMsg != null){	
+								bootbox.alert(data.errorMsg);
 							}
 							else{
-								bootbox.alert({
-								    title: "Notification",
-								    message: data.result,
-								    callback: function(){
-								    	readyFunction();
-									}
-								});	
+								bootbox.alert(data.result,function(){readyFunction();})
 							}
 						});
 			    	}

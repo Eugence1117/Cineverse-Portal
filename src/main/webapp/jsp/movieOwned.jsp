@@ -22,22 +22,6 @@
 		cursor:pointer;
 	}
 	
-	#overlayloading {
-		  display:none;
-		  background: #ffffff;
-		  color: #666666;
-		  position: fixed;
-		  height: 100%;
-		  width: 100%;
-		  z-index: 5000;
-		  top: 0;
-		  left: 0;
-		  float: left;
-		  text-align: center;
-		  padding-top: 15%;
-		  opacity: .80;
-		}
-	
 </style>
 </head>
 
@@ -152,7 +136,7 @@
 		</div>
 	</div>
 	
-	<div class="modal fade bd-example-modal-lg" id="editMovie">
+	<div class="modal fade" tabindex="-1" id="editMovie">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">

@@ -232,6 +232,14 @@
 			</div>
 		</div>
 	</div>
+	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
+	</div>
 
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
@@ -459,6 +467,7 @@
 			}
 			
 			$("#addBranch").modal('hide');
+			$("#overlayloading").show();
 			
 			var formData = $("#newBranchForm").serializeObject();
 			
@@ -483,6 +492,7 @@
 					}
 				},
 			}).done(function(data){
+				$("#overlayloading").hide();
 				if(data.errorMsg != null){
 					bootbox.alert({
 					    title: "Notification",
@@ -607,6 +617,7 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
+						$("#overlayloading").show();
 						$.ajax("api/admin/updateStatus.json?status=" + status + "&branchId=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
@@ -623,14 +634,13 @@
 								}
 							},
 						}).done(function(data){
-							var msg = data.errorMsg == null ? data.result : data.errorMsg;
-							bootbox.alert({
-							    title: "Notification",
-							    message: msg,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});	
+							$("#overlayloading").hide();
+							if(data.errorMsg != null){
+								bootbox.alert(data.errorMsg);
+							}
+							else{
+								bootbox.alert(data.result,function(){readyFunction();})
+							}
 						});
 			    	}
 			    }
@@ -710,6 +720,7 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
+						$("#overlayloading").show();
 						$.ajax("api/admin/deleteBranch.json?branchID=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
@@ -726,14 +737,15 @@
 								}
 							},
 						}).done(function(data){
-							var msg = data.errorMsg == null ? data.result : data.errorMsg;
-							bootbox.alert({
-							    title: "Notification",
-							    message: msg,
-							    callback: function(){
-							    	readyFunction();
-								}
-							});	
+							$("#overlayloading").hide();
+							if(data.errorMsg != null){
+								bootbox.alert(data.errorMsg);
+							}
+							else{
+								bootbox.alert(data.result,function(){
+									readyFunction();
+								})
+							}
 						});
 			    	}
 			    }

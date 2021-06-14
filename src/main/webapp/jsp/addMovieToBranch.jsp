@@ -84,7 +84,7 @@
 												<div class="col-md-5"></div>
 												<div class="col-md-2 p-1 text-center">
 													<button type="button" id="ext-btn-submit"
-														class="btn btn-success">Search</button>
+														class="btn btn-success"><span class='fas fa-search'></span> Search</button>
 												</div>
 												<div class="col-md-5"></div>
 											</div>
@@ -238,7 +238,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal fade bd-example-modal-lg" id="extModal">
+	<div class="modal fade" tabindex="-1" id="extModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -274,7 +274,7 @@
 		</div>
 	</div>
 	
-	<div class="modal fade bd-example-modal-lg" id="picModal">
+	<div class="modal fade" tabindex="-1" id="picModal">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -288,7 +288,14 @@
 			</div>
 		</div>
 	</div>
-
+	
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
+	</div>
 	<!-- /.container -->
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
@@ -299,10 +306,14 @@
 		src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 		
+		const searchBtn = "<span class='fas fa-search'></span> Search";
+    	const loadingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...";
+    	
 		$(document).ready(function(){
 			var status = "${error}";
 			if(status != ""){
@@ -317,7 +328,8 @@
 				bootbox.alert("Please select a movie from the list.");
 				return false;
 			}
-
+			
+			addLoading($(this),loadingBtn);
 			$.ajax("api/manager/ViewExistMovie.json?"+ $('#extMovieForm').serialize(), {
 				method : "GET",
 				accepts : "application/json",
@@ -334,6 +346,7 @@
 					}
 				},
 				}).done(function(data) {
+					removeLoading($("#ext-btn-submit"),searchBtn)
 					if(data.errorMsg == null){
 						$("#details-collapse").toggle(true);
 						insertData(data.result);
@@ -373,6 +386,7 @@
 				return false;
 			}
 			
+			$("#overlayloading").show();
 			var formData = $("#dateForm").serializeObject();
 			formData["movieId"] = $("#addMovieForm input[name=movieId]").val()
 			
@@ -397,6 +411,7 @@
 					}
 				},
 				}).done(function(data){
+					$("#overlayloading").hide();
 					$("#extModal").modal("hide");
 					if(data.errorMsg == null){
 						bootbox.alert({

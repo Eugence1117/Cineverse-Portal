@@ -174,6 +174,14 @@
 		    </div>
 		  </div>
 		</div>
+		
+		<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+		
+	</div>
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
@@ -623,6 +631,8 @@
 						formData["layout"] = data;
 						formData["totalSeat"] = counter;
 						
+						$("#overlayloading").show();
+						
 						$.ajax("api/manager/submitLayout.json", {
 							method : "POST",
 							accepts : "application/json",
@@ -632,7 +642,6 @@
 							headers:{
 								"X-CSRF-Token": CSRF_TOKEN
 							},
-							async: false,
 							statusCode:{
 								401:function(){
 									window.location.href = "expire.htm";
@@ -645,6 +654,7 @@
 								}
 							},
 						}).done(function(data){
+							$("#overlayloading").hide();
 							if(data.errorMsg != null){
 								bootbox.alert(data.errorMsg);
 							}
@@ -753,22 +763,6 @@
 				}
 			}
 		});
-		
-		$.fn.serializeObject = function() {
-	        var o = {};
-	        var a = this.serializeArray();
-	        $.each(a, function() {
-	            if (o[this.name]) {
-	                if (!o[this.name].push) {
-	                    o[this.name] = [o[this.name]];
-	                }
-	                o[this.name].push(this.value || '');
-	            } else {
-	                o[this.name] = this.value || '';
-	            }
-	        });
-	        return o;
-	    };
 		
 	</script>
 </body>

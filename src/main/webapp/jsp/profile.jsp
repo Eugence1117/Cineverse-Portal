@@ -151,7 +151,7 @@
 	</a>
 	<!-- /.container -->
 
-	<div class="modal fade" id="passwordModal">
+	<div class="modal fade" id="passwordModal"  tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">

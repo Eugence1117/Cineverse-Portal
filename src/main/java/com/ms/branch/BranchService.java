@@ -97,14 +97,17 @@ public class BranchService {
 			}
 			else {
 				String msg = "Selected Branch is deleted.";
-				errorMsg = userDao.updateUserStatusViaBranchid(branchId, Constant.INACTIVE_STATUS_CODE);
-				if(errorMsg == null) {
-					msg += " Manager for the selected branch is now inactive. Please reassigend a branch for him or delete it.";
+				Map<Boolean,String> result = userDao.updateUserStatusViaBranchid(branchId, Constant.INACTIVE_STATUS_CODE);
+				if(result.containsKey(true)) {
+					if(result.get(true) == null) {
+						msg += " Manager for the selected branch is now inactive. Please reassigend a branch for him or remove the account.";
+					}
+					
 					return new Response((Object)msg);
 				}
 				else {
-					log.info(errorMsg);
-					throw new RuntimeException(errorMsg);
+					log.info(result.get(false));
+					throw new RuntimeException(result.get(false));
 				}
 			}
 		}
@@ -121,7 +124,7 @@ public class BranchService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)"Branch status updated to " + Util.getStatusDesc(status));
+				return new Response((Object)("Branch status updated to " + Util.getStatusDesc(status)));
 			}
 		}
 	}

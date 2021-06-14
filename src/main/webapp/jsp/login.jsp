@@ -80,7 +80,7 @@
 		</footer>
 	</div>
 	
-	<div class="modal fade bd-example-modal-lg" id="modal">
+	<div class="modal fade" tabindex="-1" id="modal">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">

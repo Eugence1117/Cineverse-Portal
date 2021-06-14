@@ -283,6 +283,7 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/slick_slider/slick_slider.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootstrap/js/bootstrap-maxlength.min.js'/>"></script>
@@ -290,11 +291,9 @@
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
-    	/* $(".date").datetimepicker({
-    		timepicker : false,
-			format : "d/m/Y",
-			scrollMonth : false,
-    	}); */
+    	const searchBtn = "<span class='fas fa-search'></span> Search";
+    	const loadingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...";
+    	
     	$.validator.setDefaults({
 			errorElement : "div",
 			errorClass : "invalid-feedback",
@@ -436,6 +435,8 @@
 				$("#nameOption").collapse('toggle');
 			}
 			
+			addLoading($("#searchByDate"),loadingBtn);
+			
     		var from = $("input[name=startdate]").val();
     		console.log(from);
     		var to = $("input[name=enddate]").val();
@@ -457,6 +458,7 @@
 						}
 					},
 				}).done(function(data){
+					removeLoading($("#searchByDate"),searchBtn);
 					if(data.errorMsg == null){
 						if(!$("#movieDetails").hasClass("show")){
 							$("#movieDetails").collapse('toggle');
@@ -478,6 +480,7 @@
 			if($("#dateOption").hasClass("show")){
 				$("#dateOption").collapse('toggle');
 			}
+			addLoading($("#searchByName"),loadingBtn);
     		$.ajax("api/authorize/retrieveMovieDetailwithName.json?" + $("#nameOption").serialize(),{
 				method : "GET",
 				accepts : "application/json",
@@ -494,6 +497,7 @@
 					}
 				},
 			}).done(function(data){
+				removeLoading($("#searchByName"),searchBtn);
 				if(data.errorMsg == null){
 					if(!$("#movieDetails").hasClass("show")){
 						$("#movieDetails").collapse('toggle');

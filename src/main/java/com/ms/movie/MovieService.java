@@ -163,7 +163,7 @@ public class MovieService {
 	public Response getAllMovieInfo(String movieName) {
 		
 		if(Util.trimString(movieName).isEmpty()) {
-			return new Response("Please enter movie name.");
+			return new Response("Please enter the movie name.");
 		}
 		else {
 			Map<Boolean,Object> result = dao.getMovieByMovieName(movieName);

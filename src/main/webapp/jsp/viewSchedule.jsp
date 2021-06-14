@@ -56,29 +56,9 @@
 	text-align:center
 }
 
-#overlayloading {
-  display:none;
-  background: #ffffff;
-  color: #666666;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  z-index: 5000;
-  top: 0;
-  left: 0;
-  float: left;
-  text-align: center;
-  padding-top: 15%;
-  opacity: .80;
-}
-
 @media only screen and (max-width: 768px) {
 	form .btn{
 		width:100% !important;
-	}
-	
-	#overlayloading {
-		padding-top:50% !important;
 	}
 	
 	.card-body{
@@ -311,6 +291,7 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
@@ -323,6 +304,8 @@
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	var timeRange = null;
     	
+    	const searchBtn = "<span class='fas fa-search'></span> Search";
+    	const loadingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...";
     	
     	$(document).ready(function(){
     		var resultDt = getResultDataTable().clear();
@@ -382,18 +365,6 @@
 			}
 		});
     	
-    	function removeLoading(){
-    		$("#btnSearch").empty();
-    		$("#btnSearch").append("<span class='fas fa-fa-search'></span> Search");
-    		$("#btnSearch").attr("disabled",false);
-    	
-    	}
-    	function addLoading(){
-    		$("#btnSearch").empty();
-    		$("#btnSearch").append("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...");
-    		$("#btnSearch").attr("disabled",true);
-    	}
-    	
     	$(".quickFill").on('click',function(e){
     		e.preventDefault();
     		var data = parseInt($(this).data("duration"));
@@ -448,7 +419,7 @@
     	});
     	
     	function getCalendarData(existingData){
-    		addLoading();
+    		addLoading($("#btnSearch"),loadingBtn);
     		
     		var formData = new Object();
     		if(existingData != null){
@@ -476,7 +447,7 @@
 					}
 				},
     		}).done(function(data){
-    			removeLoading();
+    			removeLoading($("#btnSearch"),searchBtn);
 				if(data.errorMsg == null){
 					timeRange = formData;
 					var startDate = formData.startdate;
@@ -490,7 +461,7 @@
     	}
     	<!--FOR DISPLAY DATA TABLE-->
     	function getTableData(existingData){
-    		addLoading();
+    		addLoading($("#btnSearch"),loadingBtn);
     		
     		var formData = new Object();
     		if(existingData != null){
@@ -517,7 +488,7 @@
 					}
 				},
     		}).done(function(data){
-    			removeLoading();
+    			removeLoading($("#btnSearch"),searchBtn);
     			var resultDt = getResultDataTable().clear();
 				if(data.errorMsg == null){
 					timeRange = formData;

@@ -22,22 +22,6 @@
 	text-align:center;
 }
 
-#overlayloading {
-  display:none;
-  background: #ffffff;
-  color: #666666;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  z-index: 5000;
-  top: 0;
-  left: 0;
-  float: left;
-  text-align: center;
-  padding-top: 15%;
-  opacity: .80;
-}
-
 .clickable:hover{
 	cursor:pointer;
 }
@@ -304,7 +288,7 @@
 					        			<ul class="draggable list-group">
 					        			</ul>
 					        		</div>
-					        		<div class="text-center">
+					        		<div class="text-center m-2">
 					        			<button id="btnSubmit" class="btn btn-primary" disabled>Complete</button>
 					        		</div>
 					        	</div>
@@ -398,6 +382,7 @@
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
@@ -409,7 +394,9 @@
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 		
-		
+		const searchBtn = "<span class='fas fa-wrench'></span> Configure";
+    	const loadingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...";
+    	
 		var selectedEvent = null;
 		var calendar = null;
 		var chart = null;
@@ -505,6 +492,7 @@
 				return false;
 			}
 			$("#loading").show();
+			addLoading($("#searchByDate"),loadingBtn);
 			
 			var theatreElement = addTheatreElement(theatreList,"");
 			$.ajax("api/manager/retrieveOverallAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
@@ -523,10 +511,12 @@
 							}
 						}
 					}).done(function(data) {
-				$("#loading").hide();
+					$("#loading").hide();
+					removeLoading($("#searchByDate"),searchBtn);
 				if (data.error == null) {
+					
 					//hideAllSchedule();
-					clearFormHTML()
+					clearFormHTML();
 					
 					//Read data
 					var movieList = data.singleResult;
@@ -654,7 +644,7 @@
 				return false;
 			}
 			$("#loading").show();
-			
+			addLoading($("#searchByDate"),loadingBtn);
 			$.ajax("api/manager/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
 					method : "GET",
 					accepts : "application/json",
@@ -672,6 +662,7 @@
 					}
 				}).done(function(data) {
 				$("#loading").hide();
+				removeLoading($("#searchByDate"),searchBtn);
 				if (data.error == null) {
 					clearFormHTML();
 					//hideAllSchedule();
@@ -831,7 +822,7 @@
 				return false;
 			}
 			$("#loading").show();
-			
+			addLoading($("#searchByDate"),loadingBtn);
 			$.ajax("api/manager/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 					method : "GET",
 					accepts : "application/json",
@@ -848,6 +839,7 @@
 						}
 					}
 				}).done(function(data) {
+					removeLoading($("#searchByDate"),searchBtn);
 				$("#loading").hide();
 				if (data.error == null) {
 					clearFormHTML()
@@ -1407,6 +1399,7 @@
 				bootbox.alert("Please finish the configuration first.");
 			}
 			else{
+				$("#overlayloading").show();
 				var data = convertCalendarToJSON();
 				
 				$.ajax("api/manager/addSchedule.json",{
@@ -1430,6 +1423,7 @@
 						}
 					}
 				}).done(function(data){
+					$("#overlayloading").hide();
 					if(data.errorMsg != null){
 						bootbox.alert(data.errorMsg);
 					}

@@ -250,7 +250,7 @@
 		class="fas fa-angle-up"></i>
 	</a>
 	
-	<div class="modal fade bd-example-modal-lg" id="picModal">
+	<div class="modal fade" tabindex="-1" id="picModal">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -265,7 +265,12 @@
 		</div>
 	</div>
 
-
+	<div id="overlayloading">
+    	<div class="spinner-border text-primary" role="status">
+		  <span class="visually-hidden">Loading...</span>
+		</div>
+		<p class="text-center">Loading...</p>
+	</div>
 	<!-- /.container -->
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"
@@ -363,10 +368,11 @@
 				return false;
 			}
 			
+			$("#overlayloading").show();
 			var form = $("#newMovieForm")[0];
 			var data = new FormData(form);
 			
-			$(this).prop("disabled",true);
+			//$(this).prop("disabled",true);
 			$.ajax("api/admin/uploadnewmovie.json", {
 				method : "POST",
 				processData: false,
@@ -390,7 +396,8 @@
 					}
 				},
 			}).done(function(data){
-				$(this).prop("disabled",false);
+				$("#overlayloading").hide();
+				//$(this).prop("disabled",false);
 				if(data.errorMsg != null){
 					bootbox.alert(data.errorMsg);
 				}

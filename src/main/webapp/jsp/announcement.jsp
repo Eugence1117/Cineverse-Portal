@@ -35,22 +35,6 @@
 	display:none;
 }
 
-#overlayloading {
-  display:none;
-  background: #ffffff;
-  color: #666666;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  z-index: 5000;
-  top: 0;
-  left: 0;
-  float: left;
-  text-align: center;
-  padding-top: 15%;
-  opacity: .80;
-}
-
 .announcement-item{
 	max-width:200px !important;
 	position:relative;
@@ -229,12 +213,6 @@
 					 		<label for="picURL" class="form-label">Announcement Poster: </label>
 							<input class="form-control" type="file" id="picURL" name="picURL" accept="image/*" data-type='image'>
 						</form>
-						<div id="loading" class="text-center">
-							<div class="spinner-border text-primary" role="status">
-							  <span class="visually-hidden">Loading...</span>
-							</div>
-							<p class="text-center">Processing your request...</p>
-						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -375,7 +353,6 @@
 				headers:{
 					"X-CSRF-Token": CSRF_TOKEN
 				},
-				async:false,
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -423,7 +400,6 @@
         					headers:{
         						"X-CSRF-Token": CSRF_TOKEN
         					},
-        					async:!1,
         					statusCode:{
         						401:function(){
         							window.location.href = "expire.htm";
@@ -584,16 +560,6 @@
     		$("#newForm input").removeClass("is-valid").removeClass("is-invalid");	
     	}
     	
-    	function hideForm(){
-    		$("#newForm").hide();
-    		$("#loading").show();
-    	}
-    	
-    	function showForm(){
-    		$("#newForm").show();
-    		$("#loading").hide();
-    	}
-    	
     	$("#addAnnouncement").on("hidden.bs.modal",function(){
     		if(!$(this).hasClass("skip")){
     			clearInput();
@@ -607,7 +573,7 @@
     			return false;
     		}
     		
-    		hideForm();
+    		$("#overlayloading").show();
     		var data = $("#newForm")[0];
     		var formData = new FormData(data);
     		
@@ -621,7 +587,6 @@
 				headers:{
 					"X-CSRF-Token": CSRF_TOKEN
 				},
-				async: false,
 				statusCode:{
 					401:function(){
 						window.location.href = "expire.htm";
@@ -634,7 +599,7 @@
 					}
 				},
 			}).done(function(data){
-				showForm();
+				$("#overlayloading").hide();
 				if(data.errorMsg != null){
 					$("#addAnnouncement").addClass("skip");
 					$("#addAnnouncement").modal("hide");
