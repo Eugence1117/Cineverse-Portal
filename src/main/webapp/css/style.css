@@ -8,6 +8,10 @@
 		padding-top:50% !important;
 	}
 	
+	#toastContainer{
+		top:70% !important;
+		right:0 !important;
+	}
 }
 
 #overlayloading {
@@ -29,9 +33,4 @@
 #toastContainer {
 	z-index: 9999999;
 	margin-top:70px !important;
-}
-
-.toast{
-	max-width:400px !important;
-	width:400px;
 }
