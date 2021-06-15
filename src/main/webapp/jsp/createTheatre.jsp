@@ -110,9 +110,7 @@
 		</div>
 	</div>
 
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="createTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
@@ -652,10 +650,10 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg != null){
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,"Create theatre <b>Failed</b>",false);
 							}
 							else{
-								bootbox.alert(data.result);
+								var toast = createToast(data.result,"Create theatre <b>Success</b>",true);
 								resetForm();
 							}	
 						});

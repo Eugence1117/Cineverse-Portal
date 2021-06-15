@@ -144,9 +144,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	<!-- /.container -->
 
 	<div class="modal fade" id="passwordModal"  tabindex="-1">

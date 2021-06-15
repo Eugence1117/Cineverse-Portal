@@ -242,9 +242,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" id="picModal">
 		<div class="modal-dialog modal-xl">
@@ -389,10 +387,12 @@
 				$("#overlayloading").hide();
 				//$(this).prop("disabled",false);
 				if(data.errorMsg != null){
-					bootbox.alert(data.errorMsg);
+					var toast = createToast(data.errorMsg,"Create movie <b>Failed</b>",false);
+					
 				}
 				else{
-					bootbox.alert(data.result);
+					var toast = createToast(data.result,"Create movie <b>Success</b>",true);
+					
 					form.reset();
 				}	
 			});

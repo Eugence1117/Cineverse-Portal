@@ -25,3 +25,13 @@
   padding-top: 15%;
   opacity: .80;
 }
+
+#toastContainer {
+	z-index: 9999999;
+	margin-top:70px !important;
+}
+
+.toast{
+	max-width:400px !important;
+	width:400px;
+}

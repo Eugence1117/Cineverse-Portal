@@ -250,9 +250,7 @@
 		</div>
 	</div>
 	<!-- /.container -->
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="preferences">
 	  <div class="modal-dialog" role="document">
@@ -564,11 +562,11 @@
 				},
     		}).done(function(data){
     			if(data.errorMsg == null){
-    				bootbox.alert(data.result);
+    				var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
     				$("#editBtn").click();
     			}
     			else{
-    				bootbox.alert(data.errorMsg);
+    				var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
     			}
     		});
     		 

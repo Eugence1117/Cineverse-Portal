@@ -124,7 +124,7 @@ public class BranchService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)("Branch status updated to " + Util.getStatusDesc(status)));
+				return new Response((Object)("Branch status updated to " + Util.getStatusDesc(status) + "."));
 			}
 		}
 	}

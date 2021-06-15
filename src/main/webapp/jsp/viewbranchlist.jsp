@@ -81,9 +81,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<!-- View Modal -->
 	<div class="modal fade" id="viewBranch" tabindex="-1" role="dialog">
@@ -466,7 +464,7 @@
 				return false;
 			}
 			
-			$("#addBranch").modal('hide');
+			//$("#addBranch").modal('hide');
 			$("#overlayloading").show();
 			
 			var formData = $("#newBranchForm").serializeObject();
@@ -494,23 +492,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.errorMsg,
-					    callback: function(){
-					    	$("#addBranch").modal('show');
-						}
-					});	
+					var toast = createToast(data.errorMsg,"Add branch <b>Failed</b>",false);
 				}
 				else{
-					bootbox.alert({
-					    title: "Notification",
-					    message: data.result,
-					    callback: function(){
-					    	readyFunction();
-				    		clearInsertField();
-						}
-					});	
+					$("#addBranch").modal('hide');
+					var toast = createToast(data.result,"Edit movie <b>Success</b>",false);
+					clearInsertField();
+					readyFunction();
 				}
 				
 			});
@@ -601,9 +589,9 @@
 		<!--FOR activate / deactivate branch-->
 		function activateAndDeactivateBranch(element,status){
 			var branchId = element.id;
-			var statusName = (status == 1? "activate":"deactivate");
+			var statusName = (status == 1? "Active":"Inactive");
 			bootbox.confirm({
-			    message: "Are you sure you want to update the status to " + statusName + "?", 
+			    message: "Are you sure you want to update the status to <b>" + statusName + "</b> ?", 
 			    buttons: {
 			        confirm: {
 			            label: 'Yes',
@@ -635,11 +623,13 @@
 							},
 						}).done(function(data){
 							$("#overlayloading").hide();
+							var title = status == 1 ? "Activate" : "Deactivate"
 							if(data.errorMsg != null){
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,title + " user <b>Failed</b>",false);
 							}
 							else{
-								bootbox.alert(data.result,function(){readyFunction();})
+								var toast = createToast(data.result,title + " user <b>Success</b>",true);
+								readyFunction();
 							}
 						});
 			    	}
@@ -739,12 +729,11 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg != null){
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,"Remove branch <b>Failed</b>",false);								
 							}
 							else{
-								bootbox.alert(data.result,function(){
-									readyFunction();
-								})
+								var toast = createToast(data.result,"Remove branch <b>Failed</b>",true);
+								readyFunction();
 							}
 						});
 			    	}

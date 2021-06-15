@@ -76,9 +76,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" id="viewMovie" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -187,13 +185,6 @@
 		</div>
 	</div>
 	
-	<div id="overlayloading">
-    	<div class="spinner-border text-primary" role="status">
-		  <span class="visually-hidden">Loading...</span>
-		</div>
-		<p class="text-center">Loading...</p>
-		
-	</div>
 	<!-- /.container -->
 
 <%@ include file="include/js.jsp"%>
@@ -362,12 +353,15 @@
 							},
 						}).done(function(data){
 							if(data.errorMsg != null){
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,"Change movie status <b>Failed</b>",false);
+								//bootbox.alert(data.errorMsg);
 							}
 							else{
-								bootbox.alert(data.result,function(){
-									getTableData();
-								})
+								var toast = createToast(data.result,"Change movie status <b>Success</b>",true);
+								getTableData();
+								//bootbox.alert(data.result,function(){
+								//	getTableData();
+								//	})
 							}
 						});
 					}
@@ -567,13 +561,16 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					$("#editMovie").addClass("skip");
-					$("#editMovie").modal("hide");
-					bootbox.alert(data.errorMsg,function(){$("#editMovie").modal("show");$("#editMovie").removeClass("skip");});
+					//$("#editMovie").addClass("skip");
+					//$("#editMovie").modal("hide");
+					var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
+					//bootbox.alert(data.errorMsg,function(){$("#editMovie").modal("show");$("#editMovie").removeClass("skip");});
 				}
 				else{
 					$("#editMovie").modal("hide");
-					bootbox.alert(data.result,function(){getTableData();});
+					var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
+					getTableData();
+					//bootbox.alert(data.result,function(){getTableData();});
 				}
 			});
 		})

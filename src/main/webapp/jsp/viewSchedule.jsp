@@ -238,9 +238,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div id="overlayloading">
     	<div class="spinner-border text-primary" role="status">
@@ -751,17 +749,25 @@
 				}).done(function(data) {
 					$("#overlayloading").hide();
 					if(data.errorMsg != null){
-						bootbox.alert(data.errorMsg)
+						var toast = createToast(data.errorMsg,"Remove schedule <b>Failed</b>",false);
+						//bootbox.alert(data.errorMsg)
 					}
 					else{
-						bootbox.alert(data.result,function(){
-							if(carouselSlide == 0){
-								getTableData(timeRange);	
-							}
-							else{
-								getCalendarData(timeRange);
-							}
-						});
+						var toast = createToast(data.result,"Remove schedule <b>Success</b>",true);
+						if(carouselSlide == 0){
+							getTableData(timeRange);	
+						}
+						else{
+							getCalendarData(timeRange);
+						}
+						//bootbox.alert(data.result,function(){
+						//	if(carouselSlide == 0){
+						//		getTableData(timeRange);	
+						//	}
+						//	else{
+						//		getCalendarData(timeRange);
+						//	}
+						//});
 					}
 				})
 		}

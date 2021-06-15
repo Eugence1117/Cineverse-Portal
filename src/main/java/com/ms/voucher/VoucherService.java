@@ -125,7 +125,12 @@ public class VoucherService {
 					return new Response(errorMsg);
 				}
 				else {
-					return new Response((Object)"Voucher:" + voucherId.toUpperCase() + " 's status is changed to <b>" + desc.toUpperCase() + "</b>");
+					if(status == Constant.REMOVED_STATUS_CODE) {
+						return new Response((Object)("Voucher:" + voucherId.toUpperCase() + " is <b>" + desc.toUpperCase() + "</b>"));
+					}
+					else {
+						return new Response((Object)("Voucher:" + voucherId.toUpperCase() + " 's status is changed to <b>" + desc.toUpperCase() + "</b>"));
+					}
 				}
 			}
 		}
@@ -151,7 +156,7 @@ public class VoucherService {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)"Voucher:" + form.getSeqid().toUpperCase() + " 's information has been updated.");
+			return new Response((Object)("Voucher:" + form.getSeqid().toUpperCase() + " 's information has been updated."));
 		}
 		
 	}

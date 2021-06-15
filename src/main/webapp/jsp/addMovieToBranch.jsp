@@ -234,9 +234,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" id="extModal">
 		<div class="modal-dialog">
@@ -414,6 +412,7 @@
 					$("#overlayloading").hide();
 					$("#extModal").modal("hide");
 					if(data.errorMsg == null){
+						createActivity(data.result,"Add movie to branch <b>Success</b>",true);
 						bootbox.alert({
 							message: data.result,
 							callback: function(){
@@ -422,6 +421,7 @@
 						});
 					}
 					else{
+						createActivity(data.errorMsg,"Add movie to branch <b>Failed</b>",false);
 						bootbox.alert({
 							message: data.errorMsg,
 							callback: function(){

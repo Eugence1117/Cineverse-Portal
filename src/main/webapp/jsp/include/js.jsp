@@ -1,15 +1,21 @@
 <script src="<spring:url value='/plugins/bootstrap/js/bootstrap.bundle.min.js'/>"></script>
 <script src="<spring:url value='/plugins/jquery-easing/jquery.easing.min.js'/>"></script>
+<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 <script src="<spring:url value='/js/template.js'/>"></script>
+<script src="<spring:url value='/js/toastMessageInitiater.js'/>"></script>
 
 <script type="text/javascript">
 
 
 $('#logOutBtn').on('click', function() {
+	window.sessionStorage.clear();
 	$('#logout-form').submit();
 	return false;
 });
 
+$(document).ready(function(){
+	loadContent();
+});
 
 $.fn.serializeObject = function() {
     var o = {};

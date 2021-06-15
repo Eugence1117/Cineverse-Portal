@@ -162,9 +162,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="editAnnouncement">
 		<div class="modal-dialog modal-xl" role="document">
@@ -353,8 +351,8 @@
     	
     	
     	function updateStatus(formData){
-    		$("#editAnnouncement").modal("hide");
-    		$("#overlayloading").show();
+    		//$("#editAnnouncement").modal("hide");
+    		//$("#overlayloading").show();
     		$.ajax("api/admin/editAnnouncement.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -376,17 +374,20 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				//$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					bootbox.alert(data.errorMsg,function(){
-						$("#editAnnouncement").modal("show");
-					});
+					var toast = createToast(data.errorMsg,"Edit announcement status <b>Failed</b>",false);
+					//bootbox.alert(data.errorMsg,function(){
+					//	$("#editAnnouncement").modal("show");
+					//});
 				}
 				else{
-					bootbox.alert(data.result,function(){
-						$("#editAnnouncement").modal("show");
-						getAnnouncementByStatus();
-					})
+					var toast = createToast(data.result,"Edit announcement status <b>Success</b>",true);
+					getAnnouncementByStatus();
+					//bootbox.alert(data.result,function(){
+					//	$("#editAnnouncement").modal("show");
+					//	getAnnouncementByStatus();
+					//})
 				}
 				
 			});
@@ -425,15 +426,21 @@
         				}).done(function(data){
         					$("#overlayloading").hide();
         					if(data.errorMsg != null){
-        						bootbox.alert(data.errorMsg,function(){
-        							$("#editAnnouncement").modal("show");
-        						});
+        						var toast = createToast(data.errorMsg,"Remove announcement <b>Failed</b>",false);
+        						$("#editAnnouncement").modal("show");
+        						
+        						//bootbox.alert(data.errorMsg,function(){
+        						//	$("#editAnnouncement").modal("show");
+        						//});
         					}
         					else{
-        						bootbox.alert(data.result,function(){
-        							$("#editAnnouncement").modal("show");
-        							getAnnouncementByStatus();
-        						});
+        						var toast = createToast(data.result,"Remove announcement <b>Success</b>",true);
+        						//bootbox.alert(data.result,function(){
+        						//	$("#editAnnouncement").modal("show");
+        						//	getAnnouncementByStatus();
+        						//});
+        						$("#editAnnouncement").modal("show");
+        						getAnnouncementByStatus();
         					}
         					
         				});				
@@ -612,16 +619,18 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					$("#addAnnouncement").addClass("skip");
-					$("#addAnnouncement").modal("hide");
-					bootbox.alert(data.errorMsg,function(){
-						$("#addAnnouncement").modal("show");
-						$("#addAnnouncement").removeClass("skip");
-					});
+					var toast = createToast(data.errorMsg,"Add announcement <b>Failed</b>",false);
+					//$("#addAnnouncement").addClass("skip");
+					//$("#addAnnouncement").modal("hide");
+					//bootbox.alert(data.errorMsg,function(){
+					//	$("#addAnnouncement").modal("show");
+					//	$("#addAnnouncement").removeClass("skip");
+					//});
 				}
 				else{
+					var toast = createToast(data.result,"Add announcement <b>Success</b>",true);
 					$("#addAnnouncement").modal("hide");
-					bootbox.alert(data.result);
+					//bootbox.alert(data.result);
 				}	
 			});
     	}

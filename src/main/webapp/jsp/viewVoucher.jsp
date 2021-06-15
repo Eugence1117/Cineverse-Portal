@@ -78,9 +78,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="editVoucher">
 		<div class="modal-dialog modal-lg" role="document">
@@ -417,13 +415,18 @@
 				},
 			}).done(function(data){
 				$("#overlayloading").hide();
+				
+				var title = status == -1 ? "Remove voucher" : "Edit voucher status";
 				if(data.errorMsg != null){
-					bootbox.alert(data.errorMsg);
+					var toast = createToast(data.errorMsg,title + " <b>Failed</b>.",false);
+					//bootbox.alert(data.errorMsg);
 				}
 				else{
-					bootbox.alert(data.result,function(){
-						readyFunction();
-					})
+					var toast = createToast(data.result,title +" <b>Success</b>.",true);
+					readyFunction();
+					//bootbox.alert(data.result,function(){
+					//	readyFunction();
+					//})
 				}
 			});
 		}
@@ -587,13 +590,16 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					$("#editVoucher").addClass("skip");
-					$("#editVoucher").modal("hide");
-					bootbox.alert(data.errorMsg,function(){$("#editVoucher").removeClass("skip");$("#editVoucher").modal("show")});
+					var toast = createToast(data.errorMsg,"Edit voucher <b>Failed</b>.",false);
+					//$("#editVoucher").addClass("skip");
+					//$("#editVoucher").modal("hide");
+					//bootbox.alert(data.errorMsg,function(){$("#editVoucher").removeClass("skip");$("#editVoucher").modal("show")});
 				}
 				else{
+					var toast = createToast(data.result,"Edit voucher <b>Success</b>",true);
 					$("#editVoucher").modal("hide");
-					bootbox.alert(data.result,function(){readyFunction()});
+					readyFunction();
+					//bootbox.alert(data.result,function(){readyFunction()});
 					
 				}
 			})

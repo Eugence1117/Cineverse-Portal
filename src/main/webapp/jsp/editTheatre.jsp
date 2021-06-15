@@ -114,9 +114,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="editTheatre" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">
@@ -658,7 +656,6 @@
 							headers:{
 								"X-CSRF-Token": CSRF_TOKEN
 							},
-							async: false,
 							statusCode:{
 								401:function(){
 									window.location.href = "expire.htm";
@@ -673,9 +670,11 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg != null){
+								createActivity(data.errorMsg,"Edit theatre <b>Failed</b>",false)
 								bootbox.alert(data.errorMsg);
 							}
 							else{
+								createActivity(data.result,"Edit theatre <b>Success</b>",true)
 								bootbox.alert(data.result,function(){
 									window.location.href = "viewTheatre.htm";	
 								})

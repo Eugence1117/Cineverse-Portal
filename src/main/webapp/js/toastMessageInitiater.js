@@ -1,36 +1,100 @@
 /**
  * 
  */
- function createToast(msg,title,date,status){
+ function createActivity(msg,title,status){
+ 	var dataObject = new Object();
+ 	
+    dataObject["icon"] = status ? "<i class='fas fa-info-circle text-white'></i>" : "<i class='fas fa-exclamation-triangle text-white'></i>"
+    dataObject["date"] = new Date();
+    dataObject["msg"] = title;
+    dataObject["status"] = status;
+    
+    var sessionStorage = window.sessionStorage;
+	if(sessionStorage.activityFeed){
+		var activityArray = JSON.parse(sessionStorage.activityFeed);
+		activityArray.push(dataObject);
+		sessionStorage.setItem("activityFeed",JSON.stringify(activityArray));
+	}
+	else{
+		var activityArray = [];
+		activityArray.push(dataObject);
+		sessionStorage.setItem("activityFeed",JSON.stringify(activityArray));
+	}
+ }
+ 
+ function loadContent(){
+ 	 var sessionStorage = window.sessionStorage;
+ 	 if(sessionStorage.activityFeed){
+ 	 	var activityArray = JSON.parse(sessionStorage.activityFeed);
+ 	 	for(var i = 0 ; i < 5; i++){
+ 	 		var dataObj = activityArray[i];
+ 	 		
+ 	 		var icon = dataObj.icon;
+    		var msg = dataObj.msg;
+    		var date = dataObj.date;
+    		var status = dataObj.status;
+    		
+ 	 		convertToastToActivityFeed(icon,msg,date,status);
+ 	 	}
+	 }
+}
+ 
+ function createToast(msg,title,status){
 	
 	const successIcon = "<i class='fas fa-info-circle text-success'></i>";
 	const failIcon = "<i class='fas fa-exclamation-triangle text-danger'></i>"
-
+	var date = new Date();
+	
+	var dataObject = new Object();
+    dataObject["icon"] = status ? "<i class='fas fa-info-circle text-white'></i>" : "<i class='fas fa-exclamation-triangle text-white'></i>"
+    dataObject["date"] = date;
+    dataObject["msg"] = title;
+    dataObject["status"] = status;
+	
+	//Store into session
+	var sessionStorage = window.sessionStorage;
+	if(sessionStorage.activityFeed){
+		var activityArray = JSON.parse(sessionStorage.activityFeed);
+		activityArray.push(dataObject);
+		sessionStorage.setItem("activityFeed",JSON.stringify(activityArray));
+	}
+	else{
+		var activityArray = [];
+		activityArray.push(dataObject);
+		sessionStorage.setItem("activityFeed",JSON.stringify(activityArray));
+	}
+	
  	var toast = $("<div></div>");
  	toast.addClass("toast");
+ 	toast.addClass("bg-light");
+ 	
  	toast.attr("role","alert");
  	toast.attr("aria-live","assertive");
  	toast.attr("aria-atomic","true");
  	
- 	toast.data("icon",status ? "<i class='fas fa-info-circle text-white'></i>" : "<i class='fas fa-exclamation-triangle text-white'></i>");
- 	toast.data("date",date);
- 	toast.data("msg",title);
- 	toast.data("status",status);
+ 	toast.data("obj",JSON.stringify(dataObject));
  	
- 	var toastHeader = $("<div></div");
- 	toastHeader.addClass("toast-header");
+ 	//var toastHeader = $("<div></div");
+ 	//toastHeader.addClass("toast-header");
  	
- 	toastHeader.append(status ? successIcon : failIcon);
- 	toastHeader.append("<strong class='me-auto ml-1 text-primary'>" + title + "</strong>");
- 	toastHeader.append("<small class='text-muted'>" +  moment(date).fromNow() +"</small>");
- 	toastHeader.append("<button type='button' class='btn-close' data-bs-dismiss='toast' aria-label='Close'></button>");
+ 	//toastHeader.append(status ? successIcon : failIcon);
+ 	//toastHeader.append("<strong class='me-auto ml-1 text-primary'>" + title + "</strong>");
+ 	//toastHeader.append("<small class='text-muted'>" +  moment(date).fromNow() +"</small>");
+ 	//toastHeader.append("<button type='button' class='btn-close' data-bs-dismiss='toast' aria-label='Close'></button>");
  	
  	var toastBody = $("<div></div>");
  	toastBody.addClass("toast-body");
- 	toastBody.append("<p>" + msg + "</p>");
+ 	toastBody.append(msg);
  	
- 	toast.append(toastHeader);
- 	toast.append(toastBody);
+ 	var row = $("<div></div>");
+ 	row.addClass('d-flex');
+ 	row.append("<div class='my-auto fs-5 px-1'>" + (status ? successIcon : failIcon) + "</div>");
+ 	row.append(toastBody);
+ 	row.append("<button type='button' class='btn-close me-2' data-bs-dismiss='toast' aria-label='Close' style='margin:auto'></button>");
+ 	
+ 	//toast.append(toastHeader);
+ 	//toast.append(toastBody);
+ 	toast.append(row);
     
     $("#toastContainer").append(toast);
     
@@ -43,12 +107,19 @@
     toastObject.show();
     
     toast.on('hide.bs.toast',function(){
+    
+    	var dataObj = JSON.parse($(this).data("obj"));
+    	var icon = dataObj.icon;
+    	var msg = dataObj.msg;
+    	var date = dataObj.date;
+    	var status = dataObj.status;
     	
-    	convertToastToActivityFeed($(this).data("icon"),$(this).data("msg"),$(this).data("date"),$(this).data("status"));
+    	convertToastToActivityFeed(icon,msg,date,status);
 		$(this).remove();
 		
-		
     });
+    
+    return toast;
  }
  
  function convertToastToActivityFeed(iconElement,message,datetime,status){
@@ -110,7 +181,7 @@
  function withActivity(counter){
  	$("#activityFeed .emptyActivity").hide();
  	$("#activityDropDown .badge-counter").show();
- 	$("#activityDropDown .badge-counter").html(counter + "+");
+ 	$("#activityDropDown .badge-counter").html(counter + (counter > 5 ? "+" : ""));
  	$("#activityFeed .existActivity").show();
  }
  

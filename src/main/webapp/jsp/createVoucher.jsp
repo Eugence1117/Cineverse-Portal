@@ -131,9 +131,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 
 <%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
@@ -362,14 +360,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					bootbox.alert(data.errorMsg);
+					var toast = createToast(data.errorMsg,"Create voucher <b>Failed</b>",false);
 				}
 				else{
 					clearValidator();
 					clearInsertField();
-					
-					bootbox.alert(data.result);
-					
+
+					var toast = createToast(data.result,"Create voucher <b>Success</b>",true);
 				}
 			});
 		}

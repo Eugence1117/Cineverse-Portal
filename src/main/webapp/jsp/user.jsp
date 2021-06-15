@@ -92,9 +92,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<!-- Insert Modal -->
 	<div class="modal fade" tabindex="-1" role="dialog" id="addUser">
@@ -486,7 +484,7 @@
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
 				}
-				else if(value.status = "Active"){
+				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
@@ -650,7 +648,7 @@
 			
 			var formData = $("#newUserForm").serializeObject();
 			
-			$("#addUser").modal('hide');
+			//$("#addUser").modal('hide');
 			$("#overlayloading").show();
 			
 			$.ajax("api/admin/addUser.json",{
@@ -676,10 +674,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg == null){
-					bootbox.alert(data.result,function(){readyFunction();clearInsertField();})
+					$("#addUser").modal('hide');
+					var toast = createToast(data.result,"Add user <b>Success</b>",true);
+					readyFunction();
+					clearInsertField();
 				}
 				else{
-					bootbox.alert(data.errorMsg,function(){$("#addUser").modal('show')})
+					var toast = createToast(data.errorMsg,"Add user <b>Failed</b>",false);	
 				}	
 			});
 		}
@@ -778,10 +779,13 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg == null){
-								bootbox.alert(data.result,function(){readyFunction();})
+								var toast = createToast(data.result,"Edit user status <b>Success</b>",true);
+								readyFunction();
+								
 							}
 							else{
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,"Edit user status <b>Failed</b>",false);
+								
 							}	
 						});
 			    	}
@@ -889,7 +893,7 @@
 				return false;
 			}
 			
-			$("#editUser").modal("hide");
+			//$("#editUser").modal("hide");
 		
 			var formData = $("#editUserForm").serializeObject();
 			formData["seqid"] = $("#editUserForm #seqid").val();
@@ -918,10 +922,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					bootbox.alert(data.errorMsg,function(){$("#editUser").modal("show");})
+					var toast = createToast(data.errorMsg,"Edit user <b>Failed</b>",false);
 				}
 				else{
-					bootbox.alert(data.result,function(){readyFunction();clearEditField();})
+					$("#editUser").modal("hide");
+					var toast = createToast(data.result,"Edit user <b>Success</b>",true);
+					readyFunction();
+					clearEditField();
 				}
 			});
 		}
@@ -964,10 +971,11 @@
 							$("#overlayloading").hide();
 							
 							if(data.errorMsg != null){	
-								bootbox.alert(data.errorMsg);
+								var toast = createToast(data.errorMsg,"Remove user <b>Failed</b>",false);
 							}
 							else{
-								bootbox.alert(data.result,function(){readyFunction();})
+								var toast = createToast(data.result,"Remove user <b>Success</b>",true);
+								readyFunction();
 							}
 						});
 			    	}

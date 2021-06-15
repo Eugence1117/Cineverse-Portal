@@ -332,10 +332,7 @@
 		</div>
 	</div> 
 	
-	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" id="eventView" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -1425,9 +1422,11 @@
 				}).done(function(data){
 					$("#overlayloading").hide();
 					if(data.errorMsg != null){
+						createActivity(data.errorMsg,"Create schedule <b>Failed</b>",false)
 						bootbox.alert(data.errorMsg);
 					}
 					else{
+						createActivity(data.result,"Create schedule <b>Success</b>",true)
 						bootbox.alert(data.result,function(){window.location.reload(false)})
 					}
 				});

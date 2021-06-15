@@ -108,9 +108,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div class="modal fade" tabindex="-1" role="dialog" id="viewModal" data-backdrop="static" data-keyboard="false">
 		  <div class="modal-dialog modal-lg" role="document">

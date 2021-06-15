@@ -138,9 +138,7 @@
 	</div>
 	<!-- /.container -->
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<div id="overlayloading">
     	<div class="spinner-border text-primary" role="status">
@@ -378,7 +376,7 @@
 			}
 			
 			var formData = $("#editBranchForm").serializeObject();
-			
+			$("#overlayloading").show();
 			$.ajax("api/manager/updateBranch.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -400,8 +398,15 @@
 					}
 				},
 			}).done(function(data){
-				var msg = data.errorMsg == null? data.result : data.errorMsg;
-				bootbox.alert(msg,function(){$("#editBtn").click()});
+				$("#overlayloading").hide();
+				if(data.errorMsg != null){
+					var toast = createToast(data.errorMsg,"Edit branch <b>Failed</b>",false);	
+					$("#editBtn").click()
+				}
+				else{
+					var toast = createToast(data.result,"Edit branch <b>Success</b>",true);	
+					$("#editBtn").click()
+				}
 			});
 		}
 			

@@ -85,9 +85,7 @@
 		</div>
 	</div>
 	
-	<a class="scroll-to-top rounded" href="#page-top"> <i
-		class="fas fa-angle-up"></i>
-	</a>
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
 	<!-- View Modal -->
 	<div class="modal fade" id="movieDetails" tabindex="-1" role="dialog">
@@ -442,18 +440,18 @@
 			});	
 			
 			$("#movieDetails").modal("show");
+			$("#movieForm").hide();
+			$("#loading").show();
 			
 			$.ajax("api/authorize/getMovieInfo.json?movieId=" + movieId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				beforeSend:function(){
-					$("#movieForm").hide();
-					$("#loading").show();
+
 				},
 				complete:function(){
-					$("#loading").hide();
-					$("#movieForm").show();
+
 				},
 				statusCode:{
 					401:function(){
@@ -470,9 +468,12 @@
     			$("#loading").hide();
     			if(data.errorMsg == null){
 					injectData(data.result,movieId);
+					$("#movieForm").show();
 				}
 				else{
-					bootbox.alert(data.errorMsg);
+					$("#movieDetails").modal("hide");
+					bootbox.alert(data.errorMsg);	
+					
 				}
     		})
 		}
@@ -561,6 +562,7 @@
     			return false;
     		}
     		
+    		$("#overlayloading").show();
     		var formData = $("#movieForm").serializeObject();
     		formData["movieId"] = $("#movieForm input[name=movieId]").val();
     		$.ajax("api/admin/editMovieInfo.json",{
@@ -584,18 +586,21 @@
 					}
 				},
     		}).done(function(data){
+    			$("#overlayloading").hide();
     			if(data.errorMsg == null){
+    				var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
     				$("#movieDetails").modal('hide');
-    				bootbox.alert(data.result);
+    				//bootbox.alert(data.result);
     				readyFunction();
     			}
     			else{
-    				$("#movieDetails").addClass("skip");
-    				$("#movieDetails").modal('hide');
-    				bootbox.alert(data.errorMsg,function(){
-    					$("#movieDetails").removeClass("skip");
-    					$("#movieDetails").modal('show');
-    				});
+    				var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
+    				//$("#movieDetails").addClass("skip");
+    				//$("#movieDetails").modal('hide');
+    				//bootbox.alert(data.errorMsg,function(){
+    				//	$("#movieDetails").removeClass("skip");
+    				//	$("#movieDetails").modal('show');
+    				//});
     				
     			}	
     		});
