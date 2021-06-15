@@ -12,7 +12,21 @@
 		    
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
-    
+    		 <!-- Nav Item - Alerts -->
+            <li class="nav-item dropdown no-arrow mx-1" id="activityDropDown">
+             	 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               		 <i class="fas fa-bell fa-fw"></i>
+               		 <!-- Counter - Alerts -->
+                	 <span class="badge badge-danger badge-counter"></span>
+              	 </a>
+              <!-- Dropdown - Alerts -->
+           	 	<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" id="activityFeed"  style="left:auto">
+                	<h6 class="dropdown-header">Alerts Center</h6>
+                	<a class="dropdown-item text-center small text-gray-500 emptyActivity">No messages</a>
+                	<a class="dropdown-item text-center small text-gray-500 existActivity hide" href="#">Show All Alerts</a>
+            	</div>
+             </li>
+             
             <div class="topbar-divider d-none d-sm-block"></div>
 			
             <!-- Nav Item - User Information -->

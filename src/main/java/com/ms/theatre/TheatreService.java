@@ -188,7 +188,7 @@ public class TheatreService {
 			}else {
 				String errorMsg = dao.updateTheatre(form,statusCode);
 				if(errorMsg == null) {
-					return new Response((Object)("Thetre has been updated to latest information."));
+					return new Response((Object)("Theatre has been updated to latest information."));
 				}
 				else {
 					return new Response(errorMsg);

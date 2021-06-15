@@ -31,6 +31,7 @@ import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.ms.branch.BranchDAO;
+import com.ms.common.Azure;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 import com.ms.login.Staff;
@@ -45,11 +46,8 @@ public class MovieService {
 	HttpSession session;
 	
 	@Autowired
-	CloudBlobContainer cloudBlobContainer;
-	
-	@Autowired
-	CloudBlobClient cloudBlobClient;
-	
+	Azure azure;
+
 	@Autowired
 	MovieDao dao;
 	
@@ -282,9 +280,9 @@ public class MovieService {
 		
 		boolean status = false;
 		String uuid = UUID.randomUUID().toString();
-		String format = getFileFormat(form.getPosterImage().getOriginalFilename());
+		String format = azure.getFileFormat(form.getPosterImage().getOriginalFilename());
 		form.setMovieId(uuid);
-		URI uri = uploadFileToAzure(uuid + format,form.getPosterImage());
+		URI uri = azure.uploadFileToAzure(uuid + format, form.getPosterImage(), Constant.MOVIE_IMAGE_CONTAINER_NAME);
 		if(uri == null) {
 			log.info("Unable to upload. Action abort.");
 			return new Response("Unable to upload the image. Please try again later.");
@@ -297,11 +295,11 @@ public class MovieService {
 				String errorMsg = dao.insertNewMovie(form,uri.toString());
 				if(errorMsg == null) {
 					log.info("Movie insert successful.");
-					return new Response((Object)("The movie " + form.getMovieName() + " has been inserted."));
+					return new Response((Object)("The movie " + form.getMovieName() + " has been created."));
 				}
 				else {
 					log.error("Insert to database failed.");
-					deleteFile(uuid + format);
+					azure.deleteFile(uuid + format,Constant.MOVIE_IMAGE_CONTAINER_NAME);
 					return new Response(errorMsg);
 				}
 			}
@@ -335,7 +333,7 @@ public class MovieService {
 					form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getEndDate() + Constant.DEFAULT_TIME)));
 					String errorMsg = dao.insertMovieAvailable(form, branchId);
 					if(errorMsg == null) {
-						return new Response((Object)"Insert successful.");
+						return new Response((Object)"The movie has been added into your branch.");
 					}
 					else {
 						return new Response(errorMsg);
@@ -421,7 +419,7 @@ public class MovieService {
 						
 						String errorMsg = dao.updateMovieAvailableInBranch(form, branchId);
 						if(errorMsg == null) {
-							return new Response((Object)"Information updated.");
+							return new Response((Object)"The movie has been updated to latest changes.");
 						}
 						else {
 							return new Response(errorMsg);
@@ -465,60 +463,7 @@ public class MovieService {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)("Movie " + form.getMovieName() + " updated."));
-		}
-	}
-	
-	public String getFileFormat(String filename) {
-		String format = "";
-		Pattern ptn = Pattern.compile(Constant.FILE_PATTERN);
-		Matcher matcher = ptn.matcher(filename);
-		
-		while(matcher.find()) {
-			format = matcher.group();
-		}
-		
-		return format;
-	}
-	
-	
-	public URI uploadFileToAzure(String filename, MultipartFile mpf) {
-		URI uri = null;
-		CloudBlockBlob blob = null;
-		try {
-			blob = cloudBlobContainer.getBlockBlobReference(filename);
-			blob.upload(mpf.getInputStream(), -1);
-			uri = blob.getUri();
-		}
-		catch(URISyntaxException e) {
-			log.error("URISyntaxException :" + e.getMessage());
-		}
-		catch(StorageException ex) {
-			log.error("StorageException :" + ex.getMessage());
-		}
-		catch(IOException ep) {
-			log.error("IOException :" + ep.getLocalizedMessage());
-		}
-		return uri;
-	}
-	
-	public void deleteFile(String fileName) {
-		try {
-			CloudBlobContainer container = cloudBlobClient.getContainerReference(Constant.MOVIE_IMAGE_CONTAINER_NAME);
-			CloudBlockBlob pendingDelete = container.getBlockBlobReference(fileName);
-			boolean status = pendingDelete.deleteIfExists();
-			if(status) {
-				log.info("Image " + fileName + " removed");
-			}
-			else {
-				log.info("Image " + fileName + " unable to delete.");
-			}
-		}
-		catch(URISyntaxException e) {
-			log.error("URISyntaxException :" + e.getMessage());
-		}
-		catch(StorageException ex) {
-			log.error("StorageException :" + ex.getMessage());
+			return new Response((Object)("The Movie: " + form.getMovieName() + " 's information has been updated."));
 		}
 	}
 

@@ -204,7 +204,7 @@ public class AnnouncementService {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)("The status is updated to <b>" + Util.getStatusDescWithoutRemovedStatus(data.getStatus()) + "</b>. Please refresh the slide to view the latest information."));
+			return new Response((Object)("The announcement status is updated to <b>" + Util.getStatusDescWithoutRemovedStatus(data.getStatus()) + "</b>. Please refresh the slide to view the latest information."));
 		}
 	}
 }

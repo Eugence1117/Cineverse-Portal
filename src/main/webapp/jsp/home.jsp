@@ -43,6 +43,12 @@
 					  <label for="floatingTextarea">Comments</label>
 					</div>
 					<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+					
+					<button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
+											
+					<div class="toast-container position-absolute bottom-0 end-0 p-3" id="toastContainer">
+				  			
+				  	</div>
 		        </div>
 		        <!--  END CONTENT -->
 			</div>
@@ -62,10 +68,13 @@
 	<!-- /.container -->
 
 <%@ include file="include/js.jsp"%>
+	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/js/toastMessageInitiater.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");

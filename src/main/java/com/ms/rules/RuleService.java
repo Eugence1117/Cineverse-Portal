@@ -30,7 +30,7 @@ public class RuleService {
 			if(errorMsg == null) {
 				String timeRange = startTime + "-" + endTime;
 				errorMsg = dao.editOperatingHours(branchid + Constant.OPERATING_HOURS_SYNTAX, timeRange);
-				return errorMsg == null ? new Response((Object)"Operating Hours changed.") : new Response(errorMsg);
+				return errorMsg == null ? new Response((Object)"Operating Hour for your branch has been changed.") : new Response(errorMsg);
 			}
 			else {
 				return new Response(errorMsg);

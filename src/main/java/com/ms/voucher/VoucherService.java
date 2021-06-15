@@ -101,7 +101,7 @@ public class VoucherService {
 				}
 			}
 			else {
-				return new Response((Object)"Voucher added successfully.");
+				return new Response((Object)"Voucher:" + v.getSeqid().toUpperCase() + " added successfully.");
 			}
 		}
 	}
@@ -125,7 +125,7 @@ public class VoucherService {
 					return new Response(errorMsg);
 				}
 				else {
-					return new Response((Object)"Voucher's status modified successfully.");
+					return new Response((Object)"Voucher:" + voucherId.toUpperCase() + " 's status is changed to <b>" + desc.toUpperCase() + "</b>");
 				}
 			}
 		}
@@ -151,7 +151,7 @@ public class VoucherService {
 			return new Response(errorMsg);
 		}
 		else {
-			return new Response((Object)"The voucher data has been updated.");
+			return new Response((Object)"Voucher:" + form.getSeqid().toUpperCase() + " 's information has been updated.");
 		}
 		
 	}

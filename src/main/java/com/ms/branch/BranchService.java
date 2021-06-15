@@ -189,7 +189,7 @@ public class BranchService {
 			String errorMsg = dao.updateBranch(branchid,form);
 			if(errorMsg == null) {
 				log.info("Updating Branch:" + form.getBranchname() + " SUCCESS.");
-				return new Response((Object)"Branch update successfully.");
+				return new Response((Object)"Branch information has been updated successfully.");
 			}
 			else {
 				return new Response(errorMsg);
