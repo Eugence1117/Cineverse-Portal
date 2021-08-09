@@ -63,7 +63,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ms.movie.MovieDao;
+import com.ms.movie.MovieDAO;
 import com.ms.movie.Movie;
 import com.ms.optaplanner.MovieConfig;
 import com.ms.optaplanner.Schedule;
@@ -97,7 +97,7 @@ public class ScheduleService {
 	ScheduleDAO dao;
 
 	@Autowired
-	MovieDao movieDao;
+	MovieDAO movieDao;
 
 	@Autowired
 	BranchDAO branchDao;

@@ -193,6 +193,45 @@ public class TheatreDAO {
 		}
 		return response;
 	}
+	
+	public Map<Boolean,Object> getTheatreInfoForUpdate(String theatreid) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		
+		try {
+			String query = "SELECT seqid, theatrename, seatrow, seatcol, theatretype, createddate,status, totalSeat, theatreLayout FROM masp.theatre where seqid = ?";
+			List<Map<String,Object>> rows = jdbc.queryForList(query,theatreid);
+			if(rows.size() > 0) {				
+				for(Map<String,Object> row: rows) {
+					String seqid = Util.trimString((String)row.get("seqid"));
+					char name = ((String)row.get("theatrename")).charAt(0);
+					int seatRow = (int)row.get("seatrow");
+					int seatCol = (int)row.get("seatcol");
+					String theatreType = (String)row.get("theatretype");
+					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					int status = (int)row.get("status");
+					int totalSeat = (int)row.get("totalSeat");
+					String theatreLayout = (String)row.get("theatreLayout");
+					
+					ViewTheatreForm theatre = new ViewTheatreForm(seqid,name,theatreType,Util.getStatusDesc(status),Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(createddate))
+							  ,seatRow,seatCol,totalSeat,theatreLayout);
+					
+					response.put(true, theatre);
+				}
+			}
+			else {
+				response.put(false,Constant.NO_RECORD_FOUND);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce:" + ce.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("(Exception ex:" + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
 
 	public Map<Boolean,Object> getAllTheatre(String branchid){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();

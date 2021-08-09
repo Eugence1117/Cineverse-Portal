@@ -428,7 +428,7 @@
 					{ data: 'username','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
 					{ data: 'usergroup','width':'15%',},
 		   			{ data: 'branchname','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
-		   			{ data: 'status','width':'10%'},
+		   			{ data: 'status','width':'10%',className:"text-center"},
 		   			{ data: 'action','width':'15%'}
 				],
 				order: [], 
@@ -483,15 +483,21 @@
 					value.action += "<span class='p-1 mx-1 fontBtn approveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,1)>" + approveBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
+					
+					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
 				}
 				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
+					
+						value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>";
 					value.action +="</p>"
+					
+						value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
 				}
 				
 			});
@@ -675,12 +681,12 @@
 				$("#overlayloading").hide();
 				if(data.errorMsg == null){
 					$("#addUser").modal('hide');
-					var toast = createToast(data.result,"Add user <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to add user <b>Success</b>",true);
 					readyFunction();
 					clearInsertField();
 				}
 				else{
-					var toast = createToast(data.errorMsg,"Add user <b>Failed</b>",false);	
+					var toast = createToast(data.errorMsg,"An attempt to add user <b>Failed</b>",false);	
 				}	
 			});
 		}
@@ -779,12 +785,12 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg == null){
-								var toast = createToast(data.result,"Edit user status <b>Success</b>",true);
+								var toast = createToast(data.result,"An attempt to edit user status <b>Success</b>",true);
 								readyFunction();
 								
 							}
 							else{
-								var toast = createToast(data.errorMsg,"Edit user status <b>Failed</b>",false);
+								var toast = createToast(data.errorMsg,"An attempt to edit user status <b>Failed</b>",false);
 								
 							}	
 						});
@@ -922,11 +928,11 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Edit user <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to edit user <b>Failed</b>",false);
 				}
 				else{
 					$("#editUser").modal("hide");
-					var toast = createToast(data.result,"Edit user <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to edit user <b>Success</b>",true);
 					readyFunction();
 					clearEditField();
 				}
@@ -971,10 +977,10 @@
 							$("#overlayloading").hide();
 							
 							if(data.errorMsg != null){	
-								var toast = createToast(data.errorMsg,"Remove user <b>Failed</b>",false);
+								var toast = createToast(data.errorMsg,"An attempt to remove user <b>Failed</b>",false);
 							}
 							else{
-								var toast = createToast(data.result,"Remove user <b>Success</b>",true);
+								var toast = createToast(data.result,"An attempt to remove user <b>Success</b>",true);
 								readyFunction();
 							}
 						});

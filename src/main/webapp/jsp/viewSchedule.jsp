@@ -350,11 +350,9 @@
 			rules : {
 				startdate:{
 					required:true,
-					DateFormat:true,
 				},
     			enddate:{
     				required:true,
-    				DateFormat:true,
     			}
 			},
 			invalidHandler: function() {
@@ -518,7 +516,7 @@
 					{ data: 'startTime','width':'20%'},
 		   			{ data: 'endTime','width':'20%'},
 		   			{ data: 'theatreName','width':'5%'},
-		   			{ data: 'status','width':'15%'},
+		   			{ data: 'status','width':'15%',className:"text-center"},
 		   			{ data: 'action','width':'10%'}
 				],
 				order: [], 
@@ -548,6 +546,16 @@
 				if(value.status == "Available"){
 					value.action += "<span class='p-1 mx-1 fontBtn removeBtn' id='" + value.scheduleId +"' onclick='checkTicket(this.id)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
+					
+					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+				}
+				
+				if(value.status == "End"){
+					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+				}
+				
+				if(value.status == "Cancelled"){
+					value.status = "<span class='badge bg-danger text-uppercase'>" + value.status + "</span>"
 				}
 			});
 		}
@@ -749,11 +757,11 @@
 				}).done(function(data) {
 					$("#overlayloading").hide();
 					if(data.errorMsg != null){
-						var toast = createToast(data.errorMsg,"Remove schedule <b>Failed</b>",false);
+						var toast = createToast(data.errorMsg,"An attempt to remove schedule <b>Failed</b>",false);
 						//bootbox.alert(data.errorMsg)
 					}
 					else{
-						var toast = createToast(data.result,"Remove schedule <b>Success</b>",true);
+						var toast = createToast(data.result,"An attempt to remove schedule <b>Success</b>",true);
 						if(carouselSlide == 0){
 							getTableData(timeRange);	
 						}

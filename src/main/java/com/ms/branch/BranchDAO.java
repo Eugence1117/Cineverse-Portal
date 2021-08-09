@@ -109,7 +109,7 @@ public class BranchDAO {
 		try {
 			StringBuffer query = new StringBuffer().append(
 					"SELECT b.seqid, b.branchName, b.address, b.postcode, d.districtname, s.stateName, b.status FROM masp.branch b, masp.district d, masp.state s ")
-					.append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid");
+					.append("WHERE b.districtid = d.seqid AND d.stateid = s.seqid ORDER BY b.status desc");
 
 			List<Map<String, Object>> rows = jdbc.queryForList(query.toString());
 			if (rows.size() > 0) {

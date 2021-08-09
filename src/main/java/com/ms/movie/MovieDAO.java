@@ -26,9 +26,8 @@ import com.ms.common.Response;
 import com.ms.schedule.ConfigurationModel.MovieAvailablePeriod;
 import com.ms.schedule.Model.AvailableMovie;
 
-
 @Repository
-public class MovieDao {
+public class MovieDAO {
 
 	private JdbcTemplate jdbc;
 	
@@ -37,7 +36,7 @@ public class MovieDao {
 	    this.jdbc = new JdbcTemplate(dataSource);
 	}
 	
-	public static Logger log = LogManager.getLogger(MovieDao.class);
+	public static Logger log = LogManager.getLogger(MovieDAO.class);
 	
 	
 	public Map<Boolean,Object> getNameList(){
@@ -463,7 +462,7 @@ public class MovieDao {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		List<Map<String,String>> movieList = new ArrayList<Map<String,String>>();
 		try {
-			String query = "SELECT a.movieID, a.startDate, a.endDate, a.status, m.movieName from masp.movieavailable a, masp.movie m where a.branchID = ? AND a.movieId = m.seqid";
+			String query = "SELECT a.movieID, a.startDate, a.endDate, a.status, m.movieName from masp.movieavailable a, masp.movie m where a.branchID = ? AND a.movieId = m.seqid order by a.status desc";
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchId);
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {

@@ -98,6 +98,25 @@ public class TheatreService {
 		}
 	}
 	
+	public Response getTheatreDetailsForUpdate(String theatreid) {
+		log.info("Retrieving theatre " + theatreid + " info");
+		if(Util.trimString(theatreid).equals("")) {
+			log.info("receive theatreid:null from controller.");
+			return new Response("Data required are missing from client's request.");
+		}
+		else {
+			Map<Boolean,Object> result = dao.getTheatreInfoForUpdate(theatreid);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
+			}
+			else {
+				//ViewTheatreForm theatre = (ViewTheatreForm)result.get(true);
+				//return new Response(theatre);
+				return new Response(result.get(true));
+			}
+		}
+	}
+	
 	public Response retrieveAvailableTheatre(String branchid){
 		log.info("Retrieving theatre list...");
 		if(Util.trimString(branchid).equals("")) {

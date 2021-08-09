@@ -78,7 +78,16 @@
 									<div class="row">
 										<div class="col col-md-4 label">Status</div>
 										<div class="col col-md-1 colon">:</div>
-										<div class="col col-md-7 value"><c:out value="${theatre.status}"/></div>
+										<div class="col col-md-7 value">
+										<c:choose>
+											<c:when test="${theatre.status == 'Active'}">
+												<span class="badge bg-primary"><c:out value="${theatre.status}"/></span>	
+											</c:when>
+											<c:otherwise>
+													<span class="badge bg-warning"><c:out value="${theatre.status}"/></span>	
+											</c:otherwise>
+										</c:choose>
+										</div>
 									</div>
 									<div class="row mt-2">
 										<div class="col-md m-1">

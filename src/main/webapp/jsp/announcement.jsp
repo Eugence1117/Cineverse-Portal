@@ -376,13 +376,13 @@
 			}).done(function(data){
 				//$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Edit announcement status <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to edit announcement status <b>Failed</b>",false);
 					//bootbox.alert(data.errorMsg,function(){
 					//	$("#editAnnouncement").modal("show");
 					//});
 				}
 				else{
-					var toast = createToast(data.result,"Edit announcement status <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to edit announcement status <b>Success</b>",true);
 					getAnnouncementByStatus();
 					//bootbox.alert(data.result,function(){
 					//	$("#editAnnouncement").modal("show");
@@ -426,7 +426,7 @@
         				}).done(function(data){
         					$("#overlayloading").hide();
         					if(data.errorMsg != null){
-        						var toast = createToast(data.errorMsg,"Remove announcement <b>Failed</b>",false);
+        						var toast = createToast(data.errorMsg,"An attempt to remove announcement <b>Failed</b>",false);
         						$("#editAnnouncement").modal("show");
         						
         						//bootbox.alert(data.errorMsg,function(){
@@ -434,7 +434,7 @@
         						//});
         					}
         					else{
-        						var toast = createToast(data.result,"Remove announcement <b>Success</b>",true);
+        						var toast = createToast(data.result,"An attempt to remove announcement <b>Success</b>",true);
         						//bootbox.alert(data.result,function(){
         						//	$("#editAnnouncement").modal("show");
         						//	getAnnouncementByStatus();
@@ -619,7 +619,7 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Add announcement <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to add announcement <b>Failed</b>",false);
 					//$("#addAnnouncement").addClass("skip");
 					//$("#addAnnouncement").modal("hide");
 					//bootbox.alert(data.errorMsg,function(){
@@ -628,7 +628,7 @@
 					//});
 				}
 				else{
-					var toast = createToast(data.result,"Add announcement <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to add announcement <b>Success</b>",true);
 					$("#addAnnouncement").modal("hide");
 					//bootbox.alert(data.result);
 				}	

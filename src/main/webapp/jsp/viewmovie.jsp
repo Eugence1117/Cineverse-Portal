@@ -562,11 +562,11 @@
 				},
     		}).done(function(data){
     			if(data.errorMsg == null){
-    				var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
+    				var toast = createToast(data.result,"An attempt to edit movie <b>Success</b>",true);
     				$("#editBtn").click();
     			}
     			else{
-    				var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
+    				var toast = createToast(data.errorMsg,"An attempt to edit movie <b>Failed</b>",false);
     			}
     		});
     		 

@@ -49,7 +49,7 @@ public class MovieService {
 	Azure azure;
 
 	@Autowired
-	MovieDao dao;
+	MovieDAO dao;
 	
 	@Autowired
 	BranchDAO branchDao;

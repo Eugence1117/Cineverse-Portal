@@ -144,7 +144,7 @@ public class UserDAO {
 		try {
 			StringBuffer query = new StringBuffer().append("SELECT s.seqid, s.username, u.groupname, s.status, b.branchName, s.createddate ")
 												   .append("FROM masp.staff s LEFT JOIN masp.user_group u ON s.usergroup = u.groupid ")
-												   .append("LEFT JOIN masp.branch b ON s.branchid = b.seqid WHERE s.username != ? AND s.usergroup != ?");
+												   .append("LEFT JOIN masp.branch b ON s.branchid = b.seqid WHERE s.username != ? AND s.usergroup != ? ORDER BY s.status desc");
 			List<Map<String,Object>> records = jdbc.queryForList(query.toString(),myUsername,Constant.ADMIN_GROUP);
 			log.info("Retrieved "+ records.size() +" record(s) from database.");
 			if(records.size() > 0) {

@@ -123,4 +123,11 @@ public class TheatreController {
 		log.info("Entered /theatre/getTheatreInfo.json");
 		return service.getTheatreDetails(theatreid);
 	}
+	
+	@RequestMapping( value= {"/api/manager/getTheatreInfoForUpdate.json"})
+	@ResponseBody
+	public Response getTheatreInfoForUpdate(Model model, String theatreid) {
+		log.info("Entered /theatre/getTheatreInfo.json");
+		return service.getTheatreDetails(theatreid);
+	}
 }

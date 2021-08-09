@@ -387,11 +387,11 @@
 				$("#overlayloading").hide();
 				//$(this).prop("disabled",false);
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Create movie <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to create movie <b>Failed</b>",false);
 					
 				}
 				else{
-					var toast = createToast(data.result,"Create movie <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to create movie <b>Success</b>",true);
 					
 					form.reset();
 				}	

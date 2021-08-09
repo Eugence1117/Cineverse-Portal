@@ -36,7 +36,7 @@ public class VoucherDAO {
 		
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT * FROM masp.voucher";
+			String query = "SELECT * FROM masp.voucher ORDER BY status desc";
 			List<Map<String,Object>> vouchers = jdbc.queryForList(query);
 			
 			if(vouchers.size() > 0) {

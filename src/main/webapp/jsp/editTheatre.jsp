@@ -162,13 +162,13 @@
 								<div class="col-md form-group">
 									<div class="form-floating">
 										<input name="row" class="form-control data" id="inputRow" data-json-key="row" placeholder="Write something here"/>
-										<label for="row">Total Row</label>
+										<label for="inputRow">Total Row</label>
 									</div>
 								</div>
 								<div class="col-md form-group">
 									<div class="form-floating">
 										<input name="col" class="form-control data" id="inputCol" data-json-key="col" placeholder="Write something here"/>
-											<label for="col">Total Column</label>
+											<label for="inputCol">Total Column</label>
 									</div>
 								</div>
 							</div>
@@ -240,7 +240,7 @@
 		
 		function retrieveInformation(theatreid){
     		if(theatreid != ""){
-    			$.ajax("api/authorize/getTheatreInfo.json?theatreid=" + theatreid,{
+    			$.ajax("api/manager/getTheatreInfoForUpdate.json?theatreid=" + theatreid,{
     				method : "GET",
     				accepts : "application/json",
     				dataType : "json",

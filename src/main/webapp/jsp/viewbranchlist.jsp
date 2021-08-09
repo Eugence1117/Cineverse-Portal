@@ -312,7 +312,7 @@
 					{ data: 'branchName','width':'30%'},
 		   			{ data: 'stateName','width':'20%'},
 		   			{ data: 'districtName','width':'20%'},
-		   			{ data: 'status','width':'7%'},
+		   			{ data: 'status','width':'7%',className:"text-center"},
 		   			{ data: 'action','width':'13%'}
 				],
 				order: [], 
@@ -353,13 +353,19 @@
 				if(value.status == "Inactive"){
 					value.action += "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.seqid +"' onclick=activateAndDeactivateBranch(this,1)>" + activateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='removeBranch(this)'>" + deleteBtn + "</span>";
+					
+					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
 				}
 				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateBranch(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='removeBranch(this)'>" + deleteBtn + "</span>";
+					
+					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>";
+					
+					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
 				}
 				value.action +="</p>"
 			});
@@ -492,11 +498,11 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Add branch <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to add branch <b>Failed</b>",false);
 				}
 				else{
 					$("#addBranch").modal('hide');
-					var toast = createToast(data.result,"Edit movie <b>Success</b>",false);
+					var toast = createToast(data.result,"An attempt to add branch <b>Success</b>",false);
 					clearInsertField();
 					readyFunction();
 				}
@@ -623,7 +629,7 @@
 							},
 						}).done(function(data){
 							$("#overlayloading").hide();
-							var title = status == 1 ? "Activate" : "Deactivate"
+							var title = status == 1 ? "An attempt to activate" : "An attempt to deactivate"
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,title + " user <b>Failed</b>",false);
 							}
@@ -729,10 +735,10 @@
 						}).done(function(data){
 							$("#overlayloading").hide();
 							if(data.errorMsg != null){
-								var toast = createToast(data.errorMsg,"Remove branch <b>Failed</b>",false);								
+								var toast = createToast(data.errorMsg,"An attempt to remove branch <b>Failed</b>",false);								
 							}
 							else{
-								var toast = createToast(data.result,"Remove branch <b>Failed</b>",true);
+								var toast = createToast(data.result,"An attempt to remove branch <b>Failed</b>",true);
 								readyFunction();
 							}
 						});

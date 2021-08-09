@@ -360,13 +360,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Create voucher <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to create voucher <b>Failed</b>",false);
 				}
 				else{
 					clearValidator();
 					clearInsertField();
 
-					var toast = createToast(data.result,"Create voucher <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to create voucher <b>Success</b>",true);
 				}
 			});
 		}

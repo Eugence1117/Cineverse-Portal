@@ -400,11 +400,11 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Edit branch <b>Failed</b>",false);	
+					var toast = createToast(data.errorMsg,"An attempt to edit branch <b>Failed</b>",false);	
 					$("#editBtn").click()
 				}
 				else{
-					var toast = createToast(data.result,"Edit branch <b>Success</b>",true);	
+					var toast = createToast(data.result,"An attempt to edit branch <b>Success</b>",true);	
 					$("#editBtn").click()
 				}
 			});

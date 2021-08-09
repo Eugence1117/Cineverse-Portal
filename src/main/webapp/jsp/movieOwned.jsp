@@ -248,8 +248,8 @@
 					{ data: 'movieName','width':'31%',render:function(data,type,row){return data = '<a class="movieRedirect" href="#" id="' + encodeURIComponent(data) + '">' + data + '</a>'}},
 		   			{ data: 'startDate','width':'12%',type:'de_date',targets:0},
 		   			{ data: 'endDate','width':'12%',type:'de_date',targets:0},
-		   			{ data: 'status','width':'10%'},
-		   			{ data: 'action','width':'10%'}
+		   			{ data: 'status','width':'8%',className:"text-center"},
+		   			{ data: 'action','width':'12%'}
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
@@ -290,11 +290,15 @@
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.movieId +"' onclick=getMovieDetails(this)>" + viewBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.movieId +"' onclick=activateAndDeactivateMovie(this,1)>" + activateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.movieId +"' onclick=getEditMovieDateInfo(this)>" + editBtn + "</span>";
+					
+					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.movieId +"' onclick=getMovieDetails(this)>" + viewBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.movieId +"' onclick=activateAndDeactivateMovie(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.movieId +"' onclick=getEditMovieDateInfo(this)>" + editBtn + "</span>";
+					
+					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
 				}
 				value.action +="</p>"
 			});
@@ -353,11 +357,11 @@
 							},
 						}).done(function(data){
 							if(data.errorMsg != null){
-								var toast = createToast(data.errorMsg,"Change movie status <b>Failed</b>",false);
+								var toast = createToast(data.errorMsg,"An attempt to change movie status <b>Failed</b>",false);
 								//bootbox.alert(data.errorMsg);
 							}
 							else{
-								var toast = createToast(data.result,"Change movie status <b>Success</b>",true);
+								var toast = createToast(data.result,"An attempt to change movie status <b>Success</b>",true);
 								getTableData();
 								//bootbox.alert(data.result,function(){
 								//	getTableData();
@@ -563,12 +567,12 @@
 				if(data.errorMsg != null){
 					//$("#editMovie").addClass("skip");
 					//$("#editMovie").modal("hide");
-					var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
+					var toast = createToast(data.errorMsg,"An attempt to edit movie <b>Failed</b>",false);
 					//bootbox.alert(data.errorMsg,function(){$("#editMovie").modal("show");$("#editMovie").removeClass("skip");});
 				}
 				else{
 					$("#editMovie").modal("hide");
-					var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to edit movie <b>Success</b>",true);
 					getTableData();
 					//bootbox.alert(data.result,function(){getTableData();});
 				}

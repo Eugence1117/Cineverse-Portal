@@ -588,13 +588,13 @@
     		}).done(function(data){
     			$("#overlayloading").hide();
     			if(data.errorMsg == null){
-    				var toast = createToast(data.result,"Edit movie <b>Success</b>",true);
+    				var toast = createToast(data.result,"An attempt to edit movie <b>Success</b>",true);
     				$("#movieDetails").modal('hide');
     				//bootbox.alert(data.result);
     				readyFunction();
     			}
     			else{
-    				var toast = createToast(data.errorMsg,"Edit movie <b>Failed</b>",false);
+    				var toast = createToast(data.errorMsg,"An attempt to edit movie <b>Failed</b>",false);
     				//$("#movieDetails").addClass("skip");
     				//$("#movieDetails").modal('hide');
     				//bootbox.alert(data.errorMsg,function(){

@@ -216,6 +216,7 @@
 					if(usergroup == 1){
 						addActionButton(data.result);	
 					}
+					enhanceStatusVisual(data.result);
 					resultDt.rows.add(data.result).draw();
 					addTooltip();
 				}
@@ -279,7 +280,7 @@
 					{ data: 'min','width':'15%',},
 		   			{ data: 'reward','width':'10%'},
 		   			{ data: 'quantity','width':'15%'},
-		   			{ data: 'status','width':'10%'},
+		   			{ data: 'status','width':'10%',className:"text-center"},
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
@@ -299,7 +300,7 @@
 					{ data: 'min','width':'15%',},
 		   			{ data: 'reward','width':'10%'},
 		   			{ data: 'quantity','width':'15%'},
-		   			{ data: 'status','width':'10%'},
+		   			{ data: 'status','width':'10%',className:"text-center"},
 		   			{ data: 'action','width':'15%'}
 				],
 				order: [], 
@@ -307,6 +308,22 @@
 				retrieve: true,
 				fixedHeader: true,
 				responsive:true
+			});
+		}
+		
+		function enhanceStatusVisual(data){
+			$.each(data, function(index, value) {
+				if(value.status == "Inactive"){
+					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+				}
+				
+				if(value.status == "Active"){
+					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+				}
+				
+				if(value.status == "Removed"){		
+					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+				}
 			});
 		}
 		
@@ -347,7 +364,7 @@
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.voucherId +"' onclick=getCurrentVoucherDetails(this.id)>" + editBtn + "</span>";
 					value.action +="</p>"
 				}
-				
+			
 			});
 		}
 		
@@ -416,7 +433,7 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				
-				var title = status == -1 ? "Remove voucher" : "Edit voucher status";
+				var title = status == -1 ? "An attempt to remove voucher is " : "An attempt to edit voucher status is";
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,title + " <b>Failed</b>.",false);
 					//bootbox.alert(data.errorMsg);
@@ -590,13 +607,13 @@
 			}).done(function(data){
 				$("#overlayloading").hide();
 				if(data.errorMsg != null){
-					var toast = createToast(data.errorMsg,"Edit voucher <b>Failed</b>.",false);
+					var toast = createToast(data.errorMsg,"An attempt to edit voucher <b>Failed</b>.",false);
 					//$("#editVoucher").addClass("skip");
 					//$("#editVoucher").modal("hide");
 					//bootbox.alert(data.errorMsg,function(){$("#editVoucher").removeClass("skip");$("#editVoucher").modal("show")});
 				}
 				else{
-					var toast = createToast(data.result,"Edit voucher <b>Success</b>",true);
+					var toast = createToast(data.result,"An attempt to edit voucher <b>Success</b>",true);
 					$("#editVoucher").modal("hide");
 					readyFunction();
 					//bootbox.alert(data.result,function(){readyFunction()});
