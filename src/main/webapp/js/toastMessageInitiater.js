@@ -6,7 +6,8 @@
  	
     dataObject["icon"] = status ? "<i class='fas fa-info-circle text-white'></i>" : "<i class='fas fa-exclamation-triangle text-white'></i>"
     dataObject["date"] = new Date();
-    dataObject["msg"] = title;
+    dataObject["title"] = title;
+	dataObject["msg"] = msg
     dataObject["status"] = status;
     
     var sessionStorage = window.sessionStorage;
@@ -26,10 +27,11 @@
  	 var sessionStorage = window.sessionStorage;
  	 if(sessionStorage.activityFeed){
  	 	var activityArray = JSON.parse(sessionStorage.activityFeed);
- 	 	for(var i = 0 ; i < 5; i++){
+		var counter = activityArray.length > 5 ? 5 : activityArray.length
+ 	 	for(var i = 0 ; i < counter; i++){
  	 		var dataObj = activityArray[i];
  	 		
- 	 		var icon = dataObj.icon;
+ 	 		var icon = dataObj.icon;			
     		var msg = dataObj.msg;
     		var date = dataObj.date;
     		var status = dataObj.status;
@@ -48,7 +50,8 @@
 	var dataObject = new Object();
     dataObject["icon"] = status ? "<i class='fas fa-info-circle text-white'></i>" : "<i class='fas fa-exclamation-triangle text-white'></i>"
     dataObject["date"] = date;
-    dataObject["msg"] = title;
+    dataObject["msg"] = msg;
+	dataObject["title"] = title;
     dataObject["status"] = status;
 	
 	//Store into session

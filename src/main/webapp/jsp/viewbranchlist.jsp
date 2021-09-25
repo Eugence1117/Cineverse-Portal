@@ -631,10 +631,10 @@
 							$("#overlayloading").hide();
 							var title = status == 1 ? "An attempt to activate" : "An attempt to deactivate"
 							if(data.errorMsg != null){
-								var toast = createToast(data.errorMsg,title + " user <b>Failed</b>",false);
+								var toast = createToast(data.errorMsg,title + " branch <b>Failed</b>",false);
 							}
 							else{
-								var toast = createToast(data.result,title + " user <b>Success</b>",true);
+								var toast = createToast(data.result,title + " branch <b>Success</b>",true);
 								readyFunction();
 							}
 						});

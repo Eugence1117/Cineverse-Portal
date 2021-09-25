@@ -23,7 +23,7 @@
            	 	<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" id="activityFeed"  style="left:auto">
                 	<h6 class="dropdown-header">Alerts Center</h6>
                 	<a class="dropdown-item text-center small text-gray-500 emptyActivity">No messages</a>
-                	<a class="dropdown-item text-center small text-gray-500 existActivity hide" href="/viewNotification.htm">Show All Alerts</a>
+                	<a class="dropdown-item text-center small text-gray-500 existActivity hide" href="viewNotification.htm">Show All Alerts</a>
             	</div>
              </li>
              
