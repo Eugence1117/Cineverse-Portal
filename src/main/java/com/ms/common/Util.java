@@ -1,5 +1,7 @@
 package com.ms.common;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,7 +12,13 @@ import java.util.Map;
 import com.ms.rules.OperatingHours;
 
 public class Util {
-
+	public static String getDetailExceptionMsg(Exception ex) {
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+		ex.printStackTrace(printWriter);
+		printWriter.flush();
+		return writer.toString();
+	}
 	public static String trimString(String string) {
 		return string==null?"":string.trim();
 	}
