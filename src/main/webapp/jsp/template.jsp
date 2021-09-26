@@ -50,6 +50,7 @@
 		</div>
 	</div>
 	
+	<%@ include file="/jsp/include/globalElement.jsp" %>
 	<!-- /.container -->
 
 <%@ include file="include/js.jsp"%>

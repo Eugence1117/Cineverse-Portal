@@ -415,6 +415,9 @@
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
+					400:function(){
+						window.locatin.href = "400.htm";
+					},
 					401:function(){
 						window.location.href = "expire.htm";
 					},
@@ -445,6 +448,9 @@
 					accepts : "application/json",
 					dataType : "json",
 					statusCode:{
+						400:function(){
+							window.locatin.href = "400.htm";
+						},
 						401:function(){
 							window.location.href = "expire.htm";
 						},
@@ -484,6 +490,9 @@
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
+					400:function(){
+						window.locatin.href = "400.htm";
+					},
 					401:function(){
 						window.location.href = "expire.htm";
 					},
@@ -550,6 +559,9 @@
 					"X-CSRF-Token": CSRF_TOKEN
 				},
 				statusCode:{
+					400:function(){
+						window.locatin.href = "400.htm";
+					},
 					401:function(){
 						window.location.href = "expire.htm";
 					},

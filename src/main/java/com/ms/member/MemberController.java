@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.javaparser.utils.Log;
 import com.ms.common.Response;
 
 @Controller
@@ -37,9 +38,17 @@ public class MemberController {
 	
 	@RequestMapping(value = {"/api/admin/updateMemberStatus.json"}, method= {RequestMethod.POST})
 	@ResponseBody
-	public Response changeMemberStatus(Model model,@RequestBody UpdateMemberStatusForm dataForm) {
+	public Response changeMemberStatus(Model model, @RequestBody UpdateMemberStatusForm dataForm) {
 		log.info("Enter /updateMemberStatus");
+				
+		return service.updateMemberStatus(dataForm);	
+	}
+	
+	@RequestMapping(value = {"/api/admin/retrieveMemberInfo.json"})
+	@ResponseBody
+	public Response getMemberDetails(Model model,String memberId) {
+		log.info("Enter /getMemberDetails");
 		
-		return service.updateMemberStatus(dataForm);
+		return service.getMemberDetails(memberId);
 	}
 }

@@ -65,6 +65,70 @@
 		    </footer>
 		</div>
 	</div>
+	
+	<%@ include file="/jsp/include/globalElement.jsp" %>
+	
+	<!-- View Modal -->
+	<div class="modal fade" id="viewMember" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Member Details</h5>
+					<button type="button" class="close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="hide m-2 text-center" id="loading">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						<p class="text-center">Loading...</p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Member ID</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="seqid"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Name</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="name"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Username</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="username"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>IC Number</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="ic"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Birth Date</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="dateOfBirth"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Email</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="email"></p>
+					</div>
+					<div class="row">
+						<label class="col-md-4"><b>Status</b></label> <label
+							class="col-md-1 colon">:</label>
+						<p class="d-inline data col-md-6" data-json-key="status"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary mx-auto"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- /.container -->
 
@@ -87,6 +151,9 @@
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
+					400:function(){
+						window.locatin.href = "400.htm";
+					},
 					401:function(){
 						window.location.href = "expire.htm";
 					},
@@ -97,8 +164,7 @@
 						window.location.href = "404.htm";
 					}
 				},
-			}).done(function(data){
-				console.log(data)
+			}).done(function(data){				
 				var resultDt = getResultDataTable().clear();
 				if(data.errorMsg == null){
 					addActionButton(data.result);
@@ -175,7 +241,7 @@
 					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
 				}
 				else if(value.status == "Active"){
-					value.action = "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateBranch(this,0)>" + deactivateBtn + "</span>";
+					value.action = "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateMember(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getMemberDetails(this)>" + viewBtn + "</span>"
 					
 					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
@@ -186,6 +252,119 @@
 				}
 				value.action +="</p>"
 			});
+		}
+		
+		function getMemberDetails(element){
+			var id = element.id
+			
+			if(id === undefined){
+				bootbox.alert("Unable to extract the member ID from the selected member. Please try again later or refresh the page.");
+				return;
+			}
+			clearMemberDetails();
+			if(!$("#viewMember").hasClass("show")){
+				$("#viewMember").modal("show");
+			}
+			
+			$("#loading").show();
+			$("#viewMember .row").hide();
+			
+			$.ajax("api/admin/retrieveMemberInfo.json?memberId=" + id,{
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+				statusCode:{
+					400:function(){
+						window.locatin.href = "400.htm";
+					},
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				},
+			}).done(function(data){
+				if(data.errorMsg == null){
+					$("#loading").hide();
+					$("#viewMember .row").show();
+					
+					$("#viewMember .modal-body .data").each(function(index,element){
+						var key = $(this).data('json-key');
+			            if (key && data.result.hasOwnProperty(key)) {
+			                $(this).text("	" + data.result[key] || "	-");
+			            }
+					});
+				}
+				else{
+					$("#loading").hide();
+					bootbox.alert(data.errorMsg);
+				}
+			})
+
+		}
+		
+		function clearMemberDetails(){
+			$("#viewMember .data").each(function(){
+				$(this).text("");
+			})
+		}
+		
+		function activateAndDeactivateMember(element,status){			
+			if(status == 0 || status == 1){
+				bootbox.confirm("Are you sure to change the member status to <b>" + (status == 1 ? "Active" : "Inactive") + "</b>?",function(result){
+					if(result){
+						var id = element.id
+						
+						var formData = {
+							"seqid":id,
+							"status":status
+						}
+						
+						$("#overlayloading").show();															
+						
+						$.ajax("api/admin/updateMemberStatus.json",{
+							method : "POST",
+							accepts : "application/json",
+							dataType : "json",
+							contentType:"application/json; charset=utf-8",
+							data: JSON.stringify(formData),
+							headers:{
+								"X-CSRF-Token": CSRF_TOKEN
+							},
+							statusCode:{
+								400:function(){
+									window.locatin.href = "400.htm";
+								},
+								401:function(){
+									window.location.href = "expire.htm";
+								},
+								403:function(){
+									window.location.href = "403.htm";
+								},
+								404:function(){
+									window.location.href = "404.htm";
+								}
+							},
+						}).done(function(data){
+							$("#overlayloading").hide();
+							if(data.errorMsg != null){
+								var toast = createToast(data.errorMsg,"An attempt to update member status <b>Failed</b>",false);
+							}
+							else{
+								var toast = createToast(data.result,"An attempt to update member status <b>Success</b>",true);
+								readyFunction();
+							}
+						});
+					}
+				})	
+			}
+			else{
+				bootbox.alert("Invalid request found. PLease try again later.")
+			}
 		}
 	</script>
 </body>

@@ -31,19 +31,44 @@ public class MemberService {
 	}
 	
 	public Response updateMemberStatus(UpdateMemberStatusForm form) {
-		String statusDesc = Util.getStatusDescWithoutRemovedStatus(form.getStatus());
-		if(statusDesc == null) {
-			return new Response("Received invalid data from user's request.");
-		}
-		else {
-			log.info("Updating user status to :" + statusDesc);
-			String errorMsg = dao.updateMemberStatus(form);
-			if(errorMsg != null) {
-				return new Response(errorMsg);
+		int status = form.convertToInteger();
+		if(status != -1) {
+			String statusDesc = Util.getStatusDescWithoutRemovedStatus(status);
+			if(statusDesc == null) {
+				return new Response("Received invalid data from user's request.");
 			}
 			else {
-				return new Response((Object)("User's status is updated to " + statusDesc));
+				log.info("Updating user status to :" + statusDesc);
+				String errorMsg = dao.updateMemberStatus(form);
+				if(errorMsg != null) {
+					return new Response(errorMsg);
+				}
+				else {
+					return new Response((Object)("Member (" + form.getSeqid() +") status is updated to " + statusDesc + "."));
+				}
 			}
+		}
+		else {
+			return new Response("Received invalid data. Please try again later");
+		}
+	}
+	
+	public Response getMemberDetails(String memberId) {
+		if(!memberId.isEmpty()) {
+			Map<Boolean,Object> result = dao.retrieveMemberDetails(memberId);
+			if(result.containsKey(false)) {
+				return new Response((String)result.get(false));
+			}
+			else {
+				if(result.get(true) != null) {
+					return new Response(result.get(true));
+				}else {
+					return new Response("Member with id " + memberId + " not found.");
+				}
+			}
+		}
+		else {
+			return new Response("Member ID requested to view are empty.");
 		}
 	}
 	

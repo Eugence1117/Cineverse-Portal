@@ -72,6 +72,43 @@ public class MemberDAO {
 		return result;
 	}
 	
+	public Map<Boolean,Object> retrieveMemberDetails(String memberId){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
+		try { 
+			String query = "SELECT seqid, name, ic, dateofbirth, email, status, username FROM masp.member where seqid = ?";			
+			List<Map<String,Object>> records = jdbc.queryForList(query,memberId);
+			
+			if(records.size() > 0) {				
+				for(Map<String,Object> record : records) {
+					String seqid = Util.trimString((String)record.get("seqid"));
+					String name = Util.trimString((String)record.get("name"));
+					String ic = Util.trimString((String)record.get("ic"));
+					String email = Util.trimString((String)record.get("email"));
+					String username = Util.trimString((String)record.get("username"));
+					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)record.get("dateOfBirth"));
+					int status = (int)record.get("status");
+					
+					
+					MemberView data = new MemberView(seqid,name,ic,birthdate,Util.getStatusDesc(status),email,username);
+					result.put(true, data);
+				}				
+			}
+			else {				
+				log.info("Member not found.");
+				result.put(true,null);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return result;
+	}
+	
 	public String updateMemberStatus(UpdateMemberStatusForm data) {
 		try {
 			StringBuffer query = new StringBuffer().append("UPDATE masp.member SET status = ? WHERE seqid = ?");

@@ -29,6 +29,11 @@ public class ErrorController{
 		return "sessionExpire";
 	}
 	
+	@RequestMapping("/400.htm")
+	public String handle400Event(HttpServletRequest req, Model model) {
+		return "400";
+	}
+	
 	@RequestMapping("/404.htm")
 	public String handle404Event(HttpServletRequest req, Model model) {
 		return "404";
@@ -44,6 +49,11 @@ public class ErrorController{
 		String errorMsg = "";
 		String title ="";
 		switch(statusCode){
+			case 400:{
+				title = "Bad Request";
+				errorMsg = "It looks like you use the application wrongly...";
+				break;
+			}
 			case 404:{
 				title = "Page Not Found";
 				errorMsg = "It looks like the page is missing...";
