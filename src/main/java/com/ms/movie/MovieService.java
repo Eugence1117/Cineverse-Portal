@@ -333,7 +333,8 @@ public class MovieService {
 					form.setEndDate(Constant.SQL_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(form.getEndDate() + Constant.DEFAULT_TIME)));
 					String errorMsg = dao.insertMovieAvailable(form, branchId);
 					if(errorMsg == null) {
-						return new Response((Object)"The movie has been added into your branch.");
+						String msg = "The movie with ID:" + form.getMovieId() + " has been added into your branch."; 
+						return new Response((Object)msg);
 					}
 					else {
 						return new Response(errorMsg);
@@ -419,7 +420,8 @@ public class MovieService {
 						
 						String errorMsg = dao.updateMovieAvailableInBranch(form, branchId);
 						if(errorMsg == null) {
-							return new Response((Object)"The movie has been updated to latest changes.");
+							String msg = "The movie with ID:" + form.getMovieId() + " has been updated to latest changes."; 
+							return new Response((Object)msg);							
 						}
 						else {
 							return new Response(errorMsg);
@@ -448,7 +450,8 @@ public class MovieService {
 		else {
 			String errorMsg = dao.changeMovieAvailableStatusInBranch(branchId, movieId, status);
 			if(errorMsg == null) {
-				return new Response((Object)"Status updated.");
+				String msg = "The Movie's Status with ID:" + movieId + " has been updated."; 
+				return new Response((Object)msg);
 			}
 			else {
 				return new Response(errorMsg);

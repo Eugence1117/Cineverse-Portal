@@ -185,7 +185,7 @@ public class ScheduleService {
 			else {
 				//UPDATE ALL THE TICKET WITH SAME SCHEDULE ID
 				//iF PROBLEM OCCURED THROW NEW RUNTIMEEXCEPTION
-				return new Response((Object)"The schedule is being removed. A refund will be initialize to the ticket that is under this schedule.");
+				return new Response((Object)("The schedule with ID " + scheduleId + " is being removed. A refund will be initialize to the ticket that is under this schedule."));
 			}
 		}
 	}

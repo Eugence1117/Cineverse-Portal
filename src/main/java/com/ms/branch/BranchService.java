@@ -77,7 +77,7 @@ public class BranchService {
 
 	
 	public Response getBranchDetails(String branchId) {
-		log.info("Retrieving branch Information with ID" + branchId);
+		log.info("Retrieving branch Information with ID:" + branchId);
 		Map<Boolean,Object> response = dao.getBranchDetails(branchId);
 		if(response.containsKey(false)) {
 			return new Response((String)response.get(false));
@@ -126,7 +126,7 @@ public class BranchService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)("Branch status updated to " + Util.getStatusDesc(status) + "."));
+				return new Response((Object)("Branch 's status with ID:" + branchId + " updated to " + Util.getStatusDesc(status) + "."));
 			}
 		}
 	}
@@ -191,7 +191,7 @@ public class BranchService {
 			String errorMsg = dao.updateBranch(branchid,form);
 			if(errorMsg == null) {
 				log.info("Updating Branch:" + form.getBranchname() + " SUCCESS.");
-				return new Response((Object)"Branch information has been updated successfully.");
+				return new Response((Object)("Branch information with ID:" + branchid + " has been updated successfully."));
 			}
 			else {
 				return new Response(errorMsg);

@@ -118,7 +118,7 @@ public class UserService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)("User's status is updated to " + statusDesc));
+				return new Response((Object)("User's status with ID:" + userid + " is updated to " + statusDesc));
 			}
 		}
 	}
@@ -135,7 +135,7 @@ public class UserService {
 	
 	public Response getEditInfo(String userid){
 		Map<String,Object> result = new LinkedHashMap<String, Object>();
-		log.info("Retrieving info from database with id :" + userid);
+		log.info("Retrieving info from database with ID :" + userid);
 		Map<Boolean,Object> response = dao.getEditInfo(userid);
 		log.info("Received response from database.");
 		if(response.containsKey(false)) {
@@ -182,13 +182,13 @@ public class UserService {
 						throw new RuntimeException(error);
 					}
 					else {
-						return new Response((Object)("User details is update. The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
+						return new Response((Object)("User details with ID:" + form.getSeqid() + " is updated. The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
 					}
 				}
 				else {
 					if(form.getEditbranchid().equals((String)branchInfo.get("id"))) {
 						//if same no need bother
-						return new Response((Object)("User details is update."));
+						return new Response((Object)("User details with ID:" + form.getSeqid() + " is updated."));
 					}
 					else {
 						//Deactivate previous branch too
@@ -197,7 +197,7 @@ public class UserService {
 							throw new RuntimeException(error);
 						}
 						else {
-							return new Response((Object)("User details is update. The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
+							return new Response((Object)("User details with ID:" + form.getSeqid() + " is updated.The previous branch <b>" + branchInfo.get("name") + "</b> assigned to this user has been deactivated automatically since there is no user managing the branch."));
 						}
 					}
 				}
@@ -239,7 +239,7 @@ public class UserService {
 				URL url = uri.toURL();
 				String errorMsg = dao.changeProfilePic(url.toString(), userid);
 				if(errorMsg == null) {
-					return new Response((Object)"Profile picture changed. Please login again to view the latest changes.");
+					return new Response((Object)"Your profile picture has been changed. Please login again to view the latest changes.");
 				}
 				else {
 					return new Response(errorMsg);
@@ -288,7 +288,7 @@ public class UserService {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)"Password updated. Please use the new password when you login.");
+				return new Response((Object)"Your password has been updated. Please use the new password when you login.");
 			}
 		}
 		else {

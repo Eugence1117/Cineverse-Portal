@@ -28,7 +28,11 @@
  	 if(sessionStorage.activityFeed){
  	 	var activityArray = JSON.parse(sessionStorage.activityFeed);
 		var counter = activityArray.length > 5 ? 5 : activityArray.length
- 	 	for(var i = 0 ; i < counter; i++){
+		
+		var firstIndex = activityArray.length - 1;
+		var lastIndex = firstIndex > 5 ? activityArray.length - 5 : 0		
+		
+ 	 	for(var i = lastIndex ; i <= firstIndex; i++){
  	 		var dataObj = activityArray[i];
  	 		
  	 		var icon = dataObj.icon;			

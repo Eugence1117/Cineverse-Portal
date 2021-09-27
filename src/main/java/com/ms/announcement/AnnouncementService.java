@@ -146,7 +146,7 @@ public class AnnouncementService {
 					Announcement annoucement = new Announcement(id, url.toString(), Constant.ACTIVE_STATUS_CODE);
 					String errorMsg = dao.addNewAnnouncement(annoucement);
 					if(errorMsg == null) {
-						return new Response((Object)"Annoucement Added. Please refresh the slide to view the latest information.");
+						return new Response((Object)"New Annoucement Added. Please refresh the slide to view the latest information.");
 					}
 					else {
 						azure.deleteFile(id + fileFormat, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
@@ -178,7 +178,7 @@ public class AnnouncementService {
 			String errorMsg = dao.deleteAnnouncement(announcementID);
 			if(errorMsg==null) {
 				azure.deleteFile(announcementID + fileFormat, Constant.ANNOUCEMENT_IMAGE_CONTAINER_NAME);
-				return new Response((Object)"Announcement specified has been removed. Please refresh the slide to view the latest information.");
+				return new Response((Object)("Announcement with ID:" + announcementID + " has been removed. Please refresh the slide to view the latest information."));
 			}
 			else {
 				return new Response(errorMsg);
