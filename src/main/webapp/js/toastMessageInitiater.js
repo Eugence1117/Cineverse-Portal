@@ -117,11 +117,11 @@
     
     	var dataObj = JSON.parse($(this).data("obj"));
     	var icon = dataObj.icon;
-    	var msg = dataObj.msg;
+    	var title = dataObj.title;
     	var date = dataObj.date;
     	var status = dataObj.status;
     	
-    	convertToastToActivityFeed(icon,msg,date,status);
+    	convertToastToActivityFeed(icon,title,date,status);
 		$(this).remove();
 		
     });
