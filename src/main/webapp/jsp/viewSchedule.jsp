@@ -240,14 +240,6 @@
 	
 	<%@ include file="/jsp/include/globalElement.jsp" %>
 	
-	<div id="overlayloading">
-    	<div class="spinner-border text-primary" role="status">
-		  <span class="visually-hidden">Loading...</span>
-		</div>
-		<p class="text-center">Loading...</p>
-		
-	</div>
-	
 	<div class="modal fade" id="eventView" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">

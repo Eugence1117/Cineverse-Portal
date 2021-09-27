@@ -33,6 +33,9 @@
     	<intercept-url pattern="/addVoucher.htm" access="hasAnyRole('ROLE_ADMIN')"/>
     
     	<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
+    	<intercept-url pattern="/members.htm" access="hasAnyRole('ROLE_ADMIN')" />
+    	<intercept-url pattern="/viewTickets.htm" access="hasAnyRole('ROLE_ADMIN')" />
+    	
     	<intercept-url pattern="/profile.htm" access="isAuthenticated()" />
 		
     	<intercept-url pattern="/scheduleMovie.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
@@ -44,6 +47,7 @@
     	
     	<intercept-url pattern="/viewBranch.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
     	<intercept-url pattern="/addMovie.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
+    	<intercept-url pattern="/viewTicketSales.htm" access="hasAnyRole('ROLE_ADMIN','ROLE_BRANCH_ADMIN')"/>
     	
     	<intercept-url pattern="/api/admin/*" access="hasAnyRole('ROLE_ADMIN')" />
     	<intercept-url pattern="/api/manager/*" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />

@@ -230,24 +230,12 @@
 											<div class="row px-3 mt-3">
 												<div class="col-sm-12">
 													<!--  Template for Daily -->
-													<div class="d-none" id="dailySchedule">
-														<form>
-														</form>
-													</div>
-													
-													<!-- Template for Weekly -->
-													<div class="d-none" id="weeklySchedule">
-														<form>
-														</form>
-													</div>
-						
-													<!--  Template for Overall -->
-													<div class="d-none" id="overallSchedule">
+													<div id="ConfigureSchedule">
 														<form>
 														</form>
 													</div>
 													<!--  End of Overall Template -->
-													<div class="d-none m-2" id="loading">
+													<div class="m-2" id="loading">
 														<div class="spinner-border text-primary" role="status">
 													  		<span class="visually-hidden">Loading...</span>
 														</div>
@@ -279,7 +267,7 @@
 					        	</div>
 					        	
 					        	<div class="m-2 p-2">
-					        		<h4>Unassigned Schedule</h4>
+					        		<h4>Unassigned Schedule <span id="unAssignSubtitle"></span></h4>
 					        		<div id="draggable">
 					        			<ul class="draggable list-group">
 					        			</ul>
@@ -401,6 +389,8 @@
 					}
 				})
 			}
+			
+			$("#loading").hide()
 
 		});
 	
@@ -523,8 +513,8 @@
 					//Read data
 					var movieList = data.singleResult;
 					if(movieList != null){
-						$("#overallSchedule > form").data("startDate",data.range.startDate);
-						$("#overallSchedule > form").data("endDate",data.range.endDate);
+						$("#ConfigureSchedule > form").data("startDate",data.range.startDate);
+						$("#ConfigureSchedule > form").data("endDate",data.range.endDate);
 						var innerElement = theatreElement + "<hr/><div class='media-group'>";
 						var movies = movieList.list;
 						for(var index in movies){
@@ -555,16 +545,16 @@
 										"<button class='btn-primary btn' type='button' id='submitOverall'>Apply</button>" +
 										"</div>" +
 										"<div class='col-sm-5'></div></div>";
-						$("#overallSchedule > form").append(innerElement);
+						$("#ConfigureSchedule > form").append(innerElement);
 						synchronizeSliderValue(1); //Used to keep the range value at 100
-						$("#overallSchedule").slideDown()
+						$("#ConfigureSchedule").slideDown()
 						setupSlider(); //Setup legend under the range
 						activeTooltip();
 						addListenerToOverallButton();
 						theatreSelectionListener(1);
 					}
 					else{
-						$("#overallSchedule > form").append("<p class='emptyMovie'>No movie Available.</p>");
+						$("#ConfigureSchedule > form").append("<p class='emptyMovie'>No movie Available.</p>");
 					}
 					
 				} else {
@@ -574,8 +564,8 @@
 		}
 		
 		function addListenerToOverallButton(){
-			$("#overallSchedule #submitOverall").on('click',function(){
-				var form = $("#overallSchedule > form");
+			$("#ConfigureSchedule #submitOverall").on('click',function(){
+				var form = $("#ConfigureSchedule > form");
 				var theatreSelected = retrieveTheatreSelection(1);
 				if(!theatreSelected){
 					return false;
@@ -633,6 +623,8 @@
 							obj["operatingEndTime"] = "23:59";
 							obj["resource"] = dataLocation;
 							
+							$("#unAssignSubtitle").text(" (" + unassignedData.length + " Schedule(s))")
+							
 							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
 						}
 					});
@@ -679,8 +671,8 @@
 					
 					//Read the date from list.
 					var resultList = data.result
-					$("#weeklySchedule > form").data("startDate",data.range.startDate);
-					$("#weeklySchedule > form").data("endDate",data.range.endDate);
+					$("#ConfigureSchedule > form").data("startDate",data.range.startDate);
+					$("#ConfigureSchedule > form").data("endDate",data.range.endDate);
 					for(var result in resultList){
 						if(resultList[result] != null){
 							var weeklyMovie = resultList[result];
@@ -719,7 +711,7 @@
 							}
 							
 							innerElement += "</div></div></div>";
-							$("#weeklySchedule > form").append(innerElement);
+							$("#ConfigureSchedule > form").append(innerElement);
 						
 						}
 						else{
@@ -735,11 +727,11 @@
 					"</div>" +
 					"<div class='col-sm-5'></div></div>";
 					
-					$("#weeklySchedule > form").append(buttonElement);
+					$("#ConfigureSchedule > form").append(buttonElement);
 					
 					activateClickListener();
 					synchronizeSliderValue(0);
-					$("#weeklySchedule").slideDown();
+					$("#ConfigureSchedule").slideDown();
 					setupSlider();
 					activeTooltip();
 					addListenerToWeeklyButton();
@@ -762,8 +754,8 @@
 		}
 		
 		function addListenerToWeeklyButton(){
-			$("#weeklySchedule #submitWeekly").on('click',function(){
-				var form = $("#weeklySchedule > form");
+			$("#ConfigureSchedule #submitWeekly").on('click',function(){
+				var form = $("#ConfigureSchedule > form");
 				var theatreSelected = retrieveTheatreSelection(2);
 				if(!theatreSelected){
 					return false;
@@ -862,7 +854,7 @@
 				if (data.error == null) {
 					clearFormHTML()
 					//clearAllSchedule();
-					$("#dailySchedule > form").data("startDate",data.range.startDate);
+					$("#ConfigureSchedule > form").data("startDate",data.range.startDate);
 					//Read the data from list.
 					var resultList = data.result
 					for(var result in resultList){
@@ -900,7 +892,7 @@
 								innerElement += "<p class='emptyMovie'>No movie Available</p>";
 							}
 							innerElement += "</div></div></div>";
-							$("#dailySchedule > form").append(innerElement);
+							$("#ConfigureSchedule > form").append(innerElement);
 						}
 						else{
 							console.log("No movie Available");
@@ -915,11 +907,11 @@
 					"</div>" +
 					"<div class='col-sm-5'></div></div>";
 					
-					$("#dailySchedule > form").append(buttonElement);
+					$("#ConfigureSchedule > form").append(buttonElement);
 					
 					activateClickListener();
 					synchronizeSliderValue(0); //sync the range value maintain at 100
-					$("#dailySchedule").slideDown();
+					$("#ConfigureSchedule").slideDown();
 					setupSlider(); //setup legend
 					activeTooltip();
 					addListenerToDailyButton();
@@ -931,8 +923,8 @@
 		}
 		
 		function addListenerToDailyButton(){
-			$("#dailySchedule #submiDaily").on('click',function(){
-				var form = $("#dailySchedule > form");
+			$("#ConfigureSchedule #submiDaily").on('click',function(){
+				var form = $("#ConfigureSchedule > form");
 				var theatreSelected = retrieveTheatreSelection(3);
 				if(!theatreSelected){
 					return false;
@@ -1062,7 +1054,7 @@
 			var objects = new Object();
 			if(mode == 1){
 				var theatres = [];
-				$("#overallSchedule > form input[type=checkbox]").each(function(){
+				$("#ConfigureSchedule > form input[type=checkbox]").each(function(){
 					if($(this).prop("checked")){						
 						theatres.push($(this).attr("id"));
 					}
@@ -1075,7 +1067,7 @@
 				}
 			}
 			else if (mode == 2){
-				$("#weeklySchedule > form > .component").each(function(){
+				$("#ConfigureSchedule > form > .component").each(function(){
 					if(!$(this).find(".emptyMovie").length){
 						var preId = $(this).attr("id");
 						var key = preId + ".theatreSelection";
@@ -1102,7 +1094,7 @@
 				
 				if(isEmpty){
 					var string = "Error occrued from: <br/>";
-					var lastConfiguredDay = new Date($("#weeklySchedule > form").data("endDate"));
+					var lastConfiguredDay = new Date($("#ConfigureSchedule > form").data("endDate"));
 					console.log(lastConfiguredDay);
 					for(var i in weeks){
 						var startDate = weeks[i];
@@ -1122,7 +1114,7 @@
 				}
 			}
 			else{
-				$("#dailySchedule > form > .component").each(function(){
+				$("#ConfigureSchedule > form > .component").each(function(){
 					if(!$(this).find(".emptyMovie").length){
 						var preId = $(this).attr("id");
 						var key = preId + ".theatreSelection";
@@ -1183,7 +1175,7 @@
 			//Overall
 			if(mode == 1){
 				var arrays = [];
-				$("#overallSchedule > form input[type=checkbox]").each(function(){
+				$("#ConfigureSchedule > form input[type=checkbox]").each(function(){
 					if($(this).prop("checked")){
 						//var theatreId = $(this).attr("id");
 						var type =  $(this).siblings("input").val();
@@ -1193,7 +1185,7 @@
 					}
 				});
 				
-				$("#overallSchedule > form .theatreAvailable").each(function(){
+				$("#ConfigureSchedule > form .theatreAvailable").each(function(){
 					var previousElement = $(this).val();
 					$(this).html(createTheatreSelection(arrays,previousElement));
 				});
@@ -1224,12 +1216,8 @@
 		
 		<!-- Used when user switch to another view Eg. Daily to weekly-->
 		function hideAllSchedule() {
-			$("#dailySchedule").hide()
-			$("#dailySchedule > form").html("");
-			$("#weeklySchedule").hide()
-			$("#weeklySchedule > form").html("");
-			$("#overallSchedule").hide()
-			$("#overallSchedule > form").html("");
+			$("#ConfigureSchedule").hide()
+			$("#ConfigureSchedule > form").html("");
 		}
 
 		<!-- Append the legend into the range slider-->
@@ -1246,11 +1234,11 @@
 		<!-- Used to listen the slider value and control other slider to make maximum at 100-->
 		function synchronizeSliderValue(mode){
 			if(mode == 1){ //For Overall
-				$("#overallSchedule > form .slider").on('input',function(){
+				$("#ConfigureSchedule > form .slider").on('input',function(){
 					var nonActiveElementSum = getSliderValue(this);
 					var leftOver = 100 - $(this).val();
 					var activeElement = this;
-					$("#overallSchedule > form .slider").each(function(){
+					$("#ConfigureSchedule > form .slider").each(function(){
 						if(!$(this).is($(activeElement))){
 							var newValue = (leftOver/100) * ($(this).val() / (nonActiveElementSum / 100));
 							$(this).val(Math.round(newValue));
@@ -1289,7 +1277,7 @@
 		function getSliderValue(activeElement){
 
 			var total = +0;
-			$("#overallSchedule > form .slider").each(function(){
+			$("#ConfigureSchedule > form .slider").each(function(){
 				if(!$(this).is($(activeElement))){
 					total += +$(this).val();
 				}
@@ -1319,7 +1307,7 @@
 		//Used for debug
 		function getTotal(){
 			var total = +0;
-			$("#overallSchedule > form .slider").each(function(){
+			$("#ConfigureSchedule > form .slider").each(function(){
 				total += +$(this).val();
 			});
 			console.log(total);

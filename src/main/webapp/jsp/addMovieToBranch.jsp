@@ -286,14 +286,7 @@
 			</div>
 		</div>
 	</div>
-	
-	<div id="overlayloading">
-    	<div class="spinner-border text-primary" role="status">
-		  <span class="visually-hidden">Loading...</span>
-		</div>
-		<p class="text-center">Loading...</p>
-		
-	</div>
+
 	<!-- /.container -->
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript"

@@ -1416,7 +1416,7 @@ public class ScheduleService {
 				log.info("Assigned Layout to all schedule. Proceed to insert schedule.");
 				Map<Boolean,Object> response = dao.insertMultipleSchedules(schedules);
 				if(response.containsKey(false)) {
-					return new Response((String)response.get(false));
+					throw new RuntimeException((String)response.get(false));					
 				}
 				else {
 					int size = (int)response.get(true);

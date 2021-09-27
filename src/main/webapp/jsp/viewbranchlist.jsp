@@ -230,14 +230,7 @@
 			</div>
 		</div>
 	</div>
-	
-	<div id="overlayloading">
-    	<div class="spinner-border text-primary" role="status">
-		  <span class="visually-hidden">Loading...</span>
-		</div>
-		<p class="text-center">Loading...</p>
-		
-	</div>
+
 
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
