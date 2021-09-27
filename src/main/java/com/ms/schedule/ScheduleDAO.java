@@ -15,6 +15,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -73,7 +74,16 @@ public class ScheduleDAO {
 			
 			Map<String, Object> result = jdbcCall.execute(in);
 			
-			latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)result.get("endDate"));
+			if(result.get("endDate") == null) {
+				Calendar currentDate = Calendar.getInstance();
+				currentDate.setTime(new Date());
+				currentDate.add(Calendar.DATE, 1);
+				
+				latestDate = Constant.SQL_DATE_WITHOUT_TIME.format(currentDate.getTime());
+			}
+			else {
+				latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)result.get("endDate"));
+			}			
 		}
 		catch(CannotGetJdbcConnectionException ce) {
 			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
@@ -89,7 +99,7 @@ public class ScheduleDAO {
 	public Map<Boolean,Object> insertMultipleSchedules(List<Schedule> scheduleList) {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "INSERT INTO masp.SCHEDULE (seqid,starttime,endtime,movieId,theatreId) VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO masp.SCHEDULE (seqid,starttime,endtime,movieId,theatreId,layoutId) VALUES(?,?,?,?,?,?)";
 			List<Object[]> parameters = new ArrayList<Object[]>();
 			for(Schedule schedule : scheduleList) {
 				parameters.add(new Object[] {
@@ -97,7 +107,8 @@ public class ScheduleDAO {
 						Constant.SQL_DATE_FORMAT.format(schedule.getStart()),
 						Constant.SQL_DATE_FORMAT.format(schedule.getEnd()),
 						schedule.getMovieId(),
-						schedule.getTheatreId()
+						schedule.getTheatreId(),
+						schedule.getLayoutId()
 				});
 			}
 			
@@ -209,5 +220,28 @@ public class ScheduleDAO {
 			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return response;
+	}
+	
+	public String insertSeatLayout(SeatLayout data) {
+		String errorMsg = "";
+		try {
+			String query = "INSERT INTO masp.seatLayout(seqid,seatRow,seatCol,theatreLayout) VALUES(?,?,?,?)";
+			int result = jdbc.update(query,data.getSeqid(),data.getRow(),data.getCol(),data.getSeatLayout());
+			if(result > 0) {
+				return null;
+			}
+			else {
+				errorMsg = "Unable to insert the seat layout. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		return errorMsg;
 	}
 }

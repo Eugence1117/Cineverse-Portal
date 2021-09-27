@@ -13,6 +13,7 @@ public class Schedule {
 	
 	private String scheduleId;
 	private String theatreId;
+	private String layoutId;
 	private String movieName;
 	private String movieId;
 	private Date start;

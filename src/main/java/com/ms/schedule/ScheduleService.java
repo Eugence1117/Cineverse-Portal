@@ -63,6 +63,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.javaparser.utils.Log;
 import com.ms.movie.MovieDAO;
 import com.ms.movie.Movie;
 import com.ms.optaplanner.MovieConfig;
@@ -81,6 +82,7 @@ import com.ms.schedule.Model.AvailableMovie;
 import com.ms.theatre.Theatre;
 import com.ms.theatre.TheatreDAO;
 import com.ms.theatre.TheatreType;
+import com.ms.theatre.ViewTheatreForm;
 
 @Service
 public class ScheduleService {
@@ -1386,6 +1388,32 @@ public class ScheduleService {
 				return new Response("The data recevied from client's requests is empty.");
 			}
 			else {
+				//Retrieve layout
+				Map<String,List<com.ms.schedule.Schedule>> scheduleByTheatre = schedules.stream().collect(Collectors.groupingBy(com.ms.schedule.Schedule::getTheatreId));
+				for(String key: scheduleByTheatre.keySet()) {
+					Map<Boolean,Object> theatreObject = theatreDao.getTheatreInfo(key);
+					if(theatreObject.containsKey(false)) {
+						return new Response((String)theatreObject.get(false));
+					}
+					else {
+						//Cache current Layout for the schedule
+						String layoutId = UUID.randomUUID().toString();
+						ViewTheatreForm theatre = (ViewTheatreForm)theatreObject.get(true);
+						SeatLayout layout = new SeatLayout(layoutId,theatre.getRow(),theatre.getCol(),theatre.getTheatreLayout());
+						String errorMsg = dao.insertSeatLayout(layout);
+						
+						if(errorMsg != null) {
+							log.error(errorMsg);
+							throw new RuntimeException("Unable to create the seat layout that required for schedule. Please contact with developer if the problem still exist");
+						}
+						else {
+							for(com.ms.schedule.Schedule schedule: scheduleByTheatre.get(key)) {						
+								schedule.setLayoutId(layoutId);
+							}
+						}											
+					}
+				}	
+				log.info("Assigned Layout to all schedule. Proceed to insert schedule.");
 				Map<Boolean,Object> response = dao.insertMultipleSchedules(schedules);
 				if(response.containsKey(false)) {
 					return new Response((String)response.get(false));

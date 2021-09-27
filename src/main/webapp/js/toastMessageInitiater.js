@@ -184,8 +184,8 @@
  function withActivity(counter){
  	$("#activityFeed .emptyActivity").hide();
  	$("#activityDropDown .badge-counter").show();
- 	$("#activityDropDown .badge-counter").html(counter + (counter > 5 ? "+" : ""));
- 	$("#activityFeed .existActivity").show();
+ 	$("#activityDropDown .badge-counter").html(counter + (counter > 5 ? "+" : ""));	
+ 	$("#activityFeed .existActivity").show();	
  }
  
  function updateHistoryTime(items){

@@ -58,10 +58,6 @@
 	width: 100%
 }
 
-.hide {
-	display: none;
-}
-
 .ui-slider-legend > p:first-of-type{
 	text-align:left;
 }
@@ -222,7 +218,7 @@
 											<div class="alert alert-info" role="alert">
 												Please aware that <b>weekly</b> will take longer time than <b>overall</b> while the <b>daily</b> take longest.
 											</div>
-											<ul class="nav nav-pills nav-fill">
+											<ul class="nav nav-pills nav-fill" id="scheduleMode">
 												<li class="nav-item col-sm-4"><a
 													class="nav-link active text-center"
 													onclick="configureByOverall()" id="defaultNav">Overall</a></li>
@@ -234,24 +230,24 @@
 											<div class="row px-3 mt-3">
 												<div class="col-sm-12">
 													<!--  Template for Daily -->
-													<div class="hide" id="dailySchedule">
+													<div class="d-none" id="dailySchedule">
 														<form>
 														</form>
 													</div>
 													
 													<!-- Template for Weekly -->
-													<div class="hide" id="weeklySchedule">
+													<div class="d-none" id="weeklySchedule">
 														<form>
 														</form>
 													</div>
 						
 													<!--  Template for Overall -->
-													<div class="hide" id="overallSchedule">
+													<div class="d-none" id="overallSchedule">
 														<form>
 														</form>
 													</div>
 													<!--  End of Overall Template -->
-													<div class="hide m-2" id="loading">
+													<div class="d-none m-2" id="loading">
 														<div class="spinner-border text-primary" role="status">
 													  		<span class="visually-hidden">Loading...</span>
 														</div>
@@ -367,13 +363,7 @@
 		</div>
 	</div>
 	
-	<div id="overlayloading">
-    	<div class="spinner-border text-primary" role="status">
-		  <span class="visually-hidden">Loading...</span>
-		</div>
-		<p class="text-center" id="loadingTip">Please wait...</p>
-		
-	</div>
+
 	<!-- /.container -->
 
 	<%@ include file="include/js.jsp"%>
@@ -435,7 +425,17 @@
 				$("#defaultNav").addClass("active");
 			}
 		}
-	
+		
+		function toggleNavLinkAvailablility(status){
+			if(status){
+				$("#scheduleMode .nav-link").removeClass("disabled");
+			}
+			else{
+				$("#scheduleMode .nav-link").addClass("disabled");	
+			}
+			
+		}
+		
 		<!--END of switch tab effect-->
 		function retrieveTheatreAsOption(){
 			var jsonData = '${theatre}';
@@ -489,6 +489,7 @@
 				return false;
 			}
 			$("#loading").show();
+			toggleNavLinkAvailablility(false)
 			addLoading($("#searchByDate"),loadingBtn);
 			
 			var theatreElement = addTheatreElement(theatreList,"");
@@ -513,6 +514,7 @@
 					}).done(function(data) {
 					$("#loading").hide();
 					removeLoading($("#searchByDate"),searchBtn);
+					toggleNavLinkAvailablility(true)
 				if (data.error == null) {
 					
 					//hideAllSchedule();
@@ -647,6 +649,7 @@
 				return false;
 			}
 			$("#loading").show();
+			toggleNavLinkAvailablility(false)
 			addLoading($("#searchByDate"),loadingBtn);
 			$.ajax("api/manager/retrieveWeeklyAvailableMovie.json?"+ $("#dateOption").serialize() + "&startdate="+ startDate, {
 					method : "GET",
@@ -669,6 +672,7 @@
 				}).done(function(data) {
 				$("#loading").hide();
 				removeLoading($("#searchByDate"),searchBtn);
+				toggleNavLinkAvailablility(true)
 				if (data.error == null) {
 					clearFormHTML();
 					//hideAllSchedule();
@@ -831,6 +835,7 @@
 				return false;
 			}
 			$("#loading").show();
+			toggleNavLinkAvailablility(false)
 			addLoading($("#searchByDate"),loadingBtn);
 			$.ajax("api/manager/retriveDailyAvailableMovie.json?" + $("#dateOption").serialize() + "&startdate=" + startDate, {
 					method : "GET",
@@ -852,6 +857,7 @@
 					}
 				}).done(function(data) {
 					removeLoading($("#searchByDate"),searchBtn);
+					toggleNavLinkAvailablility(true)
 				$("#loading").hide();
 				if (data.error == null) {
 					clearFormHTML()
