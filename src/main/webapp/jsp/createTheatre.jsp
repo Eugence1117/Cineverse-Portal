@@ -221,7 +221,7 @@
 					async: false,
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -621,7 +621,7 @@
 						formData["layout"] = data;
 						formData["totalSeat"] = counter;
 						
-						$("#overlayloading").show();
+						Notiflix.Loading.Dots('Processing...');		
 						
 						$.ajax("api/manager/submitLayout.json", {
 							method : "POST",
@@ -634,7 +634,7 @@
 							},
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -647,7 +647,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,"An attempt to create theatre <b>Failed</b>",false);
 							}

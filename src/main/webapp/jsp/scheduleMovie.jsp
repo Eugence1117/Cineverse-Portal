@@ -106,10 +106,6 @@
 	form .btn{
 		width:100% !important;
 	}
-	
-	#overlayloading {
-		padding-top:50% !important;
-	}
 }
 
 
@@ -489,7 +485,7 @@
 						dataType : "json",
 						statusCode:{
 							400:function(){
-								window.locatin.href = "400.htm";
+								window.location.href = "400.htm";
 							},
 							401:function(){
 								window.location.href = "expire.htm";
@@ -570,7 +566,7 @@
 				if(!theatreSelected){
 					return false;
 				}
-				$("#overlayloading").show();
+				Notiflix.Loading.Dots('Configuring...');		
 				
 				var formData = form.serializeObject();
 				traverseObject(formData); //Only used if configure 1 movie
@@ -592,7 +588,7 @@
 					},
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -605,7 +601,7 @@
 						}
 					}
 					}).done(function(data) {
-						$("#overlayloading").hide();
+						Notiflix.Loading.Remove();		
 						if(data.error != "" && data.error != null){
 							bootbox.alert(data.error);
 						}
@@ -649,7 +645,7 @@
 					dataType : "json",
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -761,7 +757,7 @@
 					return false;
 				}
 				
-				$("#overlayloading").show();
+				Notiflix.Loading.Dots('Configuring...');		
 				var formData = form.serializeObject();
 				traverseObject(formData);
 				
@@ -780,7 +776,7 @@
 					},
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -797,7 +793,7 @@
 							bootbox.alert(data.error);
 						}
 						else{
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							$("#btnNext").click();
 							
 							var dataResult = JSON.parse(data.result);
@@ -835,7 +831,7 @@
 					dataType : "json",
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -929,7 +925,7 @@
 				if(!theatreSelected){
 					return false;
 				}
-				$("#overlayloading").show();
+				Notiflix.Loading.Dots('Configuring...');		
 				
 				var formData = form.serializeObject();
 				traverseObject(formData); //Only used if configure 1 movie
@@ -946,7 +942,7 @@
 					},
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -963,7 +959,7 @@
 							bootbox.alert(data.error);
 						}
 						else{
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							$("#btnNext").click();
 							
 							var dataResult = JSON.parse(data.result);
@@ -995,7 +991,7 @@
 				async: !1,
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -1411,7 +1407,7 @@
 				bootbox.alert("Please finish the configuration first.");
 			}
 			else{
-				$("#overlayloading").show();
+				Notiflix.Loading.Dots('Processing...');		
 				var data = convertCalendarToJSON();
 				
 				$.ajax("api/manager/addSchedule.json",{
@@ -1425,7 +1421,7 @@
 					},
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -1438,7 +1434,7 @@
 						}
 					}
 				}).done(function(data){
-					$("#overlayloading").hide();
+					Notiflix.Loading.Remove();		
 					if(data.errorMsg != null){
 						createActivity(data.errorMsg,"Create schedule <b>Failed</b>",false)
 						bootbox.alert(data.errorMsg);
@@ -1464,7 +1460,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";

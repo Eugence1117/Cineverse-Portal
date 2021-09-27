@@ -17,6 +17,9 @@
 	.fontBtn{
 		cursor:pointer;
 	}
+	.data{
+		margin-bottom:0.5rem;
+	}
 </style>
 </head>
 
@@ -80,43 +83,37 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="hide m-2 text-center" id="loading">
-						<div class="spinner-border text-primary" role="status">
-							<span class="visually-hidden">Loading...</span>
-						</div>
-						<p class="text-center">Loading...</p>
-					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Member ID</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="seqid"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Name</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="name"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Username</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="username"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>IC Number</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="ic"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Birth Date</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="dateOfBirth"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Email</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="email"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Status</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="status"></p>
@@ -152,7 +149,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -254,6 +251,7 @@
 			});
 		}
 		
+		
 		function getMemberDetails(element){
 			var id = element.id
 			
@@ -266,16 +264,13 @@
 				$("#viewMember").modal("show");
 			}
 			
-			$("#loading").show();
-			$("#viewMember .row").hide();
-			
 			$.ajax("api/admin/retrieveMemberInfo.json?memberId=" + id,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -289,12 +284,11 @@
 				},
 			}).done(function(data){
 				if(data.errorMsg == null){
-					$("#loading").hide();
-					$("#viewMember .row").show();
 					
 					$("#viewMember .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
 			            if (key && data.result.hasOwnProperty(key)) {
+			            	$(this).removeClass("placeholder")
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
@@ -310,8 +304,10 @@
 		function clearMemberDetails(){
 			$("#viewMember .data").each(function(){
 				$(this).text("");
+				$(this).addClass("placeholder")
 			})
 		}
+		
 		
 		function activateAndDeactivateMember(element,status){			
 			if(status == 0 || status == 1){
@@ -324,7 +320,7 @@
 							"status":status
 						}
 						
-						$("#overlayloading").show();															
+						Notiflix.Loading.Dots('Processing...');															
 						
 						$.ajax("api/admin/updateMemberStatus.json",{
 							method : "POST",
@@ -337,7 +333,7 @@
 							},
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -350,7 +346,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,"An attempt to update member status <b>Failed</b>",false);
 							}

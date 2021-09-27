@@ -3,6 +3,7 @@
 <script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 <script src="<spring:url value='/js/template.js'/>"></script>
 <script src="<spring:url value='/js/toastMessageInitiater.js'/>"></script>
+<script src="<spring:url value='/plugins/Notiflix-2.7.0/notiflix.js'/>"></script>
 
 <script type="text/javascript">
 
@@ -15,6 +16,8 @@ $('#logOutBtn').on('click', function() {
 
 $(document).ready(function(){
 	loadContent();
+	
+	Notiflix.Loading.Init({svgColor:"#4e73df",clickToClose:false});
 });
 
 $.fn.serializeObject = function() {

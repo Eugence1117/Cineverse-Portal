@@ -8,7 +8,7 @@
 
 <head>
 <meta charset="ISO-8859-1">
-<title>Access Denied</title>
+<title>Bad Request</title>
 
 <%@ include file="include/css.jsp"%>
 </head>

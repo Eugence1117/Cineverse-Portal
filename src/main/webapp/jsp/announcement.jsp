@@ -267,7 +267,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -302,7 +302,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -351,8 +351,7 @@
     	
     	
     	function updateStatus(formData){
-    		//$("#editAnnouncement").modal("hide");
-    		//$("#overlayloading").show();
+    		Notiflix.Loading.Dots('Processing...');		
     		$.ajax("api/admin/editAnnouncement.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -364,7 +363,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -377,7 +376,7 @@
 					}
 				},
 			}).done(function(data){
-				//$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to edit announcement status <b>Failed</b>",false);
 					//bootbox.alert(data.errorMsg,function(){
@@ -405,7 +404,7 @@
     					var formData = new Object();
         	    		formData["seqid"] = id;
         	    		
-        	    		$("#overlayloading").show();
+        	    		Notiflix.Loading.Dots('Processing...');		
         	    		$.ajax("api/admin/deleteAnnouncement.json",{
         					method : "POST",
         					accepts : "application/json",
@@ -417,7 +416,7 @@
         					},
         					statusCode:{
         						400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
         						401:function(){
         							window.location.href = "expire.htm";
@@ -430,7 +429,7 @@
         						}
         					},
         				}).done(function(data){
-        					$("#overlayloading").hide();
+        					Notiflix.Loading.Remove();		
         					if(data.errorMsg != null){
         						var toast = createToast(data.errorMsg,"An attempt to remove announcement <b>Failed</b>",false);
         						$("#editAnnouncement").modal("show");
@@ -597,7 +596,7 @@
     			return false;
     		}
     		
-    		$("#overlayloading").show();
+    		Notiflix.Loading.Dots('Processing...');		
     		var data = $("#newForm")[0];
     		var formData = new FormData(data);
     		
@@ -613,7 +612,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -626,7 +625,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to add announcement <b>Failed</b>",false);
 					//$("#addAnnouncement").addClass("skip");

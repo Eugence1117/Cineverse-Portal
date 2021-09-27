@@ -94,13 +94,7 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body">
-					<div class="hide m-2 text-center" id="loading">
-						<div class="spinner-border text-primary" role="status">
-							<span class="visually-hidden">Loading...</span>
-						</div>
-						<p class="text-center">Loading...</p>
-					</div>
+				<div class="modal-body placeholder-glow">
 					<div class="row">
 						<label class="col-md-4"><b>Branch ID</b></label> <label
 							class="col-md-1 colon">:</label>
@@ -255,7 +249,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -410,7 +404,7 @@
 						},
 						statusCode:{
 							400:function(){
-								window.locatin.href = "400.htm";
+								window.location.href = "400.htm";
 							},
 							401:function(){
 								window.location.href = "expire.htm";
@@ -470,7 +464,7 @@
 			}
 			
 			//$("#addBranch").modal('hide');
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			
 			var formData = $("#newBranchForm").serializeObject();
 			
@@ -485,7 +479,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -498,7 +492,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to add branch <b>Failed</b>",false);
 				}
@@ -529,7 +523,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -569,7 +563,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -619,14 +613,14 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
-						$("#overlayloading").show();
+						Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/admin/updateStatus.json?status=" + status + "&branchId=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -639,7 +633,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							var title = status == 1 ? "An attempt to activate" : "An attempt to deactivate"
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,title + " branch <b>Failed</b>",false);
@@ -664,17 +658,14 @@
 			if(!$("#viewBranch").hasClass("show")){
 				$("#viewBranch").modal("show");
 			}
-			
-			$("#loading").show();
-			$("#viewBranch .row").hide();
-			
+					
 			$.ajax("api/admin/branchDetails.json?branchID=" + branchId,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -688,19 +679,19 @@
 				},
 			}).done(function(data){
 				if(data.errorMsg == null){
-					$("#loading").hide();
-					$("#viewBranch .row").show();
 					
 					$("#viewBranch .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
 			            if (key && data.result.hasOwnProperty(key)) {
+			            	$(this).removeClass("placeholder");
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
 				}
 				else{
-					$("#loading").hide();
-					bootbox.alert(data.errorMsg);
+					bootbox.alert(data.errorMsg,function(){
+						$("#viewBranch").modal("hide");
+					});					
 				}
 			})
 		}
@@ -708,6 +699,7 @@
 		function clearBranchDetails(){
 			$("#viewBranch .data").each(function(){
 				$(this).text("");
+				$(this).addClass("placeholder");
 			})
 		}
 		
@@ -730,14 +722,14 @@
 			    callback: function (result) {
 			    	if(result == true){
 						var branchId = element.id;
-						$("#overlayloading").show();
+						Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/admin/deleteBranch.json?branchID=" + branchId,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -750,7 +742,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,"An attempt to remove branch <b>Failed</b>",false);								
 							}

@@ -64,6 +64,8 @@ public class BranchService {
 					return new Response(result.get(false));
 				}
 				else {
+					Branch data = (Branch)result.get(true);
+					data.setStatus(String.valueOf(Util.getStatusCode(data.getStatus())));
 					return new Response(result.get(true));
 				}
 			}

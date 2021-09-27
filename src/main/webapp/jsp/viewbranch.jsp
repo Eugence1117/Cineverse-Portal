@@ -206,7 +206,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -247,7 +247,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -320,7 +320,7 @@
 						},
 						statusCode:{
 							400:function(){
-								window.locatin.href = "400.htm";
+								window.location.href = "400.htm";
 							},
 							401:function(){
 								window.location.href = "expire.htm";
@@ -379,7 +379,7 @@
 			}
 			
 			var formData = $("#editBranchForm").serializeObject();
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			$.ajax("api/manager/updateBranch.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -391,7 +391,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -404,7 +404,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to edit branch <b>Failed</b>",false);	
 					$("#editBtn").click()
@@ -426,7 +426,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";

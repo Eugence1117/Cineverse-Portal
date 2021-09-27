@@ -350,7 +350,7 @@
 				return false;
 			}
 			
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			var form = $("#newMovieForm")[0];
 			var data = new FormData(form);
 			
@@ -368,7 +368,7 @@
 				async: false,
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -381,7 +381,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				//$(this).prop("disabled",false);
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to create movie <b>Failed</b>",false);

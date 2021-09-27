@@ -416,7 +416,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -449,7 +449,7 @@
 					dataType : "json",
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -491,7 +491,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -560,7 +560,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";

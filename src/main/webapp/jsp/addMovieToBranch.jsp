@@ -327,7 +327,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -380,7 +380,7 @@
 				return false;
 			}
 			
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			var formData = $("#dateForm").serializeObject();
 			formData["movieId"] = $("#addMovieForm input[name=movieId]").val()
 			
@@ -395,7 +395,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -408,7 +408,7 @@
 					}
 				},
 				}).done(function(data){
-					$("#overlayloading").hide();
+					Notiflix.Loading.Remove();		
 					$("#extModal").modal("hide");
 					if(data.errorMsg == null){
 						createActivity(data.result,"Add movie to branch <b>Success</b>",true);

@@ -425,7 +425,7 @@
 				data:formData,
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -469,7 +469,7 @@
 				data:formData,
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -690,7 +690,7 @@
 		})
 		
 		function checkTicket(id){
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			$.ajax("api/manager/getImpactTicket.json", {
 				method : "POST",
 				accepts : "application/json",
@@ -702,7 +702,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -715,7 +715,7 @@
 					}
 				}
 				}).done(function(data) {
-					$("#overlayloading").hide();
+					Notiflix.Loading.Remove();		
 					if(data.errorMsg != null){
 						bootbox.alert(data.errorMsg)
 					}
@@ -734,7 +734,7 @@
 		}
 		
 		function removeSchedule(id){
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			$.ajax("api/manager/removeSchedule.json", {
 				method : "POST",
 				accepts : "application/json",
@@ -746,7 +746,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -759,7 +759,7 @@
 					}
 				}
 				}).done(function(data) {
-					$("#overlayloading").hide();
+					Notiflix.Loading.Remove();		
 					if(data.errorMsg != null){
 						var toast = createToast(data.errorMsg,"An attempt to remove schedule <b>Failed</b>",false);
 						//bootbox.alert(data.errorMsg)

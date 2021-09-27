@@ -85,7 +85,7 @@ public class BranchDAO {
 					int postcode = (int) row.get("postcode");
 					String district = Util.trimString((String) row.get("districtname"));
 					String state = Util.trimString((String) row.get("stateName"));
-					String status = String.valueOf((int) row.get("status"));
+					String status = Util.getStatusDesc((int) row.get("status"));
 					Branch data = new Branch(id, branchName, address,
 							postcode, district, state, status);
 					result.put(true, data);

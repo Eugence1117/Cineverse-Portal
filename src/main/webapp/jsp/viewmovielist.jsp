@@ -299,7 +299,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -343,7 +343,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -461,7 +461,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -537,7 +537,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -574,7 +574,7 @@
     			return false;
     		}
     		
-    		$("#overlayloading").show();
+    		Notiflix.Loading.Dots('Processing...');		
     		var formData = $("#movieForm").serializeObject();
     		formData["movieId"] = $("#movieForm input[name=movieId]").val();
     		$.ajax("api/admin/editMovieInfo.json",{
@@ -588,7 +588,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -601,7 +601,7 @@
 					}
 				},
     		}).done(function(data){
-    			$("#overlayloading").hide();
+    			Notiflix.Loading.Remove();
     			if(data.errorMsg == null){
     				var toast = createToast(data.result,"An attempt to edit movie <b>Success</b>",true);
     				$("#movieDetails").modal('hide');

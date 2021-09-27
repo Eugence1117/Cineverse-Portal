@@ -239,7 +239,7 @@
     				dataType : "json",
     				statusCode:{
     					400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
     					401:function(){
     						window.location.href = "expire.htm";
@@ -281,7 +281,7 @@
 					async: false,
 					statusCode:{
 						400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -645,7 +645,7 @@
 						formData["layout"] = data;
 						formData["totalSeat"] = counter;
 						
-						$("#overlayloading").show();
+						Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/manager/updateTheatre.json", {
 							method : "POST",
 							accepts : "application/json",
@@ -657,7 +657,7 @@
 							},
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -670,7 +670,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							if(data.errorMsg != null){
 								createActivity(data.errorMsg,"Edit theatre <b>Failed</b>",false)
 								bootbox.alert(data.errorMsg);

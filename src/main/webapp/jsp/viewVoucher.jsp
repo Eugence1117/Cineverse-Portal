@@ -194,7 +194,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -405,7 +405,7 @@
 			formData["voucherId"] = voucherId;
 			formData["status"] = status;
 			
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			$.ajax("api/admin/updateStatus.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -417,7 +417,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -430,7 +430,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				
 				var title = status == -1 ? "An attempt to remove voucher is " : "An attempt to edit voucher status is";
 				if(data.errorMsg != null){
@@ -474,7 +474,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -584,7 +584,7 @@
 			if(!validator.form()){
 				return false;
 			}
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			var formData = $("#editVoucherForm").serializeObject();
 			$.ajax("api/admin/editVoucher.json",{
 				method : "POST",
@@ -597,7 +597,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -610,7 +610,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to edit voucher <b>Failed</b>.",false);
 					//$("#editVoucher").addClass("skip");

@@ -89,38 +89,32 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<div class="hide m-2 text-center" id="loading">
-						<div class="spinner-border text-primary" role="status">
-							<span class="visually-hidden">Loading...</span>
-						</div>
-						<p class="text-center">Loading...</p>
-					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Movie ID</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="movieId"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Movie Name</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="movieName"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Release Date</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="releaseDate"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Start Showing Date</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="startDate"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Last Showing Date</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="endDate"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-md-4"><b>Status</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="status"></p>
@@ -216,7 +210,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -343,13 +337,14 @@
 				message:"Are you sure to update the status to <b>" + statusDesc + "</b>",
 				callback:function(result){
 					if(result){
+						Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/manager/updateMovieAvailableStatus.json?movieId=" + movieId + "&status=" + status,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -362,6 +357,7 @@
 								}
 							},
 						}).done(function(data){
+							Notiflix.Loading.Remove();		
 							if(data.errorMsg != null){
 								var toast = createToast(data.errorMsg,"An attempt to change movie status <b>Failed</b>",false);
 								//bootbox.alert(data.errorMsg);
@@ -383,7 +379,7 @@
 		function getMovieDetails(element){
 			var movieId = element.id;
 			
-			showViewLoading();
+			clearViewModalData();
 			$("#viewMovie").modal("show")
 			$.ajax("api/manager/getMovieAvailableDetails.json?movieId=" + movieId,{
 				method : "GET",
@@ -391,7 +387,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -404,37 +400,26 @@
 					}
 				},
 			}).done(function(data){
-				clearViewModalData();
 				if(data.errorMsg != null){
-					$("#viewMovie").modal("hide");
-					hideViewLoading();
+					$("#viewMovie").modal("hide");					
 					bootbox.alert(data.errorMsg);
 				}
 				else{
 					$("#viewMovie .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
 			            if (key && data.result.hasOwnProperty(key)) {
+			            	$(this).removeClass("placeholder");
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
-					});
-					hideViewLoading();
+					});					
 				}
 			});
-		}
-		
-		function showViewLoading(){
-			$("#loading").show();
-			$("#viewMovie .row").hide();
-		}
-		
-		function hideViewLoading(){
-			$("#loading").hide();
-			$("#viewMovie .row").show();
 		}
 		
 		function clearViewModalData(){
 			$("#viewMovie .modal-body .data").each(function(){
 				$(this).text("");
+				$(this).addClass("placeholder");
 			});
 		}
 		
@@ -449,7 +434,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -551,7 +536,7 @@
 				return false;
 			}
 			
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			var formData = $("#dateForm").serializeObject();
 			
 			$.ajax("api/manager/updateMovieAvailableDate.json",{
@@ -565,7 +550,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -578,7 +563,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					//$("#editMovie").addClass("skip");
 					//$("#editMovie").modal("hide");

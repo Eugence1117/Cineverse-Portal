@@ -201,35 +201,27 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<div id="viewLoading" class="hide">
-						<div class="hide m-2 text-center" id="loading">
-							<div class="spinner-border text-primary" role="status">
-								<span class="visually-hidden">Loading...</span>
-							</div>
-							<p class="text-center">Loading...</p>
-						</div>
-					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-sm-4"><b>User ID</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="seqid"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-sm-4"><b>User Group</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="usergroup"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-sm-4"><b>Branch</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="branchname"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-sm-4"><b>User Status</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6" data-json-key="status"></p>
 					</div>
-					<div class="row">
+					<div class="row placeholder-glow">
 						<label class="col-sm-4"><b>Created Date</b></label> <label
 							class="col-sm-1 colon">:</label>
 						<p class="d-inline data col-sm-6 border-0"
@@ -368,7 +360,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -506,15 +498,13 @@
 				$("#viewUser").modal("show");
 			}
 			
-			$("#viewUser .row").hide();
-			$("#viewUser #viewLoading").show();
 			$.ajax("api/admin/viewUser.json?userid=" + userid,{
 				method : "GET",
 				accepts : "application/json",
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -528,14 +518,13 @@
 				},
 			}).done(function(data){
 				clearViewUser();
-				$("#viewUser #viewLoading").hide();
-				$("#viewUser .row").show();
 				
 				if(data.errorMsg == null){
 					$("#viewUser").find(".modal-title").html("User :  <b>" + data.result.username + "</b>");
 					$("#viewUser .modal-body .data").each(function(index,element){
 						var key = $(this).data('json-key');
 			            if (key && data.result.hasOwnProperty(key)) {
+			            	$(this).removeClass("placeholder")
 			                $(this).text("	" + data.result[key] || "	-");
 			            }
 					});
@@ -552,6 +541,7 @@
 		function clearViewUser(){
 			$("#viewUser .data").each(function(){
 				$(this).text("");
+				$(this).addClass("placeholder")
 			});
 			$("#viewUser").find(".modal-title").html("");
 		}
@@ -567,7 +557,7 @@
 				 async:false,
 				 statusCode:{
 					 400:function(){
-							window.locatin.href = "400.htm";
+							window.location.href = "400.htm";
 						},
 						401:function(){
 							window.location.href = "expire.htm";
@@ -606,7 +596,7 @@
 						},
 						statusCode:{
 							400:function(){
-								window.locatin.href = "400.htm";
+								window.location.href = "400.htm";
 							},
 							401:function(){
 								window.location.href = "expire.htm";
@@ -660,7 +650,8 @@
 			var formData = $("#newUserForm").serializeObject();
 			
 			//$("#addUser").modal('hide');
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
+
 			
 			$.ajax("api/admin/addUser.json",{
 				method : "POST",
@@ -673,7 +664,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -686,7 +677,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+		    	Notiflix.Loading.Remove();		
 				if(data.errorMsg == null){
 					$("#addUser").modal('hide');
 					var toast = createToast(data.result,"An attempt to add user <b>Success</b>",true);
@@ -774,14 +765,14 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
-				    	$("#overlayloading").show();
+				    	Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/admin/changeUserStatus.json?userid=" + userid + "&status=" + newStatus,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -794,7 +785,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							if(data.errorMsg == null){
 								var toast = createToast(data.result,"An attempt to edit user status <b>Success</b>",true);
 								readyFunction();
@@ -843,7 +834,7 @@
 				dataType : "json",
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -918,7 +909,7 @@
 			var formData = $("#editUserForm").serializeObject();
 			formData["seqid"] = $("#editUserForm #seqid").val();
 			
-			$("#overlayloading").show();
+			Notiflix.Loading.Dots('Processing...');		
 			$.ajax("api/admin/editUser.json",{
 				method : "POST",
 				accepts : "application/json",
@@ -930,7 +921,7 @@
 				},
 				statusCode:{
 					400:function(){
-						window.locatin.href = "400.htm";
+						window.location.href = "400.htm";
 					},
 					401:function(){
 						window.location.href = "expire.htm";
@@ -943,7 +934,7 @@
 					}
 				},
 			}).done(function(data){
-				$("#overlayloading").hide();
+				Notiflix.Loading.Remove();		
 				if(data.errorMsg != null){
 					var toast = createToast(data.errorMsg,"An attempt to edit user <b>Failed</b>",false);
 				}
@@ -974,14 +965,14 @@
 			    callback: function (result) {
 			    	if(result == true){
 				    	var userid = element.id;
-				    	$("#overlayloading").show();
+				    	Notiflix.Loading.Dots('Processing...');		
 						$.ajax("api/admin/deleteUser.json?userid=" + userid,{
 							method : "GET",
 							accepts : "application/json",
 							dataType : "json",
 							statusCode:{
 								400:function(){
-									window.locatin.href = "400.htm";
+									window.location.href = "400.htm";
 								},
 								401:function(){
 									window.location.href = "expire.htm";
@@ -994,7 +985,7 @@
 								}
 							},
 						}).done(function(data){
-							$("#overlayloading").hide();
+							Notiflix.Loading.Remove();		
 							
 							if(data.errorMsg != null){	
 								var toast = createToast(data.errorMsg,"An attempt to remove user <b>Failed</b>",false);
