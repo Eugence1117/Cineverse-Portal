@@ -90,7 +90,7 @@
 						<div class="card-body">
 							<div class="row">
 								<div class="col-md text-right">
-									<button class="fa-pull-right btn btn-primary" onclick=refreshSlide()><i class="fas fa-sync-alt"></i> Refresh</button>
+									<button class="fa-pull-right btn btn-primary" onclick=refreshSlide() id="btnRefresh"><i class="fas fa-sync-alt"></i> Refresh</button>
 								</div>
 							</div>
 							<div id="loading" class="hide">
@@ -237,6 +237,7 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/additional.method.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
@@ -245,6 +246,9 @@
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
 		
+    	const refreshBtn = "<i class='fas fa-sync-alt'></i> Refresh";
+    	const refreshingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Refreshing...";
+    	
     	$(document).ready(function(){
     		var error = "${error}";
     		if(error != ""){
@@ -260,7 +264,8 @@
     	
     	function refreshSlide(){
     		$("#activeCarousel").hide();
-    		$("#loading").show();
+    		addLoading($("#btnRefresh"),refreshingBtn);
+    		
     		$.ajax("api/admin/retrieveActiveAnnouncement.json",{
     			method : "GET",
 				accepts : "application/json",
@@ -280,6 +285,7 @@
 					}
 				},
     		}).done(function(data){
+    			removeLoading($("#btnRefresh"),refreshBtn);
     			if(data.errorMsg != null){
     				$("#loading").hide();
     				bootbox.alert(data.errorMsg);

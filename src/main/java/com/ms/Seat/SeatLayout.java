@@ -1,4 +1,4 @@
-package com.ms.schedule;
+package com.ms.Seat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

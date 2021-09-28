@@ -36,6 +36,18 @@ public class Constant {
 	public static final int INACTIVE_STATUS_CODE = 0;
 	public static final int REMOVED_STATUS_CODE = -1;
 	
+	public static final int TICKET_UNPAID_STATUS_CODE = 0;
+	public static final int TICKET_PAID_STATUS_CODE = 1;
+	public static final int TICKET_COMPLETED_STATUS_CODE = 2;
+	public static final int TICKET_PENDING_REFUND_STATUS_CODE = 3;
+	public static final int TICKET_CANCELLED_STATUS_CODE = -1;
+	
+	public static final String TICKET_UNPAID = "Unpaid";
+	public static final String TICKET_PAID = "Paid";
+	public static final String TICKET_COMPLETED = "Completed";
+	public static final String TICKET_PENDING_REFUND = "Pending Refund";
+	public static final String TICKET_CANCELLED = "Cancelled";
+	
 	public static final int SCHEDULE_END_CODE = -1;
 	public static final int SCHEDULE_AVAILABLE_CODE = 1;
 	public static final int SCHEDULE_CANCELLED_CODE = 0;

@@ -2,16 +2,27 @@ package com.ms.common;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.ms.rules.OperatingHours;
+import com.ms.schedule.ScheduleService;
 
 public class Util {
+	
+	public static Logger log = LogManager.getLogger(Util.class);
+	
 	public static String getDetailExceptionMsg(Exception ex) {
 		StringWriter writer = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(writer);
@@ -58,6 +69,12 @@ public class Util {
 	}
 	public static String getScheduleStatus(int code) {
 		return code == Constant.SCHEDULE_AVAILABLE_CODE ? Constant.SCHEDULE_AVAILABLE : code == Constant.SCHEDULE_CANCELLED_CODE ? Constant.SCHEDULE_CANCELLED : code == Constant.SCHEDULE_END_CODE ? Constant.SCHEDULE_END : null;
+	}
+	public static int getTicketStatusCode(String string) {
+		return string.equals(Constant.TICKET_UNPAID) ? Constant.TICKET_UNPAID_STATUS_CODE : string.equals(Constant.TICKET_PAID) ? Constant.TICKET_PAID_STATUS_CODE : string.equals(Constant.TICKET_COMPLETED) ? Constant.TICKET_COMPLETED_STATUS_CODE : string.equals(Constant.TICKET_PENDING_REFUND) ? Constant.TICKET_PENDING_REFUND_STATUS_CODE : string.equals(Constant.TICKET_CANCELLED) ? Constant.TICKET_CANCELLED_STATUS_CODE : Constant.INVALID_STATUS_CODE; 
+	}
+	public static String getTicketStatusDesc(int code) {
+		return code == Constant.TICKET_UNPAID_STATUS_CODE ? Constant.TICKET_UNPAID : code == Constant.TICKET_PAID_STATUS_CODE ? Constant.TICKET_PAID : code == Constant.TICKET_COMPLETED_STATUS_CODE ? Constant.TICKET_COMPLETED : code == Constant.TICKET_PENDING_REFUND_STATUS_CODE ? Constant.TICKET_PENDING_REFUND : code == Constant.TICKET_CANCELLED_STATUS_CODE ? Constant.TICKET_CANCELLED : null;
 	}
 	public static OperatingHours getDefaultRules(String branchid) {
 		return new OperatingHours(branchid,"The operating hours of the business",Constant.DEFAULT_BUSINESS_OPERATING_START_TIME,Constant.DEFAULT_BUSINESS_OPERATING_END_TIME);
@@ -132,5 +149,34 @@ public class Util {
 		colors.add("#687295");
 		colors.add("#E44255");
 		return colors;
+	}
+	
+	public static Map<Boolean,String> validateDateRangeWithoutLimit(String fromdate, String todate) {
+		Map<Boolean,String> result = new HashMap<Boolean,String>();
+		try {
+			SimpleDateFormat format = Constant.SQL_DATE_WITHOUT_TIME;
+			format.setLenient(false);
+			Date fromDate = format.parse(fromdate);
+			Date toDate = format.parse(todate);
+			
+			Calendar fromCal = Calendar.getInstance();
+			fromCal.setTime(fromDate);
+			
+			Calendar toCal = Calendar.getInstance();
+			toCal.setTime(toDate);
+		
+			if(fromCal.compareTo(toCal) > 0) {
+				result.put(false,"[End Date] cannot greater than the [Start Date].");
+				return result;
+			}
+			
+			result.put(true,"");
+			return result;
+		}
+		catch(Exception ex) {
+			log.error("Exception ::" + ex.getMessage());
+			result.put(false,"The date received is invalid.");
+			return result;
+		}
 	}
 }

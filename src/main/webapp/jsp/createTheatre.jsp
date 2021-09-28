@@ -561,7 +561,7 @@
 					
 					if(!rowStorage.hasOwnProperty(key)){
 						var array = [];
-						array.push(seatNum);
+						//array.push(seatNum);
 						obj.seatNum = seatNum;
 						obj.isBind = $(this).data('isBind');
 						obj.reference = $(this).data('reference');

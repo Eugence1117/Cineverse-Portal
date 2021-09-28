@@ -70,6 +70,7 @@ import com.ms.optaplanner.MovieConfig;
 import com.ms.optaplanner.Schedule;
 import com.ms.optaplanner.Theatre_Schedule;
 import com.ms.optaplanner.TimeGrain;
+import com.ms.Seat.SeatLayout;
 import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
 import com.ms.common.Response;
@@ -136,7 +137,7 @@ public class ScheduleService {
 			if(Util.trimString(branchid) == "") {
 				return new Response("Unable to identify your identity. Please contact with admin or developer for more information");
 			}
-			 Map<Boolean,String> validation = validateDateRangeWithoutLimit(start, end);
+			 Map<Boolean,String> validation = Util.validateDateRangeWithoutLimit(start, end);
 			 if(validation.containsKey(false)) {
 				 return new Response((String)validation.get(false));
 			 }
@@ -189,36 +190,7 @@ public class ScheduleService {
 			}
 		}
 	}
-	
-	public Map<Boolean,String> validateDateRangeWithoutLimit(String fromdate, String todate) {
-		Map<Boolean,String> result = new HashMap<Boolean,String>();
-		try {
-			SimpleDateFormat format = Constant.SQL_DATE_WITHOUT_TIME;
-			format.setLenient(false);
-			Date fromDate = format.parse(fromdate);
-			Date toDate = format.parse(todate);
-			
-			Calendar fromCal = Calendar.getInstance();
-			fromCal.setTime(fromDate);
-			
-			Calendar toCal = Calendar.getInstance();
-			toCal.setTime(toDate);
 		
-			if(fromCal.compareTo(toCal) > 0) {
-				result.put(false,"[End Date] cannot greater than the [Start Date].");
-				return result;
-			}
-			
-			result.put(true,"");
-			return result;
-		}
-		catch(Exception ex) {
-			log.error("Exception ::" + ex.getMessage());
-			result.put(false,"The date received is invalid.");
-			return result;
-		}
-	}
-	
 	public boolean validateStartDate(long startDate,String branchId) {
 		try {
 			log.info("Validating startDate received...");
@@ -1439,7 +1411,7 @@ public class ScheduleService {
 			if(Util.trimString(branchid) == "") {
 				return new Response("Unable to identify your identity. Please contact with admin or developer for more information");
 			}
-			 Map<Boolean,String> validation = validateDateRangeWithoutLimit(start, end);
+			 Map<Boolean,String> validation = Util.validateDateRangeWithoutLimit(start, end);
 			 if(validation.containsKey(false)) {
 				 return new Response((String)validation.get(false));
 			 }
