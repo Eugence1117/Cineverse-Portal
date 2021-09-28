@@ -164,8 +164,16 @@
  			deleteActivity(items);
  			items = dropdownMenu.children(".activity");
  		}
+		var sessionStorage = window.sessionStorage;
+ 	 	if(sessionStorage.activityFeed){
+ 	 		var activityArray = JSON.parse(sessionStorage.activityFeed);			
+			withActivity(activityArray.length > 5 ? "5+" : activityArray.length);
+		}
+		else{
+			noActivity()
+		}
  		updateHistoryTime(items);
- 		withActivity(items.length);
+ 		//withActivity(items.length);
  	}
  	else{
  		noActivity();
@@ -188,7 +196,7 @@
  function withActivity(counter){
  	$("#activityFeed .emptyActivity").hide();
  	$("#activityDropDown .badge-counter").show();
- 	$("#activityDropDown .badge-counter").html(counter + (counter > 5 ? "+" : ""));	
+ 	$("#activityDropDown .badge-counter").html(counter);	
  	$("#activityFeed .existActivity").show();	
  }
  
