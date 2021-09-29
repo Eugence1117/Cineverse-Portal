@@ -1571,6 +1571,7 @@ public class ScheduleService {
 				}
 				data.addData("Cleaning Time",totalCleaningTime);
 				data.addData("Unallocated Time", totalOperatingHours - totalMovieTime - totalCleaningTime);
+				data.setTotalTime(totalOperatingHours);
 				if(dateList.size() == 1) {
 					data.setTitle("Time allocation  on " + Constant.UI_DATE_FORMAT.format(dateList.get(0)));
 				}

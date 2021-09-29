@@ -13,7 +13,6 @@
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
-<link rel="stylesheet" href="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.css'/>">
 <style>
 .fontBtn:hover,.collapsible{
 	cursor:pointer;
@@ -30,9 +29,12 @@
 .currentSeat{
 	fill: #4e73df;	
 }
-
-#expandSearch,.clickable{
-cursor:pointer;
+.clickable{
+	cursor:pointer;
+}
+#expandSearch:hover{
+	cursor:pointer;
+	background-color:#f8f9fa
 }
 </style>
 </head>
@@ -84,11 +86,11 @@ cursor:pointer;
 									<div class="form-group row text-center my-2 justify-content-center">
 										<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
 										<div class="collapse my-2 row" id="advancedOption">
-											<div class="col-md">
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
+											<div class="col-md">												
 												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
 											</div>
 										</div>
 									</div>
@@ -183,8 +185,7 @@ cursor:pointer;
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>	
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
@@ -253,6 +254,14 @@ cursor:pointer;
 				$(this).find(":input.has-error:first").focus();
 			}
 		});
+    	
+    	$("#advancedOption").on("hide.bs.collapse",function(){
+    		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
+    	});
+    	
+		$("#advancedOption").on("show.bs.collapse",function(){
+			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
+    	});
     	
     	$(".quickFill").on('click',function(e){
     		e.preventDefault();

@@ -13,6 +13,7 @@ public class ChartData {
 	private String title;
 	private List<String> labels;
 	private List<Integer> data;
+	private int totalTime;
 	
 	public ChartData() {
 		labels = new ArrayList<String>();

@@ -19,6 +19,11 @@
 	cursor:pointer;
 }
 
+#expandSearch:hover{
+	cursor:pointer;
+	background-color:#f8f9fa
+}
+
 @media only screen and (max-width: 768px) {
 	form .btn{
 		width:100% !important;
@@ -74,6 +79,21 @@
 													</div>
 												</div>
 												<div class="col-md-1"></div>
+											</div>
+											<div class="form-group row text-center my-2 justify-content-center">
+												<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
+												<div class="collapse my-2 row" id="advancedOption">
+													<div class="col-md">
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="-89"><i class="fas fa-minus"></i> 90 Days</button>
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="-59"><i class="fas fa-minus"></i> 60 Days</button>
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="-29"><i class="fas fa-minus"></i> 30 Days</button>
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="29"><i class="fas fa-plus"></i> 30 Days</button>	
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="59"><i class="fas fa-plus"></i> 60 Days</button>
+														<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="89"><i class="fas fa-plus"></i> 90 Days</button>
+																																									
+													</div>
+												</div>
 											</div>
 											<div class="form-group row m-0">
 												<div class="col-md-4"></div>
@@ -431,7 +451,63 @@
     		});
     	}
     	
+    	$("#advancedOption").on("hide.bs.collapse",function(){
+    		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
+    	});
+    	
+		$("#advancedOption").on("show.bs.collapse",function(){
+			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
+    	});
+	
+		$("#searchForm").validate({
+			ignore : ".ignore",
+			focusInvalid:true,
+			rules : {
+				startdate:{
+					required:true,
+				},
+    			enddate:{
+    				required:true,
+    			}
+			},
+			invalidHandler: function() {
+				
+				$(this).find(":input.has-error:first").focus();
+			}
+		});
+    	
+		$(".quickFill").on('click',function(e){
+    		e.preventDefault();
+    		var data = parseInt($(this).data("duration"));
+    		
+    		var validator = $("#dateOption").validate();
+    		if(!validator.element("input[name=startdate]")){
+    			return false;
+    		}
+    		
+    		if(data < 0){
+    			var endDate = moment($("input[name=startdate]").val()).format("YYYY-MM-DD");
+    			$("input[name=enddate]").val(endDate);
+    			
+    			var startDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
+    			$("input[name=startdate]").val(startDate);
+    		}
+    		else{
+    			var endDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
+        		$("input[name=enddate]").val(endDate);	
+    		}
+    		
+    		$("#searchByDate").click();
+    		
+    	})
+    	
     	$("#searchByDate").on("click",function(){
+    		
+    		var validator = $("#dateOption").validate();
+    		if(!validator.form()){
+    			return false;
+    		}
+    		    		
 			if($("#nameOption").hasClass("show")){
 				$("#nameOption").collapse('toggle');
 			}
@@ -439,7 +515,7 @@
 			addLoading($("#searchByDate"),loadingBtn);
 			
     		var from = $("input[name=startdate]").val();
-    		console.log(from);
+    		
     		var to = $("input[name=enddate]").val();
     		var result = validateDate(from,to);
     		if(result){

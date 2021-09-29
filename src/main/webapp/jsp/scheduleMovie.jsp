@@ -26,6 +26,12 @@
 	cursor:pointer;
 }
 
+#expandSearch:hover{
+	cursor:pointer;
+	background-color:#f8f9fa
+}
+
+
 #draggable{
 	min-height:50px;
 }
@@ -190,6 +196,17 @@
 													</div>
 													<div class="col-md-1"></div>
 												</div>
+												<div class="form-group row text-center my-2 justify-content-center">
+													<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
+													<div class="collapse my-2 row" id="advancedOption">
+														<div class="col-md">
+															<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
+															<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="6"><i class="fas fa-plus"></i> 7 Days</button>
+															<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="13"><i class="fas fa-plus"></i> 14 Days</button>
+															<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="29"><i class="fas fa-plus"></i> 30 Days</button>	
+														</div>
+													</div>
+												</div>
 												<div class="form-group row m-0">
 													<div class="col-md-4"></div>
 													<div class="col-md-4 text-center">
@@ -217,10 +234,13 @@
 											<ul class="nav nav-pills nav-fill" id="scheduleMode">
 												<li class="nav-item col-sm-4"><a
 													class="nav-link active text-center"
+													data-index = "1"
 													onclick="configureByOverall()" id="defaultNav">Overall</a></li>
 												<li class="nav-item col-sm-4"><a class="nav-link text-center"
+													data-index = "2"
 													onclick="configureByWeekly()">Weekly</a></li>
 												<li class="nav-item col-sm-4"><a class="nav-link text-center"
+													data-index = "3"
 													onclick="configureByDaily()">Daily</a></li>
 											</ul>
 											<div class="row px-3 mt-3">
@@ -356,9 +376,8 @@
 	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/chart/Chart.bundle.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/chart/chartjs-plugin-labels.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>	
+	<script type="text/javascript" src="<spring:url value='/plugins/chart/Chart-3.5.1.min.js'/>"></script>	
 	<script type="text/javascript">
 	
 		
@@ -395,6 +414,7 @@
 		$("#scheduleOption .nav-item > .nav-link").on('click', function() {
 			clearActiveNav();
 			$(this).addClass("active");
+			selectedMode = $(this).data("index");
 		});
 
 		function clearActiveNav() {
@@ -457,12 +477,49 @@
 			}
 			
 		});
+		
+		$("#advancedOption").on("hide.bs.collapse",function(){
+    		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
+    	});
+    	
+		$("#advancedOption").on("show.bs.collapse",function(){
+			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
+    	});
 	
+		$(".quickFill").on('click',function(e){
+    		e.preventDefault();
+    		var data = parseInt($(this).data("duration"));
+    		
+    		var validator = $("#dateOption").validate();
+    		if(!validator.element("input[name=startdate]")){
+    			return false;
+    		}
+    		
+    		var endDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
+    		$("input[name=enddate]").val(endDate);
+    		
+    		$("#searchByDate").click();
+    		
+    	})
+
+    	
+    	var selectedMode = null;
 		$("#searchByDate").on('click', function() {
-			checkDefaultActiveNav();
+			//checkDefaultActiveNav();
 
 			//Default search as OVERALL Configuration
-			configureByOverall();
+			if(selectedMode == null || selectedMode == "1"){
+				configureByOverall()
+			}
+			else if(selectedMode == "2"){
+				configureByWeekly()
+			}
+			else if(selectedMode == "3"){
+				configureByDaily()	
+			}
+			else{
+				configureByOverall()		
+			}
 		});
 		
 		<!-- Retrieve Movie that grouped by Overall-->
@@ -1479,7 +1536,7 @@
 					//$("#chartTitle").text(chartData.title);
 					chart = new Chart($("#pieChart"),{
 						type:'doughnut',
-						 data: {
+						data: {
 							    labels: chartData.labels,
 							    datasets: [{
 							      data:chartData.data,
@@ -1498,20 +1555,26 @@
 						      displayColors: false,
 						      caretPadding: 10,
 						    },
-						    legend: {
-						      display: false
-						    },
-						    cutoutPercentage: 68,
-					    	title: {
-				                display: true,
-				                text: chartData.title
-				            },
 						    plugins: {
-					            labels: {
-					                render: 'percentage',
-					                fontColor: 'Black',
-					                precision: 2
-					            }
+						    	tooltip: {
+						    		callbacks: {
+					                    label: function(context) {
+					                        var label = context.label;																						
+											var average = Math.round((+context.raw / chartData.totalTime) * 100)											
+					                        label += ': ' + average + '%';
+							                        
+					                        return label;
+					                    }
+					                }
+					            },
+							    legend: {
+									display: true
+								},
+								cutoutPercentage: 68,
+							   	title: {
+						        	display: true,
+						            text: chartData.title
+						        },
 						    }
 						},
 					});
