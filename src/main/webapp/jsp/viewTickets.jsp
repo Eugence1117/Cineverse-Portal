@@ -429,7 +429,7 @@
 			if(id != null && id != ""){
 				Notiflix.Loading.Circle('Please wait...');
 				$.ajax("api/admin/getTheatreLayout.json?ticketId="+id, {
-					method : "POST",
+					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
 					contentType:"application/json; charset=utf-8",				
@@ -476,7 +476,7 @@
 			if(id != null && id != ""){
 				addLoading($("#btnRefresh"),refreshingBtn);
 				$.ajax("api/admin/getSelectedSeat.json?ticketId="+id, {
-					method : "POST",
+					method : "GET",
 					accepts : "application/json",
 					dataType : "json",
 					contentType:"application/json; charset=utf-8",				

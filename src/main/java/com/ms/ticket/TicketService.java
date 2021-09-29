@@ -1,9 +1,13 @@
 package com.ms.ticket;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -202,7 +206,7 @@ public class TicketService {
 		}
 	}
 	
-	public Response processMovieRanking(String branchId, String start, String end) {
+	public Response retrieveSalesData(String branchId, String start, String end) {
 		if(Util.trimString(branchId) == ""){
 			return new Response("Unable to identify your identity. Please try again later.");
 		}
@@ -213,117 +217,51 @@ public class TicketService {
 					 return new Response((String)validation.get(false));
 				 }
 				 else {
-					 start += Constant.DEFAULT_TIME;
-					 end += Constant.END_OF_DAY;
-					 Map<Boolean,Object> result = dao.getTicketByPaymentDate(start, end,branchId);
-					 if(result.containsKey(false)) {
-						 return new Response((String)result.get(false));
-					 }
-					 else {
-						 @SuppressWarnings("unchecked")
-						 List<TicketSummary> summaryData = (List<TicketSummary>)result.get(true);
-						 
-						 Map<String,List<TicketSummary>> groupedByMovie = summaryData.stream().collect(Collectors.groupingBy(TicketSummary::getMovieId));
-						 
-						 List<Map<String,String>> infoList = new ArrayList<Map<String,String>>();
-						 for(String movieId : groupedByMovie.keySet()) {
-							 
-							 Map<Boolean,Object> response = movieDao.getMovieDetails(movieId);
-							 Map<String,String> movieInfo = new HashMap<String, String>();
-					    	 if(response.containsKey(false)) {
-					    		 return new Response((String)response.get(false));
-					    	 }
-					    	 Movie movie = (Movie)response.get(true);
-					    	 movieInfo.put("name",movie.getMovieName());
-					    	 movieInfo.put("picUrl", movie.getPicURL());
-					    	 movieInfo.put("ticketSold",String.valueOf(groupedByMovie.get(movieId).size()));
-					    	 
-					    	 infoList.add(movieInfo);
-						 }
-//						 Map<String,Integer> unsortedMovie = new HashMap<String, Integer>();
-//						 for(String movieId : groupedByMovie.keySet()) {
-//							 unsortedMovie.put(movieId,groupedByMovie.get(movieId).size());
-//						 }
-//						 ValueComparator bvc = new ValueComparator(unsortedMovie);
-//					     TreeMap<String, Integer> sorted_map = new TreeMap<String, Integer>(bvc);
-//					     sorted_map.putAll(unsortedMovie);
-//					     
-//					     int maxLength = sorted_map.size() > 3 ? 3 : sorted_map.size();			
-//					     List<Map<String,String>> infoList = new ArrayList<Map<String,String>>();
-//					     for(int i = 0 ; i < maxLength; i++) {
-//					    	 String key = sorted_map.firstKey();
-//					    	 
-//					    	 Map<String,String> movieInfo = new HashMap<String, String>();
-//					    	 Map<Boolean,Object> response = movieDao.getMovieDetails(key);
-//					    	 if(response.containsKey(false)) {
-//					    		 return new Response((String)response.get(false));
-//					    	 }
-//					    	 Movie movie = (Movie)response.get(true);
-//					    	 movieInfo.put("name",movie.getMovieName());
-//					    	 movieInfo.put("picUrl", movie.getPicURL());
-//					    	 movieInfo.put("ticketSold",String.valueOf(sorted_map.get(key)));
-//					    	 
-//					    	 infoList.add(movieInfo);
-//					    	 sorted_map.remove(key);
-//					     }
-					     return new Response(infoList);					     
-					 }
-				 }
-			}
-			else {
-				return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
-			}
-		}
-	}
-	
-	public Response processTicketSummaryData(String branchId, String start, String end) {
-		if(Util.trimString(branchId) == ""){
-			return new Response("Unable to identify your identity. Please try again later.");
-		}
-		else {
-			if(Util.trimString(start) != "" && Util.trimString(end) != "") {
-				 Map<Boolean,String> validation = Util.validateDateRangeWithoutLimit(start, end);
-				 if(validation.containsKey(false)) {
-					 return new Response((String)validation.get(false));
-				 }
-				 else {
-					 start += Constant.DEFAULT_TIME;
-					 end += Constant.END_OF_DAY;
-					 Map<Boolean,Object> result = dao.getTicketByPaymentDate(start, end,branchId);
-					 if(result.containsKey(false)) {
-						 return new Response((String)result.get(false));
-					 }
-					 else {
-						 @SuppressWarnings("unchecked")
-						 List<TicketSummary> summaryData = (List<TicketSummary>)result.get(true);
-						 
-						 Map<String,Integer> sumOfData = new LinkedHashMap<String, Integer>();
-						 for(TicketSummary data : summaryData) {
-							 String key = "";
-							 switch(data.getStatus()) {
-							 	case Constant.TICKET_PAID_STATUS_CODE:{
-							 		key = "paidTicket";
-							 		break;
-							 	}
-							 	case Constant.TICKET_CANCELLED_STATUS_CODE:{
-							 		key = "cancelledTicket";
-							 		break;
-							 	}							 	
-							 }
-							
-							if(key != "") {
-								if(sumOfData.containsKey(key)) {
-									sumOfData.put(key, sumOfData.get(key) + 1);
-								} 
-								else {
-									sumOfData.put(key, 1);
-								}
+					List<String> errorList = new ArrayList<String>();
+					
+					Map<Boolean,Object> movieRanking = processMovieRanking(branchId, start, end);
+					if(movieRanking.containsKey(false)) {
+						if(!errorList.contains((String)movieRanking.get(false))) {
+							errorList.add((String)movieRanking.get(false));
+						}
+					}
+					
+					Map<Boolean,Object> ticketSummary = processTicketSummaryData(branchId, start, end);
+					if(ticketSummary.containsKey(false)) {
+						if(!errorList.contains((String)ticketSummary.get(false))) {
+							errorList.add((String)ticketSummary.get(false));
+						}
+					}
+					
+					Map<Boolean,Object> ticketSales = processTicketSales(branchId, start, end);
+					if(ticketSales.containsKey(false)) {
+						if(!errorList.contains((String)ticketSales.get(false))) {
+							errorList.add((String)ticketSales.get(false));
+						}
+					}
+					
+					if(errorList.size() > 0) {
+						if(errorList.size() == 1) {
+							return new Response(errorList.get(0));
+						}
+						else {
+							String msg = "Multiple error occurred.\n";
+							for(int i = 0 ; i < errorList.size(); i++) {
+								msg += (i+1) + ". " + errorList.get(i) + "\n";
 							}
-						 }
-						 sumOfData.put("sumTicket", summaryData.size());
-						 
-						 return new Response(sumOfData);
-					 }
+							return new Response(msg);
+						}
+					}
+					else {
+						Map<String,Object> result = new HashMap<String, Object>();
+						
+						result.put("movieRanking",movieRanking.get(true));
+						result.put("ticketSummary",ticketSummary.get(true));
+						result.put("ticketSales", ticketSales.get(true));
+						
+						return new Response(result);
+					}
+					
 				 }
 			}
 			else {
@@ -332,21 +270,172 @@ public class TicketService {
 		}
 	}
 	
-	class ValueComparator implements Comparator<String> {
-	    Map<String, Integer> base;
+	public Map<Boolean, Object> processMovieRanking(String branchId, String start, String end) {
+		Map<Boolean, Object> response = new HashMap<Boolean, Object>();
 
-	    public ValueComparator(Map<String, Integer> base) {
-	        this.base = base;
-	    }
+		start += Constant.DEFAULT_TIME;
+		end += Constant.END_OF_DAY;
+		Map<Boolean, Object> result = dao.getTicketByPaymentDate(start, end, branchId);
+		if (result.containsKey(false)) {
+			response.put(false, (String)result.get(false));
+			return response;
+		} else {
+			@SuppressWarnings("unchecked")
+			List<TicketSummary> summaryData = (List<TicketSummary>) result.get(true);
 
-	    // Note: this comparator imposes orderings that are inconsistent with
-	    // equals.
-	    public int compare(String a, String b) {
-	        if (base.get(b) >= base.get(a)) {
-	            return -1;
-	        } else {
-	            return 1;
-	        } // returning 0 would merge keys
-	    }
+			Map<String, List<TicketSummary>> groupedByMovie = summaryData.stream()
+					.collect(Collectors.groupingBy(TicketSummary::getMovieId));
+
+			Map<String, Object> infoList = new HashMap<String, Object>();
+			List<String> labels = new ArrayList<String>();
+			List<Integer> data = new ArrayList<Integer>();
+			for (String movieId : groupedByMovie.keySet()) {
+
+				Map<Boolean, Object> movieInfo = movieDao.getMovieDetails(movieId);
+				// Map<String,String> movieInfo = new HashMap<String, String>();
+
+				if (movieInfo.containsKey(false)) {
+					response.put(false, (String) movieInfo.get(false));
+				}
+				Movie movie = (Movie) movieInfo.get(true);
+
+				labels.add(movie.getMovieName());
+				data.add(groupedByMovie.get(movieId).size());
+			}
+
+			infoList.put("label", labels);
+			infoList.put("data", data);
+				
+			response.put(true,infoList);
+			return response;			
+		}
 	}
+
+	public Map<Boolean, Object> processTicketSummaryData(String branchId, String start, String end) {
+		Map<Boolean, Object> response = new HashMap<Boolean, Object>();
+
+		start += Constant.DEFAULT_TIME;
+		end += Constant.END_OF_DAY;
+		Map<Boolean, Object> result = dao.getTicketByPaymentDate(start, end, branchId);
+		if (result.containsKey(false)) {
+			response.put(false, (String) result.get(false));
+			return response;
+		} else {
+			@SuppressWarnings("unchecked")
+			List<TicketSummary> summaryData = (List<TicketSummary>) result.get(true);
+
+			Map<String, Integer> sumOfData = new LinkedHashMap<String, Integer>();
+			for (TicketSummary data : summaryData) {
+				String key = "";
+				switch (data.getStatus()) {
+				case Constant.TICKET_PAID_STATUS_CODE: {
+					key = "paidTicket";
+					break;
+				}
+				case Constant.TICKET_CANCELLED_STATUS_CODE: {
+					key = "cancelledTicket";
+					break;
+				}
+				}
+
+				if (key != "") {
+					if (sumOfData.containsKey(key)) {
+						sumOfData.put(key, sumOfData.get(key) + 1);
+					} else {
+						sumOfData.put(key, 1);
+					}
+				}
+			}
+			sumOfData.put("sumTicket", summaryData.size());
+			sumOfData.putIfAbsent("paidTicket", 0);
+			sumOfData.putIfAbsent("cancelledTicket", 0);
+			sumOfData.putIfAbsent("sumTicket", 0);
+
+			response.put(true, sumOfData);
+			return response;
+		}
+	}
+
+	public Map<Boolean, Object> processTicketSales(String branchId, String start, String end) {
+		Map<Boolean, Object> response = new HashMap<Boolean, Object>();
+		try {
+			Date fromDate = Constant.SQL_DATE_WITHOUT_TIME.parse(start);
+			Date toDate = Constant.SQL_DATE_WITHOUT_TIME.parse(end);
+
+			start += Constant.DEFAULT_TIME;
+			end += Constant.END_OF_DAY;
+			Map<Boolean, Object> data = dao.getSalesByPaymentDate(start, end, branchId);
+			if (data.containsKey(false)) {
+				response.put(false, (String) data.get(false));
+				return response;
+			} else {
+				@SuppressWarnings("unchecked")
+				List<SalesSummary> salesData = (List<SalesSummary>) data.get(true);
+
+				Map<String, Object> result = new HashMap<String, Object>();
+				if (fromDate.compareTo(toDate) == 0) {
+					result.put("isChart", false);
+					result.put("title","Sales on " + Constant.UI_DATE_FORMAT.format(fromDate));
+					
+					if(salesData.size() > 0) {
+						result.put("data",String.format("%.2f", salesData.get(0).getPrice()));
+					}
+					else {
+						result.put("data","0.00");
+					}
+				}
+				else {
+					result.put("isChart", true);
+					result.put("title","Sales from " + Constant.UI_DATE_FORMAT.format(fromDate) + " to " + Constant.UI_DATE_FORMAT.format(toDate));
+					
+					Calendar startDate = Calendar.getInstance();
+					startDate.setTime(fromDate);
+					
+					Calendar endDate = Calendar.getInstance();
+					endDate.setTime(toDate);
+					
+					while(startDate.compareTo(endDate) <= 0) {
+						boolean isFound = false;
+						for (SalesSummary sales : salesData) {
+							if(sales.getDate().compareTo(startDate.getTime()) == 0) {
+								isFound = true;
+							}						
+						}
+						
+						if(!isFound) {
+							salesData.add(new SalesSummary(0,startDate.getTime()));
+						}
+						
+						startDate.add(Calendar.DATE,1);
+					}
+					
+					Collections.sort(salesData,new Comparator<SalesSummary>() {
+						 @Override
+						  public int compare(SalesSummary u1, SalesSummary u2) {
+						    return u1.getDate().compareTo(u2.getDate());
+						  }
+					});
+					//Convert to graph data
+					List<String> label = new ArrayList<String>();
+					List<String> graphData = new ArrayList<String>();
+					
+					for(SalesSummary sales : salesData) {					
+						label.add(Constant.UI_DATE_FORMAT.format(sales.getDate()));
+						graphData.add(String.format("%.2f", sales.getPrice()));
+					}
+										
+					result.put("data", graphData);
+					result.put("label", label);
+				}
+
+				response.put(true, result);
+				return response;
+			}
+		} catch (ParseException ex) {
+			log.error(ex.getMessage());
+			response.put(false, "Date received is invalid. Please try again later.");
+			return response;
+		}
+	}
+	
 }

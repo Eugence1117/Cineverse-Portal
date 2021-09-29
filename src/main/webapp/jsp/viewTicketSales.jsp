@@ -1,6 +1,6 @@
 <%@ include file="include/taglib.jsp"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <meta name="_csrf" content="${_csrf.token}" />
@@ -11,25 +11,29 @@
 <title><fmt:message key="ticket.sales.title" /></title>
 
 <%@ include file="include/css.jsp"%>
-<link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<link rel="stylesheet"
+	href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
-#expandSearch:hover{
-	cursor:pointer;
-	background-color:#f8f9fa
+#expandSearch:hover {
+	cursor: pointer;
+	background-color: #f8f9fa
 }
 
-.refreshBtn:hover{
-	cursor:pointer;	
+.refreshBtn:hover, .collapsible {
+	cursor: pointer;
+}
+
+.spin {
+	-webkit-animation: .75s linear infinite spinner-border;
+	animation: .75s linear infinite spinner-border;
 }
 
 @media only screen and (max-width: 768px) {
-	form .btn{
-		width:100% !important;
+	form .btn {
+		width: 100% !important;
 	}
-	
-	#advancedOption .btn{
-		margin:5px 0px 5px 0px !important;
-		
+	#advancedOption .btn {
+		margin: 5px 0px 5px 0px !important;
 	}
 }
 </style>
@@ -37,16 +41,17 @@
 
 <body id="page-top">
 	<div id="wrapper">
-		<%@ include file="include/sidebar.jsp" %>
+		<%@ include file="include/sidebar.jsp"%>
 		<div id="content-wrapper" class="d-flex flex-column">
 			<div id="content">
-				 <%@ include file="include/topbar.jsp" %>
-				 <div class="container-fluid">
-				 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			        	<h1 class="h3 mb-0 text-gray-800">Ticket Sales</h1>
-			        </div>
-		        	
-		        	<div class="card m-2">
+				<%@ include file="include/topbar.jsp"%>
+				<div class="container-fluid">
+					<div
+						class="d-sm-flex align-items-center justify-content-between mb-4">
+						<h1 class="h3 mb-0 text-gray-800">Ticket Sales</h1>
+					</div>
+
+					<div class="card m-2">
 						<div class="card-header">
 							<a data-bs-toggle="collapse" data-bs-target="#searchForm"
 								class="collapsible"><i class="fas fa-search"></i> Search</a>
@@ -79,14 +84,29 @@
 										</div>
 										<div class="col-md-1"></div>
 									</div>
-									<div class="form-group row text-center my-2 justify-content-center">
-										<span id="expandSearch" data-bs-toggle="collapse" data-bs-target="#advancedOption"><i class="fas fa-sort-down"></i></span>
+									<div
+										class="form-group row text-center my-2 justify-content-center">
+										<span id="expandSearch" data-bs-toggle="collapse"
+											data-bs-target="#advancedOption"><i
+											class="fas fa-sort-down"></i></span>
 										<div class="collapse my-2 row" id="advancedOption">
-											<div class="col-md">																								
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="0">Only <b>Start Date</b></button>
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="1"><i class="fas fa-plus"></i> 1 Day</button>
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="30"><i class="fas fa-plus"></i> 30 Days</button>
-												<button class="btn btn-sm btn-info mx-3 quickFill" data-duration="365"><i class="fas fa-plus"></i> 365 Days</button>
+											<div class="col-md">
+												<button class="btn btn-sm btn-info mx-3 quickFill"
+													data-duration="0">
+													Only <b>Start Date</b>
+												</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill"
+													data-duration="1">
+													<i class="fas fa-plus"></i> 1 Day
+												</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill"
+													data-duration="30">
+													<i class="fas fa-plus"></i> 30 Days
+												</button>
+												<button class="btn btn-sm btn-info mx-3 quickFill"
+													data-duration="365">
+													<i class="fas fa-plus"></i> 365 Days
+												</button>
 											</div>
 										</div>
 									</div>
@@ -103,230 +123,499 @@
 							</form>
 						</div>
 					</div>
-					
+
 					<div class="card m-2">
 						<div class="card-header">
 							<span class="fa fa-chart-line"></span> Statistics
 							<div class="fa-pull-right d-inline-block">
-								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="btnExport"> <span class="fas fa-file-export" aria-hidden="true"></span> <span>Export PDF</span></a>
-							</div>							
+								<a
+									class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
+									id="btnExport"> <span class="fas fa-file-export"
+									aria-hidden="true"></span> <span>Export PDF</span></a>
+							</div>
 						</div>
 						<div class="card-body">
-							<div class="row mt-2">
-								<div class="col-md">
-									<h5 class="card-subtitle m-1 text-muted">Ticket Sales Summary <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshTicketBtn"></span></h5>
-								</div>								
-							</div>
-							<div class="row mb-2">
-								<div class="col-md">
-									<div class="card mx-1 border-left-primary shadow">
-										<div class="card-body">
-									    	<div class="row no-gutters align-items-center">
-		                                        <div class="col mr-2">
-		                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ticket Ordered</div>
-		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketOrdered">0</div>
-		                                        </div>
-		                                        <div class="col-auto">
-		                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-		                                        </div>
-		                                    </div>	
-									  	</div>
+							<div id="dataContent">
+								<div class="row mt-2 mb-3">
+									<div class="col-md">
+										<h5 class="card-subtitle m-1 text-muted">
+											Ticket Sales Summary <span
+												class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right"
+												id="refreshBtn"></span>
+										</h5>
 									</div>
 								</div>
-								
-								<div class="col-md">
-									<div class="card mx-1 border-left-success shadow">
-										<div class="card-body">
-											<div class="row no-gutters align-items-center">
-		                                        <div class="col mr-2">
-		                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Ticket Paid</div>
-		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketPaid">0</div>
-		                                        </div>
-		                                        <div class="col-auto">
-		                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-		                                        </div>
-		                                    </div>									    	
-									  	</div>
+								<div class="row mb-2">
+									<div class="col-md">
+										<div class="card mx-1 border-left-primary shadow">
+											<div class="card-body">
+												<div class="row no-gutters align-items-center">
+													<div class="col mr-2">
+														<div
+															class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ticket
+															Ordered</div>
+														<div class="h5 mb-0 font-weight-bold text-gray-800"
+															id="ticketOrdered">0</div>
+													</div>
+													<div class="col-auto">
+														<i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md">
+										<div class="card mx-1 border-left-success shadow">
+											<div class="card-body">
+												<div class="row no-gutters align-items-center">
+													<div class="col mr-2">
+														<div
+															class="text-xs font-weight-bold text-success text-uppercase mb-1">Ticket
+															Paid</div>
+														<div class="h5 mb-0 font-weight-bold text-gray-800"
+															id="ticketPaid">0</div>
+													</div>
+													<div class="col-auto">
+														<i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md">
+										<div class="card mx-1 border-left-danger shadow">
+											<div class="card-body">
+												<div class="row no-gutters align-items-center">
+													<div class="col mr-2">
+														<div
+															class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ticket
+															Cancelled</div>
+														<div class="h5 mb-0 font-weight-bold text-gray-800"
+															id="ticketCancelled">0</div>
+													</div>
+													<div class="col-auto">
+														<i class="fas fa-ban fa-2x text-gray-300"></i>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
-								
-								<div class="col-md">
-									<div class="card mx-1 border-left-danger shadow">
-										<div class="card-body">
-									    	<div class="row no-gutters align-items-center">
-		                                        <div class="col mr-2">
-		                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ticket Cancelled</div>
-		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketCancelled">0</div>
-		                                        </div>
-		                                        <div class="col-auto">
-		                                            <i class="fas fa-ban fa-2x text-gray-300"></i>
-		                                        </div>
-		                                    </div>
-									  	</div>
+
+								<div class="row mt-4">
+									<div class="col-md">
+										<h5 class="card-subtitle m-1 text-muted">Movie Popularity</h5>
 									</div>
 								</div>
-							</div>
-							
-							<div class="row mt-4">
-								<div class="col-md">
-									<h5 class="card-subtitle m-1 text-muted">Movie Popularity <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshMovieBtn"></span></h5>
-								</div>								
-							</div>
-							<div class="row">
-								<div class="col-md">
-									<div class="card mx-1">
-										<div class="card-body">
-											<div id="movieGraph">
+								<div class="row">
+									<div class="col-md">
+										<canvas id="movieGraph" style="min-height: 300px">
+										</canvas>
+									</div>
+								</div>
+
+								<div class="row mt-4">
+									<div class="col-md">
+										<h5 class="card-subtitle m-1 text-muted" id="salesTitle">Sales</h5>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md">
+										<canvas id="salesGraph" style="min-height: 450px">
+										</canvas>
+
+										<div class="card mx-2 shadow" id="singleSales">
+											<div class="card-body">
+												<div class="row no-gutters align-items-center">
+													<div class="col mr-2">
+														<div class="text-xs font-weight-bold text-success text-uppercase mb-1">Gross Profit</div>
+														<div class="h5 mb-0 font-weight-bold text-gray-800" id="grossProfit">RM 0</div>
+													</div>
+													<div class="col-auto">
+														<i class="fas fa-file-invoice-dollar fa-2x text-gray-300"></i>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-							
-							<div class="row mt-4">
-								<div class="col-md">
-									<h5 class="card-subtitle m-1 text-muted">Movie Popularity <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshSales"></span></h5>
-								</div>								
-							</div>
-							<div class="row">
-								<div class="col-md">
-									<div class="card mx-1">
-										<div class="card-body">
-											<div id="movieGraph">
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>							
 						</div>
 					</div>
-		        </div>
-		        <!--  END CONTENT -->
+				</div>
+				<!--  END CONTENT -->
 			</div>
 			<footer class="sticky-footer bg-white">
-		        <div class="container my-auto">
-		          <div class="copyright text-center my-auto">
-		            <span><fmt:message key="common.copyright" /></span>
-		          </div>
-		        </div>
-		    </footer>
+				<div class="container my-auto">
+					<div class="copyright text-center my-auto">
+						<span><fmt:message key="common.copyright" /></span>
+					</div>
+				</div>
+			</footer>
 		</div>
 	</div>
-	
-	<%@ include file="/jsp/include/globalElement.jsp" %>
+
+	<%@ include file="/jsp/include/globalElement.jsp"%>
 	<!-- /.container -->
 
-<%@ include file="include/js.jsp"%>
-	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/js/validatorPattern.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/js/loadingInitiater.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
-	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<%@ include file="include/js.jsp"%>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/js/validatorPattern.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/js/loadingInitiater.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/chart/Chart-3.5.1.min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
-    	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
-    	
-    	const generateBtn = "<span class='fas fa-search'></span> Search  ";
-    	const generatingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Generating...";
-    	
-    	
-    	$(document).ready(function(){
-    		//var resultDt = getResultDataTable().clear();
-    		var currentDate = moment(new Date()).format("YYYY-MM-DD");
-    		$("#searchForm input[type=date]").val(currentDate);
-    		
+		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
+
+		const generateBtn = "<span class='fas fa-search'></span> Search  ";
+		const generatingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Generating...";
+
+		$(document).ready(function() {
+			//var resultDt = getResultDataTable().clear();
+			var currentDate = moment(new Date()).format("YYYY-MM-DD");
+			$("#searchForm input[type=date]").val(currentDate);
+			$("#dataContent").hide();
+
 		});
-    	
-    	$.validator.setDefaults({
+
+		$.validator.setDefaults({
 			errorElement : "div",
 			errorClass : "invalid-feedback",
 			highlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
-					$(element).closest('.form-control').removeClass(
-							'is-valid').addClass('is-invalid');
+					$(element).closest('.form-control').removeClass('is-valid')
+							.addClass('is-invalid');
 				}
 			},
 			unhighlight : function(element, errorClass, validClass) {
 				// Only validation controls
 				if (!$(element).hasClass('novalidation')) {
-					$(element).closest('.form-control')
-							.removeClass('is-invalid').addClass('is-valid');
+					$(element).closest('.form-control').removeClass(
+							'is-invalid').addClass('is-valid');
 				}
 			},
 			errorPlacement : function(error, element) {
 				error.insertAfter(element);
 			}
 		});
-    	
-    	  $.validator.addMethod("DateFormat",function(value,element){
-  			
-  			var isValid = false;
-  			var regex = /^20[0-2][0-9]-((0[1-9])|(1[0-2]))-([0-2][1-9]|3[0-1])$/;
-  			if(regex.test(value)){
-  				isValid = true;	
-  			}
-  			return this.optional(element) ||  isValid;
-  		},"Please make sure the date you entered is within year 2000 - 2029.");
-    	  
-    	$("#advancedOption").on("hide.bs.collapse",function(){
-      		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
-      	});
-      	
-  		$("#advancedOption").on("show.bs.collapse",function(){
-  			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
-      	});
-  		
-    	$("#searchForm").validate({
+
+		$.validator
+				.addMethod(
+						"DateFormat",
+						function(value, element) {
+
+							var isValid = false;
+							var regex = /^20[0-2][0-9]-((0[1-9])|(1[0-2]))-([0-2][1-9]|3[0-1])$/;
+							if (regex.test(value)) {
+								isValid = true;
+							}
+							return this.optional(element) || isValid;
+						},
+						"Please make sure the date you entered is within year 2000 - 2029.");
+
+		$("#advancedOption").on(
+				"hide.bs.collapse",
+				function() {
+					$("#expandSearch > i").removeClass("fa-sort-up").addClass(
+							"fa-sort-down")
+				});
+
+		$("#advancedOption").on(
+				"show.bs.collapse",
+				function() {
+					$("#expandSearch > i").addClass("fa-sort-up").removeClass(
+							"fa-sort-down")
+				});
+
+		$("#searchForm").validate({
 			ignore : ".ignore",
-			focusInvalid:true,
+			focusInvalid : true,
 			rules : {
-				startdate:{
-					required:true,
+				startdate : {
+					required : true,
 				},
-    			enddate:{
-    				required:true,
-    			}
+				enddate : {
+					required : true,
+				}
 			},
-			invalidHandler: function() {
-				
+			invalidHandler : function() {
+
 				$(this).find(":input.has-error:first").focus();
 			}
 		});
-    	
-    	$(".quickFill").on('click',function(e){
-    		e.preventDefault();
-    		var data = parseInt($(this).data("duration"));
-    		
-    		var validator = $("#searchForm").validate();
-    		if(!validator.element("input[name=startdate]")){
-    			return false;
-    		}
-    		
-    		var endDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
-    		$("input[name=enddate]").val(endDate);
-    		
-    		$("#btnSearch").click();
-    		
-    	})
-    	
-    	$("#btnSearch").on('click',function(){
-    		
-    		var validator = $("#searchForm").validate();
-    		if(!validator.form()){
-    			return false;
-    		}
-    		
-    		getStatistics($("#searchForm").serializeObject());
-    		
-    	});
-    	
-    	function getStatistics(timeRange){
-    		
-    		
-    		console.log(timeRange);	
-    	}
+
+		$(".quickFill").on(
+				'click',
+				function(e) {
+					e.preventDefault();
+					var data = parseInt($(this).data("duration"));
+
+					var validator = $("#searchForm").validate();
+					if (!validator.element("input[name=startdate]")) {
+						return false;
+					}
+
+					var endDate = moment($("input[name=startdate]").val()).add(
+							data, 'days').format("YYYY-MM-DD");
+					$("input[name=enddate]").val(endDate);
+
+					$("#btnSearch").click();
+
+				})
+
+		$("#btnSearch").on('click', function() {
+
+			var validator = $("#searchForm").validate();
+			if (!validator.form()) {
+				return false;
+			}
+
+			getStatistics($("#searchForm").serializeObject());
+
+		});
+
+		var range = null;
+
+		$("#refreshBtn").on('click', function() {
+			getStatistics(null);
+		})
+
+		function getStatistics(formData) {
+			$("#refreshBtn").addClass("spin");
+			removeLoading($("#btnSearch"), generatingBtn);
+
+			if (formData == null) {
+				formData = range;
+			} else {
+				range = formData
+			}
+
+			if (formData == null) {
+				formData = $("#searchForm").serializeObject();
+			}
+
+			$.ajax("api/manager/retrieveSalesData.json", {
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+				data : formData,
+				contentType : "application/json; charset=utf-8",
+				headers : {
+					"X-CSRF-Token" : CSRF_TOKEN
+				},
+				statusCode : {
+					400 : function() {
+						window.location.href = "400.htm";
+					},
+					401 : function() {
+						window.location.href = "expire.htm";
+					},
+					403 : function() {
+						window.location.href = "403.htm";
+					},
+					404 : function() {
+						window.location.href = "404.htm";
+					}
+				}
+			}).done(function(data) {
+				$("#refreshBtn").removeClass("spin");
+				removeLoading($("#btnSearch"), generateBtn);
+
+				if (data.errorMsg != null) {
+					bootbox.alert(data.errorMsg);
+				} else {
+					var ticketStat = data.result.ticketSummary;
+					var ticketSales = data.result.ticketSales;
+					var movieRanking = data.result.movieRanking;
+
+					renderTicketStat(ticketStat);
+					renderMovieStat(movieRanking);
+					renderSalesData(ticketSales);
+					
+					if(!$("#dataContent").is(":visible")){
+						$("#dataContent").slideDown();
+					}
+				}
+			})
+		}
+
+		function renderTicketStat(stat) {
+			var sumTicket = stat["sumTicket"];
+			var paidTicket = stat["paidTicket"];
+			var cancelledTicket = stat["cancelledTicket"];
+
+			$("#ticketOrdered").fadeOut(400, function() {
+				$("#ticketOrdered").text(sumTicket);
+				$("#ticketOrdered").fadeIn();
+			});
+
+			$("#ticketPaid").fadeOut(400, function() {
+				$("#ticketPaid").text(paidTicket);
+				$("#ticketPaid").fadeIn();
+			});
+
+			$("#ticketCancelled").fadeOut(400, function() {
+				$("#ticketCancelled").text(cancelledTicket);
+				$("#ticketCancelled").fadeIn();
+			});
+		}
+
+		var movieGraph = null
+		function renderMovieStat(chartData) {
+			if (movieGraph != null) {
+				movieGraph.destroy();
+			}
+			//$("#chartTitle").text(chartData.title);
+			movieGraph = new Chart($("#movieGraph"), {
+				type : 'bar',
+				data : {
+					labels : chartData.label,
+					datasets : [ {
+						data : chartData.data,
+						backgroundColor : poolColors(chartData.label.length)
+					} ],
+				},
+				options : {
+					layout : {
+						padding : {
+							left : 20,
+							right : 20,
+							top : 35,
+							bottom : 35
+						}
+					},
+					maintainAspectRatio : false,
+					aspectRatio : 3,
+					scale : {
+						ticks : {
+							precision : 0
+						}
+					},
+					tooltips : {
+						backgroundColor : "rgb(255,255,255)",
+						bodyFontColor : "#858796",
+						borderColor : '#dddfeb',
+						borderWidth : 1,
+						xPadding : 15,
+						yPadding : 15,
+						displayColors : false,
+						caretPadding : 10,
+					},
+					plugins : {
+						legend : {
+							display : false,
+						},
+					}
+				},
+			});
+		}
+
+		var salesGraph = null;
+		function renderSalesData(chartData) {
+			if (salesGraph != null) {
+				salesGraph.destroy();
+			}
+
+			$("#salesTitle").text(chartData.title);
+			
+			$("#salesGraph").hide();
+			$("#singleSales").hide();
+			
+			if (chartData.isChart) {
+				$("#salesGraph").fadeIn();
+				//Process Data 		
+				salesGraph = new Chart(
+						$("#salesGraph"),
+						{
+							type : 'line',
+							data : {
+								labels : chartData.label,
+								datasets : [ {
+									data : chartData.data,
+									backgroundColor : poolColors(chartData.label.length)
+								} ],
+							},
+							options : {
+								layout : {
+									padding : {
+										left : 20,
+										right : 20,
+										top : 35,
+										bottom : 35
+									}
+								},
+								maintainAspectRatio : false,
+								aspectRatio : 3,
+								scale : {
+									ticks : {
+										precision : 0
+									}
+								},
+								tooltips : {
+									backgroundColor : "rgb(255,255,255)",
+									bodyFontColor : "#858796",
+									borderColor : '#dddfeb',
+									borderWidth : 1,
+									xPadding : 15,
+									yPadding : 15,
+									displayColors : false,
+									caretPadding : 10,
+								},
+								plugins : {
+									legend : {
+										display : false,
+									},
+									tooltip : {
+										callbacks : {
+											label : function(context) {
+												var label = "RM " + context.raw;
+												return label;
+											}
+										}
+									},
+								}
+							},
+						});
+			}
+			else{
+				$("#singleSales").fadeIn();
+				$("#grossProfit").text("RM " + chartData.data);
+			}
+		}
+
+		function poolColors(a) {
+			var pool = [];
+			for (i = 0; i < a; i++) {
+				//pool.push(intToRGB(hashCode(a[i])));
+				var color = dynamicColors();
+				while (pool.includes(color)) {
+					color = dynamicColors();
+				}
+
+				pool.push(color);
+			}
+			return pool;
+		}
+
+		function dynamicColors() {
+			var r = Math.floor(Math.random() * 255);
+			var g = Math.floor(Math.random() * 255);
+			var b = Math.floor(Math.random() * 255);
+			return "rgba(" + r + "," + g + "," + b + ", 0.5)";
+		}
 	</script>
 </body>
 

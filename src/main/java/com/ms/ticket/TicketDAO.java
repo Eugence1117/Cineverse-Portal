@@ -2,6 +2,7 @@ package com.ms.ticket;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -86,7 +87,7 @@ public class TicketDAO {
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT t.seqid, t.ticketStatus, t.scheduleId, s.movieId " +
-						   "FROM masp.ticket t, masp.schedule s, masp.payment p , masp.theatre th" +
+						   "FROM masp.ticket t, masp.schedule s, masp.payment p, masp.theatre th " +
 						   "WHERE p.createddate <= ? AND p.createddate >= ? " + 
 						   "AND t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?";
 						
@@ -108,6 +109,48 @@ public class TicketDAO {
 			}
 			else {
 				response.put(false,"No ticket made at the date specified.");
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
+	public Map<Boolean,Object> getSalesByPaymentDate(String start, String end, String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT SUM(p.totalPrice) AS grossProfit, CONVERT(date,p.createddate) AS paymentDate " +
+						   "FROM masp.ticket t, masp.schedule s, masp.payment p, masp.theatre th " +
+						   "WHERE p.createddate <= ? AND p.createddate >= ? " + 
+						   "AND t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ? " +
+						   "GROUP BY p.createddate ORDER BY p.createddate";
+						
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
+			if(rows.size() > 0) {
+				List<SalesSummary> sales = new ArrayList<SalesSummary>();
+				for(Map<String,Object> row : rows) {
+					
+					double profit = (double)row.get("grossProfit");
+					Date date = (java.sql.Date)row.get("paymentDate");
+						
+					Calendar dateTime = Calendar.getInstance();
+					dateTime.setTime(date);
+					
+					SalesSummary view = new SalesSummary(profit,dateTime.getTime());
+					sales.add(view);
+				}
+				log.info("Sales size: " + sales.size());
+				response.put(true, sales);
+			}
+			else {
+				List<SalesSummary> sales = new ArrayList<SalesSummary>();
+				response.put(true,sales);
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {

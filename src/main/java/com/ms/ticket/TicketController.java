@@ -78,23 +78,43 @@ public class TicketController {
 		return service.updateTicketSeat(data);
 	}
 	
-	@RequestMapping(value = {"/api/manager/retrieveTicketSummary.json"})
+	@RequestMapping(value = {"/api/manager/retrieveSalesData.json"})
 	@ResponseBody
-	public Response getTicketSummaryInfo(Model model, String startdate, String enddate) {
-		log.info("Entered /retrieveTicketSummary.json");
+	public Response getSalesData(Model model, String startdate, String enddate) {
+		log.info("Entered /retrieveSalesData.json");
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();
 		
-		return service.processTicketSummaryData(branchid, startdate, enddate);
+		return service.retrieveSalesData(branchid, startdate, enddate);
 	}
 	
-	@RequestMapping(value = {"/api/manager/retrieveMovieRanking.json"})
-	@ResponseBody
-	public Response getMovieRanking(Model model, String startdate, String enddate) {
-		log.info("Entered /retrieveMovieRanking.json");
-		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String branchid = user.getBranchid();
-		
-		return new Response("");
-	}
+//	@RequestMapping(value = {"/api/manager/retrieveTicketSummary.json"})
+//	@ResponseBody
+//	public Response getTicketSummaryInfo(Model model, String startdate, String enddate) {
+//		log.info("Entered /retrieveTicketSummary.json");
+//		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		String branchid = user.getBranchid();
+//		
+//		return service.processTicketSummaryData(branchid, startdate, enddate);
+//	}
+//	
+//	@RequestMapping(value = {"/api/manager/retrieveMovieRanking.json"})
+//	@ResponseBody
+//	public Response getMovieRanking(Model model, String startdate, String enddate) {
+//		log.info("Entered /retrieveMovieRanking.json");
+//		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		String branchid = user.getBranchid();
+//		
+//		return service.processMovieRanking(branchid, startdate, enddate);
+//	}
+//	
+//	@RequestMapping(value = {"/api/manager/retrieveTicketSales.json"})
+//	@ResponseBody
+//	public Response getTicketSales(Model model, String startdate, String enddate) {
+//		log.info("Entered /retrieveMovieRanking.json");
+//		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		String branchid = user.getBranchid();
+//		
+//		return service.processTicketSales(branchid, startdate, enddate);
+//	}
 }
