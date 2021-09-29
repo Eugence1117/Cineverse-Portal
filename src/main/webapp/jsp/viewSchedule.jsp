@@ -368,6 +368,7 @@
     		$("#btnSearch").click();
     		
     	})
+    	
     	$("#btnSearch").on('click',function(){
     		
     		var validator = $("#searchForm").validate();

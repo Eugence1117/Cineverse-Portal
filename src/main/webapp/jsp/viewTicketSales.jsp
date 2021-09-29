@@ -12,6 +12,23 @@
 
 <%@ include file="include/css.jsp"%>
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
+<style>
+#expandSearch:hover{
+	cursor:pointer;
+	background-color:#f8f9fa
+}
+
+@media only screen and (max-width: 768px) {
+	form .btn{
+		width:100% !important;
+	}
+	
+	#advancedOption .btn{
+		margin:5px 0px 5px 0px !important;
+		
+	}
+}
+</style>
 </head>
 
 <body id="page-top">
@@ -85,7 +102,10 @@
 					
 					<div class="card m-2">
 						<div class="card-header">
-							<span class="fa fa-chart-line"></span> Statistics							
+							<span class="fa fa-chart-line"></span> Statistics
+							<div class="fa-pull-right d-inline-block">
+								<a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark" id="btnExport"> <span class="fas fa-file-export" aria-hidden="true"></span> <span>Export PDF</span></a>
+							</div>							
 						</div>
 						<div class="card-body">
 							
@@ -118,7 +138,7 @@
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
-    	const generateBtn = "<span class='fas fa-search'></span> Generate  ";
+    	const generateBtn = "<span class='fas fa-search'></span> Search  ";
     	const generatingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Generating...";
     	
     	
@@ -161,6 +181,14 @@
   			return this.optional(element) ||  isValid;
   		},"Please make sure the date you entered is within year 2000 - 2029.");
     	  
+    	$("#advancedOption").on("hide.bs.collapse",function(){
+      		$("#expandSearch > i").removeClass("fa-sort-up").addClass("fa-sort-down")
+      	});
+      	
+  		$("#advancedOption").on("show.bs.collapse",function(){
+  			$("#expandSearch > i").addClass("fa-sort-up").removeClass("fa-sort-down")
+      	});
+  		
     	$("#searchForm").validate({
 			ignore : ".ignore",
 			focusInvalid:true,

@@ -32,9 +32,21 @@
 .clickable{
 	cursor:pointer;
 }
+
 #expandSearch:hover{
 	cursor:pointer;
 	background-color:#f8f9fa
+}
+
+@media only screen and (max-width: 768px) {
+	form .btn{
+		width:100% !important;
+	}
+	
+	#advancedOption .btn{
+		margin:5px 0px 5px 0px !important;
+		
+	}
 }
 </style>
 </head>

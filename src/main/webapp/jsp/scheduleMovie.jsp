@@ -112,6 +112,11 @@
 	form .btn{
 		width:100% !important;
 	}
+
+	#advancedOption .btn{
+		margin:5px 0px 5px 0px !important;
+		
+	}
 }
 
 
