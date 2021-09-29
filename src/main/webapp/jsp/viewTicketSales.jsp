@@ -18,6 +18,10 @@
 	background-color:#f8f9fa
 }
 
+.refreshBtn:hover{
+	cursor:pointer;	
+}
+
 @media only screen and (max-width: 768px) {
 	form .btn{
 		width:100% !important;
@@ -108,7 +112,92 @@
 							</div>							
 						</div>
 						<div class="card-body">
+							<div class="row mt-2">
+								<div class="col-md">
+									<h5 class="card-subtitle m-1 text-muted">Ticket Sales Summary <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshTicketBtn"></span></h5>
+								</div>								
+							</div>
+							<div class="row mb-2">
+								<div class="col-md">
+									<div class="card mx-1 border-left-primary shadow">
+										<div class="card-body">
+									    	<div class="row no-gutters align-items-center">
+		                                        <div class="col mr-2">
+		                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ticket Ordered</div>
+		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketOrdered">0</div>
+		                                        </div>
+		                                        <div class="col-auto">
+		                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+		                                        </div>
+		                                    </div>	
+									  	</div>
+									</div>
+								</div>
+								
+								<div class="col-md">
+									<div class="card mx-1 border-left-success shadow">
+										<div class="card-body">
+											<div class="row no-gutters align-items-center">
+		                                        <div class="col mr-2">
+		                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Ticket Paid</div>
+		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketPaid">0</div>
+		                                        </div>
+		                                        <div class="col-auto">
+		                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+		                                        </div>
+		                                    </div>									    	
+									  	</div>
+									</div>
+								</div>
+								
+								<div class="col-md">
+									<div class="card mx-1 border-left-danger shadow">
+										<div class="card-body">
+									    	<div class="row no-gutters align-items-center">
+		                                        <div class="col mr-2">
+		                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ticket Cancelled</div>
+		                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="ticketCancelled">0</div>
+		                                        </div>
+		                                        <div class="col-auto">
+		                                            <i class="fas fa-ban fa-2x text-gray-300"></i>
+		                                        </div>
+		                                    </div>
+									  	</div>
+									</div>
+								</div>
+							</div>
 							
+							<div class="row mt-4">
+								<div class="col-md">
+									<h5 class="card-subtitle m-1 text-muted">Movie Popularity <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshMovieBtn"></span></h5>
+								</div>								
+							</div>
+							<div class="row">
+								<div class="col-md">
+									<div class="card mx-1">
+										<div class="card-body">
+											<div id="movieGraph">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row mt-4">
+								<div class="col-md">
+									<h5 class="card-subtitle m-1 text-muted">Movie Popularity <span class="fas fa-redo-alt ml-3 refreshBtn fa-pull-right" id="refreshSales"></span></h5>
+								</div>								
+							</div>
+							<div class="row">
+								<div class="col-md">
+									<div class="card mx-1">
+										<div class="card-body">
+											<div id="movieGraph">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>							
 						</div>
 					</div>
 		        </div>
@@ -234,6 +323,8 @@
     	});
     	
     	function getStatistics(timeRange){
+    		
+    		
     		console.log(timeRange);	
     	}
 	</script>

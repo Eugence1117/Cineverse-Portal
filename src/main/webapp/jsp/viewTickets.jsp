@@ -69,6 +69,9 @@
 						</div>
 						<div class="card-body">
 							<form id="searchForm" class="collapse show">
+								<div class="alert alert-info text-center" role="alert">
+									Please use the schedule date as the input to search.
+								</div>
 								<div class="py-3 px-2">
 									<div class="form-group row">
 										<div class="col-md-1"></div>
@@ -424,6 +427,7 @@
 		
 		function showSeatLayout(id){
 			if(id != null && id != ""){
+				Notiflix.Loading.Circle('Please wait...');
 				$.ajax("api/admin/getTheatreLayout.json?ticketId="+id, {
 					method : "POST",
 					accepts : "application/json",
@@ -495,6 +499,7 @@
 					}
 				}).done(function(data) {
 					removeLoading($("#btnRefresh"),refreshBtn);	
+					Notiflix.Loading.Remove();
 					if(data.errorMsg != null){
 						bootbox.alert(data.errorMsg);												
 					}
@@ -631,8 +636,7 @@
 			});
 		}
 		
-		
-		//Redo this, Add validation fronend and backend
+				
 		function changeSeat(ticketId,seatNo){
 			var formData = {
 					"ticketId":ticketId,

@@ -35,10 +35,11 @@ public class TicketDAO {
 	    this.jdbc = new JdbcTemplate(dataSource);
 	}
 	
-	public Map<Boolean,Object> getTicketByDate(String start, String end){
+	
+	public Map<Boolean,Object> getTicketByScheduleStartDate(String start, String end){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT t.seqid, t.ticketStatus, t.seatNo, t.price, t.scheduleID, t.orderID, m.movieName, b.branchName, th.theatreName, s.starttime " +
+			String query = "SELECT t.seqid, t.ticketStatus, t.seatNo, t.price, t.scheduleID, t.transactionId, m.movieName, b.branchName, th.theatreName, s.starttime " +
 						   "FROM masp.ticket t, masp.movie m, masp.branch b, masp.theatre th, masp.schedule s " +
 						   "WHERE s.starttime <= ? AND s.starttime >= ? " + 
 						   "AND t.scheduleID = s.seqid AND s.theatreId = th.seqid " + 
@@ -54,13 +55,52 @@ public class TicketDAO {
 					String seatNo = (String)row.get("seatNo");
 					double price = (double)row.get("price");
 					String scheduleId = (String)row.get("scheduleID");
-					String orderId = (String)row.get("orderId");
+					String orderId = (String)row.get("transactionId");
 					String movieName = (String)row.get("movieName");
 					String branchName = (String)row.get("branchName");
 					String theatreName = (String)row.get("theatreName");
 					Date startTime = (Timestamp)row.get("starttime");
 														
 					TicketView view = new TicketView(ticketId,seatNo,branchName,theatreName,Constant.STANDARD_DATE_FORMAT.format(startTime),movieName,scheduleId,String.format("%.2f",price),Util.getTicketStatusDesc(status));
+					ticketList.add(view);
+				}
+				log.info("Total Ticket retrieve: " + ticketList.size());
+				response.put(true, ticketList);
+			}
+			else {
+				response.put(false,"No ticket made at the date specified.");
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
+	public Map<Boolean,Object> getTicketByPaymentDate(String start, String end,String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT t.seqid, t.ticketStatus, t.scheduleId, s.movieId " +
+						   "FROM masp.ticket t, masp.schedule s, masp.payment p , masp.theatre th" +
+						   "WHERE p.createddate <= ? AND p.createddate >= ? " + 
+						   "AND t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?";
+						
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
+			if(rows.size() > 0) {
+				List<TicketSummary> ticketList = new ArrayList<TicketSummary>();
+				for(Map<String,Object> row : rows) {
+					
+					String ticketId = (String)row.get("seqid");
+					int status = (int)row.get("ticketStatus");
+					String scheduleId = (String)row.get("scheduleId");
+					String movieId = (String)row.get("movieId");
+														
+					TicketSummary view = new TicketSummary(ticketId,scheduleId,movieId,status);
 					ticketList.add(view);
 				}
 				log.info("Total Ticket retrieve: " + ticketList.size());

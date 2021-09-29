@@ -48,6 +48,16 @@ public class Constant {
 	public static final String TICKET_PENDING_REFUND = "Pending Refund";
 	public static final String TICKET_CANCELLED = "Cancelled";
 	
+	public static final int PAYMENT_PENDING_STATUS_CODE = 0;
+	public static final int PAYMENT_COMPLETED_STATUS_CODE = 1;
+	public static final int PAYMENT_REFUND_STATUS_CODE = 2;
+	public static final int PAYMENT_CANCELLED_STATUS_CODE = -1;
+	
+	public static final String PAYMENT_PENDING = "Pending";	
+	public static final String PAYMENT_COMPLETED = "Completed";
+	public static final String PAYMENT_REFUND = "Refunded";
+	public static final String PAYMENT_CANCELLED = "Cancelled";
+	
 	public static final int SCHEDULE_END_CODE = -1;
 	public static final int SCHEDULE_AVAILABLE_CODE = 1;
 	public static final int SCHEDULE_CANCELLED_CODE = 0;

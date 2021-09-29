@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.common.Response;
+import com.ms.login.Staff;
 
 
 @Controller
@@ -70,9 +72,29 @@ public class TicketController {
 	
 	@RequestMapping(value = {"/api/admin/changeSeat.json"})
 	@ResponseBody
-	public Response changeSeat(Model mode, @RequestBody Map<String,String> data) {
+	public Response changeSeat(Model model, @RequestBody Map<String,String> data) {
 		log.info("Entered /getSelectedSeat.json");
 		
 		return service.updateTicketSeat(data);
+	}
+	
+	@RequestMapping(value = {"/api/manager/retrieveTicketSummary.json"})
+	@ResponseBody
+	public Response getTicketSummaryInfo(Model model, String startdate, String enddate) {
+		log.info("Entered /retrieveTicketSummary.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		
+		return service.processTicketSummaryData(branchid, startdate, enddate);
+	}
+	
+	@RequestMapping(value = {"/api/manager/retrieveMovieRanking.json"})
+	@ResponseBody
+	public Response getMovieRanking(Model model, String startdate, String enddate) {
+		log.info("Entered /retrieveMovieRanking.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		
+		return new Response("");
 	}
 }
