@@ -76,6 +76,19 @@ public class Util {
 	public static String getTicketStatusDesc(int code) {
 		return code == Constant.TICKET_UNPAID_STATUS_CODE ? Constant.TICKET_UNPAID : code == Constant.TICKET_PAID_STATUS_CODE ? Constant.TICKET_PAID : code == Constant.TICKET_COMPLETED_STATUS_CODE ? Constant.TICKET_COMPLETED : code == Constant.TICKET_PENDING_REFUND_STATUS_CODE ? Constant.TICKET_PENDING_REFUND : code == Constant.TICKET_CANCELLED_STATUS_CODE ? Constant.TICKET_CANCELLED : null;
 	}
+	public static int getPaymentStatusCode(String string) {
+		return string.equals(Constant.PAYMENT_PENDING) ? Constant.PAYMENT_PENDING_STATUS_CODE : string.equals(Constant.PAYMENT_COMPLETED) ? Constant.PAYMENT_COMPLETED_STATUS_CODE : string.equals(Constant.PAYMENT_REFUND) ? Constant.PAYMENT_REFUND_STATUS_CODE : string.equals(Constant.PAYMENT_CANCELLED) ? Constant.PAYMENT_CANCELLED_STATUS_CODE : Constant.INVALID_STATUS_CODE;
+	}	
+	public static String getPaymentStatusDesc(int code) {
+		return code == Constant.PAYMENT_PENDING_STATUS_CODE ? Constant.PAYMENT_PENDING : code == Constant.PAYMENT_COMPLETED_STATUS_CODE ? Constant.PAYMENT_COMPLETED : code == Constant.PAYMENT_REFUND_STATUS_CODE ? Constant.PAYMENT_REFUND : code == Constant.PAYMENT_CANCELLED_STATUS_CODE ? Constant.PAYMENT_CANCELLED : null;
+	}
+	public static int getPaymentMethodCode(String string) {
+		return string.equals(Constant.ONLINE_BANKING_PAYMENT) ? Constant.ONLINE_BANKING_PAYMENT_CODE : string.equals(Constant.CARD_PAYMENT) ? Constant.CARD_PAYMENT_CODE : Constant.INVALID_STATUS_CODE;
+	}
+	public static String getPaymentMethodDesc(int code) {
+		return code == Constant.ONLINE_BANKING_PAYMENT_CODE ? Constant.ONLINE_BANKING_PAYMENT : code == Constant.CARD_PAYMENT_CODE ? Constant.CARD_PAYMENT : "Unknown";
+	}
+	
 	public static OperatingHours getDefaultRules(String branchid) {
 		return new OperatingHours(branchid,"The operating hours of the business",Constant.DEFAULT_BUSINESS_OPERATING_START_TIME,Constant.DEFAULT_BUSINESS_OPERATING_END_TIME);
 	}

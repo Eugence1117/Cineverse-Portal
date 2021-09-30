@@ -73,6 +73,12 @@ public class Constant {
 	public static final String MOVIE_LIST_VIEW_COOKIE = "List";
 	public static final String MOVIE_COOKIE_IGNORE = "Ignore";
 	
+	public static final int ONLINE_BANKING_PAYMENT_CODE = 0;
+	public static final int CARD_PAYMENT_CODE = 1;
+	
+	public static final String ONLINE_BANKING_PAYMENT = "Internet Banking";
+	public static final String CARD_PAYMENT = "Debit/Credit Card";
+	
 	public static final int DEFAULT_TIME_GRAIN = 5;
 	public static final int DEFAULT_TIME_RANGE = 13;
 	public static final int DEFAULT_TIME_GAP = 5;
