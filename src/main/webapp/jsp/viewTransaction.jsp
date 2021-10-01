@@ -164,6 +164,7 @@
     		var resultDt = getResultDataTable().clear();
     		var currentDate = moment(new Date()).format("YYYY-MM-DD");
     		$("#searchForm input[type=date]").val(currentDate);
+    		$("#searchForm input[type=date]").attr('max',currentDate);
     		
 		});
     	
@@ -198,20 +199,19 @@
   			}
   			return this.optional(element) ||  isValid;
   		},"Please make sure the date you entered is within year 2000 - 2029.");
-    	  
+    	
     	$("#searchForm").validate({
 			ignore : ".ignore",
 			focusInvalid:true,
 			rules : {
 				startdate:{
-					required:true,
+					required:true,					
 				},
     			enddate:{
-    				required:true,
+    				required:true,    				
     			}
 			},
-			invalidHandler: function() {
-				
+			invalidHandler: function() {				
 				$(this).find(":input.has-error:first").focus();
 			}
 		});
@@ -232,12 +232,19 @@
     		if(!validator.element("input[name=startdate]")){
     			return false;
     		}
-    		
-    		var endDate = moment($("input[name=startdate]").val()).add(data,'days').format("YYYY-MM-DD");
-    		$("input[name=enddate]").val(endDate);
-    		
-    		$("#btnSearch").click();
-    		
+    		    		
+    		var endDate = moment($("input[name=startdate]").val()).add(data, 'days');
+			
+			var currentDate = moment(new Date());
+			
+			if(endDate.diff(currentDate) > 0){
+				bootbox.alert("[End Date] cannot greater than current date.");						
+			}else{
+				$("input[name=enddate]").val(endDate.format("YYYY-MM-DD"));
+
+				$("#btnSearch").click();
+
+			}		
     	})
     	
     	$("#btnSearch").on('click',function(){

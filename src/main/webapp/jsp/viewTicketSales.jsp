@@ -286,6 +286,7 @@
 			//var resultDt = getResultDataTable().clear();
 			var currentDate = moment(new Date()).format("YYYY-MM-DD");
 			$("#searchForm input[type=date]").val(currentDate);
+			$("#searchForm input[type=date]").attr('max',currentDate);
 			$("#dataContent").hide();
 
 		});
@@ -357,8 +358,7 @@
 			}
 		});
 
-		$(".quickFill").on(
-				'click',
+		$(".quickFill").on('click',
 				function(e) {
 					e.preventDefault();
 					var data = parseInt($(this).data("duration"));
@@ -369,11 +369,18 @@
 					}
 
 					var endDate = moment($("input[name=startdate]").val()).add(
-							data, 'days').format("YYYY-MM-DD");
-					$("input[name=enddate]").val(endDate);
+							data, 'days');
+					
+					var currentDate = moment(new Date());
+					
+					if(endDate.diff(currentDate) > 0){
+						bootbox.alert("[End Date] cannot greater than current date.");						
+					}else{
+						$("input[name=enddate]").val(endDate.format("YYYY-MM-DD"));
 
-					$("#btnSearch").click();
-
+						$("#btnSearch").click();
+	
+					}					
 				})
 
 		$("#btnSearch").on('click', function() {
