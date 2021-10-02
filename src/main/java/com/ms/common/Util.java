@@ -70,17 +70,11 @@ public class Util {
 	public static String getScheduleStatus(int code) {
 		return code == Constant.SCHEDULE_AVAILABLE_CODE ? Constant.SCHEDULE_AVAILABLE : code == Constant.SCHEDULE_CANCELLED_CODE ? Constant.SCHEDULE_CANCELLED : code == Constant.SCHEDULE_END_CODE ? Constant.SCHEDULE_END : null;
 	}
-	public static int getTicketStatusCode(String string) {
-		return string.equals(Constant.TICKET_UNPAID) ? Constant.TICKET_UNPAID_STATUS_CODE : string.equals(Constant.TICKET_PAID) ? Constant.TICKET_PAID_STATUS_CODE : string.equals(Constant.TICKET_COMPLETED) ? Constant.TICKET_COMPLETED_STATUS_CODE : string.equals(Constant.TICKET_PENDING_REFUND) ? Constant.TICKET_PENDING_REFUND_STATUS_CODE : string.equals(Constant.TICKET_CANCELLED) ? Constant.TICKET_CANCELLED_STATUS_CODE : Constant.INVALID_STATUS_CODE; 
-	}
-	public static String getTicketStatusDesc(int code) {
-		return code == Constant.TICKET_UNPAID_STATUS_CODE ? Constant.TICKET_UNPAID : code == Constant.TICKET_PAID_STATUS_CODE ? Constant.TICKET_PAID : code == Constant.TICKET_COMPLETED_STATUS_CODE ? Constant.TICKET_COMPLETED : code == Constant.TICKET_PENDING_REFUND_STATUS_CODE ? Constant.TICKET_PENDING_REFUND : code == Constant.TICKET_CANCELLED_STATUS_CODE ? Constant.TICKET_CANCELLED : null;
-	}
 	public static int getPaymentStatusCode(String string) {
-		return string.equals(Constant.PAYMENT_PENDING) ? Constant.PAYMENT_PENDING_STATUS_CODE : string.equals(Constant.PAYMENT_COMPLETED) ? Constant.PAYMENT_COMPLETED_STATUS_CODE : string.equals(Constant.PAYMENT_REFUND) ? Constant.PAYMENT_REFUND_STATUS_CODE : string.equals(Constant.PAYMENT_CANCELLED) ? Constant.PAYMENT_CANCELLED_STATUS_CODE : Constant.INVALID_STATUS_CODE;
+		return string.equals(Constant.PAYMENT_PENDING) ? Constant.PAYMENT_PENDING_STATUS_CODE : string.equals(Constant.PAYMENT_COMPLETED) ? Constant.PAYMENT_COMPLETED_STATUS_CODE : string.equals(Constant.PAYMENT_REFUND) ? Constant.PAYMENT_REFUND_STATUS_CODE : string.equals(Constant.PAYMENT_CANCELLED) ? Constant.PAYMENT_CANCELLED_STATUS_CODE : string.equals(Constant.PAYMENT_PENDING_REFUND) ? Constant.PAYMENT_PENDING_STATUS_CODE : string.equals(Constant.PAYMENT_PAID) ? Constant.PAYMENT_PAID_STATUS_CODE : Constant.INVALID_STATUS_CODE;
 	}	
 	public static String getPaymentStatusDesc(int code) {
-		return code == Constant.PAYMENT_PENDING_STATUS_CODE ? Constant.PAYMENT_PENDING : code == Constant.PAYMENT_COMPLETED_STATUS_CODE ? Constant.PAYMENT_COMPLETED : code == Constant.PAYMENT_REFUND_STATUS_CODE ? Constant.PAYMENT_REFUND : code == Constant.PAYMENT_CANCELLED_STATUS_CODE ? Constant.PAYMENT_CANCELLED : null;
+		return code == Constant.PAYMENT_PENDING_STATUS_CODE ? Constant.PAYMENT_PENDING : code == Constant.PAYMENT_COMPLETED_STATUS_CODE ? Constant.PAYMENT_COMPLETED : code == Constant.PAYMENT_REFUND_STATUS_CODE ? Constant.PAYMENT_REFUND : code == Constant.PAYMENT_CANCELLED_STATUS_CODE ? Constant.PAYMENT_CANCELLED : code == Constant.PAYMENT_PENDING_REFUND_STATUS_CODE ? Constant.PAYMENT_PENDING_REFUND : code == Constant.PAYMENT_PAID_STATUS_CODE ? Constant.PAYMENT_PAID : null;
 	}
 	public static int getPaymentMethodCode(String string) {
 		return string.equals(Constant.ONLINE_BANKING_PAYMENT) ? Constant.ONLINE_BANKING_PAYMENT_CODE : string.equals(Constant.CARD_PAYMENT) ? Constant.CARD_PAYMENT_CODE : Constant.INVALID_STATUS_CODE;

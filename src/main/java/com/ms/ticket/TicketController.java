@@ -46,6 +46,15 @@ public class TicketController {
 		return service.getTicketByDateRange(startdate, enddate);
 	}
 	
+	@RequestMapping(value = {"/api/admin/retrieveTicketsWithTransaction.json"})
+	@ResponseBody
+	public Response retrieveTicketsWithTransaction(Model model, @RequestBody String ticketId) {
+		log.info("Entered /retrieveTicketList.json");
+		
+		return service.findTicketsWithSameTransaction(ticketId);
+	}
+	
+	
 	@RequestMapping(value = {"/api/admin/cancelTicket.json"})
 	@ResponseBody
 	public Response cancelTicket(Model model, @RequestBody String ticketId) {

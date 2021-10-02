@@ -206,6 +206,31 @@ public class TransactionDAO {
 		return response;
 	}
 	
+	public String updateTransactionStatus(String transactionId, String date, int status) {
+		String errorMsg = "";
+		try {
+			String query = "UPDATE masp.payment SET paymentStatus = ?, lastUpdate = ? WHERE seqid = ? AND paymentStatus = ?";
+			
+			int result = jdbc.update(query,status,date,transactionId,Constant.PAYMENT_PAID_STATUS_CODE);
+			if(result > 0) {
+				return null;
+			}
+			else {
+				errorMsg = "Unable to locate the ticket you specified. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+		}
+		return errorMsg;
+		
+	}
+	
 	public Map<Boolean,Object> getDailySalesByPaymentDate(String start, String end, String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {

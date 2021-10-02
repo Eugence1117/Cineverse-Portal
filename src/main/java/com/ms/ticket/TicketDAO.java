@@ -40,11 +40,11 @@ public class TicketDAO {
 	public Map<Boolean,Object> getTicketByScheduleStartDate(String start, String end){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT t.seqid, t.ticketStatus, t.seatNo, t.price, t.scheduleID, t.transactionId, m.movieName, b.branchName, th.theatreName, s.starttime " +
-						   "FROM masp.ticket t, masp.movie m, masp.branch b, masp.theatre th, masp.schedule s " +
+			String query = "SELECT t.seqid, t.seatNo, t.price, t.scheduleID, t.transactionId, m.movieName, b.branchName, th.theatreName, s.starttime, p.paymentStatus " +
+						   "FROM masp.ticket t, masp.movie m, masp.branch b, masp.theatre th, masp.schedule s, masp.payment p " +
 						   "WHERE s.starttime <= ? AND s.starttime >= ? " + 
 						   "AND t.scheduleID = s.seqid AND s.theatreId = th.seqid " + 
-						   "AND th.branchid = b.seqid AND s.movieId = m.seqid";
+						   "AND th.branchid = b.seqid AND s.movieId = m.seqid AND p.seqid = t.transactionId";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start);
 			if(rows.size() > 0) {
@@ -52,7 +52,7 @@ public class TicketDAO {
 				for(Map<String,Object> row : rows) {
 					
 					String ticketId = (String)row.get("seqid");
-					int status = (int)row.get("ticketStatus");
+					int status = (int)row.get("paymentStatus");
 					String seatNo = (String)row.get("seatNo");
 					double price = (double)row.get("price");
 					String scheduleId = (String)row.get("scheduleID");
@@ -62,7 +62,7 @@ public class TicketDAO {
 					String theatreName = (String)row.get("theatreName");
 					Date startTime = (Timestamp)row.get("starttime");
 														
-					TicketView view = new TicketView(ticketId,seatNo,branchName,theatreName,Constant.STANDARD_DATE_FORMAT.format(startTime),movieName,scheduleId,String.format("%.2f",price),Util.getTicketStatusDesc(status));
+					TicketView view = new TicketView(ticketId,seatNo,branchName,theatreName,Constant.STANDARD_DATE_FORMAT.format(startTime),movieName,scheduleId,String.format("%.2f",price),Util.getPaymentStatusDesc(status));
 					ticketList.add(view);
 				}
 				log.info("Total Ticket retrieve: " + ticketList.size());
@@ -128,7 +128,7 @@ public class TicketDAO {
 	public Map<Boolean,Object> getTicketByLastUpdateDate(String start, String end,String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT t.seqid, t.ticketStatus, t.scheduleId, s.movieId " +
+			String query = "SELECT t.seqid, p.paymentStatus, t.scheduleId, s.movieId " +
 						   "FROM masp.ticket t, masp.payment p, masp.schedule s " +
 						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
 						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?)";
@@ -139,7 +139,7 @@ public class TicketDAO {
 				for(Map<String,Object> row : rows) {
 					
 					String ticketId = (String)row.get("seqid");
-					int status = (int)row.get("ticketStatus");
+					int status = (int)row.get("paymentStatus");
 					String scheduleId = (String)row.get("scheduleId");
 					String movieId = (String)row.get("movieId");
 														
@@ -168,7 +168,7 @@ public class TicketDAO {
 	public Map<Boolean,Object> getTicketByPaymentDate(String start, String end,String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT t.seqid, t.ticketStatus, t.scheduleId, s.movieId " +
+			String query = "SELECT t.seqid, p.paymentStatus, t.scheduleId, s.movieId " +
 						   "FROM masp.ticket t, masp.payment p, masp.schedule s " +
 						   "WHERE p.createddate <= ? AND p.createddate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
 						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?)";
@@ -179,7 +179,7 @@ public class TicketDAO {
 				for(Map<String,Object> row : rows) {
 					
 					String ticketId = (String)row.get("seqid");
-					int status = (int)row.get("ticketStatus");
+					int status = (int)row.get("paymentStatus");
 					String scheduleId = (String)row.get("scheduleId");
 					String movieId = (String)row.get("movieId");
 														
@@ -243,10 +243,10 @@ public class TicketDAO {
 	public Map<Boolean,Object> getSelectedSeat(String ticketId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT tic.seqid, tic.seatNo FROM masp.ticket t, masp.ticket tic " +
-						   "WHERE t.seqid = ? AND tic.ticketStatus != ? AND tic.ticketStatus != ? AND tic.scheduleId = t.scheduleId";
+			String query = "SELECT tic.seqid, tic.seatNo FROM masp.ticket t, masp.ticket tic, masp.payment p " +
+						   "WHERE t.seqid = ? AND t.transactionId = p.seqid AND p.paymentStatus != ? AND p.paymentStatus != ? AND tic.scheduleId = t.scheduleId";
 						
-			List<Map<String,Object>> rows = jdbc.queryForList(query,ticketId,Constant.TICKET_CANCELLED_STATUS_CODE,Constant.TICKET_PENDING_REFUND_STATUS_CODE);
+			List<Map<String,Object>> rows = jdbc.queryForList(query,ticketId,Constant.PAYMENT_CANCELLED_STATUS_CODE,Constant.PAYMENT_PENDING_REFUND_STATUS_CODE);
 			if(rows.size() > 0) {	
 				List<Map<String,String>> seatList = new ArrayList<Map<String,String>>();
 				for(Map<String,Object> row : rows) {
@@ -277,11 +277,12 @@ public class TicketDAO {
 		return response;
 	}
 	
-	public String updateTicketStatus(String ticketId, int status) {
+	public String updateTicketStatus(String ticketId, String date, int status) {
 		String errorMsg = "";
 		try {
-			String query = "UPDATE masp.ticket set ticketstatus = ? where seqid = ? AND ticketstatus != ? AND ticketstatus != ? AND ticketstatus != ?";
-			int result = jdbc.update(query,status,ticketId,Constant.TICKET_COMPLETED_STATUS_CODE,Constant.TICKET_CANCELLED_STATUS_CODE,Constant.TICKET_PENDING_REFUND_STATUS_CODE);
+			String query = "UPDATE masp.payment SET paymentStatus = ? lastUpdate = ? WHERE seqid = (SELECT t.transactionId FROM masp.ticket t WHERE t.seqid = ?) AND paymentStatus = ?";
+			
+			int result = jdbc.update(query,status,date,ticketId,Constant.PAYMENT_PAID_STATUS_CODE);
 			if(result > 0) {
 				return null;
 			}
@@ -300,12 +301,46 @@ public class TicketDAO {
 		return errorMsg;
 		
 	}
+
+	public Map<Boolean,Object> findTransactionTicketByTicketId(String ticketId) {
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT t.seqid FROM masp.ticket t, masp.payment p "
+						 + "WHERE p.seqid = (SELECT t2.transactionId FROM masp.ticket t2 WHERE t2.seqid = ?) AND t.transactionId = p.seqid";
+						
+			List<Map<String,Object>> rows = jdbc.queryForList(query,ticketId);
+			if(rows.size() > 0) {
+				List<String> ticketList = new ArrayList<String>();
+				for(Map<String,Object> row : rows) {
+					
+					String id = (String)row.get("seqid");
+										
+					ticketList.add(id);
+				}
+				log.info("Total Ticket retrieve: " + ticketList.size());
+				response.put(true, ticketList);
+			}
+			else {				
+				response.put(false,"Unable to locate the ticket you specified. Please try again later");
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
 	
 	public String updateTicketSeatNo(String ticketId, String seatNo) {
 		String errorMsg = "";
 		try {
-			String query = "UPDATE masp.ticket set seatNo = ? where seqid = ? AND ticketstatus != ? AND ticketstatus != ? AND ticketstatus != ?";
-			int result = jdbc.update(query,seatNo,ticketId,Constant.TICKET_COMPLETED_STATUS_CODE,Constant.TICKET_CANCELLED_STATUS_CODE,Constant.TICKET_PENDING_REFUND_STATUS_CODE);
+			String query = "UPDATE t SET seatNo = ? FROM masp.ticket t JOIN masp.payment p " +
+						   "ON p.seqid = t.transactionId WHERE t.seqid = ? AND (p.paymentStatus = ? or p.paymentStatus = ?)";
+			int result = jdbc.update(query,seatNo,ticketId,Constant.PAYMENT_PAID_STATUS_CODE,Constant.PAYMENT_PENDING_STATUS_CODE);
 			if(result > 0) {
 				return null;
 			}

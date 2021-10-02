@@ -1,5 +1,6 @@
 package com.ms.transaction;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +48,22 @@ public class TransactionService {
 					}
 				}
 			}
+		}
+	}
+	
+	public Response cancelTransactionById(String transactionId) {
+		if(Util.trimString(transactionId) != "") {
+			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
+			String errorMsg = dao.updateTransactionStatus(transactionId,currentDate, Constant.PAYMENT_PENDING_REFUND_STATUS_CODE);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				return new Response((Object)("The Transaction with ID:" + transactionId + " is cancelled. A refund will initiate to the respective customer."));
+			}
+		}
+		else {
+			return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
 		}
 	}
 }

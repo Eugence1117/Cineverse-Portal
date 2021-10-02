@@ -36,25 +36,29 @@ public class Constant {
 	public static final int INACTIVE_STATUS_CODE = 0;
 	public static final int REMOVED_STATUS_CODE = -1;
 	
-	public static final int TICKET_UNPAID_STATUS_CODE = 0;
-	public static final int TICKET_PAID_STATUS_CODE = 1;
-	public static final int TICKET_COMPLETED_STATUS_CODE = 2;
-	public static final int TICKET_PENDING_REFUND_STATUS_CODE = 3;
-	public static final int TICKET_CANCELLED_STATUS_CODE = -1;
-	
-	public static final String TICKET_UNPAID = "Unpaid";
-	public static final String TICKET_PAID = "Paid";
-	public static final String TICKET_COMPLETED = "Completed";
-	public static final String TICKET_PENDING_REFUND = "Pending Refund";
-	public static final String TICKET_CANCELLED = "Cancelled";
+//	public static final int TICKET_UNPAID_STATUS_CODE = 0;
+//	public static final int TICKET_PAID_STATUS_CODE = 1;
+//	public static final int TICKET_COMPLETED_STATUS_CODE = 2;
+//	public static final int TICKET_PENDING_REFUND_STATUS_CODE = 3;
+//	public static final int TICKET_CANCELLED_STATUS_CODE = -1;
+//	
+//	public static final String TICKET_UNPAID = "Unpaid";
+//	public static final String TICKET_PAID = "Paid";
+//	public static final String TICKET_COMPLETED = "Completed";
+//	public static final String TICKET_PENDING_REFUND = "Pending Refund";
+//	public static final String TICKET_CANCELLED = "Cancelled";
 	
 	public static final int PAYMENT_PENDING_STATUS_CODE = 0;
-	public static final int PAYMENT_COMPLETED_STATUS_CODE = 1;
-	public static final int PAYMENT_REFUND_STATUS_CODE = 2;
+	public static final int PAYMENT_PAID_STATUS_CODE = 1;
+	public static final int PAYMENT_COMPLETED_STATUS_CODE = 2;	
+	public static final int PAYMENT_PENDING_REFUND_STATUS_CODE = 3;
+	public static final int PAYMENT_REFUND_STATUS_CODE = 4;
 	public static final int PAYMENT_CANCELLED_STATUS_CODE = -1;
 	
-	public static final String PAYMENT_PENDING = "Pending";	
+	public static final String PAYMENT_PENDING = "Pending";
+	public static final String PAYMENT_PAID = "Paid";
 	public static final String PAYMENT_COMPLETED = "Completed";
+	public static final String PAYMENT_PENDING_REFUND = "Pending Refund";
 	public static final String PAYMENT_REFUND = "Refunded";
 	public static final String PAYMENT_CANCELLED = "Cancelled";
 	

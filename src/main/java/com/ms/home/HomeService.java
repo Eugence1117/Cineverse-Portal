@@ -193,15 +193,19 @@ public class HomeService {
 		for (TicketSummary data : summaryData) {
 			String key = "";
 			switch (data.getStatus()) {
-			case Constant.TICKET_PAID_STATUS_CODE: {
+			case Constant.PAYMENT_PAID_STATUS_CODE: {
 				key = "paidTicket";
 				break;
 			}
-			case Constant.TICKET_PENDING_REFUND_STATUS_CODE:{
+			case Constant.PAYMENT_COMPLETED_STATUS_CODE: {
+				key = "paidTicket";
+				break;
+			}
+			case Constant.PAYMENT_PENDING_REFUND_STATUS_CODE:{
 				key = "pendingTicket";
 				break;
 			}
-			case Constant.TICKET_CANCELLED_STATUS_CODE: {
+			case Constant.PAYMENT_CANCELLED_STATUS_CODE: {
 				key = "cancelledTicket";
 				break;
 			}

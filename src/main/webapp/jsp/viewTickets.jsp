@@ -141,7 +141,7 @@
 											<th>Schedule Time</th>
 											<th>Movie Name</th>
 											<th>Price (RM)</th>
-											<th>Status</th>
+											<th>Transaction Status</th>
 											<th>Action</th>											
 										</tr>
 									</thead>
@@ -395,19 +395,26 @@
 			
 			$.each(data, function(index, value) {
 				value.action = "<p class='my-auto actionColumn'>";
-				if(value.status == "Unpaid" || value.status == "Paid"){
-					value.action += "<span class='p-1 mx-1 fontBtn cancelBtn' id='" + value.ticketID +"' onclick='cancelTicket(this.id)'>" + cancelBtn + "</span>";
+				if(value.status == "Paid"){
+					value.action += "<span class='p-1 mx-1 fontBtn cancelBtn' id='" + value.ticketID +"' onclick='promptConfirmation(this.id)'>" + cancelBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn changeBtn' id='" + value.ticketID +"' onclick='showSeatLayout(this.id)'>" + changeBtn + "</span>";
-					value.action +="</p>"
+					value.action +="</p>"	
 					
 					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
 				}
-				
-				if(value.status == "Completed" || value.status == "Cancelled"){
+				else if(value.status == "Pending"){										
+					value.action += "<span class='p-1 mx-1 fontBtn changeBtn' id='" + value.ticketID +"' onclick='showSeatLayout(this.id)'>" + changeBtn + "</span>";
+					value.action +="</p>"	
+					value.status = "<span class='badge bg-info text-uppercase'>" + value.status + "</span>"
+				}				
+				else if(value.status == "Completed" || value.status == "Cancelled" || value.status == "Refunded"){
+					value.action += "Unavailable"
+					value.action +="</p>"	
 					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
-				}
-				
-				if(value.status == "Pending Refund"){
+				}				
+				else{
+					value.action += "Unavailable"
+					value.action +="</p>"	
 					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
 				}
 			});
@@ -681,48 +688,88 @@
 				})	
 		}
 		
-		function cancelTicket(id){
-			
-			bootbox.confirm("Are you sure to cancel this ticket?",function(result){
-				if(result){
-					Notiflix.Loading.Dots('Processing...');		
-					$.ajax("api/admin/cancelTicket.json", {
-						method : "POST",
-						accepts : "application/json",
-						dataType : "json",
-						contentType:"application/json; charset=utf-8",
-						data: id,
-						headers:{
-							"X-CSRF-Token": CSRF_TOKEN
-						},
-						statusCode:{
-							400:function(){
-								window.location.href = "400.htm";
-							},
-							401:function(){
-								window.location.href = "expire.htm";
-							},
-							403:function(){
-								window.location.href = "403.htm";
-							},
-							404:function(){
-								window.location.href = "404.htm";
-							}
-						}
-						}).done(function(data) {
-							Notiflix.Loading.Remove();		
-							if(data.errorMsg != null){
-								var toast = createToast(data.errorMsg,"An attempt to cancel ticket <b>Failed</b>",false);
-								//bootbox.alert(data.errorMsg)
-							}
-							else{
-								var toast = createToast(data.result,"An attempt to cancel ticket <b>Success</b>",true);
-								getTableData(timeRange);
-
-							}
-						})	
+		function promptConfirmation(id){
+			Notiflix.Loading.Dots('Processing...');	
+			$.ajax("api/admin/retrieveTicketsWithTransaction.json", {
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: id,
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					400:function(){
+						window.location.href = "400.htm";
+					},
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
 				}
-			})		
+				}).done(function(data) {
+					Notiflix.Loading.Remove();		
+					if(data.errorMsg != null){												
+						bootbox.alert(data.errorMsg)
+					}
+					else{
+						var msg = "Your action will affect the ticket as below since they belongs to same payment : <br/>"
+						for(var index in data.result){
+							msg += (+index+1) + ". " + data.result[index] + "<br/>";
+						}
+						msg += "<br/> A refund will initiate if the mentioned ticket is cancelled. Are you sure you want to proceed? ";
+						bootbox.confirm(msg,function(result){
+							if(result){
+								cancelTicket(id);
+							}
+						});
+					}
+				})	
+		}
+		
+		function cancelTicket(id){
+			Notiflix.Loading.Dots('Processing...');		
+			$.ajax("api/admin/cancelTicket.json", {
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: id,
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					400:function(){
+						window.location.href = "400.htm";
+					},
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				}
+				}).done(function(data) {
+					Notiflix.Loading.Remove();		
+					if(data.errorMsg != null){
+						var toast = createToast(data.errorMsg,"An attempt to cancel ticket <b>Failed</b>",false);
+						//bootbox.alert(data.errorMsg)
+					}
+					else{
+						var toast = createToast(data.result,"An attempt to cancel ticket <b>Success</b>",true);
+						getTableData(timeRange);
+
+					}
+				})		
 		}
     	
 	</script>

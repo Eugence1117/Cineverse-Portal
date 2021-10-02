@@ -231,7 +231,9 @@
     	$(document).ready(function(){
     		showLoading();
     		getHomePageData();
-    		
+    	});
+    	
+    	function addTooltip(){
     		new jBox('Tooltip', {
 				attach : '.ticketSold',
 				delayOpen: 700,
@@ -276,8 +278,8 @@
 				    y: 'bottom'
 				},
 				content : 'The amount that received from COMPLETED Transaction.'
-			})
-    	});
+			})	
+    	}
     	
     	function hideLoading(){
     		$("#loadingBar").fadeOut(400,function(){
@@ -311,6 +313,7 @@
     		getHomePageData();
     	})
     	
+    	var isFirstTime = true;
     	function getHomePageData(){
     		$.ajax("api/manager/retrieveManagerHomeData.json", {
 				method : "GET",
@@ -346,6 +349,12 @@
 					setupTransactionField(data.transacSum);
 					setupEarningGraph(data.earningSum);
 					setupMoviePopularityChart(data.moviePopularity);
+					if(isFirstTime){
+						addTooltip();
+						isFirstTime = false;
+					}
+					
+					
 				}
 			})	
     	}
@@ -428,7 +437,7 @@
 									}
 								},
 								scales : {
-									xAxes : [ {
+									x :{										
 										time : {
 											unit : 'date'
 										},
@@ -439,15 +448,17 @@
 										ticks : {
 											maxTicksLimit : 7
 										}
-									} ],
-									yAxes : [ {
-										ticks : {
+									},
+									y : {
+										min:0,
+										ticks : {			
+											precision:0,
 											maxTicksLimit : 5,
 											padding : 10,
 											// Include a dollar sign in the ticks
 											callback : function(value, index,
 													values) {
-												return '$'
+												return 'RM '
 														+ number_format(value);
 											}
 										},
@@ -458,7 +469,7 @@
 											borderDash : [ 2 ],
 											zeroLineBorderDash : [ 2 ]
 										}
-									} ],
+									},
 								},
 								plugins : {
 									legend : {

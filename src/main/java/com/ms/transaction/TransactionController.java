@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,6 +27,9 @@ public class TransactionController {
 	@RequestMapping( value= {"/viewTransaction.htm"})
 	public String getViewTransactionPage(Model model) {
 		log.info("Entered /viewTransaction.htm");
+		
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		model.addAttribute("usergroup",user.getUserGroup().getId());
 		return "viewTransaction";
 	}
 	
@@ -37,5 +41,13 @@ public class TransactionController {
 		String branchId = user.getUserGroup().getId() == Constant.ADMIN_GROUP ? null : Util.trimString(user.getBranchid());
 		
 		return service.getTransactionRecord(branchId, startdate,enddate);
+	}
+	
+	@RequestMapping( value= {"/api/admin/cancelPayment.json"})
+	@ResponseBody
+	public Response cancelPayment(Model model, @RequestBody String transactionId) {
+		log.info("Entered /cancelPayment.json");
+		
+		return service.cancelTransactionById(transactionId);
 	}
 }

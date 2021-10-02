@@ -122,6 +122,9 @@
 											<th>Voucher Applied</th>
 											<th>Created On</th>
 											<th>Status</th>
+											<c:if test="${usergroup == 1}">
+												<th>Action</th>
+											</c:if>
 										</tr>
 									</thead>
 								</table>
@@ -159,9 +162,16 @@
     	
     	const searchBtn = "<span class='fas fa-search'></span> Search";
     	const loadingBtn = "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Loading...";
+    	const usergroup = JSON.parse("${usergroup}");
     	
     	$(document).ready(function(){
-    		var resultDt = getResultDataTable().clear();
+    		if(usergroup == 1){
+        		var resultDt = getResultDataTable().clear();    			
+    		}
+    		else{
+        		var resultDt = getResultDataTableForView().clear();
+    		}
+
     		var currentDate = moment(new Date()).format("YYYY-MM-DD");
     		$("#searchForm input[type=date]").val(currentDate);
     		$("#searchForm input[type=date]").attr('max',currentDate);
@@ -286,11 +296,12 @@
 				},
     		}).done(function(data){
     			removeLoading($("#btnSearch"),searchBtn);
-    			var resultDt = getResultDataTable().clear();
+    			var resultDt = usergroup == 1? getResultDataTable().clear() :  getResultDataTableForView().clear(); 			
 				if(data.errorMsg == null){
 					timeRange = formData;					
-					styleStatus(data.result);
+					addActionButton(data.result);				
 					resultDt.rows.add(data.result).draw();
+					addTooltip();
 				}
 				else{
 					bootbox.alert(data.errorMsg);
@@ -298,24 +309,88 @@
     		})
     	}
 
-		function styleStatus(data){
-			$.each(data, function(index, value) {				
-				if(value.paymentStatus == "Pending"){
-					value.paymentStatus = "<span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span>"	
+		function addActionButton(data){
+			$.each(data, function(index, value) {		
+				var cancelBtn = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">' 
+		  			+ '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>'
+			  		+ '<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>'
+					+ '</svg>';
+								
+				if(usergroup == 1){
+					value.action = "<p class='my-auto actionColumn'>";
+					if(value.paymentStatus == "Paid"){
+						value.action += "<span class='p-1 mx-1 fontBtn cancelBtn' id='" + value.seqid +"' onclick='cancelPayment(this.id)'>" + cancelBtn + "</span>";					
+						value.action +="</p>"
+						
+						value.paymentStatus = "<span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+					if(value.paymentStatus == "Pending"){		
+						value.action += "Unavailable"
+						value.action +="</p>"
+						value.paymentStatus = "<span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+					
+					if(value.paymentStatus == "Completed" || value.paymentStatus == "Cancelled" || value.paymentStatus == "Refunded"){
+						value.action += "Unavailable"
+						value.action +="</p>"
+						value.paymentStatus = "<span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+					
+					if(value.paymentStatus == "Pending Refund"){
+						value.action += "Unavailable"
+						value.action +="</p>"
+						value.paymentStatus = "<span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+					
 				}
-				else if(value.paymentStatus == "Refunded"){
-					value.paymentStatus = "<span class='badge bg-danger text-uppercase'>" + value.paymentStatus + "</span>"	
+				else{
+					if(value.paymentStatus == "Paid"){				
+						value.paymentStatus = "<span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+					else if(value.paymentStatus == "Pending"){			
+						value.paymentStatus = "<span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span>"
+					}					
+					else if(value.paymentStatus == "Completed" || value.paymentStatus == "Cancelled" || value.paymentStatus == "Refunded"){						
+						value.paymentStatus = "<span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span>"
+					}					
+					else{						
+						value.paymentStatus = "<span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span>"
+					}
+
 				}
-				else if(value.paymentStatus == "Cancelled"){
-					value.paymentStatus = "<span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span>"
-				}else{
-					value.paymentStatus = "<span class='badge bg-success text-uppercase'>" + value.paymentStatus + "</span>"	
-				}
+			});
+		}
+		
+		function addTooltip(){
+			new jBox('Tooltip', {
+				attach : '.cancelBtn',
+				content : 'Cancel Transaction'
 			});
 		}
     	
 		function getResultDataTable() {
 	   		
+			return $('#transactionTable').DataTable({
+				//autowidth:false,
+				columns: [
+					{ data: 'seqid', 'width':'23%'},
+					{ data: 'ticketBrought','width':'10%'},
+					{ data: 'totalPrice','width':'10%'},
+		   			{ data: 'paymentType','width':'15%'},
+		   			{ data: 'voucherId','width':'12%'},
+		   			{ data: 'createddate','width':'15%'},
+		   			{ data: 'paymentStatus','width':'10%','className':'text-center'},
+		   			{ data: 'action','width':'5%'}
+				],
+				order: [], 
+				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+				retrieve: true,
+				fixedHeader: true,
+				responsive:true,
+			});
+		}
+		
+		function getResultDataTableForView(){
 			return $('#transactionTable').DataTable({
 				//autowidth:false,
 				columns: [
@@ -325,7 +400,7 @@
 		   			{ data: 'paymentType','width':'15%'},
 		   			{ data: 'voucherId','width':'12%'},
 		   			{ data: 'createddate','width':'15%'},
-		   			{ data: 'paymentStatus','width':'10%','className':'text-center'}
+		   			{ data: 'paymentStatus','width':'10%','className':'text-center'},		   			
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
@@ -333,6 +408,94 @@
 				fixedHeader: true,
 				responsive:true,
 			});
+		}
+		
+		function promptConfirmation(id){
+			Notiflix.Loading.Dots('Processing...');	
+			$.ajax("api/admin/retrieveTicketsWithTransaction.json", {
+				method : "POST",
+				accepts : "application/json",
+				dataType : "json",
+				contentType:"application/json; charset=utf-8",
+				data: id,
+				headers:{
+					"X-CSRF-Token": CSRF_TOKEN
+				},
+				statusCode:{
+					400:function(){
+						window.location.href = "400.htm";
+					},
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				}
+				}).done(function(data) {
+					Notiflix.Loading.Remove();		
+					if(data.errorMsg != null){												
+						bootbox.alert(data.errorMsg)
+					}
+					else{
+						var msg = "Your action will affect the ticket as below since they belongs to same payment : <br/>"
+						for(var index in data.result){
+							msg += (+index+1) + ". " + data.result[index] + "<br/>";
+						}
+						msg += "<br/> A refund will initiate if the mentioned ticket is cancelled. Are you sure you want to proceed? ";
+						bootbox.confirm(msg,function(result){
+							if(result){
+								cancelTicket(id);
+							}
+						});
+					}
+				})	
+		}
+		
+		function cancelPayment(id){
+			bootbox.confirm("Are you sure to cancel this transaction?",function(result){
+				if(result){
+					Notiflix.Loading.Dots('Processing...');		
+					$.ajax("api/admin/cancelPayment.json", {
+						method : "POST",
+						accepts : "application/json",
+						dataType : "json",
+						contentType:"application/json; charset=utf-8",
+						data: id,
+						headers:{
+							"X-CSRF-Token": CSRF_TOKEN
+						},
+						statusCode:{
+							400:function(){
+								window.location.href = "400.htm";
+							},
+							401:function(){
+								window.location.href = "expire.htm";
+							},
+							403:function(){
+								window.location.href = "403.htm";
+							},
+							404:function(){
+								window.location.href = "404.htm";
+							}
+						}
+						}).done(function(data) {
+							Notiflix.Loading.Remove();		
+							if(data.errorMsg != null){
+								var toast = createToast(data.errorMsg,"An attempt to cancel ticket <b>Failed</b>",false);
+								//bootbox.alert(data.errorMsg)
+							}
+							else{
+								var toast = createToast(data.result,"An attempt to cancel ticket <b>Success</b>",true);
+								getTableData(timeRange);
+
+							}
+						})			
+				}
+			})		
 		}
 	</script>
 </body>

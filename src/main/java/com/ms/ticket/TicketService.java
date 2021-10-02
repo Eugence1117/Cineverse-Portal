@@ -91,14 +91,30 @@ public class TicketService {
 		}
 	}
 	
+	public Response findTicketsWithSameTransaction(String ticketId) {
+		if(Util.trimString(ticketId) != "") {
+			Map<Boolean,Object> response = dao.findTransactionTicketByTicketId(ticketId);
+			if(response.containsKey(false)) {
+				return new Response((String)response.get(false));
+			}
+			else {
+				return new Response(response.get(true));
+			}
+		}
+		else {
+			return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
+		}
+	}
+	
 	public Response cancelTicketById(String ticketId) {
-		if(!ticketId.isEmpty()) {
-			String errorMsg = dao.updateTicketStatus(ticketId, Constant.TICKET_PENDING_REFUND_STATUS_CODE);
+		if(Util.trimString(ticketId) != "") {
+			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
+			String errorMsg = dao.updateTicketStatus(ticketId,currentDate, Constant.PAYMENT_PENDING_REFUND_STATUS_CODE);
 			if(errorMsg != null) {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)("The ticket with ID:" + ticketId + " is cancelled. A refund will initiate to the respective customer."));
+				return new Response((Object)("The transaction along with its ticket(s) including ID:" + ticketId + " is cancelled. A refund will initiate to the respective customer."));
 			}
 		}
 		else {
@@ -107,7 +123,7 @@ public class TicketService {
 	}
 	
 	public Response getSeatLayout(String ticketId) {
-		if(!ticketId.isEmpty()) {
+		if(Util.trimString(ticketId) != "") {
 			Map<Boolean,Object> response = dao.getSeatLayoutByTicketId(ticketId);
 			if(response.containsKey(false)) {
 				return new Response((String)response.get(false));
@@ -122,7 +138,7 @@ public class TicketService {
 	}
 	
 	public Response getSelectedSeat(String ticketId) {
-		if(!ticketId.isEmpty()) {
+		if(Util.trimString(ticketId) != "") {
 			Map<Boolean,Object> response = dao.getSelectedSeat(ticketId);
 			if(response.containsKey(false)) {
 				return new Response((String)response.get(false));
@@ -333,18 +349,18 @@ public class TicketService {
 			for (TicketSummary data : summaryData) {
 				String key = "";
 				switch (data.getStatus()) {
-				case Constant.TICKET_PAID_STATUS_CODE: {
-					key = "paidTicket";
-					break;
-				}
-				case Constant.TICKET_COMPLETED_STATUS_CODE:{
-					key = "paidTicket"; //Completed also conside paid
-					break;
-				}
-				case Constant.TICKET_CANCELLED_STATUS_CODE: {
-					key = "cancelledTicket";
-					break;
-				}
+					case Constant.PAYMENT_PAID_STATUS_CODE: {
+						key = "paidTicket";
+						break;
+					} 
+					case Constant.PAYMENT_COMPLETED_STATUS_CODE: {
+						key = "paidTicket";
+						break;
+					}
+					case Constant.PAYMENT_CANCELLED_STATUS_CODE: {
+						key = "cancelledTicket";
+						break;
+					}
 				}
 
 				if (key != "") {
