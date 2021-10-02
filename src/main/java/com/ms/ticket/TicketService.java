@@ -34,6 +34,7 @@ import com.ms.movie.Movie;
 import com.ms.movie.MovieDAO;
 import com.ms.schedule.ScheduleDAO;
 import com.ms.schedule.ScheduleView;
+import com.ms.transaction.TransactionDAO;
 
 @Service
 public class TicketService {
@@ -48,6 +49,9 @@ public class TicketService {
 	
 	@Autowired
 	MovieDAO movieDao;
+	
+	@Autowired
+	TransactionDAO transacDao;
 	
 	public ScheduleView retrieveScheduleInfo(String scheduleId) {
 		if(!scheduleId.isEmpty()) {
@@ -364,7 +368,7 @@ public class TicketService {
 
 			start += Constant.DEFAULT_TIME;
 			end += Constant.END_OF_DAY;
-			Map<Boolean, Object> data = dao.getSalesByPaymentDate(start, end, branchId);
+			Map<Boolean, Object> data = transacDao.getDailySalesByPaymentDate(start, end, branchId);
 			if (data.containsKey(false)) {
 				response.put(false, (String) data.get(false));
 				return response;
