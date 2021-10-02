@@ -83,6 +83,88 @@ public class TicketDAO {
 		return response;
 	}
 	
+	//Without Status, Createdd on particular date
+	//Used in HomeService
+	public Map<Boolean,Object> getMovieByTicketSoldAndBranch(String start, String end, String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT m.movieName, COUNT(m.seqid) As ticketSold " +
+						   "FROM masp.ticket t, masp.payment p, masp.schedule s, masp.movie m " +
+						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid AND s.movieId = m.seqid " +
+						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?) GROUP BY m.seqid, m.movieName";
+						
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
+			if(rows.size() > 0) {
+				List<MovieSummary> movieList = new ArrayList<MovieSummary>();
+				for(Map<String,Object> row : rows) {
+					
+					String movieName = (String)row.get("movieName");
+					int ticketCount = (int)row.get("ticketSold");
+														
+					MovieSummary view = new MovieSummary(movieName,ticketCount);
+					movieList.add(view);
+				}
+				log.info("Total Movie Ordered: " + movieList.size());
+				response.put(true, movieList);
+			}
+			else {
+				List<MovieSummary> movieList = new ArrayList<MovieSummary>();
+				response.put(true,movieList);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
+	
+	//Used in HomeService
+	public Map<Boolean,Object> getTicketByLastUpdateDate(String start, String end,String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT t.seqid, t.ticketStatus, t.scheduleId, s.movieId " +
+						   "FROM masp.ticket t, masp.payment p, masp.schedule s " +
+						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
+						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?)";
+						
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
+			if(rows.size() > 0) {
+				List<TicketSummary> ticketList = new ArrayList<TicketSummary>();
+				for(Map<String,Object> row : rows) {
+					
+					String ticketId = (String)row.get("seqid");
+					int status = (int)row.get("ticketStatus");
+					String scheduleId = (String)row.get("scheduleId");
+					String movieId = (String)row.get("movieId");
+														
+					TicketSummary view = new TicketSummary(ticketId,scheduleId,movieId,status);
+					ticketList.add(view);
+				}
+				log.info("Total Ticket retrieve: " + ticketList.size());
+				response.put(true, ticketList);
+			}
+			else {
+				List<TicketSummary> ticketList = new ArrayList<TicketSummary>();
+				response.put(true,ticketList);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
 	public Map<Boolean,Object> getTicketByPaymentDate(String start, String end,String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {

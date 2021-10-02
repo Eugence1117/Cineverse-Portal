@@ -510,20 +510,25 @@
 						ticks : {
 							precision : 0
 						}
-					},
-					tooltips : {
-						backgroundColor : "rgb(255,255,255)",
-						bodyFontColor : "#858796",
-						borderColor : '#dddfeb',
-						borderWidth : 1,
-						xPadding : 15,
-						yPadding : 15,
-						displayColors : false,
-						caretPadding : 10,
-					},
+					},					
 					plugins : {
 						legend : {
 							display : false,
+						},
+						tooltip : {
+							backgroundColor : "rgba(255,255,255,1)",
+							bodyColor : "#858796",
+							titleMarginBottom : 10,
+							titleColor : '#6e707e',
+							titleFontSize : 14,
+							borderColor : '#dddfeb',
+							borderWidth : 1,
+							xPadding : 15,
+							yPadding : 15,
+							displayColors : false,
+							intersect : false,
+							mode : 'index',
+							caretPadding : 10,
 						},
 					}
 				},
@@ -571,21 +576,24 @@
 										precision : 0
 									}
 								},
-								tooltips : {
-									backgroundColor : "rgb(255,255,255)",
-									bodyFontColor : "#858796",
-									borderColor : '#dddfeb',
-									borderWidth : 1,
-									xPadding : 15,
-									yPadding : 15,
-									displayColors : false,
-									caretPadding : 10,
-								},
 								plugins : {
 									legend : {
 										display : false,
 									},
 									tooltip : {
+										backgroundColor : "rgba(255,255,255,1)",
+										bodyColor : "#858796",
+										titleMarginBottom : 10,
+										titleColor : '#6e707e',
+										titleFontSize : 14,
+										borderColor : '#dddfeb',
+										borderWidth : 1,
+										xPadding : 15,
+										yPadding : 15,
+										displayColors : false,
+										intersect : false,
+										mode : 'index',
+										caretPadding : 10,
 										callbacks : {
 											label : function(context) {
 												var label = "RM " + context.raw;

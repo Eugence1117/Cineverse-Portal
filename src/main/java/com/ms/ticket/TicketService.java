@@ -210,6 +210,7 @@ public class TicketService {
 		}
 	}
 	
+	//All Using Createddate
 	public Response retrieveSalesData(String branchId, String start, String end) {
 		if(Util.trimString(branchId) == ""){
 			return new Response("Unable to identify your identity. Please try again later.");
@@ -334,6 +335,10 @@ public class TicketService {
 				switch (data.getStatus()) {
 				case Constant.TICKET_PAID_STATUS_CODE: {
 					key = "paidTicket";
+					break;
+				}
+				case Constant.TICKET_COMPLETED_STATUS_CODE:{
+					key = "paidTicket"; //Completed also conside paid
 					break;
 				}
 				case Constant.TICKET_CANCELLED_STATUS_CODE: {

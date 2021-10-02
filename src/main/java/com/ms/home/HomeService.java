@@ -1,6 +1,8 @@
 package com.ms.home;
 
+import java.text.DateFormatSymbols;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,9 +18,12 @@ import org.springframework.stereotype.Service;
 import com.ms.common.Constant;
 import com.ms.common.Response;
 import com.ms.common.Util;
+import com.ms.ticket.MovieSummary;
+import com.ms.ticket.SalesSummary;
 import com.ms.ticket.TicketDAO;
 import com.ms.ticket.TicketSummary;
 import com.ms.transaction.TransactionDAO;
+import com.ms.transaction.TransactionSummary;
 
 @Service
 public class HomeService {
@@ -32,6 +37,7 @@ public class HomeService {
 	TicketDAO ticketDao;
 	
 	//Return multiple Instance of Response
+	//Only Get Based On LastUpdateDate
 	public Map<String,Response> getBranchHomeData(String branchId) {		
 		Map<String,Response> response = new HashMap<String, Response>();
 		if(Util.trimString(branchId) != "") {
@@ -40,16 +46,38 @@ public class HomeService {
 				String endDate = Constant.SQL_DATE_WITHOUT_TIME.format(new Date()) + Constant.END_OF_DAY;
 				
 				//Get Today Revenue
-				Map<Boolean,Object> revenue = transacDao.getDailySalesByPaymentDate(startDate, endDate, branchId);
+				Map<Boolean,Object> revenue = transacDao.getDailySalesByLastUpdateDate(startDate, endDate, branchId);
 				if(revenue.containsKey(false)) {
 					response.put("revenue",new Response("Error"));
 				}
 				else {
-					response.put("revenue",new Response(revenue.get(true)));
+					@SuppressWarnings("unchecked")
+					List<SalesSummary> summaryData = (List<SalesSummary>) revenue.get(true);
+					if(summaryData.size() == 0) {
+						response.put("revenue",new Response((Object)"0"));
+					}
+					else {
+						response.put("revenue",new Response((Object)(String.format("%.2f", summaryData.get(0).getPrice()))));
+					}					
 				}
 				
+				//Get Transaction Summary
+				Map<Boolean,Object> transacSum = transacDao.getDailyCompleteTransactionByLastUpdate(startDate, endDate, branchId);
+				if (transacSum.containsKey(false)) {
+					response.put("transacSum", new Response("Error"));					
+				} else {
+					@SuppressWarnings("unchecked")
+					List<TransactionSummary> summaryData = (List<TransactionSummary>) transacSum.get(true);					
+					if(summaryData.size() == 0) {
+						response.put("transacSum",new Response((Object)"0"));
+					}
+					else {
+						response.put("transacSum",new Response((Object)(String.valueOf(summaryData.get(0).getTransactionCount()))));
+					}						
+				}
+												
 				//Get Ticket Summary
-				Map<Boolean, Object> ticketSum = ticketDao.getTicketByPaymentDate(startDate,endDate,branchId);
+				Map<Boolean, Object> ticketSum = ticketDao.getTicketByLastUpdateDate(startDate,endDate,branchId);
 				if (ticketSum.containsKey(false)) {
 					response.put("ticketSum", new Response("Error"));					
 				} else {
@@ -67,19 +95,97 @@ public class HomeService {
 				firstDayOfYear.set(Calendar.DAY_OF_YEAR, 1);
 				
 				String firstDate = Constant.SQL_DATE_WITHOUT_TIME.format(firstDayOfYear.getTime()) + Constant.DEFAULT_TIME;
+				Map<Boolean,Object> earningSum = transacDao.getMonthlySalesByBranch(firstDate, endDate, branchId);
+				if(earningSum.containsKey(false)) {
+					response.put("earningSum",new Response("Error"));
+				}
+				else {
+					@SuppressWarnings("unchecked")
+					List<SalesSummary> summaryData = (List<SalesSummary>) earningSum.get(true);
+					response.put("earningSum",new Response(processEarningSummary(summaryData, firstDayOfYear, currentDate)));
+				}
 				
 				
+				//Get Movie Popularity
+				Map<Boolean,Object> moviePopularity = ticketDao.getMovieByTicketSoldAndBranch(startDate, endDate, branchId);
+				if(moviePopularity.containsKey(false)) {
+					response.put("moviePopularity",new Response("Error"));
+				}
+				else {
+					@SuppressWarnings("unchecked")
+					List<MovieSummary> movieList = (List<MovieSummary>)moviePopularity.get(true);					
+					response.put("moviePopularity",new Response(processMoviePopularity(movieList)));
+				}
 				
 			}
 			catch(Exception ex) {
 				log.error(ex.getMessage());
-				response.put("error",new Response(Constant.UNKNOWN_ERROR_OCCURED));
+				log.error(Util.getDetailExceptionMsg(ex));
+				response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_OCCURED));
 			}		
 		}
 		else {
-			response.put("error",new Response("Unable to identify your identity. Please try again later."));
+			response.put("errorMsg",new Response("Unable to identify your identity. Please try again later."));
 		}
 		return response;
+	}
+	
+	private Map<String,Object> processMoviePopularity(List<MovieSummary> summaryData){
+		Map<String,Object> movieData = new HashMap<String, Object>();
+		if(summaryData.size() == 0) {
+			return null;
+		}
+		else {
+			List<String> labels = new ArrayList<String>();
+			List<Integer> data = new ArrayList<Integer>();
+			for(MovieSummary movie:summaryData) {
+				labels.add(movie.getMovieName());
+				data.add(movie.getTicketCount());
+			}
+			
+			movieData.put("label",labels);
+			movieData.put("data", data);
+			return movieData;
+		}		
+	}
+	
+	private Map<String,Object> processEarningSummary(List<SalesSummary> summaryData, Calendar firstDate, Calendar lastDate){
+		Map<String,Object> earningData = new HashMap<String, Object>();
+		
+		int firstMonth = firstDate.get(Calendar.MONTH);
+		int lastMonth = lastDate.get(Calendar.MONTH);
+		
+		log.info("First:" + firstMonth + "last:" + lastMonth);
+		List<String> labels = new ArrayList<String>();
+		List<String> data = new ArrayList<String>();
+		
+		for(int i = firstMonth;i <= lastMonth; i++) {				
+			boolean isFound = false;
+			for(SalesSummary sales : summaryData) {
+				Calendar dataDate = Calendar.getInstance();
+				dataDate.setTime(sales.getDate());
+				
+				if(dataDate.get(Calendar.MONTH) == i) { //Each Data only loop once
+					isFound = true;
+					labels.add(getMonth(i));
+					data.add(String.valueOf(sales.getPrice()));					
+				}
+			}
+			
+			if(!isFound) {
+				labels.add(getMonth(i));
+				data.add(String.valueOf(0.0));					
+			}
+		}
+		
+		earningData.put("label",labels);
+		earningData.put("data", data);
+		
+		return earningData;
+	}
+	
+	private String getMonth(int month) {
+	    return new DateFormatSymbols().getMonths()[month];
 	}
 	
 	private Map<String,Integer> processTicketSummary(List<TicketSummary> summaryData){
@@ -108,12 +214,11 @@ public class HomeService {
 					sumOfData.put(key, 1);
 				}
 			}
-		}
-		sumOfData.put("sumTicket", summaryData.size());
-		sumOfData.putIfAbsent("paidTicket", 0);
+		}				
+		//sumOfData.putIfAbsent("paidTicket", 0);
 		sumOfData.putIfAbsent("pendingTicket", 0);
-		sumOfData.putIfAbsent("cancelledTicket", 0);
-		sumOfData.putIfAbsent("sumTicket", 0);
+		sumOfData.putIfAbsent("cancelledTicket", 0);		
+		sumOfData.put("sumTicket",summaryData.size() - sumOfData.get("pendingTicket") - sumOfData.get("cancelledTicket"));
 		
 		return sumOfData;
 	}	

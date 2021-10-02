@@ -1,7 +1,10 @@
 package com.ms.home;
 
+import java.util.Map;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,6 +21,9 @@ public class HomeController {
 	
 	public static Logger log = LogManager.getLogger(HomeController.class);
 			
+	@Autowired
+	HomeService service;
+	
 	@RequestMapping(value={"/index", "/home","/"})
 	public String getHome(Model model) {
 		
@@ -33,11 +39,12 @@ public class HomeController {
 	//Manager
 	@RequestMapping(value = {"/api/manager/retrieveManagerHomeData.json"})
 	@ResponseBody
-	public Response retrieveHomeData(Model model) {
+	public  Map<String,Response> retrieveHomeData(Model model) {
 		log.info("Entered /retrieveHomeData");
 		
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return new Response("");
+		String branchId = user.getBranchid();
+		return service.getBranchHomeData(branchId);
 	}
 	
 //	@RequestMapping(value = {"/api/manager/retrieveTodaySales.json"})
