@@ -69,6 +69,32 @@ public class BranchDAO {
 		}
 		return result;
 	}
+	
+	//Used in HomeService
+	public Map<Boolean,Object> getNumOfBranchByStatus(int status){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
+		try {
+			StringBuffer query = new StringBuffer().append("SELECT COUNT(seqid) as num FROM masp.branch WHERE status = ?");
+			
+			List<Map<String, Object>> rows = jdbc.queryForList(query.toString(), status);
+			if (rows.size() > 0) {
+				for (Map<String, Object> row : rows) {
+					int num = (int)row.get("num");					
+					result.put(true, num);
+				}
+			} else {
+				log.info("Get Branch Count with Status[" + status + "]: No record found.");
+				result.put(true,0);
+			}
+		} catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false,Constant.DATABASE_CONNECTION_LOST);
+		} catch (Exception ex) {
+			log.error("Exception ex::" + ex.getMessage());
+			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return result;
+	}
 
 	public Map<Boolean,Object> getBranchDetails(String seqid) {
 		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();

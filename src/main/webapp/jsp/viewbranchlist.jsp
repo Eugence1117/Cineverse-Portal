@@ -18,7 +18,9 @@
 .fontBtn:hover{
 	cursor:pointer;
 }
-
+.actionColumn{
+	text-align:center
+}
 @media only screen and (max-width: 768px) {
 	.colon{
 		display:none;
@@ -302,7 +304,7 @@
 					{ data: 'branchName','width':'30%'},
 		   			{ data: 'stateName','width':'20%'},
 		   			{ data: 'districtName','width':'20%'},
-		   			{ data: 'status','width':'7%',className:"text-center"},
+		   			{ data: 'status','width':'7%'},
 		   			{ data: 'action','width':'13%'}
 				],
 				order: [], 
@@ -344,18 +346,18 @@
 					value.action += "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.seqid +"' onclick=activateAndDeactivateBranch(this,1)>" + activateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='removeBranch(this)'>" + deleteBtn + "</span>";
 					
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateBranch(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='removeBranch(this)'>" + deleteBtn + "</span>";
 					
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getBranchDetails(this)>" + viewBtn + "</span>";
 					
-					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 				value.action +="</p>"
 			});

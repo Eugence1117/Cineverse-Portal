@@ -245,7 +245,7 @@
 					{ data: 'movieName','width':'31%',render:function(data,type,row){return data = '<a class="movieRedirect" href="#" id="' + encodeURIComponent(data) + '">' + data + '</a>'}},
 		   			{ data: 'startDate','width':'12%',type:'de_date',targets:0},
 		   			{ data: 'endDate','width':'12%',type:'de_date',targets:0},
-		   			{ data: 'status','width':'8%',className:"text-center"},
+		   			{ data: 'status','width':'8%'},
 		   			{ data: 'action','width':'12%'}
 				],
 				order: [], 
@@ -288,14 +288,14 @@
 					value.action += "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.movieId +"' onclick=activateAndDeactivateMovie(this,1)>" + activateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.movieId +"' onclick=getEditMovieDateInfo(this)>" + editBtn + "</span>";
 					
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.movieId +"' onclick=getMovieDetails(this)>" + viewBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.movieId +"' onclick=activateAndDeactivateMovie(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.movieId +"' onclick=getEditMovieDateInfo(this)>" + editBtn + "</span>";
 					
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				value.action +="</p>"
 			});

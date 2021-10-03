@@ -2,6 +2,8 @@ package com.ms.member;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ms.common.Constant;
 import com.ms.common.Util;
+import com.ms.ticket.SalesSummary;
 import com.ms.user.Branch;
 
 @Repository
@@ -60,6 +63,87 @@ public class MemberDAO {
 				log.info("No Member registered.");
 				result.put(true,dataList);
 			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return result;
+	}
+		
+	//Used in HomeService
+	public Map<Boolean,Object> retrieveMemberCountByMonth(String start, String end, int status1, int status2){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
+		try { 
+			String query = "SELECT COUNT(seqid) as totalMember, MONTH(createddate) as monthCreated FROM masp.member where createddate <= ? AND createddate >= ? AND (status = ? or status = ?) GROUP BY MONTH(createddate) ORDER BY MONTH(createddate)";			
+			List<Map<String,Object>> records = jdbc.queryForList(query,end,start,status1,status2);
+			
+			List<MemberGrowth> growthList = new ArrayList<MemberGrowth>();
+			if(records.size() > 0) {				
+				for(Map<String,Object> record : records) {
+										
+					int month = (int)record.get("monthCreated");
+					int numOfMember = (int)record.get("totalMember");
+					
+					Calendar currentDay = Calendar.getInstance();
+					currentDay.setTime(new Date());
+					
+					Calendar currentMonth = Calendar.getInstance();
+					currentMonth.set(Calendar.YEAR, currentDay.get(Calendar.YEAR));
+					currentMonth.set(Calendar.MONTH,month-1);
+					currentMonth.set(Calendar.DAY_OF_MONTH, Calendar.DAY_OF_MONTH);
+					
+					MemberGrowth data = new MemberGrowth(currentMonth.getTime(),numOfMember);					
+					growthList.add(data);										
+				}				
+				log.info("Total Month with member registered:" + growthList.size());				
+			}
+			else {				
+				log.info("No new member registered in the specified month range");				
+			}
+			result.put(true, growthList);
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			result.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
+			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return result;
+	}
+	
+	
+	public Map<Boolean,Object> retrieveMemberCountByDateRange(String start, String end, int status1, int status2){
+		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
+		try { 
+			String query = "SELECT COUNT(seqid) as totalMember, CONVERT(date,createddate) as dateCreated FROM masp.member where createddate <= ? AND createddate >= ? AND (status = ? or status = ?) GROUP BY CONVERT(date,createddate) ORDER BY CONVERT(date,createddate)";			
+			List<Map<String,Object>> records = jdbc.queryForList(query,end,start,status1,status2);
+			
+			List<MemberGrowth> growthList = new ArrayList<MemberGrowth>();
+			if(records.size() > 0) {				
+				for(Map<String,Object> record : records) {
+										
+					Date date = (java.sql.Date)record.get("dateCreated");
+					int numOfMember = (int)record.get("totalMember");
+					
+					Calendar dateTime = Calendar.getInstance();
+					dateTime.setTime(date);
+					
+					MemberGrowth data = new MemberGrowth(dateTime.getTime(),numOfMember);					
+					growthList.add(data);										
+				}				
+				log.info("Total Member registered Date :" + growthList.size());				
+			}
+			else {				
+				log.info("No new member registered in the specified date range");
+			}
+			result.put(true, growthList);			
 		}
 		catch(CannotGetJdbcConnectionException ce) {
 			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());

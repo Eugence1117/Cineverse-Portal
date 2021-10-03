@@ -515,7 +515,7 @@
 					{ data: 'startTime','width':'20%'},
 		   			{ data: 'endTime','width':'20%'},
 		   			{ data: 'theatreName','width':'5%'},
-		   			{ data: 'status','width':'15%',className:"text-center"},
+		   			{ data: 'status','width':'15%'},
 		   			{ data: 'action','width':'10%'}
 				],
 				order: [], 
@@ -543,19 +543,20 @@
 			$.each(data, function(index, value) {
 				value.action = "<p class='my-auto actionColumn'>";
 				if(value.status == "Available"){
-					value.action += "<span class='p-1 mx-1 fontBtn removeBtn' id='" + value.scheduleId +"' onclick='checkTicket(this.id)'>" + deleteBtn + "</span>";
-					value.action +="</p>"
-					
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.action += "<span class='p-1 mx-1 fontBtn removeBtn' id='" + value.scheduleId +"' onclick='checkTicket(this.id)'>" + deleteBtn + "</span>";					
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				
 				if(value.status == "End"){
-					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+					value.action +="Unavailable";
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 				
 				if(value.status == "Cancelled"){
-					value.status = "<span class='badge bg-danger text-uppercase'>" + value.status + "</span>"
+					value.action +="Unavailable";
+					value.status = "<div class='text-center'><span class='badge bg-danger text-uppercase'>" + value.status + "</span></div>"
 				}
+				value.action +="</p>"
 			});
 		}
 		

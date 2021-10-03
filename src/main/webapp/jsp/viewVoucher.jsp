@@ -21,7 +21,9 @@
 .fontBtn:hover{
 	cursor:pointer;
 }
-
+.actionColumn{
+	text-align:center
+}
 </style>
 </head>
 
@@ -276,7 +278,7 @@
 					{ data: 'min','width':'15%',},
 		   			{ data: 'reward','width':'10%'},
 		   			{ data: 'quantity','width':'15%'},
-		   			{ data: 'status','width':'10%',className:"text-center"},
+		   			{ data: 'status','width':'10%'},
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
@@ -296,7 +298,7 @@
 					{ data: 'min','width':'15%',},
 		   			{ data: 'reward','width':'10%'},
 		   			{ data: 'quantity','width':'15%'},
-		   			{ data: 'status','width':'10%',className:"text-center"},
+		   			{ data: 'status','width':'10%'},
 		   			{ data: 'action','width':'15%'}
 				],
 				order: [], 
@@ -310,15 +312,15 @@
 		function enhanceStatusVisual(data){
 			$.each(data, function(index, value) {
 				if(value.status == "Inactive"){
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 				
 				if(value.status == "Active"){
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				
 				if(value.status == "Removed"){		
-					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 			});
 		}
@@ -353,12 +355,14 @@
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.voucherId +"' onclick=getCurrentVoucherDetails(this.id)>" + editBtn + "</span>";
 					value.action +="</p>"
 				}
-				
-				if(value.status == "Active"){
+				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.voucherId +"' onclick=activateAndDeactivateVoucher(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.voucherId +"' onclick=deleteVoucher(this)>" + deleteBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.voucherId +"' onclick=getCurrentVoucherDetails(this.id)>" + editBtn + "</span>";
 					value.action +="</p>"
+				}
+				else{
+					value.action += "Unavailable </p>"
 				}
 			
 			});

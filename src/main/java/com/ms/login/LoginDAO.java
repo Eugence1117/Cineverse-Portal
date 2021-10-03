@@ -213,7 +213,7 @@ public class LoginDAO{
 	public List<Menu> getAllMenu(){
 		List<Menu> menuList = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT menuid,menuname,icon,url,parentid,seq FROM masp.menu_item WHERE enabled = 1");
+			StringBuffer query = new StringBuffer().append("SELECT menuid,menuname,icon,url,parentid,seq FROM masp.menu_item WHERE enabled = 1 ORDER by seq");
 			List<Map<String,Object>> result = jdbc.queryForList(query.toString());
 			if(result.size() > 0) {
 				menuList = new ArrayList<Menu>();

@@ -17,7 +17,9 @@
 .collapsible{
 	cursor:pointer;
 }
-
+.actionColumn{
+	text-align:center
+}
 #expandSearch:hover{
 	cursor:pointer;
 	background-color:#f8f9fa
@@ -322,39 +324,39 @@
 						value.action += "<span class='p-1 mx-1 fontBtn cancelBtn' id='" + value.seqid +"' onclick='cancelPayment(this.id)'>" + cancelBtn + "</span>";					
 						value.action +="</p>"
 						
-						value.paymentStatus = "<span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 					if(value.paymentStatus == "Pending"){		
 						value.action += "Unavailable"
 						value.action +="</p>"
-						value.paymentStatus = "<span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 					
 					if(value.paymentStatus == "Completed" || value.paymentStatus == "Cancelled" || value.paymentStatus == "Refunded"){
 						value.action += "Unavailable"
 						value.action +="</p>"
-						value.paymentStatus = "<span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 					
 					if(value.paymentStatus == "Pending Refund"){
 						value.action += "Unavailable"
 						value.action +="</p>"
-						value.paymentStatus = "<span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 					
 				}
 				else{
 					if(value.paymentStatus == "Paid"){				
-						value.paymentStatus = "<span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 					else if(value.paymentStatus == "Pending"){			
-						value.paymentStatus = "<span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-info text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}					
 					else if(value.paymentStatus == "Completed" || value.paymentStatus == "Cancelled" || value.paymentStatus == "Refunded"){						
-						value.paymentStatus = "<span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}					
 					else{						
-						value.paymentStatus = "<span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span>"
+						value.paymentStatus = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.paymentStatus + "</span></div>"
 					}
 
 				}
@@ -379,7 +381,7 @@
 		   			{ data: 'paymentType','width':'15%'},
 		   			{ data: 'voucherId','width':'12%'},
 		   			{ data: 'createddate','width':'15%'},
-		   			{ data: 'paymentStatus','width':'10%','className':'text-center'},
+		   			{ data: 'paymentStatus','width':'10%'},
 		   			{ data: 'action','width':'5%'}
 				],
 				order: [], 
@@ -400,7 +402,7 @@
 		   			{ data: 'paymentType','width':'15%'},
 		   			{ data: 'voucherId','width':'12%'},
 		   			{ data: 'createddate','width':'15%'},
-		   			{ data: 'paymentStatus','width':'10%','className':'text-center'},		   			
+		   			{ data: 'paymentStatus','width':'10%'},		   			
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],

@@ -20,6 +20,9 @@
 	.data{
 		margin-bottom:0.5rem;
 	}
+	.actionColumn{
+		text-align:center
+	}
 </style>
 </head>
 
@@ -199,7 +202,7 @@
 		   			{ data: 'ic','width':'15%'},
 		   			{ data: 'dateOfBirth','width':'13%'},
 		   			{ data: 'email','width':'20%'},
-		   			{ data: 'status','width':'7%',className:"text-center"},
+		   			{ data: 'status','width':'7%'},
 		   			{ data: 'action','width':'10%'}
 				],
 				order: [], 
@@ -233,19 +236,19 @@
 			$.each(data, function(index, value) {
 				value.action = "<p class='my-auto actionColumn'>";
 				if(value.status == "Inactive"){
-					value.action = "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.seqid +"' onclick=activateAndDeactivateMember(this,1)>" + activateBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn activeBtn' id='" + value.seqid +"' onclick=activateAndDeactivateMember(this,1)>" + activateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getMemberDetails(this)>" + viewBtn + "</span>"
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 				else if(value.status == "Active"){
-					value.action = "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateMember(this,0)>" + deactivateBtn + "</span>";
+					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateMember(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getMemberDetails(this)>" + viewBtn + "</span>"
 					
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				else{
-					value.action = "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getMemberDetails(this)>" + viewBtn + "</span>"
-					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getMemberDetails(this)>" + viewBtn + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 				value.action +="</p>"
 			});

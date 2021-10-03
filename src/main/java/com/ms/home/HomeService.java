@@ -15,9 +15,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ms.branch.BranchDAO;
 import com.ms.common.Constant;
 import com.ms.common.Response;
 import com.ms.common.Util;
+import com.ms.member.MemberDAO;
+import com.ms.member.MemberGrowth;
 import com.ms.ticket.MovieSummary;
 import com.ms.ticket.SalesSummary;
 import com.ms.ticket.TicketDAO;
@@ -35,6 +38,141 @@ public class HomeService {
 	
 	@Autowired
 	TicketDAO ticketDao;
+	
+	@Autowired
+	MemberDAO memberDao;
+	
+	@Autowired
+	BranchDAO branchDao;
+	
+	@SuppressWarnings("unchecked")
+	public Map<String,Response> getAdminHomeData(){
+		Map<String,Response> response = new HashMap<String, Response>();
+		try {
+			String startDate = Constant.SQL_DATE_WITHOUT_TIME.format(new Date()) + Constant.DEFAULT_TIME;
+			String endDate = Constant.SQL_DATE_WITHOUT_TIME.format(new Date()) + Constant.END_OF_DAY;
+			
+			//Get today user growth
+			Map<Boolean,Object> currentUserGrowth = memberDao.retrieveMemberCountByDateRange(startDate, endDate, Constant.ACTIVE_STATUS_CODE, Constant.INACTIVE_STATUS_CODE);
+			Map<Boolean,Object> currentUserDrop = memberDao.retrieveMemberCountByDateRange(startDate, endDate, Constant.REMOVED_STATUS_CODE, Constant.REMOVED_STATUS_CODE);
+			int userAdded = 0;
+			int userLost = 0;
+			if(currentUserGrowth.containsKey(false) || currentUserDrop.containsKey(false)) {
+				response.put("currentUserGrowth",new Response("Error"));
+			}
+			else {
+				List<MemberGrowth> summaryPositiveData = (List<MemberGrowth>)currentUserGrowth.get(true);
+				userAdded = summaryPositiveData.size() == 0 ? 0 : summaryPositiveData.get(0).getNumOfMember();
+				
+				List<MemberGrowth> summaryNegativeData = (List<MemberGrowth>)currentUserDrop.get(true);
+				userLost = summaryNegativeData.size() == 0 ? 0 : summaryNegativeData.get(0).getNumOfMember();
+				
+				response.put("currentUserGrowth", new Response((Object)(userAdded - userLost)));
+			}
+			
+			//Get Total Active Branch
+			Map<Boolean,Object> currentActiveBranch = branchDao.getNumOfBranchByStatus(Constant.ACTIVE_STATUS_CODE);
+			if(currentActiveBranch.containsKey(false)) {
+				response.put("currentActiveBranch",new Response("Error"));
+			}
+			else {				
+				response.put("currentActiveBranch", new Response(currentActiveBranch.get(true)));
+			}
+			
+			//Get Transaction COUNT
+			Map<Boolean,Object> transacSum = transacDao.getDailyCompleteTransactionByLastUpdate(startDate, endDate);
+			if (transacSum.containsKey(false)) {
+				response.put("transacSum", new Response("Error"));					
+			} else {
+				List<TransactionSummary> summaryData = (List<TransactionSummary>) transacSum.get(true);					
+				if(summaryData.size() == 0) {
+					response.put("transacSum",new Response((Object)"0"));
+				}
+				else {
+					response.put("transacSum",new Response((Object)(String.valueOf(summaryData.get(0).getTransactionCount()))));
+				}						
+			}
+			
+			//Get Overview User Growth
+			Calendar currentDate = Calendar.getInstance();
+			currentDate.setTime(new Date());
+			
+			Calendar firstDayOfYear = Calendar.getInstance();
+			firstDayOfYear.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
+			firstDayOfYear.set(Calendar.DAY_OF_YEAR, 1);
+			
+			String firstDate = Constant.SQL_DATE_WITHOUT_TIME.format(firstDayOfYear.getTime()) + Constant.DEFAULT_TIME;
+			Map<Boolean,Object> monthlyUserGrowth = memberDao.retrieveMemberCountByMonth(firstDate,endDate,Constant.ACTIVE_STATUS_CODE,Constant.INACTIVE_STATUS_CODE);
+			Map<Boolean,Object> monthlyUserDrop = memberDao.retrieveMemberCountByMonth(firstDate,endDate,Constant.REMOVED_STATUS_CODE,Constant.REMOVED_STATUS_CODE);
+			if(monthlyUserGrowth.containsKey(false) || monthlyUserDrop.containsKey(false)) {
+				response.put("monthlyUserData",new Response("Error"));
+			}
+			else {
+				List<MemberGrowth> growthData = (List<MemberGrowth>)monthlyUserGrowth.get(true);
+				List<MemberGrowth> lostData = (List<MemberGrowth>)monthlyUserDrop.get(true);
+				lostData.forEach(data -> data.convertToNegative());
+				
+				Map<String,Object> growthOverview = new HashMap<String, Object>();
+				growthOverview.put("positive",processGrowthData(growthData, firstDayOfYear, currentDate));
+				growthOverview.put("negative",processGrowthData(lostData, firstDayOfYear, currentDate));
+				
+				response.put("monthlyUserData", new Response(growthOverview));				
+			}
+			
+			//Get Movie Popularity
+			Map<Boolean,Object> moviePopularity = ticketDao.getMovieByTicketSold(startDate, endDate);
+			if(moviePopularity.containsKey(false)) {
+				response.put("moviePopularity",new Response("Error"));
+			}
+			else {
+				List<MovieSummary> movieList = (List<MovieSummary>)moviePopularity.get(true);					
+				response.put("moviePopularity",new Response(processMoviePopularity(movieList)));
+			}
+			
+			
+		}
+		catch(Exception ex) {
+			log.error(ex.getMessage());
+			log.error(Util.getDetailExceptionMsg(ex));
+			response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_OCCURED));
+		}
+		return response;
+	}
+	
+	private Map<String,Object> processGrowthData(List<MemberGrowth> summaryData, Calendar firstDate, Calendar lastDate){
+		Map<String,Object> dataList = new HashMap<String, Object>();
+		
+		int firstMonth = firstDate.get(Calendar.MONTH);
+		int lastMonth = lastDate.get(Calendar.MONTH);
+		
+		log.info("First:" + firstMonth + "last:" + lastMonth);
+		List<String> labels = new ArrayList<String>();
+		List<String> data = new ArrayList<String>();
+		
+		for(int i = firstMonth;i <= lastMonth; i++) {				
+			boolean isFound = false;
+			for(MemberGrowth growth : summaryData) {
+				Calendar dataDate = Calendar.getInstance();
+				dataDate.setTime(growth.getDate());
+				
+				if(dataDate.get(Calendar.MONTH) == i) { //Each Data only loop once
+					isFound = true;
+					labels.add(getMonth(i));
+					data.add(String.valueOf(growth.getNumOfMember()));					
+				}
+			}
+			
+			if(!isFound) {
+				labels.add(getMonth(i));
+				data.add(String.valueOf(0));					
+			}
+		}
+		
+		dataList.put("label",labels);
+		dataList.put("data", data);
+		
+		return dataList;
+	}
 	
 	//Return multiple Instance of Response
 	//Only Get Based On LastUpdateDate
@@ -155,7 +293,6 @@ public class HomeService {
 		int firstMonth = firstDate.get(Calendar.MONTH);
 		int lastMonth = lastDate.get(Calendar.MONTH);
 		
-		log.info("First:" + firstMonth + "last:" + lastMonth);
 		List<String> labels = new ArrayList<String>();
 		List<String> data = new ArrayList<String>();
 		

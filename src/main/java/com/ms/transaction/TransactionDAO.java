@@ -206,6 +206,47 @@ public class TransactionDAO {
 		return response;
 	}
 	
+	public Map<Boolean,Object> getDailyCompleteTransactionByLastUpdate(String start, String end){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		try {
+			String query = "SELECT COUNT(p.seqid) AS transactionCount, CONVERT(date,p.lastUpdate) AS paymentDate " +
+						   "FROM masp.payment p " +
+					       "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND p.paymentStatus = ? " +
+					       "GROUP BY CONVERT(date,p.lastUpdate) ORDER BY CONVERT(date,p.lastUpdate)";
+					
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,Constant.PAYMENT_COMPLETED_STATUS_CODE);
+			if(rows.size() > 0) {
+				List<TransactionSummary> transactions = new ArrayList<TransactionSummary>();
+				for(Map<String,Object> row : rows) {
+					
+					int count = (int)row.get("transactionCount");
+					Date date = (java.sql.Date)row.get("paymentDate");
+						
+					Calendar dateTime = Calendar.getInstance();
+					dateTime.setTime(date);
+					
+					TransactionSummary view = new TransactionSummary(date,count);
+					transactions.add(view);
+				}
+				log.info("Sales size: " + transactions.size());
+				response.put(true, transactions);
+			}
+			else {
+				List<TransactionSummary> sales = new ArrayList<TransactionSummary>();
+				response.put(true,sales);
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			response.put(false, Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+		}
+		return response;
+	}
+	
 	public String updateTransactionStatus(String transactionId, String date, int status) {
 		String errorMsg = "";
 		try {

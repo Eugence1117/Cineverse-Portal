@@ -14,6 +14,9 @@
 		cursor:not-allowed;
 	}
 	
+	.actionColumn{
+		text-align:center
+	}
 	@media only screen and (max-width: 640px) {
 		.actionColumn{
 			font-size:20px;
@@ -416,7 +419,7 @@
 					{ data: 'username','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
 					{ data: 'usergroup','width':'15%',},
 		   			{ data: 'branchname','width':'20%',render:function(data,type,row){return data.length > 20 ? data.substr(0,15) + '.....' : data}},
-		   			{ data: 'status','width':'10%',className:"text-center"},
+		   			{ data: 'status','width':'10%'},
 		   			{ data: 'action','width':'15%'}
 				],
 				order: [], 
@@ -472,20 +475,20 @@
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
 					
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 				else if(value.status == "Active"){
 					value.action += "<span class='p-1 mx-1 fontBtn deactiveBtn' id='" + value.seqid +"' onclick=activateAndDeactivateUser(this,0)>" + deactivateBtn + "</span>";
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>" + "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.seqid +"' onclick=getEditInfo(this.id)>" + editBtn + "</span>" + "<span class='p-1 mx-1 fontBtn deleteBtn' id='" + value.seqid +"' onclick='deleteUser(this)'>" + deleteBtn + "</span>";
 					value.action +="</p>"
 					
-						value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+						value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.seqid +"' onclick=getUserDetails(this)>" + viewBtn + "</span>";
 					value.action +="</p>"
 					
-						value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+						value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 				
 			});

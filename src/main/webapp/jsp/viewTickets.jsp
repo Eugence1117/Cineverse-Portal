@@ -370,7 +370,7 @@
 		   			{ data: 'schedule','width':'15%'},
 		   			{ data: 'movieName','width':'15%'},
 		   			{ data: 'price','width':'10%'},
-		   			{ data: 'status','width':'10%',className:"text-center"},
+		   			{ data: 'status','width':'10%'},
 		   			{ data: 'action','width':'10%'}
 				],
 				order: [], 
@@ -400,22 +400,22 @@
 					value.action += "<span class='p-1 mx-1 fontBtn changeBtn' id='" + value.ticketID +"' onclick='showSeatLayout(this.id)'>" + changeBtn + "</span>";
 					value.action +="</p>"	
 					
-					value.status = "<span class='badge bg-primary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-primary text-uppercase'>" + value.status + "</span></div>"
 				}
 				else if(value.status == "Pending"){										
 					value.action += "<span class='p-1 mx-1 fontBtn changeBtn' id='" + value.ticketID +"' onclick='showSeatLayout(this.id)'>" + changeBtn + "</span>";
 					value.action +="</p>"	
-					value.status = "<span class='badge bg-info text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-info text-uppercase'>" + value.status + "</span></div>"
 				}				
 				else if(value.status == "Completed" || value.status == "Cancelled" || value.status == "Refunded"){
 					value.action += "Unavailable"
 					value.action +="</p>"	
-					value.status = "<span class='badge bg-secondary text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}				
 				else{
 					value.action += "Unavailable"
 					value.action +="</p>"	
-					value.status = "<span class='badge bg-warning text-uppercase'>" + value.status + "</span>"
+					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
 				}
 			});
 		}

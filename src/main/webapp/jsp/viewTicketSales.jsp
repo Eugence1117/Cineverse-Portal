@@ -22,7 +22,6 @@
 .refreshBtn:hover, .collapsible {
 	cursor: pointer;
 }
-
 .spin {
 	-webkit-animation: .75s linear infinite spinner-border;
 	animation: .75s linear infinite spinner-border;

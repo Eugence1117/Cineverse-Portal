@@ -39,12 +39,21 @@ public class HomeController {
 	//Manager
 	@RequestMapping(value = {"/api/manager/retrieveManagerHomeData.json"})
 	@ResponseBody
-	public  Map<String,Response> retrieveHomeData(Model model) {
-		log.info("Entered /retrieveHomeData");
+	public  Map<String,Response> retrieveManagerHomeData(Model model) {
+		log.info("Entered /retrieveManagerHomeData");
 		
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchId = user.getBranchid();
 		return service.getBranchHomeData(branchId);
+	}
+	
+	//Admin
+	@RequestMapping(value = {"/api/admin/retrieveAdminHomeData.json"})
+	@ResponseBody
+	public  Map<String,Response> retrieveAdminHomeData(Model model) {
+		log.info("Entered /retrieveAdminHomeData");
+		
+		return service.getAdminHomeData();
 	}
 	
 //	@RequestMapping(value = {"/api/manager/retrieveTodaySales.json"})

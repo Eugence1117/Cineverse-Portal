@@ -23,7 +23,11 @@
 .jBox-content{
 	font-size:12px;
 }
-
+.errorBox{
+	display: grid;
+    height: 100%;
+    align-items: center;
+}
 .spin {
 	-webkit-animation: .75s linear infinite spinner-border;
 	animation: .75s linear infinite spinner-border;
@@ -154,8 +158,8 @@
 									<div class="card-body">
 										<div class="chart-area">
 											<canvas id="earningGraph"></canvas>
-											<div class="text-center" id="graphError">
-												<span class="h5 mb-0 font-weight-bold text-gray-800"></span>
+											<div class="text-center" id="graphError"  style="height:100%">
+												<span class="h5 mb-0 font-weight-bold text-gray-800 errorBox"></span>
 											</div>
 										</div>
 									</div>
@@ -175,8 +179,8 @@
 									<div class="card-body">
 										<div class="chart-pie pt-4 pb-2">
 											<canvas id="movieChart"></canvas>
-											<div class="text-center" id="chartError">
-												<span class="h5 mb-0 font-weight-bold text-gray-800"></span>
+											<div class="text-center" id="chartError"  style="height:100%">
+												<span class="h5 mb-0 font-weight-bold text-gray-800 errorBox"></span>
 											</div>
 										</div>										
 									</div>
@@ -304,6 +308,8 @@
     		
     		$("#movieChart").hide();
     		$("#earningGraph").hide()
+    		$("#graphError").show();
+    		$("#chartError").show();
     		$("#graphError > span").text("Error");
     		$("#chartError > span").text("Error");
     	}
@@ -396,13 +402,13 @@
     		}
     		if(data.errorMsg != null){
     			$("#earningGraph").hide();
-    			$("#graphError > span").show();
+    			$("#graphError").show();
     			$("#graphError > span").text(data.errorMsg);
     		}
     		
 		else {
 			$("#earningGraph").show();
-			$("#graphError > span").hide();
+			$("#graphError").hide();
 				var chartData = data.result;
 				earningGraph = new Chart(
 						$("#earningGraph"),
@@ -441,7 +447,7 @@
 										time : {
 											unit : 'date'
 										},
-										gridLines : {
+										grid : {
 											display : false,
 											drawBorder : false
 										},
@@ -462,9 +468,8 @@
 														+ number_format(value);
 											}
 										},
-										gridLines : {
+										grid : {
 											color : "rgb(234, 236, 244)",
-											zeroLineColor : "rgb(234, 236, 244)",
 											drawBorder : false,
 											borderDash : [ 2 ],
 											zeroLineBorderDash : [ 2 ]
@@ -510,15 +515,15 @@
 			if (data.errorMsg != null) {
 				$("#chartError > span").text(data.errorMsg);
 				$("#movieChart").hide();
-				$("#chartError > span").show();
+				$("#chartError").show();
 			} else {
 				if (data.result == null) {
-					$("#chartError > span").show();
+					$("#chartError").show();
 					$("#chartError > span").text("No Data Available");
 					$("#movieChart").hide();
 				} else {
 					$("#movieChart").show();
-					$("#chartError > span").hide();
+					$("#chartError").hide();
 					
 					var chartData = data.result
 					movieChart = new Chart($("#movieChart"), {

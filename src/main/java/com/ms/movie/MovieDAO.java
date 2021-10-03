@@ -535,7 +535,7 @@ public class MovieDAO {
 			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return response;
-	}
+	}	
 	
 	public String changeMovieAvailableStatusInBranch(String branchID, String movieID,int status) {
 		try {
