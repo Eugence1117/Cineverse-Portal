@@ -136,6 +136,7 @@ public class HomeService {
 			log.error(Util.getDetailExceptionMsg(ex));
 			response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_OCCURED));
 		}
+		response.putIfAbsent("errorMsg",null);
 		return response;
 	}
 	
@@ -265,6 +266,7 @@ public class HomeService {
 		else {
 			response.put("errorMsg",new Response("Unable to identify your identity. Please try again later."));
 		}
+		response.putIfAbsent("errorMsg",null);
 		return response;
 	}
 	

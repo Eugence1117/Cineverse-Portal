@@ -50,7 +50,7 @@
 			        <div id="statistics" style="position:relative">
 						<div class="row my-2">
 							<div class="col-md">
-								<div class="card mx-1 border-left-info shadow revenue">
+								<div class="card mx-1 border-left-info shadow revenue mb-4">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -68,9 +68,9 @@
 							</div>
 						</div>
 
-						<div class="row mt-2 mb-4">
+						<div class="row mt-2">
 							<div class="col-md">
-								<div class="card mx-1 border-left-primary shadow ticketSold">
+								<div class="card mx-1 border-left-primary shadow ticketSold mb-4">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -89,7 +89,7 @@
 							</div>
 
 							<div class="col-md">
-								<div class="card mx-1 border-left-success shadow transactionComplete">
+								<div class="card mx-1 border-left-success shadow transactionComplete mb-4">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -107,7 +107,7 @@
 								</div>
 							</div>
 							<div class="col-md">
-								<div class="card mx-1 border-left-warning shadow ticketRefund">
+								<div class="card mx-1 border-left-warning shadow ticketRefund mb-4">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -125,7 +125,7 @@
 								</div>
 							</div>
 							<div class="col-md">
-								<div class="card mx-1 border-left-danger shadow ticketCancel">
+								<div class="card mx-1 border-left-danger shadow ticketCancel mb-4">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -234,7 +234,7 @@
     	
     	$(document).ready(function(){
     		showLoading();
-    		getHomePageData();
+    		checkCookie();
     	});
     	
     	function addTooltip(){
@@ -345,7 +345,7 @@
 				}
 			}).done(function(data) {
 				hideLoading();						
-				if(typeof data.errorMsg !== 'undefined'){
+				if(data.errorMsg != null){
 					showAllError()
 					bootbox.alert(data.errorMsg.errorMsg);												
 				}
@@ -359,11 +359,57 @@
 						addTooltip();
 						isFirstTime = false;
 					}
-					
-					
+					setCookie(data);					
 				}
 			})	
     	}
+    	
+    	function checkCookie(){
+    		var cookieValue = getCookie("graphDataM");    		
+    		if(cookieValue == ""){
+    			getHomePageData();	
+    		}
+    		else{    			
+    			hideLoading();
+    			var data = JSON.parse(cookieValue);
+    			setupRevenueField(data.revenue);
+				setupTicketField(data.ticketSum)
+				setupTransactionField(data.transacSum);
+				setupEarningGraph(data.earningSum);
+				setupMoviePopularityChart(data.moviePopularity);
+				if(isFirstTime){
+					addTooltip();
+					isFirstTime = false;
+				}
+    		}    		
+    	}
+    	
+    	function getCookie(cname) {
+    		  let name = cname + "=";
+    		  let decodedCookie = decodeURIComponent(document.cookie);
+    		  let ca = decodedCookie.split(';');
+    		  for(let i = 0; i <ca.length; i++) {
+    		    let c = ca[i];
+    		    while (c.charAt(0) == ' ') {
+    		      c = c.substring(1);
+    		    }
+    		    if (c.indexOf(name) == 0) {
+    		      return c.substring(name.length, c.length);
+    		    }
+    		  }
+    		  return "";
+    		}
+    	
+    	function setCookie(data){
+    		const d = new Date();
+    		d.setTime(d.getTime() + (5*60*1000));
+    		 
+    		var expires = "expires="+ d.toUTCString();
+    		var path = "path=home.htm";
+    		
+    		document.cookie = "graphDataM=" + JSON.stringify(data) + "; " + expires + "; " + path;
+    	}
+    	    	
     	
     	function setupRevenueField(data){
     		$("#revenue").fadeOut(400,function(){

@@ -46,9 +46,9 @@
 			        </div>
 			        
 		        	<div id="statistics" style="position:relative">
-						<div class="row mt-2 mb-4">
+						<div class="row mt-2">
 							<div class="col-md">
-								<div class="card mx-1 border-left-info shadow" id="userGrowth">
+								<div class="card mx-1 border-left-info shadow mb-4" id="userGrowth">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -64,7 +64,7 @@
 								</div>
 							</div>
 							<div class="col-md">
-								<div class="card mx-1 border-left-success shadow" id="branchActive">
+								<div class="card mx-1 border-left-success shadow mb-4" id="branchActive">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -81,7 +81,7 @@
 								</div>
 							</div>
 							<div class="col-md">
-								<div class="card mx-1 border-left-danger shadow" id="transactionComplete">
+								<div class="card mx-1 border-left-danger shadow mb-4" id="transactionComplete">
 									<div class="card-body">
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
@@ -189,7 +189,7 @@
     	
     	$(document).ready(function(){
     		showLoading();
-    		getHomePageData();
+    		checkCookie();
     	});
     	
     	function addTooltip(){
@@ -282,7 +282,7 @@
 				}
 			}).done(function(data) {
 				hideLoading();						
-				if(typeof data.errorMsg !== 'undefined'){
+				if(data.errorMsg != null){
 					showAllError()
 					bootbox.alert(data.errorMsg.errorMsg);												
 				}
@@ -297,12 +297,59 @@
 						addTooltip();
 						isFirstTime = false;
 					}
-					
-					
+					setCookie(data);
 				}
 			})	
     	}
     	    	
+    	function checkCookie(){
+    		var cookieValue = getCookie("graphDataA");    		
+    		if(cookieValue == ""){
+    			getHomePageData();	
+    		}
+    		else{    			
+    			hideLoading();
+    			var data = JSON.parse(cookieValue);
+    			
+    			setupCurrentUserGrowth(data.currentUserGrowth);
+				setupCurrentActiveBranch(data.currentActiveBranch);
+				setupTransactionCount(data.transacSum);
+				setupGrowthGraph(data.monthlyUserData);
+				setupMoviePopularityChart(data.moviePopularity);
+				
+				if(isFirstTime){
+					addTooltip();
+					isFirstTime = false;
+				}
+    		}    		
+    	}
+    	
+    	function getCookie(cname) {
+    		  let name = cname + "=";
+    		  let decodedCookie = decodeURIComponent(document.cookie);
+    		  let ca = decodedCookie.split(';');
+    		  for(let i = 0; i <ca.length; i++) {
+    		    let c = ca[i];
+    		    while (c.charAt(0) == ' ') {
+    		      c = c.substring(1);
+    		    }
+    		    if (c.indexOf(name) == 0) {
+    		      return c.substring(name.length, c.length);
+    		    }
+    		  }
+    		  return "";
+    		}
+    	
+    	function setCookie(data){
+    		const d = new Date();
+    		d.setTime(d.getTime() + (5*60*1000));
+    		 
+    		var expires = "expires="+ d.toUTCString();
+    		var path = "path=home.htm";
+    		
+    		document.cookie = "graphDataA=" + JSON.stringify(data) + "; " + expires + "; " + path;
+    	}
+    	
     	function setupCurrentUserGrowth(data){
     		$("#newUserNum").fadeOut(400,function(){
     			if(data.errorMsg != null){
