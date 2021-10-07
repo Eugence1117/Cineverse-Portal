@@ -1,6 +1,10 @@
 package com.ms.ticket;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -19,14 +23,11 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ms.Seat.SeatLayout;
 import com.ms.Seat.TheatreLayout;
 import com.ms.Seat.TheatreLayout.SeatColumn;
+import com.ms.common.Azure;
 import com.ms.common.Constant;
 import com.ms.common.Response;
 import com.ms.common.Util;
@@ -35,6 +36,15 @@ import com.ms.movie.MovieDAO;
 import com.ms.schedule.ScheduleDAO;
 import com.ms.schedule.ScheduleView;
 import com.ms.transaction.TransactionDAO;
+import com.ms.transaction.TransactionJasper;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class TicketService {
@@ -52,6 +62,9 @@ public class TicketService {
 	
 	@Autowired
 	TransactionDAO transacDao;
+	
+	@Autowired
+	Azure azure;
 	
 	public ScheduleView retrieveScheduleInfo(String scheduleId) {
 		if(!scheduleId.isEmpty()) {
@@ -463,4 +476,148 @@ public class TicketService {
 		}
 	}
 	
+	public Map<Boolean, Object> processTicketSalesForJasper(String branchId, String start, String end) {
+		Map<Boolean, Object> response = new HashMap<Boolean, Object>();
+		try {
+			Date fromDate = Constant.SQL_DATE_WITHOUT_TIME.parse(start);
+			Date toDate = Constant.SQL_DATE_WITHOUT_TIME.parse(end);
+
+			start += Constant.DEFAULT_TIME;
+			end += Constant.END_OF_DAY;
+			Map<Boolean, Object> data = transacDao.getDailySalesByPaymentDate(start, end, branchId);
+			if (data.containsKey(false)) {
+				response.put(false, (String) data.get(false));
+				return response;
+			} else {
+				@SuppressWarnings("unchecked")
+				List<SalesSummary> salesData = (List<SalesSummary>) data.get(true);
+
+				Map<String, Object> result = new HashMap<String, Object>();
+				if (fromDate.compareTo(toDate) == 0) {
+					response.put(false,"This function is not applicable for single date.");
+					return response;
+				}
+				else {					
+					result.put("title","From " + Constant.UI_DATE_FORMAT.format(fromDate) + " to " + Constant.UI_DATE_FORMAT.format(toDate));
+					
+					Calendar startDate = Calendar.getInstance();
+					startDate.setTime(fromDate);
+					
+					Calendar endDate = Calendar.getInstance();
+					endDate.setTime(toDate);
+					
+					while(startDate.compareTo(endDate) <= 0) {
+						boolean isFound = false;
+						for (SalesSummary sales : salesData) {
+							if(sales.getDate().compareTo(startDate.getTime()) == 0) {
+								isFound = true;
+							}						
+						}
+						
+						if(!isFound) {
+							salesData.add(new SalesSummary(0,startDate.getTime()));
+						}
+						
+						startDate.add(Calendar.DATE,1);
+					}
+					
+					Collections.sort(salesData,new Comparator<SalesSummary>() {
+						 @Override
+						  public int compare(SalesSummary u1, SalesSummary u2) {
+						    return u1.getDate().compareTo(u2.getDate());
+						  }
+					});
+
+					result.put("data", salesData);					
+				}
+
+				response.put(true, result);
+				return response;
+			}
+		} catch (ParseException ex) {
+			log.error(ex.getMessage());
+			response.put(false, "Date received is invalid. Please try again later.");
+			return response;
+		}
+	}
+	
+	
+	@SuppressWarnings("unchecked")											
+	public Response createSalesReportAsPdf(String branchId, String start, String end) {
+		if(Util.trimString(branchId) == ""){
+			return new Response("Unable to identify your identity. Please try again later.");
+		}
+		else {
+			if(Util.trimString(start) != "" && Util.trimString(end) != "") {
+				 Map<Boolean,String> validation = Util.validateDateRangeWithoutLimit(start, end);
+				 if(validation.containsKey(false)) {
+					 return new Response((String)validation.get(false));
+				 }
+				 else {
+						try {
+							Map<Boolean,Object> graphResponse = processTicketSalesForJasper(branchId,start,end);
+							start += Constant.DEFAULT_TIME;
+							end += Constant.END_OF_DAY;
+							Map<Boolean, Object> data = transacDao.selectTransactionRecordForJasperByDateAndBranch(branchId,start, end);							
+							if (data.containsKey(false) || graphResponse.containsKey(false)) {
+								if(data.containsKey(false)) {
+									return new Response((String) data.get(false));
+								}
+								else {
+									return new Response((String) graphResponse.get(false));
+								}
+								
+							} else {
+								//Retrieve Table Data					
+								List<TransactionJasper> datasource = (List<TransactionJasper>)data.get(true);
+								
+								//Retrieve Graph Data
+								Map<String,Object> dataList = (Map<String,Object>)graphResponse.get(true);
+								String reportSubtitle = (String)dataList.get("title");
+								List<SalesSummary> graphData = (List<SalesSummary>)dataList.get("data");
+								graphData.forEach(datas -> log.info(datas.getDate() + "  " + datas.getPrice()));								
+								final InputStream stream = this.getClass().getResourceAsStream("/templates/salesreport.jrxml");
+
+								// Compile the Jasper report from .jrxml to .japser
+								final JasperReport report = JasperCompileManager.compileReport(stream);								
+
+								// Fetching the employees from the data source.
+								final JRBeanCollectionDataSource graphSource = new JRBeanCollectionDataSource(graphData);
+								final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(datasource);								
+
+								// Adding the additional parameters to the pdf.
+								final Map<String, Object> parameters = new HashMap<>();
+								parameters.put("reportTitle", "Sales Report for branch: TEST");
+								parameters.put("subTitle", reportSubtitle);
+								parameters.put("address", "Jalan 12\nTest\n21000,Perak.");								
+								parameters.put("CHART_DATA", graphData);
+
+								// Filling the report with the employee data and additional parameters
+								// information.
+								final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
+
+								final String fileName = "Sales_Report_" + branchId + "_" + Constant.STANDARD_DATE_FORMAT.format(new Date()) + ".pdf";
+								// Export the report to a PDF file.
+								//JasperExportManager.exportReportToPdfFile(print, filePath + fileName);
+								byte[] fileData = JasperExportManager.exportReportToPdf(print);
+								InputStream input = new ByteArrayInputStream(fileData);
+																
+								
+								URI uri = azure.uploadPdfFileToAzure(fileName,input,Constant.REPORT_FILE_CONTAINER_NAME);
+								return new Response((Object)(uri.toString()));
+							}
+							
+						}
+						catch (JRException jr) {
+							log.error(jr.getMessage());
+							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+						}
+					}
+					
+			}
+			else {
+				return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
+			}
+		}
+	}
 }

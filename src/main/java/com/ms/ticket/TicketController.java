@@ -97,6 +97,16 @@ public class TicketController {
 		return service.retrieveSalesData(branchid, startdate, enddate);
 	}
 	
+	@RequestMapping(value = {"/api/manager/generateSalesReport.json"})
+	@ResponseBody
+	public Response getSalesReport(Model model,String startdate, String enddate) {
+		log.info("Entered /generateSalesReport.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String branchid = user.getBranchid();
+		
+		return service.createSalesReportAsPdf(branchid, startdate, enddate);		
+	}
+	
 //	@RequestMapping(value = {"/api/manager/retrieveTicketSummary.json"})
 //	@ResponseBody
 //	public Response getTicketSummaryInfo(Model model, String startdate, String enddate) {

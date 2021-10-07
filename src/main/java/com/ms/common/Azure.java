@@ -1,6 +1,7 @@
 package com.ms.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.BlobProperties;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
@@ -40,6 +42,29 @@ public class Azure {
 		return format;
 	}
 	
+	public URI uploadPdfFileToAzure(String filename, InputStream stream, String containerName) {
+		URI uri = null;
+		CloudBlockBlob blob = null;
+		CloudBlobContainer cloudBlobContainer = null;
+		try {
+			cloudBlobContainer = cloudBlobClient.getContainerReference(containerName);
+			blob = cloudBlobContainer.getBlockBlobReference(filename);
+			blob.getProperties().setContentType("application/pdf");
+										
+			blob.upload(stream, -1);						
+			uri = blob.getUri();
+		}
+		catch(URISyntaxException e) {
+			log.error("URISyntaxException :" + e.getMessage());
+		}
+		catch(StorageException ex) {
+			log.error("StorageException :" + ex.getMessage());
+		}
+		catch(IOException ep) {
+			log.error("IOException :" + ep.getLocalizedMessage());
+		}
+		return uri;
+	}
 	
 	public URI uploadFileToAzure(String filename, MultipartFile mpf, String containerName) {
 		URI uri = null;

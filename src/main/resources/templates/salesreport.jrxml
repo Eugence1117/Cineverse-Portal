@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Sales_Report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="72c6ee1f-39f0-4d08-b5e3-8ea18055120b">
+	<subDataset name="GraphDataSet" uuid="e022ffb4-0151-441b-8b12-e0bec2297a99">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="date" class="java.util.Date"/>
+		<field name="price" class="java.lang.Double"/>
+	</subDataset>
+	<parameter name="reportTitle" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Report"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="subTitle" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="CHART_DATA" class="java.util.List"/>
+	<field name="transactionId" class="java.lang.String"/>
+	<field name="paidDate" class="java.util.Date"/>
+	<field name="ticketPurchased" class="java.lang.Integer"/>
+	<field name="amountPaid" class="java.lang.Double"/>
+	<variable name="total" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amountPaid}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="155" splitType="Stretch">
+			<textField>
+				<reportElement x="-20" y="0" width="595" height="30" uuid="411ab57e-6e60-4821-a920-dc0d98f7a594"/>
+				<textElement textAlignment="Center">
+					<font size="20"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{reportTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="30" width="560" height="30" uuid="8dc4b95a-6734-42f3-a61a-0d3cf45c6e55"/>
+				<textElement textAlignment="Center">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{subTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="70" width="240" height="80" uuid="d1e9b012-b0d7-4a46-b81a-3f10f6f61873"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="70" width="230" height="60" uuid="b11f17a5-2309-49d0-a5de-3c12b322f192"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Generated On :" + new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="237" splitType="Stretch">
+			<lineChart>
+				<chart renderType="draw" theme="default">
+					<reportElement key="" x="0" y="10" width="560" height="210" uuid="e99ac438-b92d-436e-ab56-395dc2280845"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset resetType="Report">
+						<datasetRun subDataset="GraphDataSet" uuid="96ee9d21-f581-4eb6-b16a-acf4a6885efe">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{CHART_DATA})]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Sales"]]></seriesExpression>
+						<categoryExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{date})]]></categoryExpression>
+						<valueExpression><![CDATA[$F{price}]]></valueExpression>
+						<labelExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{date})]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<linePlot>
+					<plot/>
+					<categoryAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" tickLabelMask="#" axisLineColor="#000000"/>
+					</valueAxisFormat>
+				</linePlot>
+			</lineChart>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="190" height="21" uuid="7c92c781-b13c-4348-bf10-bfcc90869504">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b52aa052-9b86-4ce5-ae02-ba544d0b7ad4"/>
+				</reportElement>
+				<text><![CDATA[Transaction ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="0" width="120" height="21" uuid="096e9029-1d62-421e-b041-54f05b88f18e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa3816ed-8862-4894-bef4-0d7b71ae2797"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Payment Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="0" width="80" height="21" uuid="5abd2ffd-3474-4ac9-a97f-ba34940ca042">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa53650-5da2-4158-9e70-79370b1e4227"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Ticket Purchased
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="74" height="21" uuid="271e25a1-9f68-4985-9268-01e41b50cba8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d0df1b2c-d050-4caa-a481-2e92ca67b693"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Amount (RM)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="49" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="19" width="190" height="30" uuid="a680ed09-472e-4934-ae99-dfab192eb41a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b52aa052-9b86-4ce5-ae02-ba544d0b7ad4"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{transactionId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="19" width="80" height="30" uuid="83cf8997-4db5-4ba2-a30d-8d6934c81fab">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa53650-5da2-4158-9e70-79370b1e4227"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ticketPurchased}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="19" width="120" height="30" uuid="8ff3e702-1599-48d2-9474-0f6f48b93e6f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa3816ed-8862-4894-bef4-0d7b71ae2797"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{paidDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="19" width="74" height="30" uuid="ba5a3729-76b1-4011-a25e-54850d151ef9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d0df1b2c-d050-4caa-a481-2e92ca67b693"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{amountPaid}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="34" splitType="Stretch">
+			<textField>
+				<reportElement x="480" y="4" width="75" height="30" uuid="af8946d5-45de-4f30-81bb-0b313ba85c11"/>
+				<textFieldExpression><![CDATA["Sum : RM " + String.valueOf($V{total})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="2" width="553" height="1" uuid="875810dc-b54f-4d73-a003-0cfd2e0dae0b"/>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="180" y="20" width="200" height="30" uuid="94f38afc-f95c-4515-b814-f5e789db40eb"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + "/" + $V{PAGE_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -99,6 +99,7 @@ public class Constant {
 	public static final String PROFILE_IMAGE_CONTAINER_NAME = "profilepic";
 	public static final String MOVIE_IMAGE_CONTAINER_NAME = "movieimg";
 	public static final String ANNOUCEMENT_IMAGE_CONTAINER_NAME = "annoucement";
+	public static final String REPORT_FILE_CONTAINER_NAME = "report";
 	
 	public static final String DEFAULT_TIME_ZONE ="Asia/Kuala_Lumpur";
 	public static final String DEFAULT_TIME = " 00:00:00";

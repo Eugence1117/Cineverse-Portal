@@ -274,6 +274,8 @@
 		src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript"
 		src="<spring:url value='/plugins/chart/Chart-3.5.1.min.js'/>"></script>
+	<script type="text/javascript"
+		src="<spring:url value='/plugins/html2pdf/html2pdf-min.js'/>"></script>
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
 		var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
@@ -609,7 +611,49 @@
 				$("#grossProfit").text("RM " + chartData.data);
 			}
 		}
-
+		
+		$("#btnExport").on('click',function(){
+			if(range == null){
+				range = $("#searchForm").serializeObject();
+			}
+			Notiflix.Loading.Dots('Generating...');		
+			$.ajax("api/manager/generateSalesReport.json", {
+				method : "GET",
+				accepts : "application/json",
+				dataType : "json",
+				data : range,
+				contentType : "application/json; charset=utf-8",
+				headers : {
+					"X-CSRF-Token" : CSRF_TOKEN
+				},
+				statusCode : {
+					400 : function() {
+						window.location.href = "400.htm";
+					},
+					401 : function() {
+						window.location.href = "expire.htm";
+					},
+					403 : function() {
+						window.location.href = "403.htm";
+					},
+					404 : function() {
+						window.location.href = "404.htm";
+					}
+				}
+			}).done(function(data) {				
+				Notiflix.Loading.Remove();		
+				if (data.errorMsg != null) {
+					bootbox.alert(data.errorMsg);
+				} else {
+					var url = data.result;
+					var nextDay = moment(new Date()).add(1,'days').format('DD-MMM-YYYY');
+					var msg = "Accessed the report at <a href='"+url+"' target='_blank' rel='noopener noreferrer'>here</a> before " + nextDay + ".";					
+					var toast = createToast(msg,"New Sales Report Generated",true);
+					window.open(url);
+				}
+			})
+		});
+		
 		function poolColors(a) {
 			var pool = [];
 			for (i = 0; i < a; i++) {

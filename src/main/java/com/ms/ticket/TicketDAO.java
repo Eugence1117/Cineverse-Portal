@@ -1,5 +1,7 @@
 package com.ms.ticket;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,6 +38,14 @@ public class TicketDAO {
 	    this.jdbc = new JdbcTemplate(dataSource);
 	}
 	
+	public Connection getConnection() {
+		try {
+			return jdbc.getDataSource().getConnection();
+		} catch (SQLException e) {
+			log.error(Util.getDetailExceptionMsg(e));
+			return null;
+		}
+	}
 	
 	public Map<Boolean,Object> getTicketByScheduleStartDate(String start, String end){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
@@ -90,7 +100,7 @@ public class TicketDAO {
 		try {
 			String query = "SELECT m.movieName, COUNT(m.seqid) As ticketSold " +
 						   "FROM masp.ticket t, masp.payment p, masp.schedule s, masp.movie m " +
-						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid AND s.movieId = m.seqid " +
+						   "WHERE p.paidOn <= ? AND p.paidOn >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid AND s.movieId = m.seqid " +
 						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?) GROUP BY m.seqid, m.movieName";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
@@ -128,7 +138,7 @@ public class TicketDAO {
 		try {
 			String query = "SELECT m.movieName, COUNT(m.seqid) As ticketSold " +
 						   "FROM masp.ticket t, masp.payment p, masp.movie m, masp.schedule s " +
-						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid AND s.movieId = m.seqid " +
+						   "WHERE p.paidOn <= ? AND p.paidOn >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid AND s.movieId = m.seqid " +
 						   "GROUP BY m.movieName";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start);
@@ -168,7 +178,7 @@ public class TicketDAO {
 		try {
 			String query = "SELECT t.seqid, p.paymentStatus, t.scheduleId, s.movieId " +
 						   "FROM masp.ticket t, masp.payment p, masp.schedule s " +
-						   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
+						   "WHERE p.paidOn <= ? AND p.paidOn >= ? AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
 						   "AND t.seqid in (SELECT t.seqid from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ?)";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);

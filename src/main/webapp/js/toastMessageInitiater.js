@@ -36,7 +36,7 @@
  	 		var dataObj = activityArray[i];
  	 		
  	 		var icon = dataObj.icon;			
-    		var msg = dataObj.msg;
+    		var msg = dataObj.title;
     		var date = dataObj.date;
     		var status = dataObj.status;
     		
@@ -91,7 +91,8 @@
  	
  	var toastBody = $("<div></div>");
  	toastBody.addClass("toast-body");
- 	toastBody.append(msg);
+	toastBody.addClass("overflow-hidden");
+ 	toastBody.append("<p class='m-0'>" + msg + "</p>");
  	
  	var row = $("<div></div>");
  	row.addClass('d-flex');
@@ -121,6 +122,7 @@
     	var date = dataObj.date;
     	var status = dataObj.status;
     	
+		console.log(title);
     	convertToastToActivityFeed(icon,title,date,status);
 		$(this).remove();
 		
@@ -143,8 +145,9 @@
  	iconDiv.append(status ? successIcon : failIcon);
  	
  	var body = $("<div></div>");
+	body.addClass("overflow-hidden")
  	body.append("<div class='small text-gray-500 history'>" + moment(datetime).fromNow() + "</div>");
- 	body.append("<div class='font-weight-bold'>" + message + "</div>");
+ 	body.append("<div class='font-weight-bold'><p class='m-0'>" + message + "</p></div>");
  	
  	item.append(iconDiv);
  	item.append(body);
