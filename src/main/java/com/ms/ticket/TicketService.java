@@ -587,11 +587,13 @@ public class TicketService {
 
 								// Adding the additional parameters to the pdf.
 								final Map<String, Object> parameters = new HashMap<>();
-								parameters.put("reportTitle", "Sales Report for branch: TEST");
+								parameters.put("reportTitle", "Sales Report");
 								parameters.put("subTitle", reportSubtitle);
-								parameters.put("address", "Jalan 12\nTest\n21000,Perak.");								
+								parameters.put("address", "No 2, Jalan Teh Lean Swee, Taman Ipoh Selatan\n31400 Kinta\nPerak, Malaysia.");								
 								parameters.put("CHART_DATA", graphData);
-
+								parameters.put("branchName","AEON Kinta City MASP Cinema");
+							
+//z
 								// Filling the report with the employee data and additional parameters
 								// information.
 								final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
