@@ -45,7 +45,7 @@
 
 	<!-- -->
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
-	
+		
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 

@@ -104,7 +104,7 @@ public class TicketController {
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();
 		
-		return service.createSalesReportAsPdf(branchid, startdate, enddate);		
+		return service.createMoviePopularityReportAsPdf(branchid, startdate, enddate);		
 	}
 	
 //	@RequestMapping(value = {"/api/manager/retrieveTicketSummary.json"})

@@ -83,7 +83,7 @@ public class TransactionDAO {
 		try {
 			String query = "SELECT SUM(p.totalPrice) AS revenue, MONTH(p.paidOn) AS month " +
 						   "FROM masp.payment p " +
-						   "WHERE p.seqid in (select p.seqid from masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleId = s.seqid AND t.transactionId = p.seqid AND p.paidOn <= ? AND p.paidOn >= ? AND th.seqid = s.theatreId AND th.branchid = ? group by p.seqid) AND p.paymentStatus = ? Or p.paymentStatus = ?" +
+						   "WHERE p.seqid in (select p.seqid from masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleId = s.seqid AND t.transactionId = p.seqid AND p.paidOn <= ? AND p.paidOn >= ? AND th.seqid = s.theatreId AND th.branchid = ? group by p.seqid) AND p.paymentStatus = ? Or p.paymentStatus = ? " +
 						   "GROUP BY MONTH(p.paidOn)";
 					
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_COMPLETED_STATUS_CODE,Constant.PAYMENT_PAID_STATUS_CODE);
