@@ -1,9 +1,11 @@
 package com.ms.ticket;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import com.ms.schedule.ScheduleView;
 import com.ms.transaction.TransactionDAO;
 import com.ms.transaction.TransactionJasper;
 
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -45,6 +48,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.renderers.BatikRenderer;
 
 @Service
 public class TicketService {
@@ -541,6 +545,98 @@ public class TicketService {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Response createMoviePopularityReportAsPdf(String branchId,String start, String end) {
+		if(Util.trimString(branchId) == ""){
+			return new Response("Unable to identify your identity. Please try again later.");
+		}
+		else {
+			if(Util.trimString(start) != "" && Util.trimString(end) != "") {
+				 Map<Boolean,String> validation = Util.validateDateRangeWithoutLimit(start, end);
+				 if(validation.containsKey(false)) {
+					 return new Response((String)validation.get(false));
+				 }
+				 else {
+						try {							
+							start += Constant.DEFAULT_TIME;
+							end += Constant.END_OF_DAY;
+							Map<Boolean, Object> result = dao.getTicketByPaymentDate(start, end, branchId);
+							if (result.containsKey(false)) {
+								return new Response((String)result.get(false));								
+							} else {
+								@SuppressWarnings("unchecked")
+								List<TicketSummary> summaryData = (List<TicketSummary>) result.get(true);
+
+								Map<String, List<TicketSummary>> groupedByMovie = summaryData.stream()
+										.collect(Collectors.groupingBy(TicketSummary::getMovieId));
+
+								
+								List<Map<String,Object>> graphData = new ArrayList<Map<String,Object>>();								
+								for (String movieId : groupedByMovie.keySet()) {
+
+									Map<Boolean, Object> movieInfo = movieDao.getMovieDetails(movieId);
+									// Map<String,String> movieInfo = new HashMap<String, String>();
+									if (movieInfo.containsKey(false)) {										
+										return new Response((String) movieInfo.get(false));										
+									}
+									Movie movie = (Movie) movieInfo.get(true);
+
+									Map<String,Object> data = new HashMap<String, Object>();
+									data.put("movieName",movie.getMovieName());
+									data.put("ticketSold",groupedByMovie.get(movieId).size());
+									
+									graphData.add(data);
+								}
+								
+								String title = "Movie Popularity Report";
+								String subTitle = "Sales from " + Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(start)) + " to " + Constant.UI_DATE_FORMAT.format(Constant.SQL_DATE_FORMAT.parse(end));
+								String address = "No 2, Jalan Teh Lean Swee, Taman Ipoh Selatan\n31400 Kinta\nPerak, Malaysia.";								
+								String branchName = "AEON Kinta City MASP Cinema";
+								
+								final JREmptyDataSource datasource = new JREmptyDataSource();
+								final Map<String, Object> parameters = new HashMap<>();
+								parameters.put("reportTitle", title);
+								parameters.put("subTitle", subTitle);
+								parameters.put("address", address);								
+								parameters.put("CHART_DATA", graphData);								
+								parameters.put("branchName",branchName);
+								parameters.put("logoPath",this.getClass().getResource("/static/film-solid.svg").toURI());								
+								
+								final InputStream stream = this.getClass().getResourceAsStream("/templates/moviereport.jrxml");							 
+								final JasperReport report = JasperCompileManager.compileReport(stream);
+								final JasperPrint print = JasperFillManager.fillReport(report, parameters, datasource);
+
+								final String fileName = "Movie_Report_" + branchId + "_" + Constant.STANDARD_DATE_FORMAT.format(new Date()) + ".pdf"; 
+								byte[] fileData = JasperExportManager.exportReportToPdf(print);
+																
+								InputStream input = new ByteArrayInputStream(fileData);
+								
+								
+								URI uri = azure.uploadPdfFileToAzure(fileName,input,Constant.REPORT_FILE_CONTAINER_NAME);
+								return new Response((Object)(uri.toString()));
+								
+							}						
+						}			
+						catch(URISyntaxException ue) {
+							log.error(ue.getMessage());
+							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+						}
+						catch (JRException jr) {
+							log.error(jr.getMessage());
+							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+						}
+						catch(ParseException pe) {
+							log.error(pe.getMessage());
+							return new Response("Received invalid date from client's request. Please try again.");
+						}
+					}
+					
+			}
+			else {
+				return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information.");
+			}
+		}
+	}
 	
 	@SuppressWarnings("unchecked")											
 	public Response createSalesReportAsPdf(String branchId, String start, String end) {
@@ -575,9 +671,9 @@ public class TicketService {
 								Map<String,Object> dataList = (Map<String,Object>)graphResponse.get(true);
 								String reportSubtitle = (String)dataList.get("title");
 								List<SalesSummary> graphData = (List<SalesSummary>)dataList.get("data");
-								graphData.forEach(datas -> log.info(datas.getDate() + "  " + datas.getPrice()));								
+								
+								
 								final InputStream stream = this.getClass().getResourceAsStream("/templates/salesreport.jrxml");
-
 								// Compile the Jasper report from .jrxml to .japser
 								final JasperReport report = JasperCompileManager.compileReport(stream);								
 
@@ -587,11 +683,14 @@ public class TicketService {
 
 								// Adding the additional parameters to the pdf.
 								final Map<String, Object> parameters = new HashMap<>();
-								parameters.put("reportTitle", "Sales Report for branch: TEST");
+								parameters.put("reportTitle", "Sales Report");
 								parameters.put("subTitle", reportSubtitle);
-								parameters.put("address", "Jalan 12\nTest\n21000,Perak.");								
+								parameters.put("address", "No 2, Jalan Teh Lean Swee, Taman Ipoh Selatan\n31400 Kinta\nPerak, Malaysia.");								
 								parameters.put("CHART_DATA", graphData);
-
+								parameters.put("TABLE_DATA", datasource);
+								parameters.put("branchName","AEON Kinta City MASP Cinema");
+							
+//z
 								// Filling the report with the employee data and additional parameters
 								// information.
 								final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
@@ -600,6 +699,7 @@ public class TicketService {
 								// Export the report to a PDF file.
 								//JasperExportManager.exportReportToPdfFile(print, filePath + fileName);
 								byte[] fileData = JasperExportManager.exportReportToPdf(print);
+								
 								InputStream input = new ByteArrayInputStream(fileData);
 																
 								

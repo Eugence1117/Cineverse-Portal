@@ -286,6 +286,9 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/Fullcalendar-5.5.1/main.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.buttons.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jszip.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/buttons.html5.min.js'/>"></script>		
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	
@@ -518,6 +521,34 @@
 		   			{ data: 'status','width':'15%'},
 		   			{ data: 'action','width':'10%'}
 				],
+				dom:"<'row'<'col-md-6'l><'col-md-6'f>>" +				 	
+			 	"<'row'<'col-md-12't>><'row'<'col-md-12'i>><'row py-2'<'col-md-6'B><'col-md-6'p>>",				
+				buttons: [
+					{
+						text:'Copy to clipboard',
+						extend: 'copy',
+		    		 	className: 'btn btn-primary',
+		             	exportOptions: {
+  		             		columns: [ 0, 1, 2, 3, 4]
+				     	}
+				    },
+				    {
+					   	text:'Export as CSV(.csv)',
+					   	extend: 'csv',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					       columns: [ 0, 1, 2, 3, 4]
+					    }
+					},	
+				    {
+						text:'Export as Excel(.xlsx)',
+					   	extend: 'excel',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					        columns: [ 0, 1, 2, 3, 4]
+					    }
+					},							
+				],		   
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				retrieve: true,

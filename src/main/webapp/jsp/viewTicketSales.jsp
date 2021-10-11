@@ -558,7 +558,17 @@
 								labels : chartData.label,
 								datasets : [ {
 									data : chartData.data,
-									backgroundColor : poolColors(chartData.label.length)
+									lineTension : 0.3,
+									backgroundColor : "rgba(78, 115, 223, 0.05)",
+									borderColor : "rgba(78, 115, 223, 1)",
+									pointRadius : 3,
+									pointBackgroundColor : "rgba(78, 115, 223, 1)",
+									pointBorderColor : "rgba(78, 115, 223, 1)",
+									pointHoverRadius : 3,
+									pointHoverBackgroundColor : "rgba(78, 115, 223, 1)",
+									pointHoverBorderColor : "rgba(78, 115, 223, 1)",
+									pointHitRadius : 10,
+									pointBorderWidth : 2,
 								} ],
 							},
 							options : {
@@ -615,43 +625,104 @@
 		$("#btnExport").on('click',function(){
 			if(range == null){
 				range = $("#searchForm").serializeObject();
-			}
-			Notiflix.Loading.Dots('Generating...');		
-			$.ajax("api/manager/generateSalesReport.json", {
-				method : "GET",
-				accepts : "application/json",
-				dataType : "json",
-				data : range,
-				contentType : "application/json; charset=utf-8",
-				headers : {
-					"X-CSRF-Token" : CSRF_TOKEN
-				},
-				statusCode : {
-					400 : function() {
-						window.location.href = "400.htm";
-					},
-					401 : function() {
-						window.location.href = "expire.htm";
-					},
-					403 : function() {
-						window.location.href = "403.htm";
-					},
-					404 : function() {
-						window.location.href = "404.htm";
-					}
-				}
-			}).done(function(data) {				
-				Notiflix.Loading.Remove();		
-				if (data.errorMsg != null) {
-					bootbox.alert(data.errorMsg);
-				} else {
-					var url = data.result;
-					var nextDay = moment(new Date()).add(1,'days').format('DD-MMM-YYYY');
-					var msg = "Accessed the report at <a href='"+url+"' target='_blank' rel='noopener noreferrer'>here</a> before " + nextDay + ".";					
-					var toast = createToast(msg,"New Sales Report Generated",true);
-					window.open(url);
-				}
-			})
+			}			
+			bootbox.prompt({
+			    title: "Export PDF",
+			    message:"Which report you would like to generate?",
+			    inputType: 'radio',
+			    inputOptions: [{
+			        text: 'Movie Report',
+			        value: '1',
+			    },
+			    {
+			        text: 'Sales Report',
+			        value: '2',
+			    }],
+			    callback: function (result) {
+			    	console.log(result);
+			    	if(result === "1"){
+			    		Notiflix.Loading.Dots('Generating...');		
+						$.ajax("api/manager/generateMovieReport.json", {
+							method : "GET",
+							accepts : "application/json",
+							dataType : "json",
+							data : range,
+							contentType : "application/json; charset=utf-8",
+							headers : {
+								"X-CSRF-Token" : CSRF_TOKEN
+							},
+							statusCode : {
+								400 : function() {
+									window.location.href = "400.htm";
+								},
+								401 : function() {
+									window.location.href = "expire.htm";
+								},
+								403 : function() {
+									window.location.href = "403.htm";
+								},
+								404 : function() {
+									window.location.href = "404.htm";
+								}
+							}
+						}).done(function(data) {				
+							Notiflix.Loading.Remove();		
+							if (data.errorMsg != null) {
+								bootbox.alert(data.errorMsg);
+							} else {
+								var url = data.result;
+								var nextDay = moment(new Date()).add(1,'days').format('DD-MMM-YYYY');
+								var msg = "Accessed the report at <a href='"+url+"' target='_blank' rel='noopener noreferrer'>here</a> before " + nextDay + ".";					
+								var toast = createToast(msg,"New Movie Report Generated",true);
+								window.open(url);
+							}
+						})     
+				        	
+			    	}
+			    	else if(result === "2"){
+			    		Notiflix.Loading.Dots('Generating...');		
+						$.ajax("api/manager/generateSalesReport.json", {
+							method : "GET",
+							accepts : "application/json",
+							dataType : "json",
+							data : range,
+							contentType : "application/json; charset=utf-8",
+							headers : {
+								"X-CSRF-Token" : CSRF_TOKEN
+							},
+							statusCode : {
+								400 : function() {
+									window.location.href = "400.htm";
+								},
+								401 : function() {
+									window.location.href = "expire.htm";
+								},
+								403 : function() {
+									window.location.href = "403.htm";
+								},
+								404 : function() {
+									window.location.href = "404.htm";
+								}
+							}
+						}).done(function(data) {				
+							Notiflix.Loading.Remove();		
+							if (data.errorMsg != null) {
+								bootbox.alert(data.errorMsg);
+							} else {
+								var url = data.result;
+								var nextDay = moment(new Date()).add(1,'days').format('DD-MMM-YYYY');
+								var msg = "Accessed the report at <a href='"+url+"' target='_blank' rel='noopener noreferrer'>here</a> before " + nextDay + ".";					
+								var toast = createToast(msg,"New Sales Report Generated",true);
+								window.open(url);
+							}
+						})     
+				        
+			    	}
+			    	else{
+			    		return;
+			    	}
+			    }
+			});			
 		});
 		
 		function poolColors(a) {

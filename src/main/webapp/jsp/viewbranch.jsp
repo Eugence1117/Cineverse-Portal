@@ -47,7 +47,7 @@
 					<div class="card m-2">
 						<div class="card-header">
 							<span class="card-title">
-								<span class="btn">
+								<span>
 									<span class="fa fa-fw fa-store-alt"></span>
 									<span>${branch.branchName}</span>
 								</span>
