@@ -333,7 +333,7 @@
 						text:'Export as Excel(.xlsx)',
 					   	extend: 'excel',
 						className: 'btn btn-secondary',
-					    exportOptions: {
+					    exportOptions: { 
 					        columns: [ 0, 1, 2, 3, 4]
 					    }
 					},							

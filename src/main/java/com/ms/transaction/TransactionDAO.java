@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 import com.ms.ticket.SalesSummary;
+import com.ms.ticket.TicketSummary;
 
 @Repository
 public class TransactionDAO {
@@ -124,7 +125,7 @@ public class TransactionDAO {
 		return response;
 	}
 	
-	public Map<Boolean,Object> getDailySalesByLastUpdateDate(String start, String end, String branchId){
+	public Map<Boolean,Object> getDailySales(String start, String end, String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT SUM(p.totalPrice) AS grossProfit, CONVERT(date,p.paidOn) AS paymentDate " +
@@ -165,17 +166,55 @@ public class TransactionDAO {
 		return response;
 	}
 	
-	public Map<Boolean,Object> getDailyCompleteTransactionByLastUpdate(String start, String end, String branchId){
+	//Used in HomeService
+		public Map<Boolean,Object> getTransactionSummaryByLastUpdate(String start, String end, String branchId){
+			Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+			try {
+				String query = "SELECT p.seqid, p.paymentStatus FROM masp.payment p " +
+							   "WHERE p.lastUpdate <= ? AND p.lastUpdate >= ? " +
+							   "AND p.seqid in (SELECT t.transactionId from masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleID = s.seqid AND th.seqid = s.theatreId AND th.branchid = ? group by t.transactionId)";			
+							
+				List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId);
+				if(rows.size() > 0) {
+					List<TransactionSummary> transactionList = new ArrayList<TransactionSummary>();
+					for(Map<String,Object> row : rows) {
+						
+						String transactionId = (String)row.get("seqid");
+						int status = (int)row.get("paymentStatus");						
+															
+						TransactionSummary view = new TransactionSummary(transactionId,status);
+						transactionList.add(view);
+					}
+					log.info("Total Ticket retrieve: " + transactionList.size());
+					response.put(true, transactionList);
+				}
+				else {
+					List<TransactionSummary> transactionList = new ArrayList<TransactionSummary>();
+					response.put(true,transactionList);
+				}
+			}
+			catch(CannotGetJdbcConnectionException ce) {
+				log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+				response.put(false, Constant.DATABASE_CONNECTION_LOST);
+			}
+			catch(Exception ex) {
+				log.error("Exception ex:: " + ex.getMessage());
+				response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			}
+			return response;
+		}
+		
+	public Map<Boolean,Object> getDailyPaidTransaction(String start, String end, String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT COUNT(p.seqid) AS transactionCount, CONVERT(date,p.lastUpdate) AS paymentDate " +
+			String query = "SELECT COUNT(p.seqid) AS transactionCount, CONVERT(date,p.paidOn) AS paymentDate " +
 						   "FROM masp.payment p " +
-					       "WHERE p.seqid in (select p.seqid from masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleId = s.seqid AND t.transactionId = p.seqid AND p.lastUpdate <= ? AND p.lastUpdate >=  ? AND th.seqid = s.theatreId AND th.branchid = ? group by p.seqid) AND p.paymentStatus = ? " +
-					       "GROUP BY CONVERT(date,p.lastUpdate) ORDER BY CONVERT(date,p.lastUpdate)";
+					       "WHERE p.seqid in (select p.seqid from masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th where t.scheduleId = s.seqid AND t.transactionId = p.seqid AND p.paidOn <= ? AND p.paidOn >=  ? AND th.seqid = s.theatreId AND th.branchid = ? group by p.seqid) AND (p.paymentStatus = ? OR p.paymentStatus = ?) " +
+					       "GROUP BY CONVERT(date,p.paidOn) ORDER BY CONVERT(date,p.paidOn)";
 					
-			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_COMPLETED_STATUS_CODE);
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_COMPLETED_STATUS_CODE,Constant.PAYMENT_PAID_STATUS_CODE);
 			if(rows.size() > 0) {
-				List<TransactionSummary> transactions = new ArrayList<TransactionSummary>();
+				List<DailyTransaction> transactions = new ArrayList<DailyTransaction>();
 				for(Map<String,Object> row : rows) {
 					
 					int count = (int)row.get("transactionCount");
@@ -184,14 +223,14 @@ public class TransactionDAO {
 					Calendar dateTime = Calendar.getInstance();
 					dateTime.setTime(date);
 					
-					TransactionSummary view = new TransactionSummary(date,count);
+					DailyTransaction view = new DailyTransaction(date,count);
 					transactions.add(view);
 				}
 				log.info("Sales size: " + transactions.size());
 				response.put(true, transactions);
 			}
 			else {
-				List<TransactionSummary> sales = new ArrayList<TransactionSummary>();
+				List<DailyTransaction> sales = new ArrayList<DailyTransaction>();
 				response.put(true,sales);
 			}
 		}
@@ -216,7 +255,7 @@ public class TransactionDAO {
 					
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,Constant.PAYMENT_COMPLETED_STATUS_CODE);
 			if(rows.size() > 0) {
-				List<TransactionSummary> transactions = new ArrayList<TransactionSummary>();
+				List<DailyTransaction> transactions = new ArrayList<DailyTransaction>();
 				for(Map<String,Object> row : rows) {
 					
 					int count = (int)row.get("transactionCount");
@@ -225,14 +264,14 @@ public class TransactionDAO {
 					Calendar dateTime = Calendar.getInstance();
 					dateTime.setTime(date);
 					
-					TransactionSummary view = new TransactionSummary(date,count);
+					DailyTransaction view = new DailyTransaction(date,count);
 					transactions.add(view);
 				}
 				log.info("Sales size: " + transactions.size());
 				response.put(true, transactions);
 			}
 			else {
-				List<TransactionSummary> sales = new ArrayList<TransactionSummary>();
+				List<DailyTransaction> sales = new ArrayList<DailyTransaction>();
 				response.put(true,sales);
 			}
 		}

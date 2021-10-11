@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TransactionSummary {
-	private String seqid;
-	private int transactionStatus;
+public class DailyTransaction {
+	private Date date;
+	private int transactionCount;
 }

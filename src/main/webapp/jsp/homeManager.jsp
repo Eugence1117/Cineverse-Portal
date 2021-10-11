@@ -112,10 +112,10 @@
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
 												<div
-													class="text-xs font-weight-bold text-warning text-uppercase mb-1">Ticket
+													class="text-xs font-weight-bold text-warning text-uppercase mb-1">Transaction
 													Pending Refund</div>
 												<div class="h5 mb-0 font-weight-bold text-gray-800"
-													id="ticketWaitRefund"></div>
+													id="transacWaitRefund"></div>
 											</div>
 											<div class="col-auto">
 												<i class="fas fa-pause-circle fa-2x text-gray-300"></i>
@@ -130,10 +130,10 @@
 										<div class="row no-gutters align-items-center">
 											<div class="col mr-2">
 												<div
-													class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ticket
+													class="text-xs font-weight-bold text-danger text-uppercase mb-1">Transaction
 													Cancelled</div>
 												<div class="h5 mb-0 font-weight-bold text-gray-800"
-													id="ticketCancelled"></div>
+													id="transacCancelled"></div>
 											</div>
 											<div class="col-auto">
 												<i class="fas fa-ban fa-2x text-gray-300"></i>
@@ -351,8 +351,9 @@
 				}
 				else{					
 					setupRevenueField(data.revenue);
-					setupTicketField(data.ticketSum)
 					setupTransactionField(data.transacSum);
+					setupTicketField(data.ticketSum);					
+					setupTransactionSoldField(data.transacSold);
 					setupEarningGraph(data.earningSum);
 					setupMoviePopularityChart(data.moviePopularity);
 					if(isFirstTime){
@@ -373,8 +374,9 @@
     			hideLoading();
     			var data = JSON.parse(cookieValue);
     			setupRevenueField(data.revenue);
-				setupTicketField(data.ticketSum)
 				setupTransactionField(data.transacSum);
+				setupTicketField(data.ticketSum);					
+				setupTransactionSoldField(data.transacSold);
 				setupEarningGraph(data.earningSum);
 				setupMoviePopularityChart(data.moviePopularity);
 				if(isFirstTime){
@@ -418,27 +420,30 @@
     		})
     	}
     	
-    	function setupTransactionField(data){
+    	function setupTransactionSoldField(data){
     		$("#transactionCompleted").fadeOut(400,function(){
     			$("#transactionCompleted").text(data.errorMsg != null ? data.errorMsg : data.result);	
     			$("#transactionCompleted").fadeIn();
     		})    		   
     	}
     	
-    	function setupTicketField(data){ 	
+    	function setupTicketField(data){
     		$("#ticketOrdered").fadeOut(400,function(){
     			$("#ticketOrdered").text(data.errorMsg != null ? data.errorMsg : data.result.sumTicket);    		
     			$("#ticketOrdered").fadeIn();
-    		})
-    		$("#ticketWaitRefund").fadeOut(400,function(){
-    			$("#ticketWaitRefund").text(data.errorMsg != null ? data.errorMsg : data.result.pendingTicket);
-    			$("#ticketWaitRefund").fadeIn();
+    		})	
+    	}
+    	
+    	function setupTransactionField(data){
+    		$("#transacWaitRefund").fadeOut(400,function(){
+    			$("#transacWaitRefund").text(data.errorMsg != null ? data.errorMsg : data.result.pendingTransaction);
+    			$("#transacWaitRefund").fadeIn();
     		})
     		
-    		$("#ticketCancelled").fadeOut(400,function(){
-    			$("#ticketCancelled").text(data.errorMsg != null ? data.errorMsg : data.result.cancelledTicket);
-    			$("#ticketCancelled").fadeIn();
-    		})    		    		    		    		
+    		$("#transacCancelled").fadeOut(400,function(){
+    			$("#transacCancelled").text(data.errorMsg != null ? data.errorMsg : data.result.cancelledTransaction);
+    			$("#transacCancelled").fadeIn();
+    		})    	
     	}
     	
     	var earningGraph = null;

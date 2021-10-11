@@ -171,9 +171,8 @@ public class TicketDAO {
 		return response;
 	}
 	
-	
 	//Used in HomeService
-	public Map<Boolean,Object> getTicketByLastUpdateDate(String start, String end,String branchId){
+	public Map<Boolean,Object> getTicketByLastUpdate(String start, String end,String branchId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
 			String query = "SELECT t.seqid, p.paymentStatus, t.scheduleId, s.movieId " +

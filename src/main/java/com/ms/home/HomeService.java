@@ -25,6 +25,7 @@ import com.ms.ticket.MovieSummary;
 import com.ms.ticket.SalesSummary;
 import com.ms.ticket.TicketDAO;
 import com.ms.ticket.TicketSummary;
+import com.ms.transaction.DailyTransaction;
 import com.ms.transaction.TransactionDAO;
 import com.ms.transaction.TransactionSummary;
 
@@ -84,7 +85,7 @@ public class HomeService {
 			if (transacSum.containsKey(false)) {
 				response.put("transacSum", new Response("Error"));					
 			} else {
-				List<TransactionSummary> summaryData = (List<TransactionSummary>) transacSum.get(true);					
+				List<DailyTransaction> summaryData = (List<DailyTransaction>) transacSum.get(true);					
 				if(summaryData.size() == 0) {
 					response.put("transacSum",new Response((Object)"0"));
 				}
@@ -185,7 +186,7 @@ public class HomeService {
 				String endDate = Constant.SQL_DATE_WITHOUT_TIME.format(new Date()) + Constant.END_OF_DAY;
 				
 				//Get Today Revenue
-				Map<Boolean,Object> revenue = transacDao.getDailySalesByLastUpdateDate(startDate, endDate, branchId);
+				Map<Boolean,Object> revenue = transacDao.getDailySales(startDate, endDate, branchId);
 				if(revenue.containsKey(false)) {
 					response.put("revenue",new Response("Error"));
 				}
@@ -200,23 +201,33 @@ public class HomeService {
 					}					
 				}
 				
-				//Get Transaction Summary
-				Map<Boolean,Object> transacSum = transacDao.getDailyCompleteTransactionByLastUpdate(startDate, endDate, branchId);
+				//Get Transaction Sold
+				Map<Boolean,Object> transacSold = transacDao.getDailyPaidTransaction(startDate, endDate, branchId);
+				if (transacSold.containsKey(false)) {
+					response.put("transacSold", new Response("Error"));					
+				} else {
+					@SuppressWarnings("unchecked")
+					List<DailyTransaction> summaryData = (List<DailyTransaction>) transacSold.get(true);					
+					if(summaryData.size() == 0) {
+						response.put("transacSold",new Response((Object)"0"));
+					}
+					else {
+						response.put("transacSold",new Response((Object)(String.valueOf(summaryData.get(0).getTransactionCount()))));
+					}						
+				}
+				
+				//GET Transaction Summary
+				Map<Boolean,Object> transacSum = transacDao.getTransactionSummaryByLastUpdate(startDate, endDate, branchId);
 				if (transacSum.containsKey(false)) {
 					response.put("transacSum", new Response("Error"));					
 				} else {
 					@SuppressWarnings("unchecked")
-					List<TransactionSummary> summaryData = (List<TransactionSummary>) transacSum.get(true);					
-					if(summaryData.size() == 0) {
-						response.put("transacSum",new Response((Object)"0"));
-					}
-					else {
-						response.put("transacSum",new Response((Object)(String.valueOf(summaryData.get(0).getTransactionCount()))));
-					}						
+					List<TransactionSummary> summaryData = (List<TransactionSummary>) transacSum.get(true);
+					response.put("transacSum",new Response(processTransactionSummary(summaryData)));						
 				}
 												
 				//Get Ticket Summary
-				Map<Boolean, Object> ticketSum = ticketDao.getTicketByLastUpdateDate(startDate,endDate,branchId);
+				Map<Boolean, Object> ticketSum = ticketDao.getTicketByLastUpdate(startDate,endDate,branchId);
 				if (ticketSum.containsKey(false)) {
 					response.put("ticketSum", new Response("Error"));					
 				} else {
@@ -224,6 +235,9 @@ public class HomeService {
 					List<TicketSummary> summaryData = (List<TicketSummary>) ticketSum.get(true);					
 					response.put("ticketSum",new Response(processTicketSummary(summaryData)));					
 				}
+				
+				//Get Transaction Summary
+				
 				
 				//Get Earning Overview
 				Calendar currentDate = Calendar.getInstance();
@@ -325,6 +339,35 @@ public class HomeService {
 	
 	private String getMonth(int month) {
 	    return new DateFormatSymbols().getMonths()[month];
+	}
+	
+	private Map<String,Integer> processTransactionSummary(List<TransactionSummary> summaryData){
+		Map<String, Integer> sumOfData = new LinkedHashMap<String, Integer>();
+		for (TransactionSummary data : summaryData) {
+			String key = "";
+			switch (data.getTransactionStatus()) {
+			case Constant.PAYMENT_PENDING_REFUND_STATUS_CODE:{
+				key = "pendingTransaction";
+				break;
+			}
+			case Constant.PAYMENT_CANCELLED_STATUS_CODE: {
+				key = "cancelledTransaction";
+				break;
+			}
+			}
+
+			if (key != "") {
+				if (sumOfData.containsKey(key)) {
+					sumOfData.put(key, sumOfData.get(key) + 1);
+				} else {
+					sumOfData.put(key, 1);
+				}
+			}
+		}				
+		sumOfData.putIfAbsent("pendingTransaction", 0);
+		sumOfData.putIfAbsent("cancelledTransaction", 0);				
+		
+		return sumOfData;
 	}
 	
 	private Map<String,Integer> processTicketSummary(List<TicketSummary> summaryData){
