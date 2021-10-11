@@ -233,6 +233,9 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.buttons.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jszip.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/buttons.html5.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	
 	<script type="text/javascript">
@@ -300,12 +303,40 @@
 			return $('#branchInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'seqid', 'width':'10%',render:function(data,type,row){return data.length > 10 ? data.substr(0,6) + '.....' : data}},
+					{ data: 'seqid', 'width':'10%'},
 					{ data: 'branchName','width':'30%'},
 		   			{ data: 'stateName','width':'20%'},
 		   			{ data: 'districtName','width':'20%'},
 		   			{ data: 'status','width':'7%'},
 		   			{ data: 'action','width':'13%'}
+				],
+				dom:"<'row'<'col-md-6'l><'col-md-6'f>>" +				 	
+			 	"<'row'<'col-md-12't>><'row'<'col-md-12'i>><'row py-2'<'col-md-6'B><'col-md-6'p>>",		
+				buttons: [
+					{
+						text:'Copy to clipboard',
+						extend: 'copy',
+		    		 	className: 'btn btn-primary',
+		             	exportOptions: {
+  		             		columns: [ 0, 1, 2, 3, 4]
+				     	}
+				    },
+				    {
+					   	text:'Export as CSV(.csv)',
+					   	extend: 'csv',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					       columns: [ 0, 1, 2, 3, 4]
+					    }
+					},	
+				    {
+						text:'Export as Excel(.xlsx)',
+					   	extend: 'excel',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					        columns: [ 0, 1, 2, 3, 4]
+					    }
+					},							
 				],
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],

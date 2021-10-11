@@ -187,8 +187,11 @@
 	<script type="text/javascript" src="<spring:url value='/plugins/JBox/JBox.all.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/momentjs/moment.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.buttons.js'/>"></script>	
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/date-de.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jszip.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/datatables/buttons.html5.min.js'/>"></script>	
 	<script type="text/javascript">
 		var CSRF_TOKEN = $("meta[name='_csrf']").attr("content");
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
@@ -241,13 +244,41 @@
 			return $('#movieInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'movieId','width':'25%',render:function(data,type,row){return data.length > 30 ? data.substr(0,25) + '.....' : data}},
+					{ data: 'movieId','width':'25%'},
 					{ data: 'movieName','width':'31%',render:function(data,type,row){return data = '<a class="movieRedirect" href="#" id="' + encodeURIComponent(data) + '">' + data + '</a>'}},
 		   			{ data: 'startDate','width':'12%',type:'de_date',targets:0},
 		   			{ data: 'endDate','width':'12%',type:'de_date',targets:0},
 		   			{ data: 'status','width':'8%'},
 		   			{ data: 'action','width':'12%'}
 				],
+				dom:"<'row'<'col-md-6'l><'col-md-6'f>>" +				 	
+			 	"<'row'<'col-md-12't>><'row'<'col-md-12'i>><'row py-2'<'col-md-6'B><'col-md-6'p>>",				
+				buttons: [
+					{
+						text:'Copy to clipboard',
+						extend: 'copy',
+		    		 	className: 'btn btn-primary',
+		             	exportOptions: {
+  		             		columns: [ 0, 1, 2, 3, 4]
+				     	}
+				    },
+				    {
+					   	text:'Export as CSV(.csv)',
+					   	extend: 'csv',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					       columns: [ 0, 1, 2, 3, 4]
+					    }
+					},	
+				    {
+						text:'Export as Excel(.xlsx)',
+					   	extend: 'excel',
+						className: 'btn btn-secondary',
+					    exportOptions: {
+					        columns: [ 0, 1, 2, 3, 4]
+					    }
+					},							
+				],		   
 				order: [], 
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				retrieve: true,
