@@ -303,12 +303,12 @@
 			return $('#branchInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'seqid', 'width':'10%'},
+					{ data: 'seqid', 'width':'18%'},
 					{ data: 'branchName','width':'30%'},
 		   			{ data: 'stateName','width':'20%'},
-		   			{ data: 'districtName','width':'20%'},
+		   			{ data: 'districtName','width':'15%'},
 		   			{ data: 'status','width':'7%'},
-		   			{ data: 'action','width':'13%'}
+		   			{ data: 'action','width':'10%'}
 				],
 				dom:"<'row'<'col-md-6'l><'col-md-6'f>>" +				 	
 			 	"<'row'<'col-md-12't>><'row'<'col-md-12'i>><'row py-2'<'col-md-6'B><'col-md-6'p>>",		
@@ -319,7 +319,7 @@
 		    		 	className: 'btn btn-primary',
 		             	exportOptions: {
   		             		columns: [ 0, 1, 2, 3, 4]
-				     	}
+				     	},
 				    },
 				    {
 					   	text:'Export as CSV(.csv)',
