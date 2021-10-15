@@ -10,7 +10,6 @@ import lombok.Setter;
 public class Member {
 	private String seqid;
 	private String name;
-	private String ic;
 	private String dateOfBirth;
 	private String status;
 	private String email;

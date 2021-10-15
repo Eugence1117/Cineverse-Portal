@@ -4,8 +4,8 @@ public class MemberView extends Member{
 
 	private String username;
 	
-	public MemberView(String seqid, String name, String ic, String dateOfBirth, String status, String email, String username) {
-		super(seqid, name, ic, dateOfBirth, status, email);
+	public MemberView(String seqid, String name, String dateOfBirth, String status, String email, String username) {
+		super(seqid, name, dateOfBirth, status, email);
 		this.username = username;
 	}
 

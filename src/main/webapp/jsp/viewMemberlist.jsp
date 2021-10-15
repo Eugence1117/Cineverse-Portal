@@ -47,8 +47,7 @@
 									<thead>
 										<tr>
 											<th>Member ID</th>
-											<th>Name</th>
-											<th>IC Number</th>
+											<th>Name</th>											
 											<th>Birth Date</th>
 											<th>Email</th>
 											<th>Status</th>
@@ -100,11 +99,6 @@
 						<label class="col-md-4"><b>Username</b></label> <label
 							class="col-md-1 colon">:</label>
 						<p class="d-inline data col-md-6" data-json-key="username"></p>
-					</div>
-					<div class="row placeholder-glow my-2">
-						<label class="col-md-4"><b>IC Number</b></label> <label
-							class="col-md-1 colon">:</label>
-						<p class="d-inline data col-md-6" data-json-key="ic"></p>
 					</div>
 					<div class="row placeholder-glow my-2">
 						<label class="col-md-4"><b>Birth Date</b></label> <label
@@ -201,12 +195,11 @@
 			return $('#memberInfo').DataTable({
 				//autowidth:false,
 				columns: [
-					{ data: 'seqid', 'width':'15%'},
-					{ data: 'name','width':'20%'},
-		   			{ data: 'ic','width':'15%'},
-		   			{ data: 'dateOfBirth','width':'13%'},
+					{ data: 'seqid', 'width':'25%'},
+					{ data: 'name','width':'20%'},		   			
+		   			{ data: 'dateOfBirth','width':'15%'},
 		   			{ data: 'email','width':'20%'},
-		   			{ data: 'status','width':'7%'},
+		   			{ data: 'status','width':'10%'},
 		   			{ data: 'action','width':'10%'}
 				],
 				dom:"<'row'<'col-md-6'l><'col-md-6'f>>" +				 	

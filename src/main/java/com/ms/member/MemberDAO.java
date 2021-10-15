@@ -38,21 +38,20 @@ public class MemberDAO {
 	public Map<Boolean,Object> retriveMembersData(){
 		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try { 
-			String query = "SELECT seqid, name, ic, dateofbirth, email, status FROM masp.member";			
+			String query = "SELECT seqid, name, dateofbirth, email, status FROM masp.member";			
 			List<Map<String,Object>> records = jdbc.queryForList(query);
 			
 			if(records.size() > 0) {
 				List<Member> dataList = new ArrayList<Member>();
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));
-					String name = Util.trimString((String)record.get("name"));
-					String ic = Util.trimString((String)record.get("ic"));
+					String name = Util.trimString((String)record.get("name"));					
 					String email = Util.trimString((String)record.get("email"));
 					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)record.get("dateOfBirth"));
 					int status = (int)record.get("status");
 					
 					
-					Member data = new Member(seqid,name,ic,birthdate,Util.getStatusDesc(status),email);
+					Member data = new Member(seqid,name,birthdate,Util.getStatusDesc(status),email);
 					dataList.add(data);
 				}
 				log.info("Total of " + dataList.size() + " member(s) is retrieved.");
@@ -159,21 +158,20 @@ public class MemberDAO {
 	public Map<Boolean,Object> retrieveMemberDetails(String memberId){
 		Map<Boolean,Object> result = new LinkedHashMap<Boolean, Object>();
 		try { 
-			String query = "SELECT seqid, name, ic, dateofbirth, email, status, username FROM masp.member where seqid = ?";			
+			String query = "SELECT seqid, name, dateofbirth, email, status, username FROM masp.member where seqid = ?";			
 			List<Map<String,Object>> records = jdbc.queryForList(query,memberId);
 			
 			if(records.size() > 0) {				
 				for(Map<String,Object> record : records) {
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String name = Util.trimString((String)record.get("name"));
-					String ic = Util.trimString((String)record.get("ic"));
 					String email = Util.trimString((String)record.get("email"));
 					String username = Util.trimString((String)record.get("username"));
 					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)record.get("dateOfBirth"));
 					int status = (int)record.get("status");
 					
 					
-					MemberView data = new MemberView(seqid,name,ic,birthdate,Util.getStatusDesc(status),email,username);
+					MemberView data = new MemberView(seqid,name,birthdate,Util.getStatusDesc(status),email,username);
 					result.put(true, data);
 				}				
 			}

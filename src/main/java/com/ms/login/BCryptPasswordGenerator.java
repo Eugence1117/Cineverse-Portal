@@ -1,5 +1,6 @@
 package com.ms.login;
 
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -16,7 +17,7 @@ public class BCryptPasswordGenerator {
 		
 		//System.out.println("Format :" + getFileFormat("https://cineversefiles.blob.core.windows.net/profilepic/3822675f-17e1-4ea4-bca1-72a371664946.gif"));
 		
-		System.out.println(UUID.randomUUID().toString());
+		//System.out.println(UUID.fromString().toString());
 		String rawPassword;
 		if (args.length >= 1) {
 			rawPassword = args[0];
