@@ -469,8 +469,8 @@ public class ScheduleService {
 	}
 
 	public List<Schedule> createSchedule(List<Configuration> configs, int theatreCount, OperatingHours operatingHours) {
-		log.info("Generate Schedule Progress Report: Total Movie = " + configs.size());
 
+		String currentDate = Constant.UI_DATE_FORMAT.format(new Date());
 		int operatingMinutes = calculateOperatingTimeInMinute(operatingHours);
 		//OperatingHours operatingHours = rulesService.getOperatingHours((String) session.getAttribute("branchid"));
 		
@@ -710,6 +710,7 @@ public class ScheduleService {
 								// Update the date
 								for (Schedule s : solution) {
 									for (LocalDate date : scheduleDateList) {
+										String scheduleId = date + "-" + s.getScheduleId();
 										if (s.getStartTime() != null) {
 											Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 											
@@ -718,12 +719,12 @@ public class ScheduleService {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
-											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+											eventList.add(new Event(scheduleId, s.getMovie().getMovieName(),
 													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 											
 				
 										} else {
-											pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
+											pendingEvent.add(new EmptyEvent(scheduleId,s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 											UnprocessedProblemCount++;
 										}
 									}
@@ -923,6 +924,7 @@ public class ScheduleService {
 									// Update the date
 									for (Schedule s : solution) {
 										for (LocalDate date : scheduleDateList) {
+											String scheduleId = date + "-" + s.getScheduleId();
 											if (s.getStartTime() != null) {
 												Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 												
@@ -931,12 +933,12 @@ public class ScheduleService {
 													nextDate = nextDate.plusDays(1);
 												}
 												Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
-												eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+												eventList.add(new Event(scheduleId, s.getMovie().getMovieName(),
 														s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 												
 					
 											} else {
-												pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
+												pendingEvent.add(new EmptyEvent(scheduleId,s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 												UnprocessedProblemCount++;
 											}
 										}
@@ -1109,6 +1111,7 @@ public class ScheduleService {
 									// Update the date
 								for (Schedule s : solution) {
 									for (LocalDate date : scheduleDateList) {
+										String scheduleId = date + "-" + s.getScheduleId();
 										if (s.getStartTime() != null) {
 											Date startTime = Constant.SQL_DATE_FORMAT.parse(date + " " + s.getStartTime().getTime() + ":00");
 											
@@ -1117,10 +1120,10 @@ public class ScheduleService {
 												nextDate = nextDate.plusDays(1);
 											}
 											Date endTime = Constant.SQL_DATE_FORMAT.parse(nextDate + " " + s.getEndTime() + ":00");
-											eventList.add(new Event(s.getScheduleId(), s.getMovie().getMovieName(),
+											eventList.add(new Event(scheduleId, s.getMovie().getMovieName(),
 													s.getTheatre().getTheatreId(), f.format(startTime), f.format(endTime),new String[]{"movieEvent"},s.getMovie().getMovieId()));
 										} else {
-											pendingEvent.add(new EmptyEvent(s.getScheduleId(),s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
+											pendingEvent.add(new EmptyEvent(scheduleId,s.getMovie().getMovieName(),s.getMovie().getTotalTime()));
 											UnprocessedProblemCount++;
 										}
 									}
