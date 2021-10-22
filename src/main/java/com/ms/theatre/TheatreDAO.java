@@ -321,10 +321,16 @@ public class TheatreDAO {
 			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchid);
 			
 			Map<String, Object> result = jdbcCall.execute(in);
-			
-			int code = (int)result.get("name");
-			name = (char) code;
-			
+
+			if(result.get("name") == null){
+				int code = 65;
+				name = (char)code;
+			}
+			else{
+				int code = (int)result.get("name");
+				name = (char) code;
+			}
+
 			return name;
 		}
 		catch(CannotGetJdbcConnectionException ce) {

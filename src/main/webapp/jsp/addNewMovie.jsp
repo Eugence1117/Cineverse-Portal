@@ -438,16 +438,6 @@
 				else{
 					error.insertAfter(element);
 				}
-				
-				/*   if (element.parent('col-md-10').length) {
-				      error.insertAfter(element.parent());
-				  }
-				  else if(element.prop('type') === 'file'){
-				  	error.insertAfter(element.next());
-				  }
-				  else {
-				      error.insertAfter(element);
-				  } */
 			}
 		});
 		
