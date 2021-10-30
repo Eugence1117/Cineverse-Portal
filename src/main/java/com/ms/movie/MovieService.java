@@ -208,7 +208,7 @@ public class MovieService {
 		}
 	}
 	
-	public List<Map<String,String>> getMovieName(String username){
+	public List<Map<String,String>> getMovieName(String branchId){
 		log.info("Movie:Retrieveing Movie Name from database");
 		Calendar previousCal = Calendar.getInstance();
 		previousCal.setTime(new Date());
@@ -222,7 +222,7 @@ public class MovieService {
 		
 		log.info("Retrieving Movie List within " + minDate + " to " + maxDate);
 		List<Map<String,String>> result = dao.getMovieNameList(minDate,maxDate);
-		List<String> extMovie = dao.getExistMovieList(username);
+		List<String> extMovie = dao.getExistMovieList(branchId);
 		if(result == null || result.size() == 0) {
 			log.info("Movie:No record retrieve from database");
 			return null;

@@ -365,7 +365,6 @@
 				headers:{
 					"X-CSRF-Token": CSRF_TOKEN
 				},
-				async: false,
 				statusCode:{
 					400:function(){
 						window.location.href = "400.htm";
@@ -389,8 +388,9 @@
 				}
 				else{
 					var toast = createToast(data.result,"An attempt to create movie <b>Success</b>",true);
-					
+
 					form.reset();
+					$("#btnReset").click();
 				}	
 			});
 		});

@@ -93,7 +93,9 @@ public class TransactionDAO {
 				for(Map<String,Object> row : rows) {
 					
 					double profit = (double)row.get("revenue");
+					log.info("Revenue " + profit);
 					int month = (int)row.get("month");
+					log.info("Month " + month);
 					
 					Calendar currentDay = Calendar.getInstance();
 					currentDay.setTime(new Date());
@@ -120,6 +122,7 @@ public class TransactionDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
+			log.error(Util.getDetailExceptionMsg(ex));
 			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
 		}
 		return response;

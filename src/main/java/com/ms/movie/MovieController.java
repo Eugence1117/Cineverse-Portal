@@ -58,7 +58,7 @@ public class MovieController {
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		int usergroupid = user.getUserGroup().getId();
-		String username = user.getUsername();
+		//String username = user.getUsername();
 		
 		model.addAttribute("usergroup",usergroupid);
 		if(usergroupid == Constant.ADMIN_GROUP) {
@@ -74,12 +74,14 @@ public class MovieController {
 			return "addNewMovie";
 		}
 		else {
-			List<Map<String,String>> movieList = new ArrayList<Map<String,String>>();
+			String branchId = user.getBranchid();
+
+			List<Map<String,String>> movieList = service.getMovieName(branchId);
 			if(movieList == null || movieList.size() == 0) {
 				model.addAttribute("error","No movie is available at this moment.");
 			}
 			else {
-				model.addAttribute("exMovieList", service.getMovieName(username));
+				model.addAttribute("exMovieList", movieList);
 			}
 			return "addMovieToBranch";
 		}

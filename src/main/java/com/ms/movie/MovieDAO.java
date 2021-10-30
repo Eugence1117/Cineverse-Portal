@@ -112,13 +112,13 @@ public class MovieDAO {
 	}
 	
 	//Backend used
-	public List<String> getExistMovieList(String username){
+	public List<String> getExistMovieList(String branchId){
 		List<String> result = null;
 		try {
-			StringBuffer query = new StringBuffer().append("SELECT m.movieId FROM masp.movieavailable m, masp.staff s, masp.branch b WHERE s.username = ? ")
-												   .append("AND s.branchid = b.seqid AND m.branchID = b.seqid");
+			StringBuffer query = new StringBuffer().append("SELECT m.movieId FROM masp.movieavailable m, masp.branch b WHERE b.seqid = ? ")
+												   .append("AND m.branchID = b.seqid");
 			
-			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),username);
+			List<Map<String,Object>> rows = jdbc.queryForList(query.toString(),branchId);
 			if(rows.size() > 0) {
 				result = new ArrayList<String>();
 				for(Map<String,Object> row: rows) {
