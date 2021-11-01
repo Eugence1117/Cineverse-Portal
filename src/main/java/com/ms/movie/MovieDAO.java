@@ -68,7 +68,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return result;
@@ -104,7 +104,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return result;
@@ -178,7 +178,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+			return new Response(Constant.UNKNOWN_ERROR_occurred);
 		}
 	}
 	
@@ -224,7 +224,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -272,7 +272,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -343,7 +343,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -389,7 +389,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -454,7 +454,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception :: " + ex.getMessage());
-			return new AvailableMovie.resultList("Unexpected error occured, please try again later.");
+			return new AvailableMovie.resultList("Unexpected error occurred, please try again later.");
 		}
 	}
 	
@@ -494,7 +494,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -532,7 +532,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}	
@@ -554,7 +554,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -591,7 +591,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -612,7 +612,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -637,7 +637,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -662,7 +662,7 @@ public class MovieDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	

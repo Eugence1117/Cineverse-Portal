@@ -259,7 +259,6 @@
 		})
 		
 		function clearModalData(){
-    		$("#seatLayout").html("");
     		$("#theatreForm .data").each(function(){
     			$(this).val("");
     		})
@@ -333,7 +332,8 @@
 				firstLetter += 1;
 			}
 			html +="</div>";
-			$("#seatLayout").append(html);
+			//$("#seatLayout").append(html);
+			$("#seatLayout").html(html);
     	}
 	</script>
 </body>

@@ -69,7 +69,7 @@ public class MemberDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -112,7 +112,7 @@ public class MemberDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -150,7 +150,7 @@ public class MemberDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -186,7 +186,7 @@ public class MemberDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage() + " | " + Util.getDetailExceptionMsg(ex));			
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -210,7 +210,7 @@ public class MemberDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 }

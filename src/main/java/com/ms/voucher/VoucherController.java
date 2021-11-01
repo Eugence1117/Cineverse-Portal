@@ -68,7 +68,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 		
 	}
@@ -97,7 +97,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 		
 	}
@@ -112,7 +112,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 		
 	}
@@ -166,7 +166,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 	}
 	
@@ -184,7 +184,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 	}
 	
@@ -205,7 +205,7 @@ public class VoucherController {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unable to proceed the request because of the occurance of the server error. This might occured due to the data received by the server is incomplete.");
+			return new Response("Unable to proceed the request because of the occurance of the server error. This might occurred due to the data received by the server is incomplete.");
 		}
 	}
 	*/

@@ -58,7 +58,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -93,7 +93,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -122,7 +122,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -146,7 +146,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -170,7 +170,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -218,7 +218,7 @@ public class AnnouncementDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;

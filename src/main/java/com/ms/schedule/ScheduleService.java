@@ -160,7 +160,7 @@ public class ScheduleService {
 	
 	public Response getInfluenceTicket(String scheduleId) {
 		if(Util.trimString(scheduleId) == "") {
-			return new Response("Unable to locate the schedule you specified. This may occured due the the data submitted to server is empty. Please contact with developer for asistance.");
+			return new Response("Unable to locate the schedule you specified. This may occurred due the the data submitted to server is empty. Please contact with developer for asistance.");
 		}
 		else {
 			Map<Boolean,Object> result = dao.getTicketByScheduleId(scheduleId);
@@ -176,7 +176,7 @@ public class ScheduleService {
 	@Transactional(rollbackFor = Exception.class)
 	public Response cancelSchedule(String scheduleId) {
 		if(Util.trimString(scheduleId) == "") {
-			return new Response("Unable to locate the schedule you specified. This may occured due the the data submitted to server is empty. Please contact with developer for asistance.");
+			return new Response("Unable to locate the schedule you specified. This may occurred due the the data submitted to server is empty. Please contact with developer for asistance.");
 		}
 		else {
 			String res = dao.updateScheduleStatus(scheduleId);
@@ -185,7 +185,7 @@ public class ScheduleService {
 			}
 			else {
 				//UPDATE ALL THE TICKET WITH SAME SCHEDULE ID
-				//iF PROBLEM OCCURED THROW NEW RUNTIMEEXCEPTION
+				//iF PROBLEM occurred THROW NEW RUNTIMEEXCEPTION
 				return new Response((Object)("The schedule with ID " + scheduleId + " is being removed. A refund will be initialize to the ticket that is under this schedule."));
 			}
 		}
@@ -294,7 +294,7 @@ public class ScheduleService {
 		} catch (ParseException pe) {
 			return new AvailableMovie("Invalid date detected.");
 		} catch (Exception ex) {
-			return new AvailableMovie("Unexpected error occured, please try again later.");
+			return new AvailableMovie("Unexpected error occurred, please try again later.");
 		}
 	}
 
@@ -362,7 +362,7 @@ public class ScheduleService {
 
 			} catch (Exception ex) {
 				log.error("Exception ex::" + ex.getMessage());
-				return new AvailableMovie("Unexpected error occured.");
+				return new AvailableMovie("Unexpected error occurred.");
 			}
 
 		}
@@ -393,7 +393,7 @@ public class ScheduleService {
 				}
 			} catch (Exception ex) {
 				log.error("Exception ex::" + ex.getMessage());
-				return new AvailableMovie("Unexpected error occured.");
+				return new AvailableMovie("Unexpected error occurred.");
 			}
 		}
 	}
@@ -788,7 +788,7 @@ public class ScheduleService {
 		} catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
 			response = new LinkedHashMap<String, String>();
-			response.put("error", "Unexpected error occured, please try again later.");
+			response.put("error", "Unexpected error occurred, please try again later.");
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			ex.printStackTrace(printWriter);
@@ -993,7 +993,7 @@ public class ScheduleService {
 					
 		}catch(Exception ex){
 			response = new LinkedHashMap<String, String>();
-			response.put("error", "Unexpected error occured, please try again later.");
+			response.put("error", "Unexpected error occurred, please try again later.");
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			ex.printStackTrace(printWriter);
@@ -1176,7 +1176,7 @@ public class ScheduleService {
 		}
 		catch(Exception ex) {
 			response = new LinkedHashMap<String, String>();
-			response.put("error", "Unexpected error occured, please try again later.");
+			response.put("error", "Unexpected error occurred, please try again later.");
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			ex.printStackTrace(printWriter);
@@ -1516,7 +1516,7 @@ public class ScheduleService {
 			ex.printStackTrace(printWriter);
 			printWriter.flush();
 			log.error(writer.toString());
-			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+			return new Response(Constant.UNKNOWN_ERROR_occurred);
 		}
 	}
 	
@@ -1589,7 +1589,7 @@ public class ScheduleService {
 			}
 			catch(Exception ex) {
 				log.error("Exception ex" + ex.getMessage());
-				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+				return new Response(Constant.UNKNOWN_ERROR_occurred);
 			}
 			
 		}

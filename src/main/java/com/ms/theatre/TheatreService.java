@@ -74,7 +74,7 @@ public class TheatreService {
 			}
 			catch(Exception ex) {
 				log.error("Exception ex:" + ex.getMessage());
-				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+				return new Response(Constant.UNKNOWN_ERROR_occurred);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class TheatreService {
 			}
 		}
 		catch(Exception ex){
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response("Unexpected error occurred. Please try again later.");
 		}
 		
 	}
@@ -219,7 +219,26 @@ public class TheatreService {
 			return new Response("Unable to get required data from client's request.");
 		}
 		catch(Exception ex) {
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response("Unexpected error occurred. Please try again later.");
+		}
+	}
+
+	public Response updateTheatreType(TheatreTypeForm form){
+		if(Util.trimString(form.getTypeId()) == ""){
+			return new Response("Received invalid request. Action abort.");
+		}
+		else{
+			if(form.getPrice() <= 0){
+				return new Response("Seat Price cannot less than RM 0");
+			}else{
+				String errorMsg = dao.updateTheatreType(form);
+				if(errorMsg != null){
+					return new Response(errorMsg);
+				}
+				else{
+					return new Response((Object)("Theatre Type " + form.getTypeId() + " has been updated."));
+				}
+			}
 		}
 	}
 	

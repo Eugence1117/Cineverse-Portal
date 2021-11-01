@@ -10,9 +10,21 @@
 
 $('#logOutBtn').on('click', function() {
 	window.sessionStorage.clear();
+	clearCookie();
 	$('#logout-form').submit();
 	return false;
 });
+
+function clearCookie(){
+    const d = new Date();
+    d.setTime(d.getTime() + (5*60*1000));
+
+    var expires = "expires="+ d.toUTCString();
+    var path = "path=home.htm";
+
+    document.cookie = "graphDataA=; " + expires + "; " + path;
+    document.cookie = "graphDataM=; " + expires + "; " + path;
+}
 
 $(document).ready(function(){
 	loadContent();

@@ -105,7 +105,7 @@ public class LoginDAO{
 		}
 		catch(Exception ex) {
 			log.info("Exception :" + ex.getMessage());
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}

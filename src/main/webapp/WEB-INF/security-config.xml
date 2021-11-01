@@ -35,9 +35,10 @@
     	<intercept-url pattern="/user.htm" access="hasAnyRole('ROLE_ADMIN')" />
     	<intercept-url pattern="/members.htm" access="hasAnyRole('ROLE_ADMIN')" />
     	<intercept-url pattern="/viewTickets.htm" access="hasAnyRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/manageTheatreType.htm" access="hasAnyRole('ROLE_ADMIN')" />
     	
     	<intercept-url pattern="/profile.htm" access="isAuthenticated()" />
-		
+
     	<intercept-url pattern="/scheduleMovie.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	<intercept-url pattern="/createTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />
     	<intercept-url pattern="/editTheatre.htm" access="hasAnyRole('ROLE_BRANCH_ADMIN')" />

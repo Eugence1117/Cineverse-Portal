@@ -65,7 +65,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -99,7 +99,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -135,7 +135,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -174,7 +174,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -200,7 +200,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -225,7 +225,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -241,7 +241,7 @@ public class VoucherDAO {
 				errorMsg = null;
 			}
 			else {
-				errorMsg = "Unable to modify the voucher's details at this moment. This might occured due to the voucher is already removed. Please try again later.";
+				errorMsg = "Unable to modify the voucher's details at this moment. This might occurred due to the voucher is already removed. Please try again later.";
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -250,7 +250,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		return errorMsg;
 	}
@@ -276,7 +276,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		return errorMsg;
 	}
@@ -323,7 +323,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -351,7 +351,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;
@@ -377,7 +377,7 @@ public class VoucherDAO {
 		}
 		catch(Exception ex) {
 			log.info("Exception ::" + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		
 		return errorMsg;

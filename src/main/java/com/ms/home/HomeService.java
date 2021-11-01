@@ -135,7 +135,7 @@ public class HomeService {
 		catch(Exception ex) {
 			log.error(ex.getMessage());
 			log.error(Util.getDetailExceptionMsg(ex));
-			response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_OCCURED));
+			response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_occurred));
 		}
 		response.putIfAbsent("errorMsg",null);
 		return response;
@@ -274,7 +274,7 @@ public class HomeService {
 			catch(Exception ex) {
 				log.error(ex.getMessage());
 				log.error(Util.getDetailExceptionMsg(ex));
-				response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_OCCURED));
+				response.put("errorMsg",new Response(Constant.UNKNOWN_ERROR_occurred));
 			}		
 		}
 		else {

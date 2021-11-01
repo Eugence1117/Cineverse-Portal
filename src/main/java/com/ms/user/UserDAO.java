@@ -59,7 +59,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -97,7 +97,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -134,7 +134,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -171,7 +171,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			response.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -209,7 +209,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return result;
@@ -264,7 +264,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false, Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false, Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return result;
@@ -290,7 +290,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -315,7 +315,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -336,7 +336,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -358,7 +358,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	public String addNewUser(NewUserForm form, String uuid, String createddate) {
@@ -380,7 +380,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			return Constant.UNKNOWN_ERROR_OCCURED;
+			return Constant.UNKNOWN_ERROR_occurred;
 		}
 	}
 	
@@ -412,7 +412,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -463,7 +463,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex :" + ex.getMessage());
-			errorMsg = "Unexpected error occured. Please try again later.";
+			errorMsg = "Unexpected error occurred. Please try again later.";
 		}
 		return errorMsg;
 	}
@@ -534,7 +534,7 @@ public class UserDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex :" + ex.getMessage());
-			errorMsg = "Unexpected error occured. Please try again later.";
+			errorMsg = "Unexpected error occurred. Please try again later.";
 		}
 		return errorMsg;
 	}

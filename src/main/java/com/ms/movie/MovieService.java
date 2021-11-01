@@ -127,7 +127,7 @@ public class MovieService {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex: " + ex.getMessage());
-			return new Response("Unexpected error occured. Please try gain later");
+			return new Response("Unexpected error occurred. Please try gain later");
 		}
 		
 	}
@@ -305,7 +305,7 @@ public class MovieService {
 			}
 			catch(Exception ex) {
 				log.error("Exception ::" + ex.getMessage());
-				return new Response("Unexpected error occured. Please try again later.");
+				return new Response("Unexpected error occurred. Please try again later.");
 			}
 		}
 		
@@ -434,7 +434,7 @@ public class MovieService {
 			}
 			catch(Exception ex) {
 				log.error("Exception :" + ex.getMessage());
-				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+				return new Response(Constant.UNKNOWN_ERROR_occurred);
 			}
 		}
 	}

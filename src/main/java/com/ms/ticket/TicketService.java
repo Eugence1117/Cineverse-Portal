@@ -206,7 +206,7 @@ public class TicketService {
 				}
 				catch(Exception ex) {
 					log.error(ex.getMessage());
-					return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+					return new Response(Constant.UNKNOWN_ERROR_occurred);
 				}
 				
 				//Validate Redundant Seat
@@ -619,11 +619,11 @@ public class TicketService {
 						}			
 						catch(URISyntaxException ue) {
 							log.error(ue.getMessage());
-							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+							return new Response(Constant.UNKNOWN_ERROR_occurred);
 						}
 						catch (JRException jr) {
 							log.error(jr.getMessage());
-							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+							return new Response(Constant.UNKNOWN_ERROR_occurred);
 						}
 						catch(ParseException pe) {
 							log.error(pe.getMessage());
@@ -710,7 +710,7 @@ public class TicketService {
 						}
 						catch (JRException jr) {
 							log.error(jr.getMessage());
-							return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+							return new Response(Constant.UNKNOWN_ERROR_occurred);
 						}
 					}
 					

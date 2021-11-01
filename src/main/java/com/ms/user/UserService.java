@@ -159,7 +159,7 @@ public class UserService {
 	public Response editUser(UserEditForm form){
 		log.info("Updating user info");
 		if(Util.trimString(form.getSeqid()) == "") {
-			return new Response("Unable to retrieve the user specified. This may occured due to the data received by the server is empty. Please contact with the developer if the problem still exist.");
+			return new Response("Unable to retrieve the user specified. This may occurred due to the data received by the server is empty. Please contact with the developer if the problem still exist.");
 		}
 		//Check user is branch manager
 		Map<Boolean,Object> response = dao.getUserBranch(form.getSeqid());
@@ -249,7 +249,7 @@ public class UserService {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:" + ex.getMessage());
-			return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+			return new Response(Constant.UNKNOWN_ERROR_occurred);
 		}
 	}
 	
@@ -323,7 +323,7 @@ public class UserService {
 		
 		} catch (Exception e) {
 			log.error("Exception ex" + e.getMessage());
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response("Unexpected error occurred. Please try again later.");
 		}
 		return null;
 	}

@@ -42,7 +42,7 @@ public class RuleService {
 		}
 		catch(Exception ex) {
 			log.error("Exception:" + ex.getMessage());
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response("Unexpected error occurred. Please try again later.");
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class RuleService {
 		}
 		catch(Exception ex) {
 			log.error("Exception:" + ex.getMessage());
-			return new Response("Unexpected error occured. Please try again later.");
+			return new Response("Unexpected error occurred. Please try again later.");
 		}
 	}
 	

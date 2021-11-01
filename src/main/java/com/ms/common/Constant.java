@@ -114,6 +114,6 @@ public class Constant {
 	
 	/*Back End Error Message*/
 	public static final String DATABASE_CONNECTION_LOST = "Unable to connect to database. Please try again later";
-	public static final String UNKNOWN_ERROR_OCCURED = "Unexpected error occured. Please try again later";
+	public static final String UNKNOWN_ERROR_occurred = "Unexpected error occurred. Please try again later";
 	public static final String NO_RECORD_FOUND = "No data found in database.";
 }

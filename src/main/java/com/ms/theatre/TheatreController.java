@@ -34,7 +34,13 @@ public class TheatreController {
 	
 	@Autowired
 	TheatreService service;
-	
+
+	@RequestMapping(value = "/manageTheatreType.htm")
+	public String loadTheatreTypePage(Model model){
+		log.info("Entered /manageTheatreType.htm");
+		return "manageTheatreType";
+	}
+
 	@RequestMapping( value= {"/createTheatre.htm"})
 	//@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public String loadCreateTheatrePage(Model model){
@@ -93,6 +99,20 @@ public class TheatreController {
 	public Response getTheatreType(Model model, String typeId) {
 		log.info("entered /theatre/getTheatreType");
 		return service.retrieveTheatreType(typeId);
+	}
+
+	@RequestMapping (value= {"/api/admin/getAllTheatreType.json"})
+	@ResponseBody
+	public Response getAllTheatreType(Model model) {
+		log.info("entered /getAllTheatreType");
+		return service.retrieveTheatreTypes();
+	}
+
+	@RequestMapping(value = "/api/admin/updateTheatreType.json")
+	@ResponseBody
+	public Response updateTheatreType(Model model, @RequestBody TheatreTypeForm form){
+		log.info("entered /updateTheatreType");
+		return service.updateTheatreType(form);
 	}
 	
 	@RequestMapping( value= {"api/manager/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})

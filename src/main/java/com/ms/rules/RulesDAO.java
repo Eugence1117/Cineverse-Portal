@@ -50,7 +50,7 @@ public class RulesDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:" + ex.getMessage());
-			return "Unexpected error occured. Please try again later";
+			return "Unexpected error occurred. Please try again later";
 		}
 	}
 	
@@ -73,7 +73,7 @@ public class RulesDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:" + ex.getMessage());
-			return "Unexpected error occured. Please try again later";
+			return "Unexpected error occurred. Please try again later";
 		}
 	}
 	

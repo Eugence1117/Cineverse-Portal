@@ -127,7 +127,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -150,7 +150,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -173,7 +173,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		return errorMsg;
 	}
@@ -217,7 +217,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -254,7 +254,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -277,7 +277,7 @@ public class ScheduleDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			errorMsg = Constant.UNKNOWN_ERROR_OCCURED;
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
 		}
 		return errorMsg;
 	}

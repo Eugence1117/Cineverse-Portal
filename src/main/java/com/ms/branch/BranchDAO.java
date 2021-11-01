@@ -65,7 +65,7 @@ public class BranchDAO {
 			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		} catch (Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -91,7 +91,7 @@ public class BranchDAO {
 			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		} catch (Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -125,7 +125,7 @@ public class BranchDAO {
 			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		} catch (Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -159,7 +159,7 @@ public class BranchDAO {
 			result.put(false,Constant.DATABASE_CONNECTION_LOST);
 		} catch (Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			result.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			result.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return result;
 	}
@@ -181,7 +181,7 @@ public class BranchDAO {
 		}
 		catch (Exception ex) {
 			log.error("Exception ex::" + ex.getMessage());
-			message = "Unable to remove due to unexpected error occured. Please try again later.";
+			message = "Unable to remove due to unexpected error occurred. Please try again later.";
 		}
 		return message;
 	}
@@ -203,7 +203,7 @@ public class BranchDAO {
 		}
 		catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			message = "Unable to update the status due to unexpected error occured. Please try again later.";
+			message = "Unable to update the status due to unexpected error occurred. Please try again later.";
 		}
 		return message;
 	}
@@ -226,7 +226,7 @@ public class BranchDAO {
 		}
 		catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			return "Unable to add new branch due to unexpected error occured. Please try again later.";
+			return "Unable to add new branch due to unexpected error occurred. Please try again later.";
 		}
 	}
 
@@ -249,7 +249,7 @@ public class BranchDAO {
 		}
 		catch (Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			return "Unexpected error occured, unable to update the information.";
+			return "Unexpected error occurred, unable to update the information.";
 		}
 	}
 

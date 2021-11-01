@@ -72,7 +72,7 @@ public class LoginService implements UserDetailsService {
 			else {
 				Object object = result.get(true);
 				if(object == null) {
-					return new Response("No issue occured. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
+					return new Response("No issue occurred. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
 				}
 				else {
 					Map<String,String> staff = (Map<String,String>)object;
@@ -86,7 +86,7 @@ public class LoginService implements UserDetailsService {
 						return new Response("Your account was removed by the admin. Please contact with admin for further details.");
 					}
 					else{
-						return new Response("No issue occured. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
+						return new Response("No issue occurred. Please make sure that you had entered right username and password.You may contact with admin for further assistance.");
 					}
 						
 				}
@@ -94,7 +94,7 @@ public class LoginService implements UserDetailsService {
 		}
 		catch(Exception ex) {
 			Log.error("Exception " + ex.getMessage());
-			return new Response("Unexpected error occured during troubleshooting. Please contact with admin.");
+			return new Response("Unexpected error occurred during troubleshooting. Please contact with admin.");
 		}
 	}
 	

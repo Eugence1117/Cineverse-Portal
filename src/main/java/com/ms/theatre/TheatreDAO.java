@@ -118,7 +118,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -150,7 +150,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -189,7 +189,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -228,7 +228,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		return response;
 	}
@@ -269,7 +269,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -307,7 +307,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("(Exception ex:" + ex.getMessage());
-			response.put(false,Constant.UNKNOWN_ERROR_OCCURED);
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
 		}
 		
 		return response;
@@ -361,10 +361,54 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex:: " + ex.getMessage());
-			return "Unexpected error occured. Please try again later.";
+			return "Unexpected error occurred. Please try again later.";
 		}
 	}
-	
+
+	public String updateTheatreType(TheatreTypeForm form){
+		try {
+			//validation on status
+			String query = "UPDATE masp.theatretype SET description = ?, price = ? WHERE seqid = ?";
+			int result = jdbc.update(query,form.getDescription(),form.getPrice(),form.getTypeId());
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return "Unable to update the theatre type. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost: " + ge.getMessage());
+			return "Connection to database is lost";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex" + ex.getMessage());
+			return "Unexpected error occurred. Please try again later.";
+		}
+	}
+
+	public String addNewTheatreType(TheatreTypeForm form){
+		try {
+			//validation on status
+			String query = "INSERT INTO masp.theatretype(seqid,description,seatSize,price,seatOccupied) VALUES(?,?,?,?,?)";
+			int result = jdbc.update(query,form.getTypeId(),form.getDescription(),form.getSeatSize(),form.getPrice(),1);
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return "Unable to create the theatre type. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost: " + ge.getMessage());
+			return "Connection to database is lost";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex" + ex.getMessage());
+			return "Unexpected error occurred. Please try again later.";
+		}
+	}
+
 	public String updateTheatre(EditTheatreForm theatreForm,int statusCode) {
 		try {
 			//validation on status
@@ -383,7 +427,7 @@ public class TheatreDAO {
 		}
 		catch(Exception ex) {
 			log.error("Exception ex" + ex.getMessage());
-			return "Unexpected error occured. Please try again later.";
+			return "Unexpected error occurred. Please try again later.";
 		}
 	}
 }

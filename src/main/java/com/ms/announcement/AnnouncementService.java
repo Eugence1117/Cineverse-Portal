@@ -101,7 +101,7 @@ public class AnnouncementService {
 	
 	public Response getAnnouncement(String id) {
 		if(Util.trimString(id) == "") {
-			return new Response("Unable to retrieve the Announcement specified. This error occured due to the data sent to server is missing. Please try again later.");
+			return new Response("Unable to retrieve the Announcement specified. This error occurred due to the data sent to server is missing. Please try again later.");
 		}
 		else {
 			Map<Boolean,Object> result = dao.retrieveAnnouncement(id);
@@ -157,7 +157,7 @@ public class AnnouncementService {
 			}
 			catch(Exception ex) {
 				log.error("Exception ex:" + ex.getMessage());
-				return new Response(Constant.UNKNOWN_ERROR_OCCURED);
+				return new Response(Constant.UNKNOWN_ERROR_occurred);
 			}
 			
 		}
@@ -168,7 +168,7 @@ public class AnnouncementService {
 	
 	public Response removeAnnouncement(String announcementID) {
 		if(Util.trimString(announcementID) == "") {
-			return new Response("Unable to locate the Announcement specified. This error occured due to the data sent to server is missing. Please try again later.");
+			return new Response("Unable to locate the Announcement specified. This error occurred due to the data sent to server is missing. Please try again later.");
 		}
 		
 		String currentPath = dao.getCurrentAnnouncementPicture(announcementID);
@@ -192,7 +192,7 @@ public class AnnouncementService {
 	
 	public Response editAnnouncementStatus(AnnouncementEdit data) {
 		if(Util.trimString(data.getSeqid())== "") {
-			return new Response("Unable to retrieve the Announcement specified. This error occured due to the data sent to server is missing. Please try again later.");
+			return new Response("Unable to retrieve the Announcement specified. This error occurred due to the data sent to server is missing. Please try again later.");
 		}
 		
 		if(Util.getStatusDescWithoutRemovedStatus(data.getStatus()) == null) {
