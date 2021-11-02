@@ -406,10 +406,10 @@ public class TransactionDAO {
 					   	   "FROM masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th " +
 					   	   "WHERE p.paidOn <= ? AND p.paidOn >= ? " + 	
 					   	   "AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
-					   	   "AND s.theatreId = th.seqid AND th.branchid = ? AND p.paymentStatus = ? " +
+					   	   "AND s.theatreId = th.seqid AND th.branchid = ? AND p.paymentStatus BETWEEN ? AND ?" +
 					   	   "GROUP BY p.seqid, p.totalPrice, p.paidOn ORDER BY p.paidOn";
 						
-			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_PAID_STATUS_CODE);
+			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_PAID_STATUS_CODE,Constant.PAYMENT_COMPLETED_STATUS_CODE);
 			if(rows.size() > 0) {
 				List<TransactionJasper> transactions = new ArrayList<TransactionJasper>();
 				for(Map<String,Object> row : rows) {

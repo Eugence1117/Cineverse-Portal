@@ -125,7 +125,7 @@
 		<band height="221" splitType="Stretch">
 			<timeSeriesChart>
 				<chart isShowLegend="false" evaluationTime="Report">
-					<reportElement x="0" y="0" width="555" height="200" uuid="1526a310-2e95-4a02-9f29-0f173044f7cf">
+					<reportElement x="0" y="0" width="555" height="200" uuid="30be90ce-17e0-4a18-8c22-36e8772f5e85">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y">
 							<![CDATA["RM"]]>
@@ -142,7 +142,7 @@
 				</chart>
 				<timeSeriesDataset>
 					<dataset resetType="Report">
-						<datasetRun subDataset="GraphDataSet" uuid="ac5f9d0a-ccc7-431c-8bd6-8bed42b81f31">
+						<datasetRun subDataset="GraphDataSet" uuid="6c356850-2532-40e3-984d-0d5ffa146dd7">
 							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{CHART_DATA})]]></dataSourceExpression>
 						</datasetRun>
 					</dataset>
@@ -188,12 +188,18 @@
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 						<jr:tableFooter style="Table 1_TH" height="30" rowSpan="1">
 							<box>
-								<topPen lineWidth="2.0"/>
-								<bottomPen lineWidth="2.0"/>
+								<topPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
 							</box>
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 1_CH" height="40" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="200" height="40" uuid="c4c65c1a-f8dd-4c95-9b86-c947ddb5d840">
 									<property name="com.jaspersoft.studio.unit.spacingBefore" value="pixel"/>
@@ -206,6 +212,12 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<textField>
 								<reportElement x="0" y="0" width="200" height="30" forecolor="#4D4444" uuid="03ee3ed1-a7ce-4b3e-a848-7d2acd16c2e8">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
@@ -222,11 +234,17 @@
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 						<jr:tableFooter style="Table 1_TH" height="30" rowSpan="1">
 							<box>
-								<topPen lineWidth="2.0"/>
-								<bottomPen lineWidth="2.0"/>
+								<topPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
 							</box>
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 1_CH" height="40" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="110" height="40" uuid="c074e9b7-a8ef-410f-8007-8c2bc258a00e"/>
 								<box padding="5"/>
@@ -237,6 +255,12 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<textField>
 								<reportElement x="0" y="0" width="110" height="30" forecolor="#4D4444" uuid="c76afe66-21a6-4374-9d6f-86097c763922"/>
 								<box padding="5"/>
@@ -249,8 +273,8 @@
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<jr:tableFooter style="Table 1_TH" height="30" rowSpan="1">
 							<box>
-								<topPen lineWidth="2.0"/>
-								<bottomPen lineWidth="2.0"/>
+								<topPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
 							</box>
 							<textField>
 								<reportElement x="0" y="0" width="124" height="30" uuid="135a1b32-b914-4e1e-bb2c-695c571adb24"/>
@@ -262,6 +286,12 @@
 							</textField>
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 1_CH" height="40" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="124" height="40" uuid="03ae2d09-1f3e-48f1-a455-746d0b9fd2af"/>
 								<box padding="5"/>
@@ -272,6 +302,12 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<textField>
 								<reportElement x="0" y="0" width="124" height="30" forecolor="#4D4444" uuid="cb4e34a0-f987-4c03-9c7c-c3b10818a650"/>
 								<box padding="5"/>
@@ -284,8 +320,8 @@
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<jr:tableFooter style="Table 1_TH" height="30" rowSpan="1">
 							<box>
-								<topPen lineWidth="2.0"/>
-								<bottomPen lineWidth="2.0"/>
+								<topPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
 							</box>
 							<textField>
 								<reportElement x="0" y="0" width="121" height="30" uuid="1cfff1db-2647-450d-b134-652870d081c2"/>
@@ -299,6 +335,12 @@
 							</textField>
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 1_CH" height="40" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="121" height="40" uuid="16bab57c-9e03-4a82-aa78-c00fd7ffca11"/>
 								<box padding="5"/>
@@ -309,6 +351,12 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
 							<textField>
 								<reportElement x="0" y="0" width="121" height="30" forecolor="#4D4444" uuid="8e53286e-a0f2-4499-83d3-e0dcfede91f9"/>
 								<box padding="5"/>
