@@ -32,7 +32,7 @@ public class RulesDAO {
 	@Autowired
 	HttpSession session;
 	
-	public String editOperatingHours(String operatingHours, String ruleid) {
+	public String editOperatingHours(String ruleid,String operatingHours) {
 		try {
 			String query = "UPDATE masp.branch_rules SET value = ? where seqid = ?";
 			int result = jdbc.update(query,operatingHours,ruleid);
@@ -40,7 +40,7 @@ public class RulesDAO {
 				return null;
 			}
 			else {
-				return "Unable to add data into database. Please try again later.";
+				return "Unable to edit the time. Please try again later.";
 			}
 			
 		}

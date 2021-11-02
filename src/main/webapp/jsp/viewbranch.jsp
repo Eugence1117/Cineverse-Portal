@@ -15,16 +15,12 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 
 <style>
-	#editBtn:hover{
-		cursor:pointer;
-	}
-	
 	input:disabled, select:disabled{
 		background-color:#fff !important;
 	}
 	
 	@media only screen and (max-width: 650px){
-		#editBtn{
+		.btn{
 			float:none !important;
 			display:block;
 			width:100%;
@@ -51,9 +47,13 @@
 									<span class="fa fa-fw fa-store-alt"></span>
 									<span>${branch.branchName}</span>
 								</span>
-								<span style="float: right" class="btn border btn-secondary" id="editBtn">
+								<span style="float: right" class="btn border btn-secondary mb-2 mx-2" id="editBtn">
 									<span class="far fa-edit"></span>
 									<span class="text"> Enable Edit</span>
+								</span>
+								<span style="float: right" class="btn border btn-secondary mb-2 mx-2" id="changeTimeBtn">
+									<span class="far fa-edit"></span>
+									<span class="text"> Change Operating Hour</span>
 								</span>
 							</span>
 						</div>
@@ -137,12 +137,49 @@
 		</div>
 	</div>
 	<!-- /.container -->
-	
+
+	<div class="modal fade" tabindex="-1" id="timeModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="extModal-title" class="modal-title">Change Operating Hour</h4>
+					<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form id="timeForm">
+						<div class="form-group row">
+							<div class="col-md">
+								<div class="form-floating">
+									<input type="time" name="startTime" class="form-control data" id="startTime" placeholder="Select a time" data-json-key="startTime"/>
+									<label class="font-weight-bold" for="startTime">Start Time</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md">
+								<div class="form-floating">
+									<input type="time" class="form-control data" name="endTime" id="endTime" placeholder="Select a time" data-json-key="endTime"/>
+									<label class="font-weight-bold" for="endTime">End Time</label>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="ext-btn-cancel" data-bs-dismiss="modal"
+							class="btn btn-secondary">Cancel</button>
+					<button type="button" id="ext-btn-addMovie" class="btn btn-primary" onclick="updateOperatingTime()">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<%@ include file="/jsp/include/globalElement.jsp" %>
 
 	
 <%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>
+	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/additional.method.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/bootbox/bootbox.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/jquery.dataTables.min.js'/>"></script>
 	<script type="text/javascript" src="<spring:url value='/plugins/datatables/dataTables.bootstrap4.js'/>"></script>
@@ -305,7 +342,21 @@
 				error.insertAfter(element);
 			}
 		});
-		
+
+		$("#timeForm").validate({
+			focusInvalid:true,
+			rules :{
+				startTime:{
+					required:true,
+					time:true
+				},
+				endTime:{
+					required:true,
+					time:true
+				}
+			}
+		});
+
 		$("#editBranchForm").validate({
 			ignore : ".ignore",
 			focusInvalid:true,
@@ -451,6 +502,95 @@
 			            }
 		    		});
 					retrieveState(result.stateName);
+				}
+			})
+		}
+
+		$("#changeTimeBtn").on('click',function(){
+			Notiflix.Loading.Dots('Loading...');
+			$.ajax("api/manager/retrieveBranchOperatingHour.json",{
+				method:"GET",
+				accepts : "application/json",
+				dataType : "json",
+				statusCode:{
+					400:function(){
+						window.location.href = "400.htm";
+					},
+					401:function(){
+						window.location.href = "expire.htm";
+					},
+					403:function(){
+						window.location.href = "403.htm";
+					},
+					404:function(){
+						window.location.href = "404.htm";
+					}
+				},
+			}).done(function(data){
+				Notiflix.Loading.Remove();
+				if(data.errorMsg != null){
+					bootbox.alert(data.errorMsg);
+				}
+				else{
+					var result = data.result;
+					$("#timeModal .data").each(function(index,element){
+						var key = $(this).data('json-key');
+						if (key && result.hasOwnProperty(key)) {
+							$(this).val(result[key]||"");
+						}
+					});
+					$("#timeModal").modal("show");
+				}
+			})
+		})
+
+		function updateOperatingTime(){
+			var validator = $("#timeForm").validate();
+			if(!validator.form()){
+				return false;
+			}
+
+			$("#timeModal").modal("hide");
+			bootbox.confirm("Are you sure to update your operating hour? Please note that the scheduled movie will not affected by your action.",function(result){
+				if(result){
+					var formData = $("#timeForm").serializeObject();
+					Notiflix.Loading.Dots('Processing...');
+					$.ajax("api/manager/editOperatingHour.json",{
+						method : "POST",
+						accepts : "application/json",
+						dataType : "json",
+						contentType:"application/json; charset=utf-8",
+						data: JSON.stringify(formData),
+						headers:{
+							"X-CSRF-Token": CSRF_TOKEN
+						},
+						statusCode:{
+							400:function(){
+								window.location.href = "400.htm";
+							},
+							401:function(){
+								window.location.href = "expire.htm";
+							},
+							403:function(){
+								window.location.href = "403.htm";
+							},
+							404:function(){
+								window.location.href = "404.htm";
+							}
+						},
+					}).done(function(data){
+						Notiflix.Loading.Remove();
+						if(data.errorMsg != null){
+							var toast = createToast(data.errorMsg,"An attempt to edit operating hour <b>Failed</b>",false);
+							$("#timeModal").modal("show");
+						}
+						else{
+							var toast = createToast(data.result,"An attempt to edit operating hour <b>Success</b>",true);
+						}
+					});
+				}
+				else{
+					$("#timeModal").modal("show");
 				}
 			})
 		}

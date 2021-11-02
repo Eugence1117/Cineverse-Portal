@@ -248,7 +248,7 @@
 						<div class="form-group row">
 							<div class="col-md">
 								<div class="form-floating">
-									<input type="date" name="startDate" class="form-control data " placeholder="Select a date" data-json-key="startDate"/>
+									<input type="date" name="startDate" class="form-control data" id="startDate" placeholder="Select a date" data-json-key="startDate"/>
 									<label class="font-weight-bold" for="startDate">Start Showing Date</label>
 								</div>
 							</div>
@@ -256,7 +256,7 @@
 						<div class="form-group row">
 							<div class="col-md">
 								<div class="form-floating">
-									<input type="date" class="form-control data" name="endDate" placeholder="Select a date" data-json-key="endDate"/>
+									<input type="date" class="form-control data" name="endDate" id="endDate" placeholder="Select a date" data-json-key="endDate"/>
 									<label class="font-weight-bold" for="endDate">Last Showing Date</label>
 								</div>
 							</div>

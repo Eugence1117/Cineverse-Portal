@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import com.ms.rules.OperatingHours;
+import com.ms.rules.OperatingTimeRange;
+import com.ms.rules.RuleService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,9 @@ public class BranchController {
 	
 	@Autowired
 	BranchService service;
+
+	@Autowired
+	RuleService ruleService;
 	
 	@RequestMapping (value = {"/viewBranch.htm"})
 	public String getBranchPage(Model model) {
@@ -47,13 +53,30 @@ public class BranchController {
 		{
 			String username = user.getUsername();
 			Response response = service.getBranchDetails(usergroup, username);
+
 			model.addAttribute("status",Util.createStatusWithoutRemovedDropDown());
 			model.addAttribute("error",response.getErrorMsg());
 			model.addAttribute("branch",response.getResult());
 			return "viewbranch";
 		}
 	}
-	
+
+	@RequestMapping(value = {"/api/manager/retrieveBranchOperatingHour.json"})
+	@ResponseBody
+	public Response retrieveBranchOperatingHour(Model model){
+		log.info("Entered /manager/retrieveBranchOperatingHour.json");
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		OperatingHours oh = ruleService.getOperatingHours(user.getBranchid());
+		if(oh == null){
+			return new Response("Unable to retrieve the operating hour. Please try again later.");
+		}
+		else{
+			OperatingTimeRange timeRange = new OperatingTimeRange(oh.getStartTime().toString(),oh.getEndTime().toString());
+
+			return new Response(timeRange);
+		}
+	}
+
 	@RequestMapping( value= {"/api/am/retrieveBranchesInfo.json"})
 	@ResponseBody
 	public Response getBranchesInfo(Model model) {

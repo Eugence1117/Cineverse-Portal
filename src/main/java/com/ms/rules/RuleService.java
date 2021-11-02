@@ -24,11 +24,11 @@ public class RuleService {
 	@Autowired
 	RulesDAO dao;
 	
-	public Response editOperatingHours(String branchid, String startTime, String endTime) {
+	public Response editOperatingHours(String branchid,OperatingTimeRange range) {
 		try {
-			String errorMsg = checkOperatingTime(LocalTime.parse(startTime),LocalTime.parse(endTime));
+			String errorMsg = checkOperatingTime(LocalTime.parse(range.getStartTime()),LocalTime.parse(range.getEndTime()));
 			if(errorMsg == null) {
-				String timeRange = startTime + "-" + endTime;
+				String timeRange = range.getStartTime() + "-" + range.getEndTime();
 				errorMsg = dao.editOperatingHours(branchid + Constant.OPERATING_HOURS_SYNTAX, timeRange);
 				return errorMsg == null ? new Response((Object)"Operating Hour for your branch has been changed.") : new Response(errorMsg);
 			}

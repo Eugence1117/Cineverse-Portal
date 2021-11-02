@@ -41,6 +41,10 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.ms.schedule.Model.MovieSchedule;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -622,29 +626,29 @@ public class ScheduleService {
 							List<Configuration> configuration = new ArrayList<Configuration>();
 							for (int i = 0; i < movieidList.size(); i++) {
 								String movieId = movieidList.get(i);
-								
-								Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+
+								Map<Boolean,Object> movieResponse = movieDao.getMovieDetailsForSchedule(movieId,branchid);
 								if(movieResponse.containsKey(false)){
 									response = new LinkedHashMap<String, String>();
 									response.put("error", "Unable to retrieve complete data. Please try again later.");
 									return response;
 								}
-								Movie movie = (Movie)movieResponse.get(true);
+								MovieSchedule movie = (MovieSchedule)movieResponse.get(true);
 								
-								MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
-								int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-								int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
-								movie.setTotalTime(newMovieTime); // Increment to nearest % 15
+								//MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
+								int remain = movie.getMovie().getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+								int newMovieTime = movie.getMovie().getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
+								movie.getMovie().setTotalTime(newMovieTime); // Increment to nearest % 15
 								largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 								
-								if(movie == null || moviePeriod == null) {
-									log.error("Unable to retrieve movie information from database.");
-									response = new LinkedHashMap<String, String>();
-									response.put("error", "Unable to retrieve movie information. Action abort. Please try again later.");
-									return response;
-								}
+//								if(movie == null || moviePeriod == null) {
+//									log.error("Unable to retrieve movie information from database.");
+//									response = new LinkedHashMap<String, String>();
+//									response.put("error", "Unable to retrieve movie information. Action abort. Please try again later.");
+//									return response;
+//								}
 								Configuration config = new Configuration(movieId,
-										percentList[i], typeList.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
+										percentList[i], typeList.get(i),Integer.parseInt(timePrefer.get(i)), movie.getMovie(),movie.getPeriod());
 								configuration.add(config);
 							}
 							
@@ -875,22 +879,23 @@ public class ScheduleService {
 									&& percentList.length == theatrePrefer.size() && theatrePrefer.size() == timePrefer.size()) {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
-									
-									Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+
+									Map<Boolean,Object> movieResponse = movieDao.getMovieDetailsForSchedule(movieId,branchid);
 									if(movieResponse.containsKey(false)){
 										response = new LinkedHashMap<String, String>();
 										response.put("error", "Unable to retrieve complete data. Please try again later.");
 										return response;
 									}
-									Movie movie = (Movie)movieResponse.get(true);
-									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid,movieId);
-									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
-									movie.setTotalTime(newMovieTime); // Increment to nearest % 15
+									MovieSchedule movie = (MovieSchedule)movieResponse.get(true);
+
+									//MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
+									int remain = movie.getMovie().getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+									int newMovieTime = movie.getMovie().getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
+									movie.getMovie().setTotalTime(newMovieTime); // Increment to nearest % 15
 									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 																							// number
 									Configuration config = new Configuration(movieId,
-											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
+											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie.getMovie(),movie.getPeriod());
 									configuration.add(config);
 								}
 								
@@ -1070,22 +1075,23 @@ public class ScheduleService {
 									&& percentList.length == theatrePrefer.size() && theatrePrefer.size() == timePrefer.size()) {
 								for (int i = 0; i < movieIds.size(); i++) {
 									String movieId = movieIds.get(i);
-									
-									Map<Boolean,Object> movieResponse = movieDao.getMovieDetails(movieId);
+
+									Map<Boolean,Object> movieResponse = movieDao.getMovieDetailsForSchedule(movieId,branchid);
 									if(movieResponse.containsKey(false)){
 										response = new LinkedHashMap<String, String>();
 										response.put("error", "Unable to retrieve complete data. Please try again later.");
 										return response;
 									}
-									Movie movie = (Movie)movieResponse.get(true);
-									MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
-									int remain = movie.getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
-									int newMovieTime = movie.getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
-									movie.setTotalTime(newMovieTime);
-									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;										
+									MovieSchedule movie = (MovieSchedule)movieResponse.get(true);
+
+									//MovieAvailablePeriod moviePeriod = movieDao.getMovieAvailableTime(branchid, movieId);
+									int remain = movie.getMovie().getTotalTime() % Constant.DEFAULT_TIME_GRAIN;
+									int newMovieTime = movie.getMovie().getTotalTime() - remain + Constant.DEFAULT_TIME_GRAIN + (Constant.DEFAULT_TIME_GRAIN - remain <= 2 ? 5 : 0);
+									movie.getMovie().setTotalTime(newMovieTime); // Increment to nearest % 15
+									largestMovieTime = newMovieTime > largestMovieTime ? newMovieTime : largestMovieTime;
 
 									Configuration config = new Configuration(movieId,
-											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie,moviePeriod);
+											percentList[i], theatrePrefer.get(i),Integer.parseInt(timePrefer.get(i)), movie.getMovie(),movie.getPeriod());
 									configuration.add(config);
 								}
 								

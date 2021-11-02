@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
-.collapsible{
+.collapsible,.fontBtn{
 	cursor:pointer;
 }
 .actionColumn{

@@ -11,10 +11,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.ms.schedule.Model.MovieSchedule;
+import com.ms.schedule.ScheduleService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -181,11 +184,60 @@ public class MovieDAO {
 			return new Response(Constant.UNKNOWN_ERROR_occurred);
 		}
 	}
-	
+
+	public Map<Boolean,Object> getMovieDetailsForSchedule(String movieId, String branchId){
+		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
+		//TODO Need to select based on the branch manager id
+		try{
+			String query = "SELECT TOP 1 m.seqid, m.movieName, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, m.releasedate, m.synopsis, m.movietype, m.censorshipId, " +
+						   "ma.startDate, ma.endDate FROM masp.movie m, masp.movieavailable ma " +
+						   "WHERE m.seqid = ? AND m.seqid = ma.movieId AND ma.branchid = ?";
+
+			Map<String,Object> row = jdbc.queryForMap(query,movieId,branchId);
+
+			String name = Util.trimString((String)row.get("movieName"));
+			String picurl = Util.trimString((String)row.get("picURL"));
+			int totalTime = (int)row.get("totaltime");
+			String language = Util.trimString((String)row.get("language"));
+			String distributor = Util.trimString((String)row.get("distributor"));
+			String cast = Util.trimString((String)row.get("cast"));
+			String director = Util.trimString((String)row.get("director"));
+			Date releaseDate = (Timestamp)row.get("releasedate");
+			String synopsis = Util.trimString((String)row.get("synopsis"));
+			String movieType = Util.trimString((String)row.get("movietype"));
+			String desc = Util.trimString((String)row.get("censorshipId"));
+
+			LocalDate startDate = ((Timestamp)row.get("startDate")).toLocalDateTime().toLocalDate();
+			LocalDate endDate = ((Timestamp)row.get("endDate")).toLocalDateTime().toLocalDate();
+
+			Movie movie = new Movie(movieId,name,picurl,totalTime,language,distributor,cast,director,Constant.SQL_DATE_WITHOUT_TIME.format(releaseDate),synopsis,movieType,desc,totalTime);
+			MovieAvailablePeriod period = new MovieAvailablePeriod(startDate,endDate);
+
+			MovieSchedule resultData = new MovieSchedule(movie,period);
+			response.put(true,resultData);
+		}
+		catch(IncorrectResultSizeDataAccessException ex){
+			log.error("IncorrectResultSizeDataAccessException: " + ex.getMessage());
+			response.put(false,Constant.NO_RECORD_FOUND);
+		}
+		catch(CannotGetJdbcConnectionException gg) {
+			log.error("Connection error: " + gg.getMessage());
+			response.put(false,Constant.DATABASE_CONNECTION_LOST);
+		}
+		catch(Exception ex) {
+			log.error("Exception ex: " + ex.getMessage());
+			response.put(false,Constant.UNKNOWN_ERROR_occurred);
+		}
+
+		return response;
+
+	}
+
 	public Map<Boolean,Object> getMovieDetails(String movieId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		//TODO Need to select based on the branch manager id
 		try{
+			//SELECT m.startDate, m.endDate FROM masp.movieavailable m WHERE m.branchid = ? AND m.movieid = ?";
 			StringBuffer query = new StringBuffer().append("SELECT m.seqid, m.movieName, m.picURL, m.totaltime, m.language, m.distributor, m.cast, m.director, ")
 												   .append("m.releasedate, m.synopsis, m.movietype, m.censorshipId FROM masp.movie m ")
 												   .append("WHERE m.seqid = ?");

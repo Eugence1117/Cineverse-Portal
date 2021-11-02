@@ -327,7 +327,7 @@ public class TicketDAO {
 	public String updateTicketStatus(String ticketId, String date, int status) {
 		String errorMsg = "";
 		try {
-			String query = "UPDATE masp.payment SET paymentStatus = ? lastUpdate = ? WHERE seqid = (SELECT t.transactionId FROM masp.ticket t WHERE t.seqid = ?) AND paymentStatus = ?";
+			String query = "UPDATE masp.payment SET paymentStatus = ?, lastUpdate = ? WHERE seqid = (SELECT t.transactionId FROM masp.ticket t WHERE t.seqid = ?) AND paymentStatus = ?";
 			
 			int result = jdbc.update(query,status,date,ticketId,Constant.PAYMENT_PAID_STATUS_CODE);
 			if(result > 0) {
