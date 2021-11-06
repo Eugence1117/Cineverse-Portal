@@ -64,8 +64,8 @@ public class ScheduleDAO {
 	@Autowired
 	HttpSession session;
 	
-	public String getLatestSchedule(String branchId) {
-		String latestDate = null;
+	public Date getLatestSchedule(String branchId) {
+		Date latestDate = null;
 		try {
 			
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withCatalogName("cineverse").withProcedureName("GetLatestScheduleTime");
@@ -79,10 +79,10 @@ public class ScheduleDAO {
 				currentDate.setTime(new Date());
 				currentDate.add(Calendar.DATE, 1);
 				
-				latestDate = Constant.SQL_DATE_WITHOUT_TIME.format(currentDate.getTime());
+				latestDate = currentDate.getTime();
 			}
 			else {
-				latestDate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)result.get("endDate"));
+				latestDate = (Timestamp)result.get("endDate");
 			}			
 		}
 		catch(CannotGetJdbcConnectionException ce) {

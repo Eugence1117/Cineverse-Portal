@@ -233,6 +233,11 @@
     	var CSRF_HEADER = $("meta[name='_csrf_header']").attr("content");
     	
     	$(document).ready(function(){
+			var msg = "${msg}"
+			if(msg != ""){
+				bootbox.alert(msg);
+			}
+
     		showLoading();
     		checkCookie();
     	});

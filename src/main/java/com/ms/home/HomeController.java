@@ -32,6 +32,9 @@ public class HomeController {
 			return "homeAdmin";
 		}
 		else {
+			if(service.checkShowNotification(user.getBranchid())){
+				model.addAttribute("msg","You are running out of schedule. Please make sure your schedule are 7 day ahead.");
+			}
 			return "homeManager";
 		}		
 	}

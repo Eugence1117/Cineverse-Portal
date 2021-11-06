@@ -1,6 +1,7 @@
 package com.ms.home;
 
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,7 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import com.ms.schedule.ScheduleDAO;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +48,34 @@ public class HomeService {
 	
 	@Autowired
 	BranchDAO branchDao;
-	
+
+	@Autowired
+	ScheduleDAO scheduleDao;
+
+	public boolean checkShowNotification(String branchId){
+		Date lastScheduleDate = scheduleDao.getLatestSchedule(branchId);
+		if(lastScheduleDate == null){
+			return true;
+		}
+		else{
+			try{
+				Date currentDate = Constant.SQL_DATE_WITHOUT_TIME.parse(Constant.SQL_DATE_WITHOUT_TIME.format(new Date()));
+				long dayDifference = lastScheduleDate.getTime() - currentDate.getTime();
+				long diffInDays = TimeUnit.MILLISECONDS.toDays(dayDifference);
+				log.info("Schedule Available " + diffInDays);
+				if(diffInDays < 8){ //7 Days
+					return true;
+				}
+			}
+			catch(ParseException ex){
+				log.error(ex.getMessage());
+				return true;
+			}
+
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<String,Response> getAdminHomeData(){
 		Map<String,Response> response = new HashMap<String, Response>();

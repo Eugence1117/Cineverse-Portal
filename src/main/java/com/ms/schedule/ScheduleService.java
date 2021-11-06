@@ -120,7 +120,12 @@ public class ScheduleService {
 		try {
 			List<String> defaultDate = new LinkedList<String>();
 			log.info("Searching schedule for branch:" + branchID);
-			String startDate = dao.getLatestSchedule(branchID);
+			Date date = dao.getLatestSchedule(branchID);
+			if(date == null){
+				return null;
+			}
+
+			String startDate = Constant.SQL_DATE_WITHOUT_TIME.format(date);
 
 			defaultDate.add(startDate);
 			Calendar endDate = Calendar.getInstance();
@@ -198,10 +203,13 @@ public class ScheduleService {
 	public boolean validateStartDate(long startDate,String branchId) {
 		try {
 			log.info("Validating startDate received...");
-			String defaultStartDate = dao.getLatestSchedule(branchId);
-			
+			Date defaultStartDate = dao.getLatestSchedule(branchId);
+			if(defaultStartDate == null){
+				return false;
+			}
+
 			Date dateReceived = new Date(startDate);
-			Date defaultDate = Constant.SQL_DATE_WITHOUT_TIME.parse(defaultStartDate);
+			Date defaultDate = Constant.SQL_DATE_WITHOUT_TIME.parse(Constant.SQL_DATE_WITHOUT_TIME.format(defaultStartDate));
 			log.info("Default Date: " + defaultDate.getTime());
 			log.info("Date Received: " + dateReceived.getTime());
 			if(defaultDate.equals(dateReceived)) {
