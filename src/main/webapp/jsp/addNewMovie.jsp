@@ -54,165 +54,166 @@
 					<input type="hidden" id="usergroupid" value="${usergroup}">
 					<div class="m-2 card">						
 						<div class="list-group">
-							<form id="newMovieForm">
 								<div class="list-group-item">
-									<div class="form-group row">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Movie Name</label>
+									<form id="newMovieForm">
+										<div class="form-group row">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Movie Name</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="movieName" id="movieName" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="movieName" id="movieName" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Movie Time</label>
-										</div>
-										<div class="col-md-1 colon">
-											 <label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="totalTime" id="totalTime" />
-										</div>
-										<div class="col-md-1 text-center">
-											<div class="timetooltip Tooltip form-control border-0 px-0">
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Movie Time</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="totalTime" id="totalTime" />
+											</div>
+											<div class="col-md-1 text-center">
+												<div class="timetooltip Tooltip form-control border-0 px-0">
 													<div class="fa fa-question-circle"style="font-size: 1.5em; color: grey"></div>
+												</div>
 											</div>
 										</div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Poster</label>	
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Poster</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-4">
+												<input type="file" class="file" name="posterImage" accept="image/*" data-type='image' />
+											</div>
+											<div class="col-md-3">
+												<button type="button" id="poster" class="btn btn-primary showPicture">Preview Picture</button>
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>	
-										</div>
-										<div class="col-md-4">
-											<input type="file" class="file" name="posterImage" accept="image/*" data-type='image' />
-										</div>
-										<div class="col-md-3">
-											<button type="button" id="poster" class="btn btn-primary showPicture">Preview Picture</button>
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Language</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Language</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="language" id="language" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="language" id="language" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Distributor</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Distributor</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="distributor" id="distributor" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="distributor" id="distributor" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Cast</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Cast</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="cast" id="cast" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="cast" id="cast" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Director</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Director</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label colon col-1">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="director" id="director" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label colon col-1">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="director" id="director" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Release Date</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Release Date</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="date" name="releaseDate" id="releaseDate" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											 <label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="date" name="releaseDate" id="releaseDate" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Synopsis</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Synopsis</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label">:</label>
+											</div>
+											<div class="col-md-7">
+												<textarea class="form-control data" name="synopsis" id="synopsis"></textarea>
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label">:</label>
-										</div>
-										<div class="col-md-7">
-											<textarea class="form-control data" name="synopsis" id="synopsis"></textarea>
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Movie Type</label>
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Movie Type</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label colon col-1">:</label>
+											</div>
+											<div class="col-md-7">
+												<input class="form-control data" type="text" name="movietype" id="movietype" />
+											</div>
+											<div class="col-md-1"></div>
 										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label colon col-1">:</label>
-										</div>
-										<div class="col-md-7">
-											<input class="form-control data" type="text" name="movietype" id="movietype" />
-										</div>
-										<div class="col-md-1"></div>
-									</div>
 
-									<div class="form-group row ">
-										<div class="col-md-3">
-											<label class="font-weight-bold col-form-label label">Censorship</label>
-										</div>
-										<div class="col-md-1 colon">
-											<label class="col-form-label colon col-1">:</label>
-										</div>
-										<div class="col-md-7">
-											<select class="form-control data" name="censorship" id="censorship">
-												<option value="0" hidden>--- Please Select ---</option>
-												<c:forEach items="${censorship}" var="data">
-													<option value="${data.id}"><c:out value="${data.id}" /></option>
-												</c:forEach>
-											</select>
-										</div>
-										<div class="col-md-1 text-center">
-											<div class="cstooltip Tooltip form-control border-0 px-0">
-												<span class="fa fa-question-circle" style="font-size: 1.5em; color: grey"></span>	
+										<div class="form-group row ">
+											<div class="col-md-3">
+												<label class="font-weight-bold col-form-label label">Censorship</label>
+											</div>
+											<div class="col-md-1 colon">
+												<label class="col-form-label colon col-1">:</label>
+											</div>
+											<div class="col-md-7">
+												<select class="form-control data" name="censorship" id="censorship">
+													<option value="0" hidden>--- Please Select ---</option>
+													<c:forEach items="${censorship}" var="data">
+														<option value="${data.id}"><c:out value="${data.id}" /></option>
+													</c:forEach>
+												</select>
+											</div>
+											<div class="col-md-1 text-center">
+												<div class="cstooltip Tooltip form-control border-0 px-0">
+													<span class="fa fa-question-circle" style="font-size: 1.5em; color: grey"></span>
+												</div>
 											</div>
 										</div>
-									</div>
+									</form>
 
 									<div class="text-center mt-3">
 										<div class="row">
@@ -227,7 +228,7 @@
 										</div>
 									</div>
 								</div>
-							</form>
+
 						</div>
 					</div>
 				</div>
@@ -335,6 +336,7 @@
 		
 		$("#btnReset").on('click',function(){
 			//Remove validator
+			$("#newMovieForm")[0].reset();
 			$("#newMovieForm .data").each(function(){
 				$(this).removeClass("is-valid");
 				$(this).removeClass("is-invalid");
@@ -388,8 +390,6 @@
 				}
 				else{
 					var toast = createToast(data.result,"An attempt to create movie <b>Success</b>",true);
-
-					form.reset();
 					$("#btnReset").click();
 				}	
 			});

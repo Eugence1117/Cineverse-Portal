@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +38,10 @@ import com.ms.common.Response;
 
 
 @Controller
+@PropertySources({
+		@PropertySource("classpath:application.properties"),
+		@PropertySource(value = "classpath:/application-${spring.profiles.active}.properties", ignoreResourceNotFound = false)
+})
 public class MovieController {
 	
 	public static Logger log = LogManager.getLogger(MovieController.class);
@@ -45,6 +51,9 @@ public class MovieController {
 	
 	@Autowired
 	MovieService service;
+
+	@Autowired
+	Environment env;
 	
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	public class ResourceNotFoundException extends RuntimeException {
@@ -234,8 +243,8 @@ public class MovieController {
 			else {
 				Cookie cookie = new Cookie("defaultMovieView",choice);
 				cookie.setMaxAge(30 * 24 * 60 * 60);
-				cookie.setDomain("cineverse.azurewebsites.net"); //
-				cookie.setPath("/");
+				cookie.setDomain(env.getProperty("spring.cookie.domain"));
+				cookie.setPath(env.getProperty("spring.cookie.path"));
 				response.addCookie(cookie);
 				log.info("Cookie for movie default view set to " + choice);
 				return new Response((Object)"Your preference has been recorded.");
