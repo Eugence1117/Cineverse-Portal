@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ms.Seat.SeatLayout;
@@ -71,9 +70,6 @@ public class TicketService {
 	@Autowired
 	Azure azure;
 
-	@Autowired
-	StompSession client;
-	
 	public ScheduleView retrieveScheduleInfo(String scheduleId) {
 		if(!scheduleId.isEmpty()) {
 			Map<Boolean,Object> response = scheduleDao.getScheduleByID(scheduleId);

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Service;
 
 import com.ms.common.Constant;
@@ -21,9 +20,6 @@ public class TransactionService {
 	
 	@Autowired
 	TransactionDAO dao;
-
-	@Autowired
-	StompSession client;
 	
 	public Response getTransactionRecord(String branchId, String start, String end) {
 		if(branchId == "") {
