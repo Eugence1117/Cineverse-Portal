@@ -38,6 +38,11 @@
                     <div class="card-header">
                         <span class="fa fa-store-alt"></span> <span>Theatre Types</span>
                         <div class="fa-pull-right d-inline-block">
+                            <a class="btn a-btn-slide-text btn-outline-light btn-sm btn-block text-dark"
+                               id="showInsert" data-bs-toggle="modal" data-bs-target="#addModal"><span
+                                    class="fa fa-plus"
+                                    aria-hidden="true"></span> <span>Add New Theatre Type</span>
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -66,6 +71,44 @@
                 </div>
             </div>
         </footer>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Theatre Type Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body placeholder-glow">
+                <form id="addForm">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control data" data-json-key="seqid" name="typeId" placeholder="Theatre Type">
+                        <label for="seqid">Theatre Type</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control data" data-json-key="desc" name="description" placeholder="Description" style="height: 100px"></textarea>
+                        <label for="desc">Description</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control data" data-json-key="seatSize" name="seatSize" placeholder="Seat Capacity">
+                        <label for="seatSize">Theatre Capacity</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control data" data-json-key="price" placeholder="Price (RM)" name="price">
+                        <label for="price">Ticket Price (RM)</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addTheatreType()">Apply</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -187,6 +230,65 @@
             content: 'Edit'
         });
     }
+
+    $("#addForm").validate({
+        ignore : ".ignore",
+        rules : {
+            price:{
+                required:true,
+                number:true,
+                min:1
+            },
+            description:{
+                required:true
+            },
+            typeId:{
+                required:true,
+                lettersonly:true,
+                remote:{
+                    url:"api/admin/validateTheatreTypeId.json",
+                    type:"get",
+                    data:{
+                        typeId: function(){
+                            return $("#addForm input[name=typeId]").val();
+                        }
+                    },
+                    statusCode:{
+                        400:function(){
+                            window.location.href = "400.htm";
+                        },
+                        401:function(){
+                            window.location.href = "expire.htm";
+                        },
+                        403:function(){
+                            window.location.href = "403.htm";
+                        },
+                        404:function(){
+                            window.location.href = "404.htm";
+                        }
+                    },
+                    dataFilter: function(data){
+                        return data;
+                    }
+                }
+            },
+            seatSize:{
+                required:true,
+                digits:true,
+                min:10
+            }
+        },
+        messages:{
+            typeId:{
+                remote: "This Type is already exist."
+            }
+        }
+    });
+
+    jQuery.validator.addMethod("lettersonly", function(value, element)
+    {
+        return this.optional(element) || /^[a-z ]+$/i.test(value);
+    }, "Letters and spaces only please");
 
     $("#editForm").validate({
         ignore : ".ignore",
@@ -312,6 +414,64 @@
                 bootbox.alert(data.errorMsg,function(){
                     $("#editType").modal("hide");
                 });
+            }
+        })
+    }
+
+    function addTheatreType(){
+        var validator = $("#addForm").validate();
+        if(!validator.form()){
+            return false;
+        }
+
+        $("#addModal").modal("hide");
+        bootbox.confirm("Are you sure to create the theatre type?",function(result){
+            if(result){
+                Notiflix.Loading.Dots('Processing...');
+                var formData = $("#addForm").serializeObject();
+
+                $.ajax("api/admin/createTheatreType.json",{
+                    method : "POST",
+                    accepts : "application/json",
+                    dataType : "json",
+                    data:JSON.stringify(formData),
+                    contentType:"application/json; charset=utf-8",
+                    headers:{
+                        "X-CSRF-Token": CSRF_TOKEN
+                    },
+                    statusCode:{
+                        400:function(){
+                            window.location.href = "400.htm";
+                        },
+                        401:function(){
+                            window.location.href = "expire.htm";
+                        },
+                        403:function(){
+                            window.location.href = "403.htm";
+                        },
+                        404:function(){
+                            window.location.href = "404.htm";
+                        }
+                    },
+                }).done(function(data){
+                    Notiflix.Loading.Remove();
+                    if(data.errorMsg == null){
+                        var toast = createToast(data.result,"An attempt to create theatre type <b>Success</b>",true);
+                        $("#addForm .data").removeClass("is-valid").removeClass("is-invalid");
+
+                        $("#addForm .data").each(function(){
+                            $(this).val("");
+                        })
+
+                        readyFunction();
+                    }
+                    else{
+                        var toast = createToast(data.errorMsg,"An attempt to create theatre type <b>Failed</b>",false);
+                    }
+                });
+            }
+            else{
+                $("#addModal").modal("show");
             }
         })
     }

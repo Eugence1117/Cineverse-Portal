@@ -100,7 +100,7 @@ public class UserService {
 		log.info("Checking username from database.");
 		Map<String,Boolean> result = new HashMap<String,Boolean>();
 		boolean status = dao.checkRedundantUsername(username);
-		log.info("Redundent name:: " + status);
+		log.info("Redundant name:: " + status);
 		result.put("status",status);
 		return result;
 		

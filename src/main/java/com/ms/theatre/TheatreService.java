@@ -223,6 +223,38 @@ public class TheatreService {
 		}
 	}
 
+	public boolean validateTheatreType(String typeId){
+		if(Util.trimString(typeId) == ""){
+			return false;
+		}
+		else{
+			return dao.getTheatretypeById(typeId);
+		}
+	}
+
+	public Response createTheatreType(TheatreTypeForm form){
+		if(Util.trimString(form.getTypeId()) == ""){
+			return new Response("Received invalid request. Action abort.");
+		}
+		else{
+			if(form.getPrice() <= 0){
+				return new Response("Seat Price cannot less than RM 0");
+			}
+			else if(form.getSeatSize() == null || form.getSeatSize() <= 10){
+				return new Response("The theatre type must at least accommodate 10 person.");
+			}
+			else{
+				String errorMsg = dao.createTheatreType(form);
+				if(errorMsg != null){
+					return new Response(errorMsg);
+				}
+				else{
+					return new Response((Object)("Theatre Type " + form.getTypeId() + " has been created."));
+				}
+			}
+		}
+	}
+
 	public Response updateTheatreType(TheatreTypeForm form){
 		if(Util.trimString(form.getTypeId()) == ""){
 			return new Response("Received invalid request. Action abort.");

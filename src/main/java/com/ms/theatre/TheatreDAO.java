@@ -365,6 +365,50 @@ public class TheatreDAO {
 		}
 	}
 
+	public boolean getTheatretypeById(String typeId){
+		try {
+			//validation on status
+			String query = "SELECT * FROM masp.theatretype where seqid = ?";
+			List<Map<String,Object>> result = jdbc.queryForList(query,typeId);
+			if(result.size() > 0){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost: " + ge.getMessage());
+			return false;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex" + ex.getMessage());
+			return false;
+		}
+	}
+
+	public String createTheatreType(TheatreTypeForm form){
+		try {
+			//validation on status
+			String query = "INSERT INTO masp.theatretype(seqid,description,seatSize,price,seatOccupied) VALUES(?,?,?,?,?)";
+			int result = jdbc.update(query,form.getTypeId(),form.getDescription(),form.getSeatSize(),form.getPrice(),1);
+			if(result > 0) {
+				return null;
+			}
+			else {
+				return "Unable to create the theatre type. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ge) {
+			log.error("Connection lost: " + ge.getMessage());
+			return "Connection to database is lost";
+		}
+		catch(Exception ex) {
+			log.error("Exception ex" + ex.getMessage());
+			return "Unexpected error occurred. Please try again later.";
+		}
+	}
+
 	public String updateTheatreType(TheatreTypeForm form){
 		try {
 			//validation on status

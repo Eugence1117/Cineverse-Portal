@@ -14,12 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.ms.common.Response;
 import com.ms.login.Staff;
@@ -108,13 +103,27 @@ public class TheatreController {
 		return service.retrieveTheatreTypes();
 	}
 
+	@RequestMapping(value = "/api/admin/validateTheatreTypeId.json")
+	@ResponseBody
+	public boolean validateTheatreTypeId(Model model, @RequestParam String typeId){
+		log.info("entered /validateTheatreTypeId");
+		return service.validateTheatreType(typeId);
+	}
+
+	@RequestMapping(value = "/api/admin/createTheatreType.json")
+	@ResponseBody
+	public Response createTheatreType(Model model, @RequestBody TheatreTypeForm form){
+		log.info("entered /createTheatreType");
+		return service.createTheatreType(form);
+	}
+
 	@RequestMapping(value = "/api/admin/updateTheatreType.json")
 	@ResponseBody
 	public Response updateTheatreType(Model model, @RequestBody TheatreTypeForm form){
 		log.info("entered /updateTheatreType");
 		return service.updateTheatreType(form);
 	}
-	
+
 	@RequestMapping( value= {"api/manager/submitLayout.json"} ,consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})
 	@ResponseBody
 	public Response getLayoutJSON(Model model, @RequestBody Map<String,Object> payload) {
@@ -126,7 +135,6 @@ public class TheatreController {
 		else {
 			return service.createTheatre(payload, branchid);
 		}
-		
 	}
 	
 	@RequestMapping (value = {"api/manager/updateTheatre.json"} ,method= {RequestMethod.POST})
