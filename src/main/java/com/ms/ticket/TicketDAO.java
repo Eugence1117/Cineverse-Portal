@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +19,9 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.ms.Seat.SeatLayout;
+import com.ms.seat.SeatLayout;
 import com.ms.common.Constant;
 import com.ms.common.Util;
-import com.ms.schedule.ScheduleView;
 
 @Repository
 public class TicketDAO {

@@ -288,7 +288,31 @@ public class TransactionDAO {
 		}
 		return response;
 	}
-	
+
+	public String refundTransaction(String transactionId, String date){
+		String errorMsg = "";
+		try {
+			String query = "UPDATE masp.payment SET paymentStatus = ?, lastUpdate = ? WHERE seqid = ? AND paymentStatus = ?";
+
+			int result = jdbc.update(query,Constant.PAYMENT_REFUND_STATUS_CODE,date,transactionId,Constant.PAYMENT_PENDING_REFUND_STATUS_CODE);
+			if(result > 0) {
+				return null;
+			}
+			else {
+				errorMsg = "Unable to locate the transaction you specified. Please try again later.";
+			}
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			errorMsg = Constant.DATABASE_CONNECTION_LOST;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			errorMsg = Constant.UNKNOWN_ERROR_occurred;
+		}
+		return errorMsg;
+	}
+
 	public String updateTransactionStatus(String transactionId, String date, int status) {
 		String errorMsg = "";
 		try {
@@ -299,7 +323,7 @@ public class TransactionDAO {
 				return null;
 			}
 			else {
-				errorMsg = "Unable to locate the ticket you specified. Please try again later.";
+				errorMsg = "Unable to locate the transaction you specified. Please try again later.";
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -406,7 +430,7 @@ public class TransactionDAO {
 					   	   "FROM masp.payment p, masp.ticket t, masp.schedule s, masp.theatre th " +
 					   	   "WHERE p.paidOn <= ? AND p.paidOn >= ? " + 	
 					   	   "AND t.transactionId = p.seqid AND t.scheduleId = s.seqid " +
-					   	   "AND s.theatreId = th.seqid AND th.branchid = ? AND p.paymentStatus BETWEEN ? AND ?" +
+					   	   "AND s.theatreId = th.seqid AND th.branchid = ? AND p.paymentStatus BETWEEN ? AND ? " +
 					   	   "GROUP BY p.seqid, p.totalPrice, p.paidOn ORDER BY p.paidOn";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,end,start,branchId,Constant.PAYMENT_PAID_STATUS_CODE,Constant.PAYMENT_COMPLETED_STATUS_CODE);

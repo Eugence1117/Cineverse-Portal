@@ -1,4 +1,4 @@
-package com.ms.Seat;
+package com.ms.seat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

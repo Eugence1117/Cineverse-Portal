@@ -220,7 +220,7 @@
 								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<textField>
+							<textField textAdjust="StretchHeight">
 								<reportElement x="0" y="0" width="323" height="30" forecolor="#4D4444" uuid="03ee3ed1-a7ce-4b3e-a848-7d2acd16c2e8">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 								</reportElement>

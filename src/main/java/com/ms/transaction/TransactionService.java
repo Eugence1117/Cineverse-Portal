@@ -49,7 +49,23 @@ public class TransactionService {
 			}
 		}
 	}
-	
+
+	public Response refundTransactionById(String transactionId){
+		if(Util.trimString(transactionId) != "") {
+			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());
+			String errorMsg = dao.refundTransaction(transactionId,currentDate);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				return new Response((Object)("The Transaction with ID:" + transactionId + " is refunded."));
+			}
+		}
+		else {
+			return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
+		}
+	}
+
 	public Response cancelTransactionById(String transactionId) {
 		if(Util.trimString(transactionId) != "") {
 			String currentDate = Constant.SQL_DATE_FORMAT.format(new Date());

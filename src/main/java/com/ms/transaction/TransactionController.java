@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ms.common.Constant;
@@ -49,5 +50,12 @@ public class TransactionController {
 		log.info("Entered /cancelPayment.json");
 		
 		return service.cancelTransactionById(transactionId);
+	}
+
+	@RequestMapping( value= {"/api/admin/refundPayment.json"})
+	@ResponseBody
+	public Response refundPayment(Model model, @RequestParam("id") String transactionId) {
+		log.info("Entered /refundPayment.json");
+		return service.refundTransactionById(transactionId);
 	}
 }

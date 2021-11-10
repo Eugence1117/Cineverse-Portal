@@ -501,14 +501,7 @@
 								scales : {
 									x :{										
 										time : {
-											unit : 'date'
-										},
-										grid : {
-											display : false,
-											drawBorder : false
-										},
-										ticks : {
-											maxTicksLimit : 7
+											unit : 'day'
 										}
 									},
 									y : {

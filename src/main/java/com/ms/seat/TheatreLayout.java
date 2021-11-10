@@ -1,14 +1,9 @@
-package com.ms.Seat;
-
-import java.util.Map;
+package com.ms.seat;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javaparser.utils.Log;
-import com.ms.ticket.TicketService;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
