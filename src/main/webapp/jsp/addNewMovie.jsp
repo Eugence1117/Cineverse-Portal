@@ -293,9 +293,29 @@
 		});
 
 		$("#totalTime").on('change',function(){
-			if($(this).val() < 30){
+			if($(this).val() < 45){
 				bootbox.confirm({
-					message: "Are you sure the movie length is " + $(this).val() + " ? Short duration of movie might impact the performance of scheduling AI.",
+					message: "Are you sure the movie length is " + $(this).val() + " minute(s)? Short duration of movie might impact the performance of scheduling AI.",
+					buttons:{
+						confirm: {
+							label: "Yes,I understand.",
+							className: "btn-primary"
+						},
+						cancel: {
+							label: "No, is a mistake",
+							className: "btn-secondary"
+						}
+					},
+					callback:function(result){
+						if(!result){
+							$("#totalTime").val("");
+						}
+					}
+				});
+			}
+			else if($(this).val() > 500){
+				bootbox.confirm({
+					message: "Are you sure the movie length is " + $(this).val() + " minute(s) long?",
 					buttons:{
 						confirm: {
 							label: "Yes,I understand.",

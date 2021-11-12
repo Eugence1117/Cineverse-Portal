@@ -10,12 +10,12 @@
 		  	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 		  </form>
 
-            <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
-                <div class="form-switch form-check">
-                    <input class="form-check-input" type="checkbox" role="switch" name="liveSwitch" id="liveSwitch">
-                    <label class="form-check-label" for="liveSwitch">Live Update</label><span class="fas fa-info-circle ml-2" id="liveUpdate" data-bs-toggle='tooltip' data-bs-placement='right' title='Enable real-time data tracking on the page that you are visiting. It might consumes more perfomance.'></span>
-                </div>
-            </div>
+<%--            <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">--%>
+<%--                <div class="form-switch form-check">--%>
+<%--                    <input class="form-check-input" type="checkbox" role="switch" name="liveSwitch" id="liveSwitch">--%>
+<%--                    <label class="form-check-label" for="liveSwitch">Live Update</label><span class="fas fa-info-circle ml-2" id="liveUpdate" data-bs-toggle='tooltip' data-bs-placement='right' title='Enable real-time data tracking on the page that you are visiting. It might consumes more perfomance.'></span>--%>
+<%--                </div>--%>
+<%--            </div>--%>
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">

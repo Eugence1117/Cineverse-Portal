@@ -308,7 +308,7 @@
 		$(document).ready(function(){
 			var status = "${error}";
 			if(status != ""){
-				bootbox.alert(status,function(){window.location.href="home.htm"});
+				bootbox.alert(status);
 				return false;
 			}
 			

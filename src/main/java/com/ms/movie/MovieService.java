@@ -502,29 +502,29 @@ public class MovieService {
 			log.info("Start:" + startCal.getTime() + " End:" + endCal.getTime());
 			if(checkCurrentDate) {
 				if(startCal.compareTo(currentCal) <= 0) {
-					result.put(false,"Start Showing Date need to be after " + Constant.UI_DATE_FORMAT.format(new Date()));
+					result.put(false,"Start Showing Date need to be after " + Constant.UI_DATE_FORMAT.format(new Date()) + ".");
 					return result;
 				}
 			}
 			
 			if(startCal.compareTo(publishCal) < 0) {
-				result.put(false,"Start Showing Date cannot set before the Official Publish Date which is " + Constant.UI_DATE_FORMAT.format(min));
+				result.put(false,"Start Showing Date cannot set before the Official Publish Date which is " + Constant.UI_DATE_FORMAT.format(min) + ".");
 				return result;
 			}
 			
 			if(startCal.compareTo(endCal) > 0) {
-				result.put(false,"Start Showing Date cannot greater than the Last Showing Date");
+				result.put(false,"Start Showing Date cannot greater than the Last Showing Date.");
 				return result;
 			}
 			else {
 				startCal.add(Calendar.DATE,30);
 				if(endCal.compareTo(startCal) < 0) {
-					result.put(false,"Movie need to available for at least 30 days");
+					result.put(false,"Movie need to available for at least 30 days.");
 					return result;
 				}
 				startCal.add(Calendar.DATE,60);
 				if(endCal.compareTo(startCal) > 0) {
-					result.put(false,"Movie maximum available time is 90 days");
+					result.put(false,"Movie maximum available time is 90 days.");
 					return result;
 				}
 				result.put(true,"");
@@ -534,7 +534,7 @@ public class MovieService {
 		}
 		catch(Exception ex) {
 			log.error("Exception ::" + ex.getMessage());
-			result.put(false,"Invalid Date");
+			result.put(false,"Invalid Date.");
 			return result;
 		}
 		

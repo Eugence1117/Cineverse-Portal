@@ -323,7 +323,9 @@
 				}
 				else{
 					$("#loading").hide();
-					bootbox.alert(data.errorMsg);
+					bootbox.alert(data.errorMsg,function(){
+						$("#viewMember").modal("hide");
+					});
 				}
 			})
 

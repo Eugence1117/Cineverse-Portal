@@ -531,7 +531,7 @@
 				}
 				else{
 					$("#addBranch").modal('hide');
-					var toast = createToast(data.result,"An attempt to add branch <b>Success</b>",false);
+					var toast = createToast(data.result,"An attempt to add branch <b>Success</b>",true);
 					clearInsertField();
 					readyFunction();
 				}
@@ -542,10 +542,12 @@
 		function clearInsertField(){
 			$("#newBranchForm input").each(function(){
 				$(this).val("");
+				$(this).removeClass("is-valid").removeClass("is-invalid")
 			});
-			
-			$("#newUserForm select").each(function(){
+
+			$("#newBranchForm select").each(function(){
 				$(this).val("");
+				$(this).removeClass("is-valid").removeClass("is-invalid")
 			});
 		}
 		

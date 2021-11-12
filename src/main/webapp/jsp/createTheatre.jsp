@@ -601,7 +601,11 @@
 				bootbox.alert("The seat you placed is exceed the maximum capacity. Please revise your layout.");
 				return false;
 			}
-			
+
+			if(counter == 0){
+				bootbox.alert("Minimum 1 seat is needed.");
+				return false;
+			}
 			var msg = (counter >= (capacity/2)) ? "Are you sure this is your final layout?" : "It is recommended to have at least <b>" + (capacity/2) + "</b> seats for this layout. Your current seat placed is <b>" + counter + "</b>. Are you sure this is your final layout?";
 			bootbox.confirm({
 				size: "medium",

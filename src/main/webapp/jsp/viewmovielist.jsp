@@ -470,6 +470,7 @@
 		<!--END FOR DISPLAY DATA TABLE-->
 		
 		<!--FOR view movie details-->
+		var lastElement = null;
 		function getMovieDetails(element){
 			var movieId = element.id;
 			$(".adminBtn").each(function(){
@@ -507,6 +508,7 @@
     		}).done(function(data){
     			$("#loading").hide();
     			if(data.errorMsg == null){
+					lastElement = element;
 					injectData(data.result,movieId);
 					$("#movieForm").show();
 				}
@@ -517,7 +519,66 @@
 				}
     		})
 		}
-		
+
+		$("#totalTime").on('change',function(){
+			$("#movieDetails").addClass("skip");
+			$("#movieDetails").modal("hide");
+
+			if($(this).val() < 45){
+				bootbox.confirm({
+					message: "Are you sure the movie length is " + $(this).val() + " minute(s)? Short duration of movie might impact the performance of scheduling AI.",
+					buttons:{
+						confirm: {
+							label: "Yes,I understand.",
+							className: "btn-primary"
+						},
+						cancel: {
+							label: "No, is a mistake",
+							className: "btn-secondary"
+						}
+					},
+					callback:function(result){
+						$("#movieDetails").removeClass("skip");
+						if(result){
+							$("#movieDetails").modal("show");
+						}
+						else{
+							if(lastElement != null){
+								editMovieDetails(lastElement);
+							}
+						}
+					}
+				});
+			}
+			else if($(this).val() > 500){
+				bootbox.confirm({
+					message: "Are you sure the movie length is " + $(this).val() + " minute(s) long?",
+					buttons:{
+						confirm: {
+							label: "Yes,I understand.",
+							className: "btn-primary"
+						},
+						cancel: {
+							label: "No, is a mistake",
+							className: "btn-secondary"
+						}
+					},
+					callback:function(result){
+						$("#movieDetails").removeClass("skip");
+						if(result){
+							$("#movieDetails").removeClass("skip");
+							$("#movieDetails").modal("show");
+						}
+						else{
+							if(lastElement != null){
+								editMovieDetails(lastElement);
+							}
+						}
+					}
+				});
+			}
+		});
+
 		function injectData(data,movieId){
     		$("#movieForm .data").each(function(index,element){
     			var key = $(this).data('json-key');

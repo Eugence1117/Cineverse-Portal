@@ -144,7 +144,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="editTheatreType()">Apply</button>
+                <button type="button" class="btn btn-primary" onclick="editTheatreType()">Submit</button>
             </div>
         </div>
     </div>
@@ -298,7 +298,8 @@
             },
             price:{
                 required:true,
-                number:true
+                number:true,
+                min:1
             },
         }
     });
@@ -372,6 +373,7 @@
     function clearModalDetails(){
         $("#editType .data").each(function(){
             $(this).val("");
+            $(this).removeClass("is-valid").removeClass("is-invalid");
         })
     }
 
