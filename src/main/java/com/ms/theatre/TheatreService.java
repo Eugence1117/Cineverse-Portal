@@ -12,6 +12,10 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ms.seat.TheatreLayout;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.exception.JDBCConnectionException;
@@ -176,6 +180,9 @@ public class TheatreService {
 				return new Response("Unable to generate name for theatre. Please try again later.");
 			}
 			else {
+				String layoutJson = new String(Base64.getDecoder().decode(form.getLayout()));
+				TheatreLayout[] convertedLayout = new ObjectMapper().readValue(layoutJson, TheatreLayout[].class);
+
 				log.info("Theatre name: " + name);
 				//Create Theatre
 				String theatreId = UUID.randomUUID().toString();
@@ -193,7 +200,20 @@ public class TheatreService {
 				
 			}
 		}
+		catch(IllegalArgumentException ex){
+			log.error(ex.getMessage());
+			return new Response("Received invalid layout. Please try again later.");
+		}
+		catch(JsonParseException ex){
+			log.error(ex.getMessage());
+			return new Response("Received invalid layout. Please try again later.");
+		}
+		catch(JsonMappingException ex){
+			log.error(ex.getMessage());
+			return new Response("Received invalid layout. Please try again later.");
+		}
 		catch(Exception ex){
+			log.error(ex.getMessage());
 			return new Response("Unexpected error occurred. Please try again later.");
 		}
 		
@@ -205,6 +225,27 @@ public class TheatreService {
 			if(statusCode == Constant.INVALID_STATUS_CODE) {
 				return new Response("Received invalid data from client's request. Action abort.");
 			}else {
+				try{
+					String layoutJson = new String(Base64.getDecoder().decode(form.getLayout()));
+					TheatreLayout[] convertedLayout = new ObjectMapper().readValue(layoutJson, TheatreLayout[].class);
+				}
+				catch(IllegalArgumentException ex){
+					log.error(ex.getMessage());
+					return new Response("Received invalid layout. Please try again later.");
+				}
+				catch(JsonParseException ex){
+					log.error(ex.getMessage());
+					return new Response("Received invalid layout. Please try again later.");
+				}
+				catch(JsonMappingException ex){
+					log.error(ex.getMessage());
+					return new Response("Received invalid layout. Please try again later.");
+				}
+				catch(Exception ex){
+					log.error(ex.getMessage());
+					return new Response("Unexpected error occurred. Please try again later.");
+				}
+
 				String errorMsg = dao.updateTheatre(form,statusCode);
 				if(errorMsg == null) {
 					return new Response((Object)("Theatre with ID:" + form.getTheatreid() + " has been updated to latest information."));
