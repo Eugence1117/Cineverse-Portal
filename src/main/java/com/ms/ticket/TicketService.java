@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.ms.seat.SeatSelected;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,7 +157,41 @@ public class TicketService {
 				return new Response((String)response.get(false));
 			}
 			else {
-				return new Response(response.get(true));				
+				List<SeatSelected> seatList = (List<SeatSelected>) response.get(true);
+				//Get Type
+
+				if(seatList.size() > 0){
+					Integer seatValue = dao.checkSeatTypeByTicketId(ticketId);
+					if(seatValue != null){
+						if(seatValue == 2){
+							//Group By Transaction
+							Map<String,List<SeatSelected>> groupedList = seatList.stream().collect(Collectors.groupingBy(s -> s.getTransactionId()));
+
+							List<SeatSelected> seatSelectedList = new ArrayList<>();
+							for(String transaction : groupedList.keySet()){
+								List<SeatSelected> list = groupedList.get(transaction);
+								list.sort(Comparator.comparing(SeatSelected::getSeatNo));
+
+								for(int i = 0 ; i < list.size()/2; i++){
+									SeatSelected firstSeat = list.get(i+i);
+									SeatSelected secondSeat = list.get(i+i+1);
+
+									firstSeat.setReferenceTicket(secondSeat.getId());
+									seatSelectedList.add(firstSeat);
+								}
+							}
+
+							return new Response(seatSelectedList);
+						}
+						else{
+							return new Response(seatList);
+						}
+					}
+					else{
+						return new Response("Unable to retrieve required data from server. Please try again later.");
+					}
+				}
+				return new Response(seatList);
 			}
 		}
 		else {
@@ -168,6 +203,10 @@ public class TicketService {
 		if(data != null) {
 			String ticketId = data.get("ticketId");
 			String seatNo = data.get("seatNo");
+			String referenceId = data.get("reference");
+			String referenceSeat = referenceId == null ? null : data.get("referenceSeat");
+
+
 			log.info("Data " + ticketId + " " + seatNo);
 			if(Util.trimString(ticketId) != "" && Util.trimString(seatNo) != "") {
 				
@@ -190,8 +229,20 @@ public class TicketService {
 							boolean isFound = false;
 							for(SeatColumn column : row.getColumn()) {
 								if(column.getSeatNum().equals(seatNo)) {
-									isFound = true;
-								}								
+									if(referenceSeat != null){
+										if(column.getReference().equals(referenceSeat)){
+											isFound = true;
+										}
+//										for(SeatColumn referenceColumn : row.getColumn()){
+//											if(referenceColumn.getSeatNum().equals(referenceSeat)){
+//												isFound = true;
+//											}
+//										}
+									}
+									else{
+										isFound = true;
+									}
+								}
 							}
 							if(!isFound) {
 								return new Response("The seat selected is invalid. Please select another seat.");
@@ -210,18 +261,32 @@ public class TicketService {
 					return new Response((String)response.get(false));
 				}
 				@SuppressWarnings("unchecked")
-				List<Map<String,String>> seatList = (List<Map<String,String>>)response.get(true);
-				for(Map<String,String> item : seatList) {
-					String selectedSeat = item.get("num");						
-					String selectedTicket = item.get("id");
-					
-					if(selectedSeat.equals(seatNo) && !selectedTicket.equals(ticketId)) {
-						return new Response("Seat selected is booked by other customer. Please select another seat.");
+				List<SeatSelected> seatList = (List<SeatSelected>)response.get(true);
+				for(SeatSelected item : seatList) {
+					String selectedSeat = item.getSeatNo();
+					String selectedTicket = item.getId();
+
+					if(referenceId == null){
+						if(selectedSeat.equals(seatNo) && !selectedTicket.equals(ticketId)) {
+							return new Response("Seat selected is booked by other customer. Please select another seat.");
+						}
+					}
+					else{
+						if(selectedSeat.equals(seatNo) && !selectedTicket.equals(ticketId) && !selectedTicket.equals(referenceId)
+						|| selectedSeat.equals(referenceSeat) && !selectedTicket.equals(ticketId) && !selectedTicket.equals(referenceId)) {
+							return new Response("Seat selected is booked by other customer. Please select another seat.");
+						}
 					}
 				}
 				
-				
-				String errorMsg = dao.updateTicketSeatNo(ticketId, seatNo);
+				//Check is Beanie
+				List<TicketSeatUpdateForm> ticketList = new ArrayList<>();
+				ticketList.add(new TicketSeatUpdateForm(ticketId,seatNo));
+				if(referenceId != null){
+					ticketList.add(new TicketSeatUpdateForm(referenceId,referenceSeat));
+				}
+
+				String errorMsg = dao.updateTicketSeatNo(ticketList);
 				if(errorMsg == null) {
 					return new Response((Object)("Seat of the ticket with ID:" + ticketId + " has been changed to " + seatNo + "."));
 				}

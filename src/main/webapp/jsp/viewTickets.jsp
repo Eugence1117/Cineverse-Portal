@@ -14,6 +14,10 @@
 <link rel="stylesheet" href="<spring:url value='/plugins/datatables/dataTables.bootstrap4.min.css'/>">
 <link rel="stylesheet" href="<spring:url value='/plugins/JBox/JBox.all.min.css'/>">
 <style>
+	#seatLayout{
+		overflow: auto;
+	}
+
 .fontBtn:hover,.collapsible{
 	cursor:pointer;
 }
@@ -547,22 +551,26 @@
 					  		+ '</svg>'
 					  		
 						var seatList = data.result;
+						var referenceId = null
 						for(var index in seatList){
 							var seat = seatList[index];
-							var seatNo = seat.num;
+							var seatNo = seat.seatNo;
 							var ticketId = seat.id;
-							
-							if(ticketId != id){
-								$("#" + seatNo).removeClass("clickable").addClass("selected").html(icon);	
-							}else{
+							var reference = seat.referenceTicket;
+
+							if(ticketId == id || id == reference){
+								//Current Seat
+								referenceId = ticketId == id ? reference : ticketId;
 								if(selectedSeat != null){
-									selectedSeat.children().children().removeClass("currentSeat");	
+									selectedSeat.children().children().removeClass("currentSeat");
 								}
-								selectedSeat = $("#" + seatNo)								
+								selectedSeat = $("#" + seatNo)
 								selectedSeat.children().children().addClass("currentSeat");
-							}					
+							}else{
+								$("#" + seatNo).removeClass("clickable").addClass("selected").html(icon);
+							}
 						}
-						setUpdateListener(id)
+						setUpdateListener(id,referenceId)
 						$("#seatSelector").modal("show");	
 					}
 				})	
@@ -586,10 +594,10 @@
 			html+= "<div style='" + style +"'>";
 			for(var i = 0; i <= column; i++){
 				if(i != 0){
-					html += "<div style='padding:10px;width:46px;text-align:center'><span>" + i + "</span></div>";	
+					html += "<div style='padding:10px;min-width:46px;text-align:center'><span>" + i + "</span></div>";
 				}
 				else{
-					html += "<div style='padding:10px;width:46px'><span></span></div>";
+					html += "<div style='padding:10px;min-width:46px'><span></span></div>";
 				}
 			}
 			
@@ -603,7 +611,7 @@
 					}
 				}
 				html+= "<div style='" + style +"'>";
-				html+="<div style='padding:10px;width:46px'><span>" + String.fromCharCode(firstLetter) + "</span></div>"
+				html+="<div style='padding:10px;min-width:46px'><span>" + String.fromCharCode(firstLetter) + "</span></div>"
 				for(var j = 1; j <= column; j++){
 					var elementId = String.fromCharCode(firstLetter) + j;
 					var isFound = false;
@@ -614,7 +622,7 @@
 								if(seatData.isBind){
 									seat = '<svg xmlns="http://www.w3.org/2000/svg" width="62.772" height="25.975" viewBox="0 0 16.609 6.873" xmlns:v="https://vecta.io/nano"><path d="M2.184 4.422c-.556 0-1 .364-1 .815s.445.814 1 .814h12.312c.556 0 1-.364 1-.814s-.447-.815-1-.815zm-.364 1.582c-.009.024-.016.05-.016.075v.187c0 .228.355.41.795.41h11.467c.44 0 .795-.182.795-.41v-.187c0-.024-.007-.049-.014-.072-.108.033-.228.054-.352.054H2.184c-.129 0-.251-.021-.364-.058zm-.747-3.182c-.486.001-.879.216-.876.48v2.256c-.003.264.39.479.876.48h.741l.007-.033c.045.015.093.024.14.033h.045c-.467-.069-.822-.398-.822-.799 0-.452.445-.815 1-.815l1.147-.001-.01-1.143c.003-.264-.668-.455-1.155-.457zm13.371-.072c-.486.001-.879.216-.876.48v1.194h.928c.556 0 1 .364 1 .815 0 .321-.228.595-.56.727h.598c.486-.001.879-.216.876-.48V3.228c.002-.264-.39-.479-.876-.48zM6.516.197c-1.773 0-3.2.774-3.2 1.735v2.321c0 .015.005.029.005.044l.011.125H13.57l.016-.169v-2.32c0-.236-.086-.459-.242-.665l-.113-.13-.181-.169-.043-.028c-.093-.072-.196-.14-.307-.203l-.097-.054a3.67 3.67 0 0 0-.4-.179l-.255-.087-.359-.094-.09-.017-.251-.044-.129-.017-.246-.026-.117-.01-.375-.013z" fill="none" stroke="#000" stroke-width=".395"/></svg>'
 									if(seatData.seatNum < seatData.reference){										
-										html+= "<div style='padding:10px;width:92px;text-align:center'><span id='" + elementId + "' class='clickable'>" + seat + "</span></div>";
+										html+= "<div style='padding:10px;width:92px;text-align:center'><span id='" + elementId + "' class='clickable' data-reference='" + seatData.reference + "'>" + seat + "</span></div>";
 										isFound = true;
 									}
 									else{
@@ -653,16 +661,17 @@
 			})
 		}
 		
-		function setUpdateListener(ticketId){
+		function setUpdateListener(ticketId,referenceId){
 			$("#btnChangeSeat").unbind();
 			$("#btnChangeSeat").on('click',function(){
 				$("#seatSelector").modal("hide");	
 				if(selectedSeat != null){
 					var seatNo = selectedSeat.attr("id");
+					var referenceSeat = selectedSeat.data("reference");
 					
 					bootbox.confirm("Are you sure to change the seat to " + seatNo + "?",function(result){
 						if(result){
-							changeSeat(ticketId,seatNo);
+							changeSeat(ticketId,seatNo,referenceId,referenceSeat);
 						}
 					})	
 				}
@@ -675,10 +684,12 @@
 		}
 		
 				
-		function changeSeat(ticketId,seatNo){
+		function changeSeat(ticketId,seatNo,referenceId,referenceSeat){
 			var formData = {
 					"ticketId":ticketId,
-					"seatNo":seatNo
+					"seatNo":seatNo,
+					"reference":referenceId,
+					"referenceSeat":referenceSeat
 			}
 			
 			Notiflix.Loading.Dots('Processing...');			

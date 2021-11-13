@@ -11,10 +11,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.ms.schedule.Schedule;
+import com.ms.seat.SeatSelected;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -43,7 +46,29 @@ public class TicketDAO {
 			return null;
 		}
 	}
-	
+
+	public Integer checkSeatTypeByTicketId(String ticketId){
+		try {
+			String query = "SELECT tt.seatOccupied FROM masp.ticket t, masp.schedule s, masp.theatre th, masp.theatretype tt " +
+					"WHERE t.seqid = ? AND t.scheduleId = s.seqid AND s.theatreId = th.seqid AND th.theatretype = tt.seqid";
+
+			Integer seatValue = jdbc.queryForObject(query,Integer.class,ticketId);
+			return seatValue;
+		}
+		catch(IncorrectResultSizeDataAccessException ex){
+			log.error("IncorrectResultSizeDataAccessException ce::" + ex.getMessage());
+			return null;
+		}
+		catch(CannotGetJdbcConnectionException ce) {
+			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
+			return null;
+		}
+		catch(Exception ex) {
+			log.error("Exception ex:: " + ex.getMessage());
+			return null;
+		}
+	}
+
 	public Map<Boolean,Object> getTicketByScheduleStartDate(String start, String end){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
@@ -287,28 +312,22 @@ public class TicketDAO {
 	public Map<Boolean,Object> getSelectedSeat(String ticketId){
 		Map<Boolean,Object> response = new LinkedHashMap<Boolean, Object>();
 		try {
-			String query = "SELECT tic.seqid, tic.seatNo FROM masp.ticket t, masp.ticket tic, masp.payment p " +
+			String query = "SELECT tic.seqid, tic.seatNo, p.seqid AS transactionId  FROM masp.ticket t, masp.ticket tic, masp.payment p " +
 						   "WHERE t.seqid = ? AND t.transactionId = p.seqid AND p.paymentStatus != ? AND p.paymentStatus != ? AND tic.scheduleId = t.scheduleId";
 						
 			List<Map<String,Object>> rows = jdbc.queryForList(query,ticketId,Constant.PAYMENT_CANCELLED_STATUS_CODE,Constant.PAYMENT_PENDING_REFUND_STATUS_CODE);
-			if(rows.size() > 0) {	
-				List<Map<String,String>> seatList = new ArrayList<Map<String,String>>();
-				for(Map<String,Object> row : rows) {
-					String id = (String)row.get("seqid");
-					String seatNo = (String)row.get("seatNo");
-					
-					Map<String,String> seat = new LinkedHashMap<String,String>();
-					seat.put("id",id);
-					seat.put("num",seatNo);
-					seatList.add(seat);					
-				}				
-				log.info("Total seat booked = " + seatList.size());
-				response.put(true, seatList);
-				
+
+			List<SeatSelected> seatList = new ArrayList<SeatSelected>();
+			for(Map<String,Object> row : rows) {
+				String id = (String)row.get("seqid");
+				String seatNo = (String)row.get("seatNo");
+				String transactionId = (String)row.get("transactionId");
+
+				SeatSelected seat = new SeatSelected(id,seatNo,transactionId,null);
+				seatList.add(seat);
 			}
-			else {
-				response.put(false,"No Ticket made at the date specified");
-			}
+			log.info("Total seat booked = " + seatList.size());
+			response.put(true, seatList);
 		}
 		catch(CannotGetJdbcConnectionException ce) {
 			log.error("CannotGetJdbcConnectionException ce::" + ce.getMessage());
@@ -379,13 +398,22 @@ public class TicketDAO {
 		return response;
 	}
 	
-	public String updateTicketSeatNo(String ticketId, String seatNo) {
+	public String updateTicketSeatNo(List<TicketSeatUpdateForm> ticketList) {
 		String errorMsg = "";
 		try {
 			String query = "UPDATE t SET seatNo = ? FROM masp.ticket t JOIN masp.payment p " +
 						   "ON p.seqid = t.transactionId WHERE t.seqid = ? AND (p.paymentStatus = ? or p.paymentStatus = ?)";
-			int result = jdbc.update(query,seatNo,ticketId,Constant.PAYMENT_PAID_STATUS_CODE,Constant.PAYMENT_PENDING_STATUS_CODE);
-			if(result > 0) {
+			List<Object[]> parameters = new ArrayList<Object[]>();
+			for(TicketSeatUpdateForm form : ticketList) {
+				parameters.add(new Object[] {
+						form.getSeatNo(),
+						form.getTicketId(),
+						Constant.PAYMENT_PAID_STATUS_CODE,
+						Constant.PAYMENT_PENDING_STATUS_CODE
+				});
+			}
+			int[] result = jdbc.batchUpdate(query,parameters);
+			if(result.length == ticketList.size()) {
 				return null;
 			}
 			else {
