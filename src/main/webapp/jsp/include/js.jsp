@@ -30,16 +30,6 @@ $(document).ready(function(){
 	loadContent();
 	
 	Notiflix.Loading.Init({svgColor:"#4e73df",clickToClose:false});
-
-    var element = document.getElementById('liveUpdate')
-    var tooltip = bootstrap.Tooltip.getOrCreateInstance(element)
-
-    // var tooltipTriggerList = [].slice.call(document.getDocumentById('liveUpdate'))
-    // var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    //     return new bootstrap.Tooltip(tooltipTriggerEl,{
-    //         trigger:"hover"
-    //     })
-    // })
 });
 
 $.fn.serializeObject = function() {

@@ -636,6 +636,7 @@
 				buttons:{
 					confirm:{
 						label:"Yes, I'm sure",
+
 					},
 					cancel:{
 						label: "No"

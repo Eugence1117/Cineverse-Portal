@@ -9,6 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ms.rules.OperatingHours;
+import com.ms.rules.OperatingTimeRange;
+import com.ms.rules.RuleService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.Instant;
@@ -40,6 +45,9 @@ public class ScheduleController {
 	
 	@Autowired
 	ScheduleService service;
+
+	@Autowired
+	RuleService ruleService;
 	
 	@RequestMapping (value = {"/scheduleMovie.htm"})
 	public String getSchedulePage(Model model) {
@@ -54,6 +62,7 @@ public class ScheduleController {
 		}else {
 			model.addAttribute("startDate",dateRange.get(0));
 			model.addAttribute("endDate",dateRange.get(1));
+			model.addAttribute("operatingHour",retrieveOperatingHour());
 			if(theatreTypeJson.equals("")) {
 				model.addAttribute("errorMsg","Unable to retrieve the theatre's information. Please make sure your branch have at least one theatre activated. Otherwise, Please try again later or contact with the support team.");
 			}
@@ -62,6 +71,25 @@ public class ScheduleController {
 			}
 		}	
 		return "scheduleMovie";
+	}
+
+	private String retrieveOperatingHour(){
+		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		OperatingHours oh = ruleService.getOperatingHours(user.getBranchid());
+		if(oh == null){
+			return null;
+		}
+		else{
+			OperatingTimeRange timeRange = new OperatingTimeRange(oh.getStartTime().toString(),oh.getEndTime().toString());
+			try{
+				ObjectMapper mapper = new ObjectMapper();
+				return mapper.writeValueAsString(timeRange);
+			}
+			catch(JsonProcessingException ex){
+				log.error("JsonProcessingException: " + ex.getMessage());
+				return null;
+			}
+		}
 	}
 	
 	@RequestMapping (value= {"/viewSchedule.htm"})

@@ -288,7 +288,7 @@
 					        	</div>
 					        	
 					        	<div class="m-2 p-2">
-					        		<h4>Unassigned Schedule <span id="unAssignSubtitle"></span></h4>
+					        		<h4>Unassigned Schedule</h4>
 					        		<div id="draggable">
 					        			<ul class="draggable list-group">
 					        			</ul>
@@ -396,7 +396,9 @@
 		var calendar = null;
 		var chart = null;
 		var calendarData = null;
-		
+
+		let startOperateTime = null;
+		let endOperateTime = null;
 		//Check Error on load
 		$(document).ready(function() {
 			var error = "${errorMsg}";
@@ -409,7 +411,10 @@
 					}
 				})
 			}
-			
+			var operatingTime = JSON.parse('${operatingHour}');
+			startOperateTime = operatingTime.startTime;
+			endOperateTime = operatingTime.endTime;
+
 			$("#loading").hide()
 
 		});
@@ -677,11 +682,9 @@
 							
 							var obj = new Object();
 							obj["start"] = form.data("startDate");
-							obj["operatingStartTime"] = "10:00";
-							obj["operatingEndTime"] = "23:59";
+							obj["operatingStartTime"] = startOperateTime == null ? "00:00" : startOperateTime;
+							obj["operatingEndTime"] = endOperateTime == null ? "23:59" : endOperateTime;
 							obj["resource"] = dataLocation;
-							
-							$("#unAssignSubtitle").text(" (" + unassignedData.length + " Schedule(s))")
 							
 							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
 						}
@@ -865,8 +868,8 @@
 							
 							var obj = new Object();
 							obj["start"] = form.data("startDate");
-							obj["operatingStartTime"] = "10:00";
-							obj["operatingEndTime"] = "23:59";
+							obj["operatingStartTime"] = startOperateTime == null ? "00:00" : startOperateTime;
+							obj["operatingEndTime"] = endOperateTime == null ? "23:59" : endOperateTime;
 							obj["resource"] = dataLocation;
 							
 							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
@@ -1031,8 +1034,8 @@
 							
 							var obj = new Object();
 							obj["start"] = form.data("startDate");
-							obj["operatingStartTime"] = "10:00";
-							obj["operatingEndTime"] = "23:59";
+							obj["operatingStartTime"] = startOperateTime == null ? "00:00" : startOperateTime;
+							obj["operatingEndTime"] = endOperateTime == null ? "23:59" : endOperateTime;
 							obj["resource"] = dataLocation;
 							
 							initializeCalendar(calendarEl,dataResult,unassignedData,obj);
