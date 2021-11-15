@@ -279,7 +279,7 @@
 					    }
 					},							
 				],		   
-				order: [], 
+				order: [[4,"asc"]],
 				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				retrieve: true,
 				fixedHeader: true,
@@ -320,6 +320,11 @@
 					value.action += "<span class='p-1 mx-1 fontBtn editBtn' id='" + value.movieId +"' onclick=getEditMovieDateInfo(this)>" + editBtn + "</span>";
 					
 					value.status = "<div class='text-center'><span class='badge bg-warning text-uppercase'>" + value.status + "</span></div>"
+				}
+				else if(value.status == "Finished"){
+					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.movieId +"' onclick=getMovieDetails(this)>" + viewBtn + "</span>";
+
+					value.status = "<div class='text-center'><span class='badge bg-secondary text-uppercase'>" + value.status + "</span></div>"
 				}
 				else{
 					value.action += "<span class='p-1 mx-1 fontBtn viewBtn' id='" + value.movieId +"' onclick=getMovieDetails(this)>" + viewBtn + "</span>";

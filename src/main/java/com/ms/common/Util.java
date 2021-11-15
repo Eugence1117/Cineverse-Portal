@@ -54,7 +54,9 @@ public class Util {
 	public static String getStatusDescWithoutRemovedStatus(int code) {
 		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : code == Constant.INACTIVE_STATUS_CODE ? Constant.INACTIVE_STATUS : null;
 	}
-	
+	public static String getStatusDescWithFinishedStatus(int code){
+		return code == Constant.ACTIVE_STATUS_CODE ? Constant.ACTIVE_STATUS : code == Constant.INACTIVE_STATUS_CODE ? Constant.INACTIVE_STATUS : code == Constant.FINISHED_STATUS_CODE ? Constant.FINISHED_STATUS : null;
+	}
 	public static int getStatusCodeWithoutRemovedCode(String string) {
 		return string.equals(Constant.ACTIVE_STATUS) ? Constant.ACTIVE_STATUS_CODE : string.equals(Constant.INACTIVE_STATUS) ? Constant.INACTIVE_STATUS_CODE : Constant.INVALID_STATUS_CODE;
 	}

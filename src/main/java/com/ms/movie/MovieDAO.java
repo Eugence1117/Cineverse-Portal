@@ -522,7 +522,7 @@ public class MovieDAO {
 					String movieName = Util.trimString((String)row.get("movieName"));
 					String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
 					String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
-					String status = Util.getStatusDescWithoutRemovedStatus((int)row.get("status"));
+					String status = Util.getStatusDescWithFinishedStatus((int)row.get("status"));
 					
 					Map<String,String> result = new LinkedHashMap<String, String>();
 					result.put("movieId", movieId);
@@ -562,7 +562,7 @@ public class MovieDAO {
 				String releaseDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("releaseDate"));
 				String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
 				String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
-				String status = Util.getStatusDescWithoutRemovedStatus((int)row.get("status"));
+				String status = Util.getStatusDescWithFinishedStatus((int)row.get("status"));
 				
 				Map<String,String> result = new LinkedHashMap<String, String>();
 				result.put("movieId", id);
@@ -591,13 +591,13 @@ public class MovieDAO {
 	
 	public String changeMovieAvailableStatusInBranch(String branchID, String movieID,int status) {
 		try {
-			String query = "UPDATE masp.movieavailable SET status = ? where movieID = ? AND branchID = ?";
-			int result = jdbc.update(query,status,movieID,branchID);
+			String query = "UPDATE masp.movieavailable SET status = ? WHERE movieID = ? AND branchID = ? AND status != ?";
+			int result = jdbc.update(query,status,movieID,branchID,Constant.FINISHED_STATUS_CODE);
 			if(result > 0) {
 				return null;
 			}
 			else{
-				return "Unable to locate the data in database. Please try again later.";
+				return "Unable to locate the movie in database. Please try again later.";
 			}
 		}
 		catch(CannotGetJdbcConnectionException ce) {
