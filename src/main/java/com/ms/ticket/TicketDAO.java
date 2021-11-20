@@ -412,8 +412,17 @@ public class TicketDAO {
 						Constant.PAYMENT_PENDING_STATUS_CODE
 				});
 			}
+
+			int counter = 0;
 			int[] result = jdbc.batchUpdate(query,parameters);
-			if(result.length == ticketList.size()) {
+			for(int size : result){
+				if(size > 0){
+					counter++;
+				}
+			}
+
+			log.info("Size" + result.length);
+			if(counter == ticketList.size()) {
 				return null;
 			}
 			else {

@@ -1154,7 +1154,7 @@
 				}
 				
 				if(isEmpty){
-					var string = "Error occrued from: <br/>";
+					var string = "Error occurred from: <br/>";
 					var lastConfiguredDay = new Date($("#ConfigureSchedule > form").data("endDate"));
 					console.log(lastConfiguredDay);
 					for(var i in weeks){
@@ -1200,7 +1200,7 @@
 				}
 				
 				if(isEmpty){
-					var string = "Error occrued from: <br/>";
+					var string = "Error occurred from: <br/>";
 					for(var i in days){
 						var day = days[i];
 						string += "-\t" + toDate(day) + "<br/>";

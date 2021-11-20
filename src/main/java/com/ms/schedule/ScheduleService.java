@@ -264,6 +264,12 @@ public class ScheduleService {
 				Date fromDate = Constant.SQL_DATE_FORMAT.parse(fromdate + Constant.DEFAULT_TIME);
 				Date toDate = Constant.SQL_DATE_FORMAT.parse(todate + Constant.DEFAULT_TIME);
 
+				List<String> dateRange = getDefaultDate(branchid);
+				Date dateValidation = Constant.SQL_DATE_WITHOUT_TIME.parse(dateRange.get(0));
+				if(fromDate.compareTo(dateValidation) != 0){
+					return new AvailableMovie("Invalid request. The schedule should be start on " + dateRange.get(0) + ".");
+				}
+
 				List<AvailableMovie.resultList> reponseList = new ArrayList<AvailableMovie.resultList>();
 				Calendar startDate = new GregorianCalendar();
 				startDate.setTime(fromDate);

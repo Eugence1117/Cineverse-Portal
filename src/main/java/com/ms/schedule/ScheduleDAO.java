@@ -98,13 +98,19 @@ public class ScheduleDAO {
 						schedule.getLayoutId()
 				});
 			}
-			
+			int counter = 0;
 			int[] result = jdbc.batchUpdate(query,parameters);
-			if(result.length == scheduleList.size()) {
+			for (int i : result) {
+				if(i > 0){
+					counter++;
+				}
+			}
+
+			if(counter == scheduleList.size()) {
 				response.put(true, result.length);
 			}
 			else {
-				log.error("Total of " + result.length + " out of " + scheduleList.size() + "schedule(s) is added to database.");
+				log.error("Total of " + counter + " out of " + scheduleList.size() + "schedule(s) is added to database.");
 				response.put(true, result.length);
 			}
 		}

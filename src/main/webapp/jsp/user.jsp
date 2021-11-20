@@ -565,8 +565,9 @@
 					//$("#viewUser").toggle();
 				}
 				else{
-					$("#viewUser").modal("hide");
-					bootbox.alert(data.errorMsg);
+					bootbox.alert(data.errorMsg,function(){
+						$("#viewUser").modal("hide");
+					});
 				}
 			});
 		}
@@ -885,8 +886,9 @@
 				$("#editUserForm").show();
 				
 				if(data.errorMsg != null){
-					$("#editUser").modal("hide");
-					bootbox.alert(data.errorMsg);
+					bootbox.alert(data.errorMsg,function(){
+						$("#editUser").modal("hide");
+					});
 				}
 				else{	
 					var user = data.result.user;

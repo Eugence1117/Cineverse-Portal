@@ -495,7 +495,7 @@
 					400:function(){
 						window.location.href = "400.htm";
 					},
-					401:function(){
+					401:function(){retriveDailyAvailableMovie
 						window.location.href = "expire.htm";
 					},
 					403:function(){
@@ -513,9 +513,9 @@
 					$("#movieForm").show();
 				}
 				else{
-					$("#movieDetails").modal("hide");
-					bootbox.alert(data.errorMsg);	
-					
+					bootbox.alert(data.errorMsg,function(){
+						$("#movieDetails").modal("hide");
+					});
 				}
     		})
 		}

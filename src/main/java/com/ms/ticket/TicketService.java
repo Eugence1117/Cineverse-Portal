@@ -295,7 +295,7 @@ public class TicketService {
 				}
 			}
 			else {
-				return new Response("Unable to retrieve the data*- from client's request. Please contact with admin or developer for more information");
+				return new Response("Unable to retrieve the data from client's request. Please contact with admin or developer for more information");
 			}
 		}
 		else {
