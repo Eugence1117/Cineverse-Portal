@@ -104,13 +104,14 @@
 								<p class="text-center">Loading...</p>
 							</div>
 						</div>
+
 						<form class="p-0 mt-5" id="editVoucherForm">
 							<div class="col-sm-11 mx-auto">								
 								<input type="hidden" data-json-key="voucherId" name="seqid" id="seqid" class="data"/>
 								<div class="row form-group">
 									<div class="col-md">
 										<div class="form-floating">
-											<select name="calculateUnit" class="form-control data" aria-label="Select an option" data-json-key="calculateUnit">
+											<select name="calculateUnit" id="calculateUnit" class="form-control data" aria-label="Select an option" data-json-key="calculateUnit">
 												<c:forEach items="${voucherType}" var="voucher">
 							        				<option value="<c:out value='${voucher.type}'/>"><c:out value="${voucher.desc}"/></option>
 							        			</c:forEach>

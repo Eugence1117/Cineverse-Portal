@@ -343,8 +343,8 @@ public class UserDAO {
 	public String deleteUser(String userid) {
 		
 		try {
-			StringBuffer query = new StringBuffer().append("UPDATE masp.staff set status = ? WHERE seqid = ?");
-			int result = jdbc.update(query.toString(),Constant.REMOVED_STATUS_CODE,userid);
+			StringBuffer query = new StringBuffer().append("UPDATE masp.staff set status = ?, branchid = ? WHERE seqid = ?");
+			int result = jdbc.update(query.toString(),Constant.REMOVED_STATUS_CODE,null,userid);
 			if(result >0) {
 				return null;
 			}

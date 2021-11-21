@@ -105,7 +105,8 @@ public class UserService {
 		return result;
 		
 	}
-	
+
+	@Transactional(rollbackFor = RuntimeException.class)
 	public Response updateUserStatus(String userid, String status) {
 		String statusDesc = Util.getStatusDescWithoutRemovedStatus(Integer.parseInt(status));
 		if(statusDesc == null) {
@@ -113,12 +114,28 @@ public class UserService {
 		}
 		else {
 			log.info("Updating user status to :" + statusDesc);
+			Map<Boolean,Object> branch = dao.getUserBranch(userid);
+			if(branch.containsKey(false)){
+				return new Response((String)branch.get(false));
+			}
+			String branchId = branch.get(true) == null? null : ((Map<String,String>)branch.get(true)).get("id");
 			String errorMsg = dao.updateUserStatus(userid, Integer.parseInt(status));
 			if(errorMsg != null) {
 				return new Response(errorMsg);
 			}
 			else {
-				return new Response((Object)("User's status with ID:" + userid + " is updated to " + statusDesc));
+				if(branchId != null && Integer.parseInt(status) == Constant.INACTIVE_STATUS_CODE){
+					errorMsg = branchDao.updateStatus(Constant.INACTIVE_STATUS_CODE,branchId);
+					if(errorMsg != null) {
+						throw new RuntimeException(errorMsg);
+					}
+					else {
+						return new Response((Object)("User's status with ID:" + userid + " along with his branch is updated to " + statusDesc));
+					}
+				}
+				else{
+					return new Response((Object)("User's status with ID:" + userid + " is updated to " + statusDesc));
+				}
 			}
 		}
 	}
@@ -204,20 +221,43 @@ public class UserService {
 			}
 			else {
 				//Not necassary to activate branch if a user promoted as manager
-				return new Response((Object)("User details is update."));
+				return new Response((Object)("User with ID:" + form.getSeqid() + " details is updated."));
 			}
 		}
 	}	
-	
+
+	@Transactional(rollbackFor = RuntimeException.class)
 	public Response deleteUser(String userid) {
-		log.info("Deleting user " + userid);
-		String errorMsg = dao.deleteUser(userid);
-		if(errorMsg != null) {
-			return new Response(errorMsg);
+		if(Util.trimString(userid) == ""){
+			return new Response("No user selected.");
 		}
-		else {
-			return new Response((Object)("User with ID:" + userid + " is deleted."));
-		}		
+		else{
+			log.info("Deleting user " + userid);
+			Map<Boolean,Object> branch = dao.getUserBranch(userid);
+			if(branch.containsKey(false)){
+				return new Response((String)branch.get(false));
+			}
+
+			String branchId = branch.get(true) == null? null : ((Map<String,String>)branch.get(true)).get("id");
+			String errorMsg = dao.deleteUser(userid);
+			if(errorMsg != null) {
+				return new Response(errorMsg);
+			}
+			else {
+				if(branchId != null){
+					errorMsg = branchDao.updateStatus(Constant.INACTIVE_STATUS_CODE,branchId);
+					if(errorMsg != null) {
+						throw new RuntimeException(errorMsg);
+					}
+					else {
+						return new Response((Object)("User with ID:" + userid + " is deleted. The branch that managed by this user is changed to <b>Inactive</b>. Please assign a new manager to it as soon as possible."));
+					}
+				}
+				else{
+					return new Response((Object)("User with ID:" + userid + " is deleted."));
+				}
+			}
+		}
 	}
 	
 	public Response changeProfilePic(MultipartFile mpf, String userid) {

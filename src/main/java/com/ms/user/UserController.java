@@ -118,8 +118,13 @@ public class UserController {
 	@ResponseBody
 	public Response updateUserStatus(Model model, String userid, String status) {
 		log.info("Enter /user/changeUserStatus");
-		Response res = service.updateUserStatus(userid, status);
-		return res;
+		try{
+			Response res = service.updateUserStatus(userid, status);
+			return res;
+		}
+		catch (Exception ex){
+			return new Response(ex.getMessage());
+		}
 	}
 	
 	@RequestMapping( value = {"/api/admin/getEditInfo.json"})
@@ -150,8 +155,13 @@ public class UserController {
 	@ResponseBody
 	public Response deleteUser(Model model, String userid){
 		log.info("Enter /user/deleteUser");
-		Response res = service.deleteUser(userid);
-		return res;
+		try{
+			Response res = service.deleteUser(userid);
+			return res;
+		}
+		catch(Exception ex){
+			return new Response(ex.getMessage());
+		}
 	}
 	
 	@RequestMapping( value = {"/api/authorize/changeProfilePic.json"},method= {RequestMethod.POST})

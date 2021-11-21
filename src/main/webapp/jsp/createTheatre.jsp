@@ -595,6 +595,12 @@
 		}
 		
 		function submitForm(){
+			var validator = $( "#theatreForm" ).validate();
+			if(!validator.form()){
+				$("#createTheatre").modal("show");
+				return false;
+			}
+
 			var capacity = selectedTheatreType.seatSize;
 			var counter = calculateCounter();
 			if(counter > capacity){
@@ -688,6 +694,12 @@
 		function addNewRow(){
 			var existingVal = +$("#inputRow").val();
 			$("#inputRow").val(existingVal+1);
+
+			var validator = $( "#theatreForm" ).validate();
+			if(!validator.form()){
+				$("#createTheatre").modal("show");
+				return false;
+			}
 			var data = convertToJSON();
 			generateLayout();
 			fillLayoutWithJSON(data);
@@ -705,6 +717,12 @@
 		function addNewColumn(){
 			var existingVal = +$("#inputCol").val();
 			$("#inputCol").val(existingVal+1);
+
+			var validator = $( "#theatreForm" ).validate();
+			if(!validator.form()){
+				$("#createTheatre").modal("show");
+				return false;
+			}
 			var data = convertToJSON();
 			constructLayout(true);
 			fillLayoutWithJSON(data);
