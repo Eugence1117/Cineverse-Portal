@@ -305,7 +305,6 @@
 		</div>
 	</div>
 	<!-- /.container -->
->
 	
 	<%@ include file="include/js.jsp"%>
 	<script type="text/javascript" src="<spring:url value='/plugins/jquery-validation/jquery.validate.min.js'/>"></script>

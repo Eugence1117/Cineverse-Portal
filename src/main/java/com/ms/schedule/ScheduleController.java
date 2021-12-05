@@ -152,8 +152,7 @@ public class ScheduleController {
 		Staff user = (Staff) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String branchid = user.getBranchid();
 		AvailableMovie result = service.getAvailableMovie(branchid, startdate, enddate);
-		return service.groupMovieByWhole(result);
-		
+		return service.groupMovieByWhole(result); //Group the record
 	}
 	
 	@RequestMapping( value= {"/api/manager/configureScheduleByOverall.json"},consumes= {MediaType.APPLICATION_JSON},method= {RequestMethod.POST})

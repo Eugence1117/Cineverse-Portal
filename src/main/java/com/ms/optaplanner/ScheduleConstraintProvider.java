@@ -23,7 +23,6 @@ import java.util.function.Function;
 
 public class ScheduleConstraintProvider implements ConstraintProvider{
 
-	// overconstrained planning
 	@Override
 	public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
 		// TODO Auto-generated method stub
@@ -40,7 +39,6 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				DayTimeSchedule(constraintFactory),
 				NightTimeSchedule(constraintFactory),
 				ScheduleTightGap(constraintFactory),
-				//MovieVariaty(constraintFactory)
 		};
 	}
 	
@@ -54,7 +52,8 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 		return constraintFactory.from(Schedule.class)
 				.filter(schedule -> schedule.getStartTime() != null)
 				.filter(schedule -> schedule.getMovie().getPreferTime() == Constant.DAY_TIME_CODE)
-				.filter(schedule -> schedule.getStartTime().getTime().compareTo(Constant.NIGHT_TIME) < 0 && schedule.getStartTime().getTime().compareTo(Constant.DAY_TIME) >= 0)
+				.filter(schedule -> schedule.getStartTime().getTime().compareTo(Constant.NIGHT_TIME) < 0 &&
+							        schedule.getStartTime().getTime().compareTo(Constant.DAY_TIME) >= 0)
 				.reward("MatchDayTimeSchedule",HardSoftScore.ofSoft(3));
 	}
 	
@@ -63,7 +62,9 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				.filter(schedule -> schedule.getStartTime() != null)
 				.filter(schedule -> schedule.getMovie().getPreferTime() == Constant.NIGHT_TIME_CODE)
 				.filter(schedule -> schedule.getStartTime().getTime().compareTo(Constant.NIGHT_TIME) >= 0)
-				.reward("MatchNightTimeSchedule",HardSoftScore.ofSoft(1),schedule -> schedule.getStartTime().getTime().compareTo(Constant.NIGHT_TIME));
+				.reward("MatchNightTimeSchedule",
+						HardSoftScore.ofSoft(1),
+						schedule -> schedule.getStartTime().getTime().compareTo(Constant.NIGHT_TIME));
 	}
 	
 	public Constraint TheatreConflict(ConstraintFactory constraintFactory) {
@@ -73,18 +74,9 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 					Joiners.equal(Schedule::getTheatre),
 					Joiners.equal(Schedule::getDate),
 					Joiners.equal(Schedule::getStartTime))
-				.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId())).penalize("TheatreConflict", HardSoftScore.ONE_HARD);
+				.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
+				.penalize("TheatreConflict", HardSoftScore.ONE_HARD);
 				
-	}
-	
-	public Constraint MovieVariaty(ConstraintFactory constraintFactory) {
-		return constraintFactory.from(Schedule.class)
-			   .filter(schedule -> schedule.getStartTime() != null)
-			   .join(Schedule.class,Joiners.equal(Schedule::getTheatre),Joiners.equal(Schedule::getDate),Joiners.filtering((left,right) -> right.getStartTime() != null))
-			   .filter((left,right) -> !left.getScheduleId().equals(right.getScheduleId()))
-			   .filter((left,right) -> left.getMovie().getMovieId().equals(right.getMovie().getMovieId()))
-			   .penalize("MovieVariety",HardSoftScore.ofSoft(1));
-
 	}
 	
 	public Constraint TimeGrainConflict(ConstraintFactory constraintFactory) {
@@ -94,25 +86,18 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 					  Joiners.equal(Schedule::getTheatre),
 					  Joiners.equal(Schedule::getDate),
 					  Joiners.filtering((left,right) -> right.getStartTime() != null))
-				.filter((scheduleA,scheduleB) -> scheduleB.getLastGrain() > scheduleA.getStartGrain() && scheduleB.getStartGrain() < scheduleA.getLastGrain())
-					  //Joiners.overlapping(schedule -> schedule.getStartTime().getIndex(),schedule -> schedule.getStartTime().getIndex() + schedule.getMovie().getDurationInGrain()))
+				.filter((scheduleA,scheduleB) -> scheduleB.getLastGrain() > scheduleA.getStartGrain() &&
+						 scheduleB.getStartGrain() < scheduleA.getLastGrain())
 				.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-
-				//constraintFactory.from(Schedule.class)
-				//.join(Schedule.class,Joiners.equal(Schedule::getTheatre),
-				//		Joiners.overlapping(schedule -> schedule.getStartTime().getIndex(),
-				//				            schedule -> schedule.getStartTime().getIndex() + schedule.getMovie().getDurationInGrain()))
-				//.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-				//.filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-				//.filter((scheduleA,scheduleB) -> scheduleA.getStartTime().compareTo(scheduleB.getStartTime()) >= 0  && scheduleA.getStartTime().compareTo(scheduleB.getEndTime()) < 0)
 				.penalize("TimeGrainConflict", HardSoftScore.ONE_HARD);
 	}
 	
 	public Constraint PreventExceedOperatingTime(ConstraintFactory constraintFactory) {
 		return constraintFactory.from(Schedule.class)
 				.filter(schedule -> schedule.getStartTime() != null)
-				.filter(schedule -> !(schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(0)) >= 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) < 0 && schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) > 0))
-				//.filter(schedule -> schedule.getEndTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) > 0 || schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) < 0 || schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(schedule.getOperatingTime().size()-1)) >= 0)
+				.filter(schedule -> !(schedule.getStartTime().getTime().compareTo(schedule.getOperatingTime().get(0)) >= 0 &&
+									  schedule.getEndTime().compareTo(schedule.getOperatingTime().get(1)) < 0 &&
+									  schedule.getEndTime().compareTo(schedule.getOperatingTime().get(0)) > 0))
 				.penalize("PreventExceedOperatingTime", HardSoftScore.ONE_HARD);
 	}
 	
@@ -121,7 +106,9 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 				.filter(schedule -> schedule.getStartTime() != null)
 				.join(Schedule.class,Joiners.equal(Schedule::getDate))
 				 .filter((scheduleA,scheduleB) -> !scheduleA.getScheduleId().equals(scheduleB.getScheduleId()))
-				 .filter((scheduleA,scheduleB) -> scheduleA.getMovie().getMovieId().equals(scheduleB.getMovie().getMovieId()) && scheduleA.getStartTime().equals(scheduleB.getStartTime()) && !scheduleA.getTheatre().getTheatreId().equals(scheduleB.getTheatre().getTheatreId()))
+				 .filter((scheduleA,scheduleB) -> scheduleA.getMovie().getMovieId().equals(scheduleB.getMovie().getMovieId()) &&
+						    				      scheduleA.getStartTime().equals(scheduleB.getStartTime()) &&
+						 			              !scheduleA.getTheatre().getTheatreId().equals(scheduleB.getTheatre().getTheatreId()))
 				 .penalize("SameMovie", HardSoftScore.ofSoft(5));
 	}
 
@@ -169,7 +156,9 @@ public class ScheduleConstraintProvider implements ConstraintProvider{
 					 Joiners.equal(Schedule::getDate),
 					 Joiners.lessThanOrEqual(Schedule::getLastGrain, (right) -> right.getStartGrain()),
 					 Joiners.filtering((left,right) -> right.getLastGrain() != -1))
-			   .penalize("ScheduleGapRange",HardSoftScore.ofSoft(1),(left,right) -> Math.abs((right.getLastGrain() - left.getLastGrain()) - (right.getStartGrain() - left.getStartGrain())));
+			   .penalize("ScheduleGapRange",
+					   HardSoftScore.ofSoft(1),
+					   (left,right) -> Math.abs((right.getLastGrain() - left.getLastGrain()) - (right.getStartGrain() - left.getStartGrain())));
 			   
 	}
 }

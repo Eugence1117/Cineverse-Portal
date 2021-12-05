@@ -4,8 +4,8 @@
 
 <!-- Development .194 -->
     <Appenders>
-        <RollingFile name="file-log" fileName="/MasterPis/Portal/MSPortal.log"
-                     filePattern="/MasterPis/Portal/MSPortal-%d{yyyy-MM-dd}.log">
+        <RollingFile name="file-log" fileName="/Cineverse/Portal/MSPortal.log"
+                     filePattern="/Cineverse/Portal/MSPortal-%d{yyyy-MM-dd}.log">
             <PatternLayout>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%-5p] (%c:%L) %m%n</pattern>
             </PatternLayout>
@@ -14,8 +14,8 @@
             </Policies>
         </RollingFile>
         
-       	  <RollingFile name="OP-log" fileName="/MasterPis/Portal/Optaplanner.log"
-                     filePattern="/MasterPis/Portal/Optaplanner-%d{yyyy-MM-dd}.log">
+       	  <RollingFile name="OP-log" fileName="/Cineverse/Portal/Optaplanner.log"
+                     filePattern="/Cineverse/Portal/Optaplanner-%d{yyyy-MM-dd}.log">
             <PatternLayout>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%-5p] (%c:%L) %m%n</pattern>
             </PatternLayout>
