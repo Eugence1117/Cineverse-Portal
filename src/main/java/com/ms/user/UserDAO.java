@@ -1,7 +1,7 @@
 package com.ms.user;
 
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -193,7 +193,7 @@ public class UserDAO {
 					String groupname = Util.trimString((String)record.get("groupname"));
 					int status = (int)record.get("status");
 					String branchname = Util.trimString((String)record.get("branchName"));
-					String createddate = Constant.SQL_DATE_FORMAT.format((Timestamp)record.get("createddate"));
+					String createddate = Constant.SQL_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)record.get("createddate")));
 				    User user = new User(seqid, username, Util.underscoreRemoval(Util.capitalize(groupname)), Util.replaceWithDash(Util.trimString(branchname)), Util.checkActivation(status), Constant.STANDARD_PLUGIN_WITHOUT_TIME.format(Constant.SQL_DATE_FORMAT.parse(createddate)));
 				    log.info("Retrieved "+ username +" 's record from database.");
 				    result.put(true, user);
@@ -485,7 +485,7 @@ public class UserDAO {
 				String profilePic = (String)row.get("profilepic");
 				String usergroup = (String)row.get("groupdesc");
 				String branchName = groupId == Constant.MANAGER_GROUP ? (String)row.get("branchName") : "-";
-				String joinDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("createddate"));
+				String joinDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("createddate")));
 				
 				result = new ProfileInfo(username,profilePic,usergroup,branchName,joinDate);
 			}

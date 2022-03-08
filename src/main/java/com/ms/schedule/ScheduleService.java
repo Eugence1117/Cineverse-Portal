@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpSession;
 
 import com.ms.schedule.Model.MovieSchedule;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.optaplanner.core.api.score.ScoreExplanation;

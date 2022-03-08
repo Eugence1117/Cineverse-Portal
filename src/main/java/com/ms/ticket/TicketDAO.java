@@ -2,7 +2,7 @@ package com.ms.ticket;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -92,7 +92,7 @@ public class TicketDAO {
 					String movieName = (String)row.get("movieName");
 					String branchName = (String)row.get("branchName");
 					String theatreName = (String)row.get("theatreName");
-					Date startTime = (Timestamp)row.get("starttime");
+					Date startTime = Util.localDateTimeToDate((LocalDateTime)row.get("starttime"));
 														
 					TicketView view = new TicketView(ticketId,seatNo,branchName,theatreName,Constant.STANDARD_DATE_FORMAT.format(startTime),movieName,scheduleId,String.format("%.2f",price),Util.getPaymentStatusDesc(status));
 					ticketList.add(view);

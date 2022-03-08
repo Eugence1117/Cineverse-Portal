@@ -2,7 +2,7 @@ package com.ms.theatre;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import com.ms.common.Constant;
 import com.ms.common.Util;
 
@@ -168,7 +167,7 @@ public class TheatreDAO {
 					int seatRow = (int)row.get("seatrow");
 					int seatCol = (int)row.get("seatcol");
 					String theatreType = (String)row.get("theatretype");
-					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					String createddate = Util.localDateTimeToString((LocalDateTime)row.get("createddate"));
 					int status = (int)row.get("status");
 					int totalSeat = (int)row.get("totalSeat");
 					String theatreLayout = (String)row.get("theatreLayout");
@@ -207,7 +206,7 @@ public class TheatreDAO {
 					int seatRow = (int)row.get("seatrow");
 					int seatCol = (int)row.get("seatcol");
 					String theatreType = (String)row.get("theatretype");
-					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					String createddate =  Util.localDateTimeToString((LocalDateTime)row.get("createddate"));
 					int status = (int)row.get("status");
 					int totalSeat = (int)row.get("totalSeat");
 					String theatreLayout = (String)row.get("theatreLayout");
@@ -247,7 +246,7 @@ public class TheatreDAO {
 					char name = ((String)row.get("theatrename")).charAt(0);
 					String theatreType = (String)row.get("theatretype");
 					int status = (int)row.get("status");
-					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					String createddate =  Util.localDateTimeToString((LocalDateTime)row.get("createddate"));
 					
 					theatre.setId(seqid);
 					theatre.setTitle(name);
@@ -289,7 +288,7 @@ public class TheatreDAO {
 					int seatRow = (int)row.get("seatrow");
 					int seatCol = (int)row.get("seatcol");
 					String theatreType = (String)row.get("theatretype");
-					String createddate = Util.trimString(((Timestamp)row.get("createddate")).toString());
+					String createddate =  Util.localDateTimeToString((LocalDateTime)row.get("createddate"));
 					
 					Theatre theatre = new Theatre(seqid,name,seatRow,seatCol,theatreType,createddate,branchid,Constant.ACTIVE_STATUS_CODE);
 					theatreList.add(theatre);

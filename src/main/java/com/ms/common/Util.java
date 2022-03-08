@@ -3,7 +3,9 @@ package com.ms.common;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,11 +20,17 @@ import org.apache.logging.log4j.Logger;
 
 import com.ms.rules.OperatingHours;
 import com.ms.schedule.ScheduleService;
+import org.apache.tomcat.jni.Local;
 
 public class Util {
 	
 	public static Logger log = LogManager.getLogger(Util.class);
-	
+	public static Date localDateTimeToDate(LocalDateTime datetime){
+		return Date.from(datetime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+	public static String localDateTimeToString(LocalDateTime datetime){
+		return Constant.SQL_DATE_FORMAT.format(localDateTimeToDate(datetime));
+	}
 	public static String getDetailExceptionMsg(Exception ex) {
 		StringWriter writer = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(writer);

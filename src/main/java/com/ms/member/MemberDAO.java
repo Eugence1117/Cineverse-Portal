@@ -1,6 +1,6 @@
 package com.ms.member;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,7 +47,7 @@ public class MemberDAO {
 					String seqid = Util.trimString((String)record.get("seqid"));
 					String name = Util.trimString((String)record.get("name"));					
 					String email = Util.trimString((String)record.get("email"));
-					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)record.get("dateOfBirth"));
+					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format(Util.localDateTimeToDate((LocalDateTime)record.get("dateOfBirth")));
 					int status = (int)record.get("status");
 					
 					
@@ -167,7 +167,7 @@ public class MemberDAO {
 					String name = Util.trimString((String)record.get("name"));
 					String email = Util.trimString((String)record.get("email"));
 					String username = Util.trimString((String)record.get("username"));
-					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format((Timestamp)record.get("dateOfBirth"));
+					String birthdate = Constant.SQL_DATE_WITHOUT_TIME.format(Util.localDateTimeToDate((LocalDateTime)record.get("dateOfBirth")));
 					int status = (int)record.get("status");
 					
 					

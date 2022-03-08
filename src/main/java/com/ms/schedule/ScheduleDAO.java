@@ -3,8 +3,9 @@ package com.ms.schedule;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.sql.Types;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -55,7 +57,7 @@ public class ScheduleDAO {
 		Date latestDate = null;
 		try {
 			
-			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withCatalogName("cineverse").withProcedureName("GetLatestScheduleTime");
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbc).withSchemaName("masp").withProcedureName("GetLatestScheduleTime");
 			jdbcCall.addDeclaredParameter(new SqlOutParameter("endDate",Types.TIMESTAMP));
 			SqlParameterSource in = new MapSqlParameterSource().addValue("branchId", branchId);
 			
@@ -69,7 +71,7 @@ public class ScheduleDAO {
 				latestDate = currentDate.getTime();
 			}
 			else {
-				latestDate = (Timestamp)result.get("endDate");
+				latestDate = Util.localDateTimeToDate((LocalDateTime)result.get("endDate"));
 			}			
 		}
 		catch(CannotGetJdbcConnectionException ce) {
@@ -186,8 +188,8 @@ public class ScheduleDAO {
 				for(Map<String,Object> row : rows) {
 					
 					String scheduleId = (String)row.get("seqid");
-					Date startTime = (Timestamp)row.get("starttime");
-					Date endTime = (Timestamp)row.get("endtime");
+					Date startTime = Util.localDateTimeToDate((LocalDateTime)row.get("starttime"));
+					Date endTime = Util.localDateTimeToDate((LocalDateTime)row.get("endtime"));
 					String movieId = (String)row.get("movieId");
 					String movieName = (String)row.get("movieName");
 					String theatreId = (String)row.get("theatreId");
@@ -224,9 +226,9 @@ public class ScheduleDAO {
 			List<Map<String,Object>> rows = jdbc.queryForList(query,scheduleId);
 			if(rows.size() > 0) {				
 				for(Map<String,Object> row : rows) {
-					
-					Date startTime = (Timestamp)row.get("starttime");
-					Date endTime = (Timestamp)row.get("endtime");
+
+					Date startTime = Util.localDateTimeToDate((LocalDateTime)row.get("starttime"));
+					Date endTime = Util.localDateTimeToDate((LocalDateTime)row.get("endtime"));
 					String movieId = (String)row.get("movieId");
 					String movieName = (String)row.get("movieName");
 					String theatreId = (String)row.get("theatreId");

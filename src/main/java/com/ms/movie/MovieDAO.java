@@ -1,7 +1,8 @@
 package com.ms.movie;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -154,7 +155,7 @@ public class MovieDAO {
 					String name = Util.trimString((String)row.get("movieName"));
 					int totalTime = (int)row.get("totaltime");
 					String language = Util.trimString((String)row.get("language"));
-					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
+					String releaseDate = Constant.SQL_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("releasedate")));
 					String desc = Util.trimString((String)row.get("censorshipId"));
 					
 					Movie movie = new Movie();
@@ -202,13 +203,13 @@ public class MovieDAO {
 			String distributor = Util.trimString((String)row.get("distributor"));
 			String cast = Util.trimString((String)row.get("cast"));
 			String director = Util.trimString((String)row.get("director"));
-			Date releaseDate = (Timestamp)row.get("releasedate");
+			Date releaseDate = Util.localDateTimeToDate((LocalDateTime)row.get("releasedate"));
 			String synopsis = Util.trimString((String)row.get("synopsis"));
 			String movieType = Util.trimString((String)row.get("movietype"));
 			String desc = Util.trimString((String)row.get("censorshipId"));
 
-			LocalDate startDate = ((Timestamp)row.get("startDate")).toLocalDateTime().toLocalDate();
-			LocalDate endDate = ((Timestamp)row.get("endDate")).toLocalDateTime().toLocalDate();
+			LocalDate startDate = ((LocalDateTime)row.get("startDate")).toLocalDate();
+			LocalDate endDate = ((LocalDateTime)row.get("endDate")).toLocalDate();
 
 			Movie movie = new Movie(movieId,name,picurl,totalTime,language,distributor,cast,director,Constant.SQL_DATE_WITHOUT_TIME.format(releaseDate),synopsis,movieType,desc,totalTime);
 			MovieAvailablePeriod period = new MovieAvailablePeriod(startDate,endDate);
@@ -254,7 +255,7 @@ public class MovieDAO {
 					String distributor = Util.trimString((String)row.get("distributor"));
 					String cast = Util.trimString((String)row.get("cast"));
 					String director = Util.trimString((String)row.get("director"));
-					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
+					String releaseDate = Constant.SQL_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("releasedate")));
 					String synopsis = Util.trimString((String)row.get("synopsis"));
 					String movieType = Util.trimString((String)row.get("movietype"));
 					String desc = Util.trimString((String)row.get("censorshipId"));
@@ -303,7 +304,8 @@ public class MovieDAO {
 					String distributor = Util.trimString((String)row.get("distributor"));
 					String cast = Util.trimString((String)row.get("cast"));
 					String director = Util.trimString((String)row.get("director"));
-					String releaseDate = Constant.SQL_DATE_FORMAT.format((Timestamp)row.get("releasedate"));
+					log.info("Class Name :" + row.get("releasedate").getClass().getName());
+					String releaseDate = Constant.SQL_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("releasedate")));
 					String synopsis = Util.trimString((String)row.get("synopsis"));
 					String movieType = Util.trimString((String)row.get("movietype"));
 					String censorship = Util.trimString((String)row.get("censorshipid"));
@@ -453,8 +455,8 @@ public class MovieDAO {
 			List<Map<String,Object>> rows = jdbc.queryForList(query,branchid,movieid);
 			if(rows.size() > 0) {
 				for(Map<String,Object> row : rows) {
-					LocalDate startDate = ((Timestamp)row.get("startDate")).toLocalDateTime().toLocalDate();
-					LocalDate endDate = ((Timestamp)row.get("endDate")).toLocalDateTime().toLocalDate();
+					LocalDate startDate = ((LocalDateTime)row.get("startDate")).toLocalDate();
+					LocalDate endDate = ((LocalDateTime)row.get("endDate")).toLocalDate();
 					
 					MovieAvailablePeriod movie = new MovieAvailablePeriod(startDate,endDate);
 					return movie;
@@ -488,8 +490,8 @@ public class MovieDAO {
 					String seqid = Util.trimString((String)row.get("seqid"));
 					String moviename = Util.trimString((String)row.get("moviename"));
 					String picUrl = Util.trimString((String)row.get("picurl"));
-					LocalDate startDate = ((Timestamp)row.get("startDate")).toLocalDateTime().toLocalDate();
-					LocalDate endDate = ((Timestamp)row.get("endDate")).toLocalDateTime().toLocalDate();
+					LocalDate startDate = ((LocalDateTime)row.get("startDate")).toLocalDate();
+					LocalDate endDate = ((LocalDateTime)row.get("endDate")).toLocalDate();
 					
 					AvailableMovie.Result movie = new AvailableMovie.Result(seqid, moviename, picUrl,startDate,endDate);
 					movieList.add(movie);
@@ -520,8 +522,8 @@ public class MovieDAO {
 				for(Map<String,Object> row : rows) {
 					String movieId = Util.trimString((String)row.get("movieID"));
 					String movieName = Util.trimString((String)row.get("movieName"));
-					String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
-					String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+					String startDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("startDate")));
+					String endDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("endDate")));
 					String status = Util.getStatusDescWithFinishedStatus((int)row.get("status"));
 					
 					Map<String,String> result = new LinkedHashMap<String, String>();
@@ -559,9 +561,9 @@ public class MovieDAO {
 			if(row != null) {
 				String id = Util.trimString((String)row.get("movieID"));
 				String movieName = Util.trimString((String)row.get("movieName"));
-				String releaseDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("releaseDate"));
-				String startDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("startDate"));
-				String endDate = Constant.UI_DATE_FORMAT.format((Timestamp)row.get("endDate"));
+				String releaseDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("releaseDate")));
+				String startDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("startDate")));
+				String endDate = Constant.UI_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)row.get("endDate")));
 				String status = Util.getStatusDescWithFinishedStatus((int)row.get("status"));
 				
 				Map<String,String> result = new LinkedHashMap<String, String>();
@@ -726,7 +728,7 @@ public class MovieDAO {
 			List<Map<String,Object>> result = jdbc.queryForList(query,movieId);
 			if(result.size() > 0) {
 				for(Map<String,Object> o : result) {
-					date = Constant.SQL_DATE_FORMAT.format((Timestamp)o.get("releasedate"));
+					date = Constant.SQL_DATE_FORMAT.format(Util.localDateTimeToDate((LocalDateTime)o.get("releasedate")));
 				}
 			}
 			else {

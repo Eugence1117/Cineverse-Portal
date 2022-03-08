@@ -34,14 +34,14 @@
 		<property name="prefix" value="/jsp/"/>
 		<property name="suffix" value=".jsp"/>
 	</bean>
-	
-	
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name ="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-		<property name="url" value="jdbc:sqlserver://cinerverse-private.database.windows.net:1433;database=cineverse;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"/>
-		<property name="username" value="Eugence1117"/>
-		<property name="password" value="Eugence0679."/>
-	</bean>
+
+
+		<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name ="driverClassName" value="com.mysql.jdbc.Driver"/>
+			<property name="url" value="jdbc:mysql://localhost:3306/masp"/>
+			<property name="username" value="root"/>
+			<property name="password" value="root"/>
+		</bean>
 
 	<!-- -->
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>

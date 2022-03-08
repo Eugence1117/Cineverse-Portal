@@ -1,6 +1,7 @@
 package com.ms.transaction;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -56,7 +58,7 @@ public class TransactionDAO {
 					double price = (double)row.get("totalPrice");
 					String voucherId = row.get("voucherId") == null ? "None" : (String)row.get("voucherId");
 					int ticketBrought = (int)row.get("ticketBrought");
-					Date createDate = (Timestamp)row.get("createddate");
+					Date createDate = Util.localDateTimeToDate((LocalDateTime)row.get("createddate"));
 					
 					TransactionView view = new TransactionView(seqid, Util.getPaymentStatusDesc(status),Util.getPaymentMethodDesc(type),String.format("%.2f",price),voucherId,String.valueOf(ticketBrought),Constant.STANDARD_DATE_FORMAT.format(createDate));
 					transactions.add(view);
@@ -400,7 +402,7 @@ public class TransactionDAO {
 					double price = (double)row.get("totalPrice");
 					String voucherId = row.get("voucherId") == null ? "None" : (String)row.get("voucherId");
 					int ticketBrought = (int)row.get("ticketBrought");
-					Date createDate = (Timestamp)row.get("createddate");
+					Date createDate = Util.localDateTimeToDate((LocalDateTime)row.get("createddate"));
 					
 					TransactionView view = new TransactionView(seqid, Util.getPaymentStatusDesc(status),Util.getPaymentMethodDesc(type),String.format("%.2f",price),voucherId,String.valueOf(ticketBrought),Constant.STANDARD_DATE_FORMAT.format(createDate));
 					transactions.add(view);
@@ -441,8 +443,7 @@ public class TransactionDAO {
 					String seqid = (String)row.get("seqid");									
 					double price = (double)row.get("totalPrice");
 					int ticketBrought = (int)row.get("ticketBrought");
-					Date paidDate = (Timestamp)row.get("paidOn");
-					
+					Date paidDate = Util.localDateTimeToDate((LocalDateTime)row.get("paidOn"));
 					TransactionJasper data = new TransactionJasper(seqid,paidDate,ticketBrought,price);
 					transactions.add(data);
 				}
